@@ -10,7 +10,7 @@ Block SMINPUTS    # Standard Model inputs
  6 1.728900E+02    # m_top(pole) 
  7 1.776690E+00    # m_tau(pole) 
 Block MINPAR      # Input parameters 
- 1   1000.000000E+00    # vRinput
+ 1   0.000000E+00    # vRinput
  2   0.000000E+00    # vLinput
  3   0.000000E+00    # TanBeta
  111   0.000000E+00    # MD11

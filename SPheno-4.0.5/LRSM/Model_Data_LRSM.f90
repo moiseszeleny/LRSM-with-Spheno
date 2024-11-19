@@ -2180,25 +2180,24 @@ Real(dp),Intent(inout) :: vHd,vHu,vR,vL
 Logical,Intent(in)::MZsuffix 
 Real(dp), Intent(in) :: g1SM, g2SM, g3SM, vSM 
 Complex(dp),Intent(in) :: YuSM(3,3),YdSM(3,3),YeSM(3,3) 
-!Complex(dp),Intent(inout) :: UpYukawa(3,3),DownYukawa(3,3),ElectronYukawa(3,3) 
 If (MZsuffix) Then 
   hyperchargeCoupling = g1SM 
   g2MZ = g2SM 
   g3MZ = g3SM 
   vHdMZ = vSM/Sqrt(1 + TanBeta**2) 
   vHuMZ = TanBeta*vHd 
-  UpYukawa = (vSM * YuSM)vLSUSY / vHu
-  DownYukawa = (vSM * YdSM) / vHd 
-  ElectronYukawa = (vSM * YeSM) / vHd 
+  UpYukawa = (vSM*YuSM)/vHu 
+  DownYukawa = (vSM*YdSM)/vHd 
+  ElectronYukawa = (vSM*YeSM)/vHd 
 Else 
   hyperchargeCoupling = g1SM 
   g2 = g2SM 
   g3 = g3SM 
   vHd = vSM/Sqrt(1 + TanBeta**2) 
   vHu = TanBeta*vHd 
-  UpYukawa = (vSM * YuSM) / vHu 
-  DownYukawa = (vSM * YdSM) / vHd 
-  ElectronYukawa = (vSM * YeSM) / vHd 
+  UpYukawa = (vSM*YuSM)/vHu 
+  DownYukawa = (vSM*YdSM)/vHd 
+  ElectronYukawa = (vSM*YeSM)/vHd 
 End if 
 End Subroutine SetMatchingConditions 
 End Module Model_Data_LRSM
