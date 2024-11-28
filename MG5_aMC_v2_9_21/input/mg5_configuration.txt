@@ -223,3 +223,7 @@
 # amcfast = amcfast-config
 
 
+auto_convert_model = False 
+
+# MG5 MAIN DIRECTORY
+mg5_path = /workspaces/LRSM-with-Spheno/MG5_aMC_v2_9_21
