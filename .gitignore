@@ -1,0 +1,6 @@
+# Ignore all .vscode
+*.vscode
+
+#Ignore extra files
+svm3d.py
+svm3d_cmap.py
