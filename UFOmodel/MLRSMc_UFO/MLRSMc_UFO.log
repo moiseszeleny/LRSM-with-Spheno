@@ -1,0 +1,129 @@
+# This file was automatically created by FeynRules 2.0.6
+# Mathematica version: 7.0 for Linux x86 (64-bit) (November 11, 2008)
+# Date: Tue 20 Jan 2015 00:49:07
+
+
+# 
+# This is the logfile for the model MLRSMc
+
+# Authors: G. Eilam, S. Bar-Shalom, A. Roitgrund
+# Model version: 1.1.4
+# Checking the Quantum numbers
+   * Electric charge defined.
+# Checking the Lagrangians
+   * All Lagrangians are ok.
+#
+# Particle definitions
+#
+
+   * No particles removed. All particles correspond to GenInt setup.
+
+
+
+# Compulsory PDG codes:
+   * Class SM leptons complete.
+   * Class SM neutrinos complete.
+   * Class SM quarks complete.
+   * Class SM gauge bosons complete.
+#
+# Parameter definitions
+#
+
+   * All parameters are ok.
+
+
+# Vertices
+   * Calling FeynmanRules for 1 Lagrangians.
+   * Number of classes vertices: 549
+   * Number of flavored vertices: 773
+   * Saved vertices in InterfaceRun[ 1 ].
+   * Checked QNumber conservation.
+      - Quantum number LeptonNumber NOT conserved in the following vertices
+          {HP2bar, ebar, N1}
+          {HP2bar, ebar, N4}
+          {HP2bar, mubar, N2}
+          {HP2bar, mubar, N5}
+          {HP2bar, tabar, N3}
+          {HP2bar, tabar, N6}
+          {HP2, N1, e}
+          {HP2, N2, mu}
+          {HP2, N3, ta}
+          {HP2, N4, e}
+          {HP2, N5, mu}
+          {HP2, N6, ta}
+          {HPPRbar, ebar, ebar}
+          {HPPRbar, mubar, mubar}
+          {HPPRbar, tabar, tabar}
+          {HP1bar, ebar, N1}
+          {HP1bar, ebar, N4}
+          {HP1bar, mubar, N2}
+          {HP1bar, mubar, N5}
+          {HP1bar, tabar, N3}
+          {HP1bar, tabar, N6}
+          {HPPLbar, ebar, ebar}
+          {HPPLbar, mubar, mubar}
+          {HPPLbar, tabar, tabar}
+          {HPPR, e, e}
+          {HPPR, mu, mu}
+          {HPPR, ta, ta}
+          {HP1, N1, e}
+          {HP1, N2, mu}
+          {HP1, N3, ta}
+          {HP1, N4, e}
+          {HP1, N5, mu}
+          {HP1, N6, ta}
+          {HPPL, e, e}
+          {HPPL, mu, mu}
+          {HPPL, ta, ta}
+          {W, N1, e}
+          {W, N2, mu}
+          {W, N3, ta}
+          {W, N4, e}
+          {W, N5, mu}
+          {W, N6, ta}
+          {W2, N1, e}
+          {W2, N2, mu}
+          {W2, N3, ta}
+          {W2, N4, e}
+          {W2, N5, mu}
+          {W2, N6, ta}
+          {W2bar, ebar, N1}
+          {W2bar, ebar, N4}
+          {W2bar, mubar, N2}
+          {W2bar, mubar, N5}
+          {W2bar, tabar, N3}
+          {W2bar, tabar, N6}
+          {Wbar, ebar, N1}
+          {Wbar, ebar, N4}
+          {Wbar, mubar, N2}
+          {Wbar, mubar, N5}
+          {Wbar, tabar, N3}
+          {Wbar, tabar, N6}
+      - Quantum number Q conserved in all vertices.
+      - Quantum number Y conserved in all vertices.
+   * particles.py written.
+   * parameters.py written.
+#
+# Vertex definitions
+#
+
+   * 773 vertices written.
+   * vertices.py written.
+#
+# Lorentz structure definitions
+#
+
+   * 22 lorentz structures written.
+   * lorentz.py written.
+#
+# Coupling definitions
+#
+
+   * 773 couplings written.
+   * couplings.py written.
+#
+# Coupling order definitions
+#
+
+   * 0 couplings orders written.
+   * coupling_orders.py written.
