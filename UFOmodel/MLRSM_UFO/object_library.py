@@ -72,7 +72,7 @@ class Particle(UFOBaseClass):
     require_args_all = ['pdg_code', 'name', 'antiname', 'spin', 'color', 'mass', 'width', 'texname', 'antitexname','counterterm','charge', 'line', 'propagating', 'goldstoneboson', 'propagator']
 
     def __init__(self, pdg_code, name, antiname, spin, color, mass, width, texname,
-                 antitexname, charge , line=None, propagating=True, counterterm=None, goldstoneboson=False, 
+                antitexname, charge , line=None, propagating=True, counterterm=None, goldstoneboson=False, 
                  propagator=None, **options):
 
         args= (pdg_code, name, antiname, spin, color, mass, width, texname,
@@ -97,7 +97,8 @@ class Particle(UFOBaseClass):
                 self.propagator = propagator
             else:
                 self.propagator = {0: propagator, 1: propagator}
-             
+
+
     def find_line_type(self):
         """ find how we draw a line if not defined
         valid output: dashed/straight/wavy/curly/double/swavy/scurly
@@ -259,15 +260,15 @@ class Coupling(UFOBaseClass):
 
         CTparam=None
         for param in all_CTparameters:
-           pattern=re.compile(r"(?P<first>\A|\*|\+|\-|\()(?P<name>"+param.name+r")(?P<second>\Z|\*|\+|\-|\))")
-           numberOfMatches=len(pattern.findall(self.value))
-           if numberOfMatches==1:
-               if not CTparam:
-                   CTparam=param
-               else:
-                   raise UFOError, "UFO does not support yet more than one occurence of CTParameters in the couplings values."
-           elif numberOfMatches>1:
-               raise UFOError, "UFO does not support yet more than one occurence of CTParameters in the couplings values."
+            pattern=re.compile(r"(?P<first>\A|\*|\+|\-|\()(?P<name>"+param.name+r")(?P<second>\Z|\*|\+|\-|\))")
+            numberOfMatches=len(pattern.findall(self.value))
+            if numberOfMatches==1:
+                if not CTparam:
+                    CTparam=param
+                else:
+                    raise UFOError("UFO does not support yet more than one occurence of CTParameters in the couplings values.")
+            elif numberOfMatches>1:
+                raise UFOError("UFO does not support yet more than one occurence of CTParameters in the couplings values.")
 
         if not CTparam:
             if x==0:
