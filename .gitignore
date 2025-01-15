@@ -1,6 +1,9 @@
 # Ignore all .vscode
 *.vscode
 
+#Ignore pycache generated files
+*.pyc
+
 #Ignore extra files
 svm3d.py
 svm3d_cmap.py

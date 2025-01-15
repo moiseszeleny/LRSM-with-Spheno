@@ -1,6 +1,34 @@
 import os
 import sys
-from sympy import sympify, simplify
+import re
+from sympy import sympify, simplify, Matrix
+from sympy import Function, symbols
+
+
+# Define symbolic Lorentz functions
+Metric = Function('Metric')
+Epsilon = Function('Epsilon')
+Gamma = Function('Gamma')
+ProjP = Function('ProjP')
+ProjM = Function('ProjM')
+Momentum = Function('P') 
+
+def preprocess_expression(expression):
+    """
+    Preprocess a string to replace floating-point literals and functions with sympy-compatible syntax.
+    """
+    math_replacements = {
+        'cmath.sqrt': 'sqrt',
+        'cmath.pi': 'pi',
+        'complex(0,1)': 'I',
+        'complexconjugate':'conjugate',
+        '0.25':'(1/4)',
+        '0.5':'(1/2)',
+    }
+    for cmath_fn, sympy_fn in math_replacements.items():
+        expression = expression.replace(cmath_fn, sympy_fn)
+    expression = re.sub(r'(\d+)\.(?!\d)', r'\1', expression)
+    return expression
 
 class UFOModelExplorer:
     """Class to explore the UFO model by dynamically executing each file."""
@@ -111,13 +139,22 @@ class UFOModelExplorer:
         print(f"Lorentz Structures: {len(self.lorentz)}")
         print(f"Vertices: {len(self.vertices)}")
 
-    def find_vertices_involving(self, particle_name, number_particles=3):
-        """Find all vertices involving a given particle."""
+    def find_vertices_involving(self, particle_names, number_particles=None):
+        """
+        Find all vertices involving a given list of particle names.
+        :param particle_names: List of particle names to match.
+        :param number_particles: Expected number of particles in the vertex (optional).
+        :return: List of matching vertices.
+        """
+        if not isinstance(particle_names, list):
+            particle_names = [particle_names]
+
         vertices = []
         for v in self.vertices:
             try:
-                if len(v.particles) == number_particles:
-                    if any(p and getattr(p, 'name', None) == particle_name for p in v.particles):  # Check if p is not None
+                vertex_particle_names = [p.name for p in v.particles if p and hasattr(p, 'name')]
+                if number_particles is None or len(vertex_particle_names) == number_particles:
+                    if all(p in vertex_particle_names for p in particle_names):
                         vertices.append(v)
             except AttributeError as e:
                 print(f"Error processing vertex: {v}. Error: {e}")
@@ -133,36 +170,100 @@ class UFOModelExplorer:
             return None
 
         symbolic_rule = 0
+
         for coupling_info, lorentz_obj in zip(vertex.couplings.values(), vertex.lorentz):
             coupling = self._get_symbolic_coupling(coupling_info)
-            #print(coupling, type(coupling))
-            lorentz_structure = self._get_symbolic_lorentz(lorentz_obj)
-            #print(lorentz_structure, type(lorentz_structure))
+            lorentz_structure = self._get_symbolic_lorentz(lorentz_obj, vertex.particles)
+
+            # Accumulate the symbolic rule
             symbolic_rule += coupling * lorentz_structure
 
         return simplify(symbolic_rule)
 
-    def _get_symbolic_coupling(self, coupling_name):
-        """
-        Retrieve the symbolic representation of a coupling by name.
-        """
-        if hasattr(coupling_name, 'value'):
-            return sympify(
-                coupling_name.value.replace(
-                    'cmath.',''
-                ).replace('complex(0,1)','1j')
-            )
-        else:
-            return sympify(0)  # Default to 0 if not found
 
-    def _get_symbolic_lorentz(self, lorentz_obj):
+    def _get_symbolic_coupling(self, coupling_name):
+        if hasattr(coupling_name, 'value'):
+            value = preprocess_expression(coupling_name.value)
+            return sympify(value)
+        else:
+            return sympify(0)
+
+    def _get_symbolic_lorentz(self, lorentz_obj, particles):
         """
         Retrieve the symbolic representation of a Lorentz structure.
         """
         if hasattr(lorentz_obj, 'structure'):
-            return sympify(lorentz_obj.structure)
+            structure = lorentz_obj.structure
+            # Replace UFO-specific constructs with symbolic functions
+            structure = structure.replace('Metric', 'Metric')
+            structure = structure.replace('Epsilon', 'Epsilon')
+            structure = structure.replace('Gamma', 'Gamma')
+            structure = structure.replace('ProjP', 'ProjP')
+            structure = structure.replace('ProjM', 'ProjM')
+
+            # Handle momentum terms like P(mu, N)
+            for idx, particle in enumerate(particles, start=1):
+                particle_momentum = f'P(mu,{idx})'  # Replace P(mu,N) with symbolic Momentum
+                structure = structure.replace(f'P(mu,{idx})', f'Momentum(mu, {idx})')
+
+            # Add local context for sympify
+            local_context = {
+                'Momentum': Momentum,
+                'Metric': Function('Metric'),
+                'Epsilon': Function('Epsilon'),
+                'Gamma': Function('Gamma'),
+                'ProjP': Function('ProjP'),
+                'ProjM': Function('ProjM'),
+            }
+
+            return sympify(structure, locals=local_context)
         else:
             return sympify(1)  # Default to 1 if no structure provided
+
+    
+    @staticmethod
+    def _metric_tensor(mu, nu):
+        """Minkowski metric tensor."""
+        return Matrix([[1 if i == j else 0 for j in range(4)] for i in range(4)])
+
+    @staticmethod
+    def _levi_civita(mu, nu, rho, sigma):
+        """Levi-Civita tensor."""
+        return LeviCivita(mu, nu, rho, sigma)
+    
+    @staticmethod
+    def _gamma_matrix(mu):
+        """Dirac gamma matrices in the 4x4 representation."""
+        gamma_matrices = {
+            0: Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]),  # Gamma^0
+            1: Matrix([[0, 0, 0, 1], [0, 0, 1, 0], [0, -1, 0, 0], [-1, 0, 0, 0]]),  # Gamma^1
+            2: Matrix([[0, 0, 0, -I], [0, 0, I, 0], [0, I, 0, 0], [-I, 0, 0, 0]]),   # Gamma^2
+            3: Matrix([[0, 0, 1, 0], [0, 0, 0, -1], [-1, 0, 0, 0], [0, 1, 0, 0]])    # Gamma^3
+        }
+        return gamma_matrices.get(mu, Matrix.zeros(4))
+
+    @staticmethod
+    def _projection_operator_p():
+        """Projection operator P = (1 + γ^5)/2."""
+        gamma_5 = Matrix([
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+            [1, 0, 0, 0],
+            [0, 1, 0, 0]
+        ])
+        return (Matrix.eye(4) + gamma_5) / 2
+
+    @staticmethod
+    def _projection_operator_m():
+        """Projection operator M = (1 - γ^5)/2."""
+        gamma_5 = Matrix([
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+            [1, 0, 0, 0],
+            [0, 1, 0, 0]
+        ])
+        return (Matrix.eye(4) - gamma_5) / 2
+
 
     def list_feynman_rules(self):
         """
@@ -179,6 +280,61 @@ class UFOModelExplorer:
                 print("Unable to generate rule.\n")
         return feynman_rules
     ############# new add code
+    def classify_parameters(self):
+        """
+        Classify all parameters into 'internal' and 'external'.
+        :return: A dictionary with keys 'internal' and 'external', containing lists of corresponding parameters.
+        """
+        classified = {'internal': [], 'external': []}
+        for param in self.parameters:
+            if hasattr(param, 'nature'):
+                if param.nature == 'external':
+                    classified['external'].append(param)
+                elif param.nature == 'internal':
+                    classified['internal'].append(param)
+        return classified
+    
+    import re
+
+    def substitute_internal_parameters(self, expression):
+        """
+        Substitute internal parameters in a symbolic expression with their definitions in terms of external parameters.
+        :param expression: Sympy expression to perform substitution.
+        :return: A new Sympy expression with internal parameters replaced by external ones.
+        """
+        from sympy import sqrt, pi, I
+
+        # Define a mapping of common math functions/constants from cmath to sympy
+        math_replacements = {
+            'cmath.sqrt': 'sqrt',
+            'cmath.pi': 'pi',
+            'complex(0,1)': 'I'
+        }
+
+        substitutions = {}
+        for param in self.parameters:
+            if hasattr(param, 'nature') and param.nature == 'internal' and hasattr(param, 'value'):
+                value = preprocess_expression(param.value)
+                try:
+                    substitutions[sympify(param.name)] = sympify(value)
+                except Exception as e:
+                    print(f"Failed to sympify parameter {param.name} with value {param.value}: {e}")
+
+        return expression.subs(substitutions)
+
+    def evaluate_expression_numerically(self, expression):
+        """
+        Numerically evaluate a symbolic expression using the values of external parameters.
+        :param expression: Sympy expression to evaluate.
+        :return: A numerical value for the expression.
+        """
+        substitutions = {}
+        for param in self.parameters:
+            if hasattr(param, 'nature') and param.nature == 'external' and hasattr(param, 'value'):
+                substitutions[sympify(param.name)] = param.value
+        return expression.evalf(subs=substitutions)
+
+
     def calculate_amplitude(self, process):
         """
         Calculate the symbolic amplitude for a given process.
@@ -187,7 +343,6 @@ class UFOModelExplorer:
         """
         initial_particles, final_particles = process
         diagrams = self.generate_diagrams(initial_particles, final_particles)
-        print(diagrams)
         total_amplitude = 0
 
         for diagram in diagrams:
@@ -201,6 +356,7 @@ class UFOModelExplorer:
             total_amplitude += amplitude
 
         return simplify(total_amplitude)
+
 
 
     def generate_diagrams(self, initial_particles, final_particles, max_intermediate=2):
@@ -265,56 +421,19 @@ class UFOModelExplorer:
     def get_propagator(self, particle, momentum_symbol='p', gauge='feynman'):
         """
         Generate the propagator for a given particle.
-        :param particle: Particle object (from the UFO model).
-        :param momentum_symbol: Momentum variable for the propagator (default: 'p').
-        :param gauge: Gauge choice ('feynman' or 'unitary').
-        :return: Symbolic propagator expression.
         """
         p = symbols(momentum_symbol)
         mass = getattr(particle, 'mass', None)
-
-        # Default mass to 0 if not specified
         if not mass or mass == "ZERO":
             mass_value = 0
         else:
             mass_value = sympify(mass)
 
-        # Gamma matrices for fermions in the Dirac basis
-        gamma_0 = Matrix([
-            [1,  0,  0,  0],
-            [0,  1,  0,  0],
-            [0,  0, -1,  0],
-            [0,  0,  0, -1]
-        ])
-        gamma_1 = Matrix([
-            [0,  0,  0,  1],
-            [0,  0,  1,  0],
-            [0, -1,  0,  0],
-            [-1, 0,  0,  0]
-        ])
-        gamma_2 = Matrix([
-            [0,  0,  0, -I],
-            [0,  0,  I,  0],
-            [0,  I,  0,  0],
-            [-I, 0,  0,  0]
-        ])
-        gamma_3 = Matrix([
-            [0,  0,  1,  0],
-            [0,  0,  0, -1],
-            [-1, 0,  0,  0],
-            [0,  1,  0,  0]
-        ])
-
-        gamma_mu = [gamma_0, gamma_1, gamma_2, gamma_3]
-
-        # Determine propagator by spin
         if particle.spin == 1:  # Scalar
             return simplify(I / (p**2 - mass_value**2 + I * 1e-6))
-
         elif particle.spin == 2:  # Fermion
-            gamma_p = sum(p[i] * gamma_mu[i] for i in range(4))
+            gamma_p = Function('Gamma')(p)  # Symbolic Gamma matrix for momentum
             return simplify(I * (gamma_p + mass_value) / (p**2 - mass_value**2 + I * 1e-6))
-
         elif particle.spin == 3:  # Vector boson
             if gauge == 'feynman':
                 return simplify((-I * (p**2 - mass_value**2)) / (p**2 - mass_value**2 + I * 1e-6))
@@ -322,9 +441,10 @@ class UFOModelExplorer:
                 return simplify((-I * (p**2 - mass_value**2)) / (p**2 - mass_value**2 + I * 1e-6))
             else:
                 raise ValueError(f"Unknown gauge: {gauge}")
-
         else:
             raise NotImplementedError(f"Spin {particle.spin} propagator not implemented.")
+
+
 
 
 
@@ -334,24 +454,16 @@ if __name__ == "__main__":
     #"/workspaces/LRSM-with-Spheno/UFOmodel/MLRSM_UFO"
     explorer = UFOModelExplorer(ufo_directory)
     explorer.load_model()
-    explorer.summarize_model()
 
-    # Example query: Find all vertices involving a specific particle (e.g., 'H')
-    particle_name = 'H'
-    #print(f"\nVertices involving the particle '{particle_name}':")
-    #vertices = explorer.find_vertices_involving(particle_name)
-    #for vertex in vertices:
-    #    print(vertex)
-
-    # Generate and display Feynman rules
-    #print("\nSymbolic Feynman Rules:")
-    #feynman_rules = explorer.list_feynman_rules()
-    #print(feynman_rules)
+    # Add this in the main block after loading the model
+    print("\nVertices involving 'e+' and 'mu+':")
+    e_mu_vertices = explorer.find_vertices_involving('e+')
+    for vertex in e_mu_vertices:
+        print(vertex, vertex.particles)
 
     # Example process: e+ e- -> mu+ mu-
     process = (['e+', 'e-'], ['mu+', 'mu-'])
     amplitude = explorer.calculate_amplitude(process)
     print("\nSymbolic Amplitude:")
     print(amplitude)
-
 
