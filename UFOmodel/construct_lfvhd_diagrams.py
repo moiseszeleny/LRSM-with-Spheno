@@ -1,4 +1,4 @@
-from UFOexplorerSympy3 import ProjM, ProjP, Gamma
+from UFOexplorer import ProjM, ProjP, Gamma
 from LFVXD import Hdecay_diagrams as D
 from LFVXD import vertexes as v_lfvxd
 
