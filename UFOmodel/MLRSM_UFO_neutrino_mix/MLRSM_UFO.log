@@ -1,0 +1,324 @@
+# This file was automatically created by FeynRules 2.3.49
+# Mathematica version: 14.0.0 for Microsoft Windows (64-bit) (December 13, 2023)
+# Date: Wed 15 Jan 2025 18:00:03
+
+
+# 
+# This is the logfile for the model MLRSM
+
+# Authors: G. Eilam, S. Bar-Shalom, A. Roitgrund
+# Model version: 1.1.4
+# Checking the Quantum numbers
+   * Electric charge defined.
+# Checking the Lagrangians
+   * All Lagrangians are ok.
+#
+# Particle definitions
+#
+
+   * No particles removed. All particles correspond to GenInt setup.
+
+# Automatically assigned PDG numbers
+   * Assigned PDG number 9000001 to particle ghG
+
+
+# Compulsory PDG codes:
+   * Class SM leptons complete.
+   * Class SM neutrinos complete.
+   * Class SM quarks complete.
+   * Class SM gauge bosons complete.
+#
+# Parameter definitions
+#
+
+   * All parameters are ok.
+
+
+# Vertices
+   * Calling FeynmanRules for 1 Lagrangians.
+   * Number of classes vertices: 1068
+   * Number of flavored vertices: 1638
+   * Saved vertices in InterfaceRun[ 1 ].
+   * Checked QNumber conservation.
+      - Quantum number GhostNumber conserved in all vertices.
+      - Quantum number LeptonNumber NOT conserved in the following vertices
+          {HP2bar, ebar, N1}
+          {HP2bar, ebar, N2}
+          {HP2bar, ebar, N3}
+          {HP2bar, ebar, N4}
+          {HP2bar, ebar, N5}
+          {HP2bar, ebar, N6}
+          {HP2bar, mubar, N1}
+          {HP2bar, mubar, N2}
+          {HP2bar, mubar, N3}
+          {HP2bar, mubar, N4}
+          {HP2bar, mubar, N5}
+          {HP2bar, mubar, N6}
+          {HP2bar, tabar, N1}
+          {HP2bar, tabar, N2}
+          {HP2bar, tabar, N3}
+          {HP2bar, tabar, N4}
+          {HP2bar, tabar, N5}
+          {HP2bar, tabar, N6}
+          {GPLbar, ebar, N1}
+          {GPLbar, ebar, N2}
+          {GPLbar, ebar, N3}
+          {GPLbar, ebar, N4}
+          {GPLbar, ebar, N5}
+          {GPLbar, ebar, N6}
+          {GPLbar, mubar, N1}
+          {GPLbar, mubar, N2}
+          {GPLbar, mubar, N3}
+          {GPLbar, mubar, N4}
+          {GPLbar, mubar, N5}
+          {GPLbar, mubar, N6}
+          {GPLbar, tabar, N1}
+          {GPLbar, tabar, N2}
+          {GPLbar, tabar, N3}
+          {GPLbar, tabar, N4}
+          {GPLbar, tabar, N5}
+          {GPLbar, tabar, N6}
+          {GPL, N1, e}
+          {GPL, N1, mu}
+          {GPL, N1, ta}
+          {GPL, N2, e}
+          {GPL, N2, mu}
+          {GPL, N2, ta}
+          {GPL, N3, e}
+          {GPL, N3, mu}
+          {GPL, N3, ta}
+          {GPL, N4, e}
+          {GPL, N4, mu}
+          {GPL, N4, ta}
+          {GPL, N5, e}
+          {GPL, N5, mu}
+          {GPL, N5, ta}
+          {GPL, N6, e}
+          {GPL, N6, mu}
+          {GPL, N6, ta}
+          {HP2, N1, e}
+          {HP2, N1, mu}
+          {HP2, N1, ta}
+          {HP2, N2, e}
+          {HP2, N2, mu}
+          {HP2, N2, ta}
+          {HP2, N3, e}
+          {HP2, N3, mu}
+          {HP2, N3, ta}
+          {HP2, N4, e}
+          {HP2, N4, mu}
+          {HP2, N4, ta}
+          {HP2, N5, e}
+          {HP2, N5, mu}
+          {HP2, N5, ta}
+          {HP2, N6, e}
+          {HP2, N6, mu}
+          {HP2, N6, ta}
+          {GPRbar, ebar, N1}
+          {GPRbar, ebar, N2}
+          {GPRbar, ebar, N3}
+          {GPRbar, ebar, N4}
+          {GPRbar, ebar, N5}
+          {GPRbar, ebar, N6}
+          {GPRbar, mubar, N1}
+          {GPRbar, mubar, N2}
+          {GPRbar, mubar, N3}
+          {GPRbar, mubar, N4}
+          {GPRbar, mubar, N5}
+          {GPRbar, mubar, N6}
+          {GPRbar, tabar, N1}
+          {GPRbar, tabar, N2}
+          {GPRbar, tabar, N3}
+          {GPRbar, tabar, N4}
+          {GPRbar, tabar, N5}
+          {GPRbar, tabar, N6}
+          {HPPRbar, ebar, ebar}
+          {HPPRbar, ebar, mubar}
+          {HPPRbar, ebar, tabar}
+          {HPPRbar, mubar, mubar}
+          {HPPRbar, mubar, tabar}
+          {HPPRbar, tabar, tabar}
+          {HP1bar, ebar, N1}
+          {HP1bar, ebar, N2}
+          {HP1bar, ebar, N3}
+          {HP1bar, ebar, N4}
+          {HP1bar, ebar, N5}
+          {HP1bar, ebar, N6}
+          {HP1bar, mubar, N1}
+          {HP1bar, mubar, N2}
+          {HP1bar, mubar, N3}
+          {HP1bar, mubar, N4}
+          {HP1bar, mubar, N5}
+          {HP1bar, mubar, N6}
+          {HP1bar, tabar, N1}
+          {HP1bar, tabar, N2}
+          {HP1bar, tabar, N3}
+          {HP1bar, tabar, N4}
+          {HP1bar, tabar, N5}
+          {HP1bar, tabar, N6}
+          {HPPLbar, ebar, ebar}
+          {HPPLbar, ebar, mubar}
+          {HPPLbar, ebar, tabar}
+          {HPPLbar, mubar, mubar}
+          {HPPLbar, mubar, tabar}
+          {HPPLbar, tabar, tabar}
+          {GPR, N1, e}
+          {GPR, N1, mu}
+          {GPR, N1, ta}
+          {GPR, N2, e}
+          {GPR, N2, mu}
+          {GPR, N2, ta}
+          {GPR, N3, e}
+          {GPR, N3, mu}
+          {GPR, N3, ta}
+          {GPR, N4, e}
+          {GPR, N4, mu}
+          {GPR, N4, ta}
+          {GPR, N5, e}
+          {GPR, N5, mu}
+          {GPR, N5, ta}
+          {GPR, N6, e}
+          {GPR, N6, mu}
+          {GPR, N6, ta}
+          {HPPR, e, e}
+          {HPPR, e, mu}
+          {HPPR, e, ta}
+          {HPPR, mu, mu}
+          {HPPR, mu, ta}
+          {HPPR, ta, ta}
+          {HP1, N1, e}
+          {HP1, N1, mu}
+          {HP1, N1, ta}
+          {HP1, N2, e}
+          {HP1, N2, mu}
+          {HP1, N2, ta}
+          {HP1, N3, e}
+          {HP1, N3, mu}
+          {HP1, N3, ta}
+          {HP1, N4, e}
+          {HP1, N4, mu}
+          {HP1, N4, ta}
+          {HP1, N5, e}
+          {HP1, N5, mu}
+          {HP1, N5, ta}
+          {HP1, N6, e}
+          {HP1, N6, mu}
+          {HP1, N6, ta}
+          {HPPL, e, e}
+          {HPPL, e, mu}
+          {HPPL, e, ta}
+          {HPPL, mu, mu}
+          {HPPL, mu, ta}
+          {HPPL, ta, ta}
+          {W, N1, e}
+          {W, N1, mu}
+          {W, N1, ta}
+          {W, N2, e}
+          {W, N2, mu}
+          {W, N2, ta}
+          {W, N3, e}
+          {W, N3, mu}
+          {W, N3, ta}
+          {W, N4, e}
+          {W, N4, mu}
+          {W, N4, ta}
+          {W, N5, e}
+          {W, N5, mu}
+          {W, N5, ta}
+          {W, N6, e}
+          {W, N6, mu}
+          {W, N6, ta}
+          {W2, N1, e}
+          {W2, N1, mu}
+          {W2, N1, ta}
+          {W2, N2, e}
+          {W2, N2, mu}
+          {W2, N2, ta}
+          {W2, N3, e}
+          {W2, N3, mu}
+          {W2, N3, ta}
+          {W2, N4, e}
+          {W2, N4, mu}
+          {W2, N4, ta}
+          {W2, N5, e}
+          {W2, N5, mu}
+          {W2, N5, ta}
+          {W2, N6, e}
+          {W2, N6, mu}
+          {W2, N6, ta}
+          {W2bar, ebar, N1}
+          {W2bar, ebar, N2}
+          {W2bar, ebar, N3}
+          {W2bar, ebar, N4}
+          {W2bar, ebar, N5}
+          {W2bar, ebar, N6}
+          {W2bar, mubar, N1}
+          {W2bar, mubar, N2}
+          {W2bar, mubar, N3}
+          {W2bar, mubar, N4}
+          {W2bar, mubar, N5}
+          {W2bar, mubar, N6}
+          {W2bar, tabar, N1}
+          {W2bar, tabar, N2}
+          {W2bar, tabar, N3}
+          {W2bar, tabar, N4}
+          {W2bar, tabar, N5}
+          {W2bar, tabar, N6}
+          {Wbar, ebar, N1}
+          {Wbar, ebar, N2}
+          {Wbar, ebar, N3}
+          {Wbar, ebar, N4}
+          {Wbar, ebar, N5}
+          {Wbar, ebar, N6}
+          {Wbar, mubar, N1}
+          {Wbar, mubar, N2}
+          {Wbar, mubar, N3}
+          {Wbar, mubar, N4}
+          {Wbar, mubar, N5}
+          {Wbar, mubar, N6}
+          {Wbar, tabar, N1}
+          {Wbar, tabar, N2}
+          {Wbar, tabar, N3}
+          {Wbar, tabar, N4}
+          {Wbar, tabar, N5}
+          {Wbar, tabar, N6}
+      - Quantum number Q conserved in all vertices.
+      - Quantum number Y conserved in all vertices.
+   * particles.py written.
+   * parameters.py written.
+#
+# Vertex definitions
+#
+
+   * 1638 vertices written.
+   * vertices.py written.
+#
+# Lorentz structure definitions
+#
+
+   * 23 lorentz structures written.
+   * lorentz.py written.
+#
+# Coupling definitions
+#
+
+   * 1512 couplings written.
+   * couplings.py written.
+#
+# Coupling order definitions
+#
+
+   * 0 couplings orders written.
+   * coupling_orders.py written.
+#
+# Decay definitions
+#
+
+   * 29 decays written.
+   * decay.py not written
+#
+# CTCoupling definitions
+#
+
+   * 0 CTcouplings written.
+   * CT_couplings.py written.

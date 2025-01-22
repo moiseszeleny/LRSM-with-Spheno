@@ -1,9 +1,10 @@
 import os
 import sys
 import re
-from sympy import sympify, simplify, Matrix
+from sympy import sympify, simplify
 from sympy import Function, symbols
-
+from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor
 
 # Define symbolic Lorentz functions
 Metric = Function('Metric')
@@ -40,6 +41,7 @@ class UFOModelExplorer:
         self.couplings = []
         self.lorentz = []
         self.vertices = []
+        self.decays = []
 
     def load_model(self):
         """Load the UFO model by dynamically loading each file."""
@@ -49,6 +51,7 @@ class UFOModelExplorer:
             'couplings': 'couplings.py',
             'lorentz': 'lorentz.py',
             'vertices': 'vertices.py',
+            'decays': 'decays.py',
         }
 
         for key, filename in ufo_files.items():
@@ -77,27 +80,26 @@ class UFOModelExplorer:
         return namespace
 
     def _extract_objects_from_lists_or_dynamically(self, key, namespace):
-        """Extract objects from predefined lists or dynamically detect objects."""
+        """
+        Extract objects from predefined lists or dynamically detect objects.
+        """
         list_names = {
             'particles': 'all_particles',
             'parameters': 'all_parameters',
             'couplings': 'all_couplings',
             'lorentz': 'all_lorentz',
             'vertices': 'all_vertices',
+            'decays': 'all_decays',  # Added decays list handling
         }
 
         list_name = list_names.get(key)
         if list_name in namespace:
             object_list = namespace[list_name]
             # Remove duplicates by ensuring unique object names
-            #if key == 'lorentz':
             object_list = list({obj.name: obj for obj in object_list}.values())
             setattr(self, key, object_list)
             print(f"Loaded {len(object_list)} objects for {key}.")
             print(f"Objects in {list_name}: {object_list}")  # Debugging
-            #return
-
-        # Fallback: Dynamically check for objects of the expected type
         else:
             print(f"List '{list_name}' not found. Searching for individual objects...")
             class_name = {
@@ -106,13 +108,14 @@ class UFOModelExplorer:
                 'couplings': 'Coupling',
                 'lorentz': 'Lorentz',
                 'vertices': 'Vertex',
+                'decays': 'Decay',  # Added decays handling
             }.get(key)
 
             if not class_name:
                 print(f"Unknown key '{key}', skipping.")
-                #return
+                return
 
-            # Adjusted to dynamically detect classes if 'Lorentz' objects are not found
+            # Dynamically check for objects of the expected type
             object_list = []
             for name, obj in namespace.items():
                 try:
@@ -123,12 +126,11 @@ class UFOModelExplorer:
                     break
 
             # Remove duplicates by ensuring unique object names
-            #if key == 'lorentz':
             object_list = list({obj.name: obj for obj in object_list}.values())
-
             setattr(self, key, object_list)
             print(f"Loaded {len(object_list)} objects dynamically for {key}.")
             print(f"Objects loaded dynamically for {key}: {object_list}")  # Debugging
+
 
     def summarize_model(self):
         """Print a summary of the loaded model."""
@@ -138,6 +140,107 @@ class UFOModelExplorer:
         print(f"Couplings: {len(self.couplings)}")
         print(f"Lorentz Structures: {len(self.lorentz)}")
         print(f"Vertices: {len(self.vertices)}")
+        print(f"Decays: {len(self.decays)}")
+
+
+    def find_parameters(self, parameter_names):
+        """
+        Find parameters in the model by their names.
+        :param parameter_names: List of parameter names to search for.
+        :return: List of matching parameter objects.
+        """
+        if not isinstance(parameter_names, list):
+            parameter_names = [parameter_names]
+
+        matching_parameters = []
+        for parameter_name in parameter_names:
+            match = next((param for param in self.parameters if param.name == parameter_name), None)
+            if match:
+                matching_parameters.append(match)
+            else:
+                print(f"Parameter '{parameter_name}' not found in the model.")
+        return matching_parameters
+    
+    def sympify_parameters(self, parameter_names):
+        """
+        Sympify a list of parameters in the model by their names.
+        :param parameter_names: List of parameter names to sympify.
+        :return: Dictionary of parameter names and their sympy expressions.
+        """
+        if not isinstance(parameter_names, list):
+            parameter_names = [parameter_names]
+
+        sympified_parameters = {}
+        for parameter_name in parameter_names:
+            match = next((param for param in self.parameters if param.name == parameter_name), None)
+            if match and hasattr(match, 'value'):
+                try:
+                    # Sympify the parameter's value
+                    sympified_value = sympify(preprocess_expression(match.value))
+                    sympified_parameters[parameter_name] = sympified_value
+                except Exception as e:
+                    print(f"Error sympifying parameter '{parameter_name}': {e}")
+            else:
+                print(f"Parameter '{parameter_name}' not found or has no value in the model.")
+        return sympified_parameters
+    
+    def sympify_decays(self, particles_to_load=None, final_states_to_load=None):
+        """
+        Sympify the partial decay widths for selected or all decay objects in the model.
+        :param particles_to_load: List of particle names to process (None for all particles).
+        :param final_states_to_load: List of final states to process (None for all final states).
+        :return: A dictionary where keys are particle names and values are dictionaries
+                of partial widths with sympy expressions.
+        """
+
+        @lru_cache(maxsize=None)
+        def preprocess_and_sympify(expr):
+            try:
+                return sympify(preprocess_expression(expr))
+            except Exception as e:
+                print(f"Error sympifying expression: {e}")
+                return None
+
+        def process_decay(decay):
+            particle_name = decay.particle.name if hasattr(decay.particle, 'name') else "Unknown"
+            if particles_to_load and particle_name not in particles_to_load:
+                return None  # Skip this decay
+
+            decay_data = {}
+            for final_state, width_expr in decay.partial_widths.items():
+                if final_states_to_load and final_state not in final_states_to_load:
+                    continue  # Skip this final state
+                decay_data[final_state] = preprocess_and_sympify(width_expr)
+            return particle_name, decay_data
+
+        sympified_decays = {}
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(process_decay, self.decays)
+            for result in results:
+                if result:
+                    particle_name, decay_data = result
+                    sympified_decays[particle_name] = decay_data
+
+        return sympified_decays
+
+    def find_particles(self, particle_names):
+        """
+        Find particles in the model by their names.
+        :param particle_names: List of particle names to search for.
+        :return: List of matching particle objects.
+        """
+        if not isinstance(particle_names, list):
+            particle_names = [particle_names]
+
+        matching_particles = []
+        for particle_name in particle_names:
+            match = next((p for p in self.particles if p.name == particle_name), None)
+            if match:
+                matching_particles.append(match)
+            else:
+                print(f"Particle '{particle_name}' not found in the model.")
+        return matching_particles
+
 
     def find_vertices_involving(self, particle_names, number_particles=None):
         """
@@ -221,64 +324,91 @@ class UFOModelExplorer:
             return sympify(1)  # Default to 1 if no structure provided
 
     
-    @staticmethod
-    def _metric_tensor(mu, nu):
-        """Minkowski metric tensor."""
-        return Matrix([[1 if i == j else 0 for j in range(4)] for i in range(4)])
+#    @staticmethod
+#    def _metric_tensor(mu, nu):
+#        """Minkowski metric tensor."""
+#        return Matrix([[1 if i == j else 0 for j in range(4)] for i in range(4)])
 
-    @staticmethod
-    def _levi_civita(mu, nu, rho, sigma):
-        """Levi-Civita tensor."""
-        return LeviCivita(mu, nu, rho, sigma)
-    
-    @staticmethod
-    def _gamma_matrix(mu):
-        """Dirac gamma matrices in the 4x4 representation."""
-        gamma_matrices = {
-            0: Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]),  # Gamma^0
-            1: Matrix([[0, 0, 0, 1], [0, 0, 1, 0], [0, -1, 0, 0], [-1, 0, 0, 0]]),  # Gamma^1
-            2: Matrix([[0, 0, 0, -I], [0, 0, I, 0], [0, I, 0, 0], [-I, 0, 0, 0]]),   # Gamma^2
-            3: Matrix([[0, 0, 1, 0], [0, 0, 0, -1], [-1, 0, 0, 0], [0, 1, 0, 0]])    # Gamma^3
-        }
-        return gamma_matrices.get(mu, Matrix.zeros(4))
+#    @staticmethod
+#    def _levi_civita(mu, nu, rho, sigma):
+#        """Levi-Civita tensor."""
+#        return LeviCivita(mu, nu, rho, sigma)
 
-    @staticmethod
-    def _projection_operator_p():
-        """Projection operator P = (1 + γ^5)/2."""
-        gamma_5 = Matrix([
-            [0, 0, 1, 0],
-            [0, 0, 0, 1],
-            [1, 0, 0, 0],
-            [0, 1, 0, 0]
-        ])
-        return (Matrix.eye(4) + gamma_5) / 2
+#    @staticmethod
+#    def _gamma_matrix(mu):
+#        """Dirac gamma matrices in the 4x4 representation."""
+#        gamma_matrices = {
+#            0: Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]),  # Gamma^0
+#            1: Matrix([[0, 0, 0, 1], [0, 0, 1, 0], [0, -1, 0, 0], [-1, 0, 0, 0]]),  # Gamma^1
+#            2: Matrix([[0, 0, 0, -I], [0, 0, I, 0], [0, I, 0, 0], [-I, 0, 0, 0]]),   # Gamma^2
+#            3: Matrix([[0, 0, 1, 0], [0, 0, 0, -1], [-1, 0, 0, 0], [0, 1, 0, 0]])    # Gamma^3
+#        }
+#        return gamma_matrices.get(mu, Matrix.zeros(4))
 
-    @staticmethod
-    def _projection_operator_m():
-        """Projection operator M = (1 - γ^5)/2."""
-        gamma_5 = Matrix([
-            [0, 0, 1, 0],
-            [0, 0, 0, 1],
-            [1, 0, 0, 0],
-            [0, 1, 0, 0]
-        ])
-        return (Matrix.eye(4) - gamma_5) / 2
+#    @staticmethod
+#    def _projection_operator_p():
+#        """Projection operator P = (1 + γ^5)/2."""
+#        gamma_5 = Matrix([
+#            [0, 0, 1, 0],
+#            [0, 0, 0, 1],
+#            [1, 0, 0, 0],
+#            [0, 1, 0, 0]
+#        ])
+#        return (Matrix.eye(4) + gamma_5) / 2
 
+#    @staticmethod
+#    def _projection_operator_m():
+#        """Projection operator M = (1 - γ^5)/2."""
+#        gamma_5 = Matrix([
+#            [0, 0, 1, 0],
+#            [0, 0, 0, 1],
+#            [1, 0, 0, 0],
+#            [0, 1, 0, 0]
+#        ])
+#        return (Matrix.eye(4) - gamma_5) / 2
 
-    def list_feynman_rules(self):
+    def list_feynman_rules(self, vertices_to_load=None, particles_to_load=None, number_particles=None):
         """
-        Generate and display symbolic Feynman rules for all vertices.
+        Generate symbolic Feynman rules for all or selected vertices in the model.
+        :param vertices_to_load: List of vertex indices or names to process (None for all vertices).
+        :param particles_to_load: List of particle names to filter vertices by (None for all particles).
+        :param number_particles: Number of particles in the vertex to filter by (None for all vertex sizes).
+        :return: Dictionary with vertex identifiers as keys and symbolic Feynman rules as values.
         """
+        @lru_cache(maxsize=None)
+        def cached_generate_rule(vertex):
+            try:
+                return self.generate_symbolic_feynman_rule(vertex)
+            except Exception as e:
+                print(f"Error generating Feynman rule for vertex {vertex}: {e}")
+                return None
+
+        def process_vertex(vertex):
+            if vertices_to_load and vertex not in vertices_to_load:
+                return None  # Skip this vertex
+
+            vertex_particles = [p.name for p in vertex.particles if hasattr(p, 'name')]
+
+            if number_particles is not None and len(vertex_particles) != number_particles:
+                return None  # Skip vertices not matching the particle count
+
+            if particles_to_load and not any(p in vertex_particles for p in particles_to_load):
+                return None  # Skip if none of the specified particles are in the vertex
+
+            rule = cached_generate_rule(vertex)
+            return vertex, rule
+
         feynman_rules = {}
-        for vertex in self.vertices:
-            print(f"Feynman Rule for Vertex: {vertex.particles}")
-            symbolic_rule = self.generate_symbolic_feynman_rule(vertex)
-            if symbolic_rule is not None:
-                #print(symbolic_rule)
-                feynman_rules[vertex] = symbolic_rule
-            else:
-                print("Unable to generate rule.\n")
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(process_vertex, self.vertices)
+            for result in results:
+                if result:
+                    vertex, rule = result
+                    feynman_rules[vertex] = rule
+
         return feynman_rules
+
+
     ############# new add code
     def classify_parameters(self):
         """
@@ -446,24 +576,31 @@ class UFOModelExplorer:
 
 
 
-
-
-
 if __name__ == "__main__":
-    ufo_directory = "C:/Users/moise/OneDrive/Escritorio/LRSM-with-Spheno/UFOmodel/MLRSM_UFO"
+    #ufo_directory = "C:/Users/moise/OneDrive/Escritorio/LRSM-with-Spheno/UFOmodel/MLRSM_UFO"
+    ufo_directory = "C:/Users/moise/OneDrive/Escritorio/LRSM-with-Spheno/UFOmodel/MLRSM_UFO_neutrino_mix"
     #"/workspaces/LRSM-with-Spheno/UFOmodel/MLRSM_UFO"
     explorer = UFOModelExplorer(ufo_directory)
     explorer.load_model()
+    three_particle_rules = explorer.list_feynman_rules(number_particles=3)
+    print('Feynman rules with 3 particles')
+    print(three_particle_rules)
+
+    selected_decays = explorer.sympify_decays(particles_to_load=['H', 'W+'])
+    for particle, widths in selected_decays.items():
+        print(f"Decays of {particle}:")
+        for final_state, expr in widths.items():
+            print(f"  {particle} -> {final_state}: {explorer.evaluate_expression_numerically(explorer.substitute_internal_parameters(expr))}")
 
     # Add this in the main block after loading the model
-    print("\nVertices involving 'e+' and 'mu+':")
-    e_mu_vertices = explorer.find_vertices_involving('e+')
-    for vertex in e_mu_vertices:
-        print(vertex, vertex.particles)
+    #print("\nVertices involving 'e+' and 'mu+':")
+    #e_mu_vertices = explorer.find_vertices_involving('e+')
+    #for vertex in e_mu_vertices:
+    #    print(vertex, vertex.particles)
 
     # Example process: e+ e- -> mu+ mu-
-    process = (['e+', 'e-'], ['mu+', 'mu-'])
-    amplitude = explorer.calculate_amplitude(process)
-    print("\nSymbolic Amplitude:")
-    print(amplitude)
+    #process = (['e+', 'e-'], ['mu+', 'mu-'])
+    #amplitude = explorer.calculate_amplitude(process)
+    #print("\nSymbolic Amplitude:")
+    #print(amplitude)
 
