@@ -4,6 +4,7 @@ import re
 from sympy import sympify, simplify
 from sympy import Function, symbols
 from functools import lru_cache
+import importlib
 from concurrent.futures import ThreadPoolExecutor
 
 # Define symbolic Lorentz functions
@@ -73,21 +74,52 @@ class UFOModelExplorer:
             for p in self.particles
         }
 
+    #def execute_ufo_file(self, filepath):
+    #    """Execute a UFO file and return the defined objects."""
+    #    namespace = {}
+    #    ufo_dir = os.path.dirname(filepath)
+    #    if ufo_dir not in sys.path:
+    #        sys.path.insert(0, ufo_dir)
+    #    with open(filepath, 'r') as f:
+    #        code = f.read()
+    #    try:
+    #        exec(code, namespace)  # Execute the file in a controlled namespace
+    #    except Exception as e:
+    #        print(f"Error executing {filepath}: {e}")
+    #    print(f"Namespace keys after executing {filepath}: {list(namespace.keys())}")
+    #    print(f"Namespace contents after executing {filepath}: {namespace}")  # Debugging
+    #    return namespace
+
     def execute_ufo_file(self, filepath):
         """Execute a UFO file and return the defined objects."""
         namespace = {}
         ufo_dir = os.path.dirname(filepath)
+        module_name = os.path.splitext(os.path.basename(filepath))[0]
+        package_name = os.path.basename(self.ufo_directory)
+
+        # Ensure the UFO directory is in the Python path
         if ufo_dir not in sys.path:
             sys.path.insert(0, ufo_dir)
+
+        # Read the code from the file
         with open(filepath, 'r') as f:
             code = f.read()
+
+        # Prepare the namespace with necessary variables
+        namespace["__name__"] = module_name
+        namespace["__file__"] = filepath
+        namespace["__package__"] = package_name
+
         try:
-            exec(code, namespace)  # Execute the file in a controlled namespace
+            # Execute the file in the controlled namespace
+            exec(code, namespace)
         except Exception as e:
             print(f"Error executing {filepath}: {e}")
+
+        # Debugging: Print the namespace for inspection
         print(f"Namespace keys after executing {filepath}: {list(namespace.keys())}")
-        print(f"Namespace contents after executing {filepath}: {namespace}")  # Debugging
         return namespace
+
 
     def _extract_objects_from_lists_or_dynamically(self, key, namespace):
         """

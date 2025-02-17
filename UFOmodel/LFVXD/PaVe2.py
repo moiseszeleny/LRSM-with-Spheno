@@ -42,15 +42,29 @@ class PaVeFunction(Function):
         """
         raise NotImplementedError("Subclasses must implement _split_divergence_finite.")
 
+    #def doit(self, deep=False, **hints):
+    #    """
+    #    Separate into divergent and finite parts.
+    #    """
+    #    div_part, finite_part = self._split_divergence_finite()
+    #    if deep:
+    #        div_part = div_part.doit(deep=deep, **hints)
+    #        finite_part = finite_part.doit(deep=deep, **hints)
+    #    return div_part + finite_part
+
     def doit(self, deep=False, **hints):
         """
-        Separate into divergent and finite parts.
+        Separate into divergent and finite parts and evaluate them if possible.
         """
         div_part, finite_part = self._split_divergence_finite()
         if deep:
-            div_part = div_part.doit(deep=deep, **hints)
-            finite_part = finite_part.doit(deep=deep, **hints)
+            # Safely apply `.doit()` only if the term is a symbolic expression
+            if hasattr(div_part, 'doit'):
+                div_part = div_part.doit(deep=deep, **hints)
+            if hasattr(finite_part, 'doit'):
+                finite_part = finite_part.doit(deep=deep, **hints)
         return div_part + finite_part
+
 
     def _eval_evalf(self, prec):
         """

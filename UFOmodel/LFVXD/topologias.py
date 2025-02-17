@@ -38,8 +38,7 @@ class GenericOneLoopDiagramXDecayOneFermionTriangle():
         self.Cs = [C0(*masas), C1(*masas), C2(*masas)]
 
     def __str__(self):
-        return f'GenericOneLoopDiagramXDecayOneFermionTriangle({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r}, {self.masas!r})'
+        return f'GenericOneLoopDiagramXDecayOneFermionTriangle(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
 
     def __repr__(self):
         return self.__str__()
@@ -65,7 +64,7 @@ class TriangleOneFermion(GenericOneLoopDiagramXDecayOneFermionTriangle):
         returns
     '''
     def __str__(self):
-        return f'TriangleOneFermion({self.v1!r}, {self.v2!r}, {self.v3!r}, {self.masas!r})'
+        return f'TriangleOneFermion(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
 
 class GenericOneLoopDiagramXDecayOneFermionBubble():
     '''Representa a generic on loop diagram for decays of X -> la lb 
@@ -90,7 +89,7 @@ class GenericOneLoopDiagramXDecayOneFermionBubble():
         self.vertices = [v1, v2, v3]
 
     def __str__(self):
-        return f'GenericOneLoopDiagramXDecayOneFermionBubble({self.v1!r}, {self.v2!r}, {self.v3!r}, {self.masas!r})'
+        return f'GenericOneLoopDiagramXDecayOneFermionBubble(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
 
     def __repr__(self):
         return self.__str__()
@@ -115,7 +114,7 @@ class BubbleFXOneFermion(GenericOneLoopDiagramXDecayOneFermionBubble):
         returns
     '''
     def __str__(self):
-        return f'BubbleFXOneFermion({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
+        return f'BubbleFXOneFermion(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
     
     def formfactor(self):
         vertices = self.v1, self.v2, self.v3
@@ -137,7 +136,7 @@ class BubbleXFOneFermion(GenericOneLoopDiagramXDecayOneFermionBubble):
         returns
     '''
     def __str__(self):
-        return f'BubbleXFOneFermion({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
+        return f'BubbleXFOneFermion(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
     
     def formfactor(self):
         vertices = self.v1, self.v2, self.v3
@@ -171,7 +170,7 @@ class GenericOneLoopDiagramXDecayTwoFermion():
         self.Cs = [C0(*masas), C1(*masas), C2(*masas)]
 
     def __str__(self):
-        return f'GenericOneLoopDiagramXDecayTwoFermion({self.v1!r}, {self.v2!r}, {self.v3!r}, {self.masas!r})'
+        return f'GenericOneLoopDiagramXDecayTwoFermion(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
 
     def __repr__(self):
         return self.__str__()
@@ -197,7 +196,7 @@ class TriangleTwoFermion(GenericOneLoopDiagramXDecayTwoFermion):
         returns
     '''
     def __str__(self):
-        return f'TriangleTwoFermion({self.v1!r}, {self.v2!r}, {self.v3!r}, {self.masas!r})'
+        return f'TriangleTwoFermion(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
 
 if __name__ == '__main__':
     print('All right topologias.py')

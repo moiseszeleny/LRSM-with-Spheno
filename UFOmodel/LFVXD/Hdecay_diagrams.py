@@ -37,8 +37,7 @@ FactorRD = I/(16*pi**2)
 
 class TriangleFSS(TriangleOneFermion):
     def __str__(self):
-        return f'TriangleFSS({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r}, {self.masas!r})'
+        return f'TriangleFSS({self.v1!r}, {self.v2!r}, {self.v3!r}, {self.masas!r})'
     
     def AR(self):
         return FactorRD*self.formfactor().R(GFSS)
@@ -50,8 +49,7 @@ class TriangleFSS(TriangleOneFermion):
 
 class TriangleFSV(TriangleOneFermion):
     def __str__(self):
-        return f'TriangleFSV({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'TriangleFSV({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GFSV)
@@ -62,8 +60,7 @@ class TriangleFSV(TriangleOneFermion):
 
 class TriangleFVS(TriangleOneFermion):
     def __str__(self):
-        return f'TriangleFVS({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'TriangleFVS({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GFVS)
@@ -74,8 +71,7 @@ class TriangleFVS(TriangleOneFermion):
 
 class TriangleFVV(TriangleOneFermion):
     def __str__(self):
-        return f'TriangleFVV({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'TriangleFVV({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GFVV)
@@ -89,8 +85,7 @@ class TriangleFVV(TriangleOneFermion):
 
 class BubbleFV(BubbleFXOneFermion):
     def __str__(self):
-        return f'BubbleFV({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'BubbleFV({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GFV)
@@ -101,8 +96,7 @@ class BubbleFV(BubbleFXOneFermion):
 
 class BubbleVF(BubbleXFOneFermion):
     def __str__(self):
-        return f'BubbleVF({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'BubbleVF({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GVF)
@@ -113,8 +107,7 @@ class BubbleVF(BubbleXFOneFermion):
 
 class BubbleFS(BubbleFXOneFermion):
     def __str__(self):
-        return f'BubbleFS({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'BubbleFS({self.v1!r}, {self.v2!r},  {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GFS)
@@ -125,8 +118,7 @@ class BubbleFS(BubbleFXOneFermion):
 
 class BubbleSF(BubbleXFOneFermion):
     def __str__(self):
-        return f'BubbleSF({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'BubbleSF({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GSF)
@@ -140,8 +132,7 @@ class BubbleSF(BubbleXFOneFermion):
 
 class TriangleSFF(TriangleTwoFermion):
     def __str__(self):
-        return f'TriangleSFF({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'TriangleSFF({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GSFF)
@@ -152,8 +143,7 @@ class TriangleSFF(TriangleTwoFermion):
 
 class TriangleVFF(TriangleTwoFermion):
     def __str__(self):
-        return f'TriangleVFF({self.v1!r}, {self.v2!r},' +\
-            ' {self.v3!r},{self.masas!r})'
+        return f'TriangleVFF({self.v1!r}, {self.v2!r}, {self.v3!r},{self.masas!r})'
 
     def AR(self):
         return FactorRD*self.formfactor().R(GVFF)

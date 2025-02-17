@@ -7,3 +7,4 @@
 #Ignore extra files
 svm3d.py
 svm3d_cmap.py
+svm3d_cmap_multiclass.py
