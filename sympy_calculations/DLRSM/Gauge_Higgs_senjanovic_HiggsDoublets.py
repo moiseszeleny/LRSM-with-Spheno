@@ -6,7 +6,7 @@ from sympy.physics.quantum import Dagger
 from symbolic_tools import build_mass_matrix, invert_dict
 
 from potential_senjanovic_HiggsDoublets import ChiL, ChiR, Phi
-from potential_senjanovic_HiggsDoublets import change_scalar_fields, complex_scalar_fields
+from potential_senjanovic_HiggsDoublets import change_scalar_fields, complex_scalar_fields, change_scalar_fields_approx
 from potential_senjanovic_HiggsDoublets import chiL0, chiR0, chiLp, chiLm, chiRp, chiRm
 from potential_senjanovic_HiggsDoublets import phi10, phi20, phi1p, phi1m, phi2p, phi2m
 from potential_senjanovic_HiggsDoublets import vevL, vevR, vevPhi, k1, k2, vL, vR
@@ -149,6 +149,18 @@ MW = Matrix(
     ]
 ).subs(vevPhi).subs(vevL).subs(vevR)
 
+#### Approximate case for k2 = 0
+MW_k2_0 = MW.subs(k2, 0).subs(vL,0)
+
+mW1, mW2 = symbols('m_{W_1}, m_{W_2}', positive=True)
+mW_sol_k2vL_0 = solve(
+    [Eq(mW1**2, MW_k2_0[0,0]), Eq(mW2**2, MW_k2_0[1,1])],
+    [mW1**2, mW2**2], dict=True
+)[0]
+
+gvR_sol = solve(Eq(mW2**2, mW_sol_k2vL_0[mW2**2].subs((g**2*k1**2)/4, mW1**2)), (g**2*vR**2)/4, dict=True)[0]
+
+#### Rotation over angle xi
 xi = symbols(r'\xi')
 Oxi = Matrix(
     [
@@ -156,7 +168,7 @@ Oxi = Matrix(
         [sin(xi), cos(xi)]
     ]
 )
-#### Rotation over angle xi
+
 MW_rotate = (Oxi.T*MW.subs(vL,0)*Oxi).applyfunc(factor)
 
 sin2xi_sol = solve(MW_rotate[0,1].trigsimp(), sin(2*xi), dict=True)[0]
@@ -181,6 +193,10 @@ WRp_mix = mixingW12[1]
 change_charged_bosons = {
     WLp:WLp_mix, WRp:WRp_mix,
     WLm:WLp_mix.subs(W1p, W1m).subs(W2p, W2m), WRm:WRp_mix.subs(W1p, W1m).subs(W2p, W2m)
+}
+#### in the case of k_2 = 0, we have the following expressions for the masses of the charged gauge bosons
+change_charged_bosons_approx = {
+    key: value.subs(cos(xi), 1).subs(sin(xi), 0) for key, value in change_charged_bosons.items() 
 }
 
 ### Neutral gauge boson mass
@@ -214,6 +230,16 @@ sqrt_P0 = P0_approx[0,1].args[0].args[3].args[0].args[3].args[-1].args[0].args[0
 sqrt_P0_factor = sqrt_P0.factor()
 
 P0_approx = P0_approx.subs(sqrt_P0, sqrt_P0_factor).applyfunc(factor)
+
+P0_approx_inv = P0_approx.inv()
+
+####Rotation approximation k2 = 0
+M0_square_vL0_rotationg = (P0_approx_inv*M0_square_vL0*P0_approx).applyfunc(
+    lambda x:x.factor().expand().collect(vR, factor)
+)
+
+M0_square_vL0_rotationg_k2_0 = M0_square_vL0_rotationg.subs(k2,0)
+
 
 ##### Rewriting the approximate rotation matrix
 e = symbols('e', positive=True)
@@ -322,41 +348,54 @@ M0_square_vL0_rotation1[2,2] = M0_square_vL0_rotation1[2,2].subs(
     g**2 + gBL**2, g**2*cos(thw)**2/cos(2*thw) 
 ).expand().collect(vR, factor)
 
-##### Extract the submatrix non_diagonal
+# sub matrix non_diagonal
 m0_square_vL0_rotation1 = M0_square_vL0_rotation1[1:, 1:]
 
-mZ1, mZ2 = list(m0_square_vL0_rotation1.eigenvals().keys())
-mZ12_plus = mZ1 + mZ2
-mZ12_minus = mZ2 - mZ1
+##### Extract the submatrix non_diagonal
+x = symbols('x')
 
-mz12_sqrt = mZ12_minus.args[3].args[0]
+###### substituting k1^2 and vR^2 in terms of mW1, mW2 
+M0_square_vL0_rotationg_k2_0_mWs = M0_square_vL0_rotationg_k2_0.applyfunc(
+    lambda x:x.expand().collect([(g**2*k1**2)/4, (g**2*vR**2)/4])
+).subs(gvR_sol).subs(k1**2, (4*mW1**2)/g**2).subs(vR**2, (4*(mW2**2 - mW1**2))/g**2)
 
-mz12_sqrt_simplify = mz12_sqrt.factor(deep=True).expand(trig=True).subs(
-    sinthw_sol_ggBL
-).subs(
-    costhw_sol_ggBL
-).subs(
-    tanthw_sol_ggBL
-).subs(
-    cos2thw_sol_ggBL
-).expand().collect(vR, factor).subs(
-    g**2 + gBL**2, g**2*cos(thw)**2/cos(2*thw) 
-).subs(
-    sqrt(g**2 + 2*gBL**2), gBL/sin(thw)
+###### Charpoly of submatrix nondiagonal
+M0_square_vL0_rotationg_k2_0_mWs_det = (M0_square_vL0_rotationg_k2_0_mWs[1:,1:] - eye(2)*x).det().expand().collect(
+    x, lambda x:x.collect([g,gBL], factor)
 )
+###### Solve the charpoly
+MZs_mws_sol = solve(M0_square_vL0_rotationg_k2_0_mWs_det, x, dict=True)
+mZ1, mZ2 = MZs_mws_sol[0][x], MZs_mws_sol[1][x]
 
-mz12_sqrt_simplify_high_approx = sqrt(mz12_sqrt_simplify).subs(k1**2 + k2**2, epsilon*vR).series(x=epsilon, x0=0, n=2).removeO().subs(
-    epsilon, (k1**2 + k2**2)/vR
-).factor()
+###### Approximate expressions for masses of Z1 and Z2
+mZ1_approx = mZ1.subs(mW1**2, epsilon*mW2**2).series(epsilon, 0, 2).removeO().subs(epsilon, mW1**2/mW2**2)
+mZ2_approx = mZ2.subs(mW1**2, epsilon*mW2**2).series(epsilon, 0, 2).removeO().subs(epsilon, mW1**2/mW2**2)
 
-mZ12_plus_simplify = mZ12_plus.expand().collect(vR, factor).subs(cos(thw)**2, (1 + cos(2*thw))/2).collect(vR, factor)
+sqrt_mz12 = (mZ2_approx - mZ1_approx).expand().args[0].args[1].args[0]
+sqrt_mz12_factor = sqrt_mz12.collect([mW1, mW2], lambda x:x.factor())
 
-mZ1 = mZ1.subs(mZ12_plus, mZ12_plus_simplify).subs(
-    sqrt(mz12_sqrt), mz12_sqrt_simplify_high_approx
-)
-mZ2 = mZ2.subs(mZ12_plus, mZ12_plus_simplify).subs(
-    sqrt(mz12_sqrt), mz12_sqrt_simplify_high_approx
-)
+mZ1_approx2 = mZ1_approx.subs(sqrt_mz12, sqrt_mz12_factor).factor()
+mZ2_approx2 = mZ2_approx.subs(sqrt_mz12, sqrt_mz12_factor).expand().collect([mW1, mW2], factor)
+
+
+ggbL_tanthw = {(2*g**2 + gBL**2)/g**2: tan(2*thw)/2 + 2}
+
+mZ1_mW1 = mZ1_approx2.subs(1/costhw_sol_ggBL[cos(thw)]**2, 1/cos(thw)**2)
+
+mZ2_mW12 = mZ2_approx2.subs(tanthw_sol_ggBL[tan(thw)]**2, tan(thw)**2).subs(
+    1/cos2thw_cosW_square_sol_ggBL[cos(2*thw)/cos(thw)**2], 1/(cos(2*thw)/cos(thw)**2)
+).subs(ggbL_tanthw).expand().collect([mW1, mW2], lambda x:x.factor())
+
+mZ1_sym, mZ2_sym = symbols('m_{Z_1}, m_{Z_2}', positive=True)
+
+####### Masses Z1, Z2 solution approximation 
+mZ12_sol = solve(
+    [
+        Eq(mZ1_sym**2, mZ1_mW1),
+        Eq(mZ2_sym**2, mZ2_mW12)
+    ],
+    [mZ1_sym**2, mZ2_sym**2], dict=True
+)[0]
 
 ###### Rotation over angle zeta
 zeta = symbols(r'\zeta')
@@ -446,9 +485,16 @@ W3L_mix_R = mixingZ12A_R[0]
 W3R_mix_R = mixingZ12A_R[1]
 B_mix_R = mixingZ12A_R[2]
 
+# neutral guage bosons complete mixing
 change_neutral_bosons = {W3L:W3L_mix, W3R:W3R_mix, Bmu:B_mix}
+# neutral guage bosons mixing approximation zeta = 0
+change_neutral_bosons_approx = {}
+for field, mixing in change_neutral_bosons.items():
+    change_neutral_bosons_approx[field] = mixing.subs(sin(zeta),0).subs(cos(zeta),1)
+# neutral guage bosons complete mixing with elements of the rotation matrix R
 change_neutral_bosons_R = {W3L:W3L_mix_R, W3R:W3R_mix_R, Bmu:B_mix_R}
 
+# LHiggs in the physical basis
 LHiggs_physical = LHiggs.subs(
     change_charged_bosons
 ).subs(
@@ -458,6 +504,18 @@ LHiggs_physical = LHiggs.subs(
 ).subs(
     change_scalar_fields
 )
+
+# LHiggs in the physical basis approximation, v_L =  k_2 = 0, xi, zeta = 0
+# and k1 << vR
+LHiggs_physical_approx = LHiggs.subs(
+    change_charged_bosons_approx
+).subs(
+    change_neutral_bosons_approx
+).subs(
+    complex_scalar_fields
+).subs(
+    change_scalar_fields_approx
+).subs(k2,0).subs(vL,0)
 
 
 if __name__ == '__main__':

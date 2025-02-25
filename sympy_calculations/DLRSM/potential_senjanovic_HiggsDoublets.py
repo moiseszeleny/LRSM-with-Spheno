@@ -503,12 +503,24 @@ change_scalar_fields = {
     **change_charged_higgs
 }
 
+change_scalar_fields_approx = {field: exp for field, exp in change_scalar_fields.items()}
+for field in [chiRm, chiRp, chiR0r, phi1m, phi10r, phi1p]:
+    change_scalar_fields_approx[field] = change_scalar_fields_approx[field].subs(k1, epsilon*vR).series(
+            epsilon, 0, 2
+        ).removeO().subs(epsilon, k1/vR).expand()
+
 # Final Higgs potential with scalar field in the mass basis
 VLR_physical = VLRPhi_ri_tadpole_caso1.subs(
     complex_scalar_fields
 ).subs(
     change_scalar_fields
 )
+
+VLR_physical_approx = VLRPhi_ri_tadpole_caso1.subs(
+    complex_scalar_fields
+).subs(
+    change_scalar_fields_approx
+).subs(k2,0).subs(vL, 0)
 
 if __name__ == '__main__':
     from sympy import pprint

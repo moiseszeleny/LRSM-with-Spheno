@@ -2,6 +2,10 @@ from sympy import diff, S, factorial, Mul, Function, I
 from sympy.utilities.iterables import multiset_permutations
 from sympy import derive_by_array
 
+from sympy import Basic, Add
+
+
+
 momentum = Function('p')  # Function representing the momentum
 class PartialMu(Function):
     """Custom function to emulate the differential operator ∂_μ."""
@@ -284,3 +288,48 @@ def generate_latex_table_dict_2col(interactions, simplification_coeff=None):
     table += r"\end{array}"
 
     return table
+
+class ChiralProjector(Basic):
+    """
+    Custom SymPy object to represent chiral projectors P_L and P_R.
+    Automatically enforces algebraic properties.
+    """
+    def __new__(cls, name):
+        obj = super().__new__(cls, name)
+        obj.name = name
+        return obj
+
+    def __mul__(self, other):
+        # Idempotency: P_L * P_L = P_L, P_R * P_R = P_R
+        if self == other:
+            return self
+
+        # Mutual exclusivity: P_L * P_R = P_R * P_L = 0
+        if {self, other} == {PL, PR}:  # Ensures we check only P_L * P_R cases
+            return S.Zero
+
+        # Default multiplication behavior (return product)
+        return Mul(self, other)
+
+    def __add__(self, other):
+        # Completeness relation: P_L + P_R = 1
+        if {self, other} == {PL, PR}:  # Ensures we check only P_L + P_R cases
+            return S.One
+
+        # Default addition behavior (return sum)
+        return Add(self, other)
+
+    #def __repr__(self):
+    #    return self.name
+
+    def _latex(self, printer=None):
+        if self == PL:
+            return r'P_L'
+        elif self == PR:
+            return r'P_R'
+        else:
+            return super()._latex()
+    
+# Create instances for P_L and P_R
+PL = ChiralProjector("P_L")
+PR = ChiralProjector("P_R")
