@@ -307,9 +307,20 @@ class ChiralProjector(Basic):
         # Mutual exclusivity: P_L * P_R = P_R * P_L = 0
         if {self, other} == {PL, PR}:  # Ensures we check only P_L * P_R cases
             return S.Zero
+        
+        # Multiplication with other SymPy objects
+        if not isinstance(other, ChiralProjector):
+            return self*other
 
         # Default multiplication behavior (return product)
         return Mul(self, other)
+    
+    def __rmul__(self, other):
+        # Handle right multiplication
+        if not isinstance(other, ChiralProjector):
+            return other*self  # Return as a symbolic Mul
+
+        return Mul(other, self)  # Default case for ChiralProjector
 
     def __add__(self, other):
         # Completeness relation: P_L + P_R = 1
