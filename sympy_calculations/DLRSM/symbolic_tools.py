@@ -1,4 +1,4 @@
-from sympy import diff, S, factorial, Mul, Function, I
+from sympy import diff, S, factorial, Mul, Function, I, Symbol, expand, Pow, cancel
 from sympy.utilities.iterables import multiset_permutations
 from sympy import derive_by_array
 
@@ -22,69 +22,95 @@ class PartialMu(Function):
         # Apply the rule: ∂_μ(G^+) = i p(G^+) G^+
         return I * momentum(field) * field
 
-def find_feynman_coefficients(Lag, fields, parameters):
-    expanded_L = Lag.expand()
-    terms = expanded_L.as_ordered_terms()
+def extract_interaction_coefficients(L, fields, parameters):
+    """
+    Extracts interaction coefficients from a Lagrangian.
 
-    # Store interactions uniquely in a dictionary { field_set : coefficient }
-    interactions = {1: {}, 2: {}, 3: {}, 4: {}}  # Using dict to sum repeated interactions
+    Args:
+        L (sympy expression): The Lagrangian containing fields and parameters.
+        fields (iterable): A list or set of sympy symbols representing the fields.
+        parameters (set): A set of sympy symbols and functions representing parameters.
 
-    for t in terms:
-        # Extract fields from the term
-        term_fields = {s for s in t.free_symbols if s in fields}
+    Returns:
+        dict: A nested dictionary with:
+            - Outer key: Number of interacting fields.
+            - Inner key: Tuple of interacting fields (sorted).
+            - Value: Coefficient of the interaction term.
+    """
+    # Ensure fields is a set of valid SymPy objects
+    fields = {f for f in fields if isinstance(f, Symbol)}
+    
+    # Expand the Lagrangian
+    L_expanded = expand(L)
+
+    # Initialize the classification dictionary
+    interaction_dict = {}
+
+    # Iterate over each term in the expanded Lagrangian
+    for term in L_expanded.as_ordered_terms():
+        detected_fields = []
         
-        # Count the number of fields in the term
+        for f in fields:
+            if f in term.free_symbols:
+                exponent = 1
+                for subterm in term.as_ordered_factors():
+                    if isinstance(subterm, Pow) and subterm.base == f:
+                        exponent = subterm.exp
+                detected_fields.extend([f] * exponent)  # Count each appearance
+
+        term_fields = tuple(sorted(detected_fields, key=lambda x: str(x)))
         num_fields = len(term_fields)
-        
-        # Extract coefficient (remove fields from the term)
-        if num_fields > 0:
-            coefficient = t / Mul(*term_fields)  # Factor out fields
-            if coefficient.free_symbols.issubset(parameters):  # Ensure only parameters in coefficient
-                # Store as a tuple (sorted fields, coefficient)
-                sorted_fields = tuple(sorted(term_fields, key=lambda x: str(x)))  # Sorting ensures uniqueness
-                
-                # If interaction already exists, sum the coefficient
-                if sorted_fields in interactions[num_fields]:
-                    interactions[num_fields][sorted_fields] += coefficient
-                else:
-                    interactions[num_fields][sorted_fields] = coefficient
-    return interactions
 
-def find_feynman_coefficients2(Lag, fields, parameters, D):
-    expanded_L = Lag.expand()
-    terms = expanded_L.as_ordered_terms()
+        # Extract the coefficient by dividing the term by the product of detected fields
+        field_product = Mul(*term_fields) if term_fields else 1  # Avoid empty product
+        coefficient = cancel(term / field_product)  # Ensure full cancellation
 
-    # Store interactions uniquely in a dictionary { field_set : coefficient }
-    interactions = {1: {}, 2: {}, 3: {}, 4: {}}  # Using dict to sum repeated interactions
+        # Ensure all fields are completely removed
+        #coefficient = coefficient.subs({f: 1 for f in term_fields})
 
-    for t in terms:
-        # Extract derivative fields first
-        derivative_fields = {dterm for dterm in t.atoms(D) if dterm.args and dterm.args[0] in fields}
-        
-        # Extract non-derivative fields, excluding those inside D()
-        normal_fields = {s for s in t.free_symbols if s in fields and all(s != df.args[0] for df in derivative_fields)}
+        # Store in dictionary
+        if num_fields not in interaction_dict:
+            interaction_dict[num_fields] = {}
 
-        # Merge them together
-        term_fields = derivative_fields.union(normal_fields)
+        # Sum coefficients correctly for repeated field interactions
+        if term_fields in interaction_dict[num_fields]:
+            interaction_dict[num_fields][term_fields] += coefficient
+        else:
+            interaction_dict[num_fields][term_fields] = coefficient
 
-        # Count the number of fields in the term
-        num_fields = len(term_fields)
-        
-        # Extract coefficient (remove fields from the term)
-        if num_fields > 0:
-            coefficient = t / Mul(*term_fields)  # Factor out fields
-            if coefficient.free_symbols.issubset(parameters):  # Ensure only parameters in coefficient
-                # Store as a tuple (sorted fields, coefficient)
-                sorted_fields = tuple(sorted(term_fields, key=lambda x: str(x)))  # Sorting ensures uniqueness
-                
-                # If interaction already exists, sum the coefficient
-                if sorted_fields in interactions[num_fields]:
-                    interactions[num_fields][sorted_fields] += coefficient
-                else:
-                    interactions[num_fields][sorted_fields] = coefficient
-    return interactions
+    return interaction_dict
 
+def test_feynman_coefficients(Lagrangian, fields, parameters):
+    """ Test the Feynman coefficient extraction function by reconstructing the Lagrangian. """
+    
+    # Extract interactions
+    interactions = extract_interaction_coefficients(Lagrangian, fields, parameters)
+    
+    # Reconstruct the Lagrangian from interactions
+    reconstructed_Lagrangian = sum(
+        coeff * Mul(*fields)
+        for num_fields, terms in interactions.items()
+        for fields, coeff in terms.items()
+    )
 
+    # Expand both the original and reconstructed Lagrangians
+    expanded_original = Lagrangian.expand()
+    expanded_reconstructed = reconstructed_Lagrangian
+
+    print("\n--- Original Lagrangian ---")
+    print(expanded_original)
+
+    print("\n--- Reconstructed Lagrangian ---")
+    print(expanded_reconstructed)
+
+    # Check if they are equal
+    diff = (expanded_original - expanded_reconstructed).expand().factor()
+    if diff == 0 or diff.free_symbols.intersection(fields) == set():
+        print("\n Test Passed: The reconstructed Lagrangian matches the original!")
+    else:
+        print("\n Test Failed: The reconstructed Lagrangian does NOT match the original.")
+
+    return diff
 
 def invert_dict(dictionary):
     """Invert a dictionary, swapping keys and values."""
