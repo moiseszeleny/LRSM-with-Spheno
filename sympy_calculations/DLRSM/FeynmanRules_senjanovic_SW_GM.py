@@ -41,6 +41,22 @@ gauge_fields = [W1p, W2p, W1m, W2m, A, Z1, Z2]
 # Combine all physical fields relevant for interactions
 physical_fields = set(scalar_fields + gauge_fields)
 
+charge_physical_field = {
+    field:0 for field in neutral_scalar_fields + [A, Z1, Z2]
+}
+charge_physical_field[W1m] = -1
+charge_physical_field[W2m] = -1
+charge_physical_field[W1p] = 1
+charge_physical_field[W2p] = 1
+charge_physical_field[HLm] = -1
+charge_physical_field[HLp] = 1
+charge_physical_field[GLm] = -1
+charge_physical_field[GLp] = 1
+charge_physical_field[HRm] = -1
+charge_physical_field[HRp] = 1
+charge_physical_field[GRm] = -1
+charge_physical_field[GRp] = 1
+
 # Define momentum symbols corresponding to scalar fields
 # These will be treated as parameters in the interaction vertices
 scalar_fields_momentum = [momentum(scalar) for scalar in scalar_fields]
