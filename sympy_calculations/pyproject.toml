@@ -1,0 +1,27 @@
+# sympy_calculations/pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dlrsm-feynman-rules"
+version = "0.1.0"
+authors = [
+  { name="Moises Zeleny Mora", email="moiseszeleny@gmail.com" },
+]
+description = "Feynman rules for the DLRSM model calculated with SymPy"
+readme = "README.md"  # Optional
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Gnu General Public License v3 or later (GPLv3+)", # Choose your license
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Physics :: Particle physics phenomelology",
+]
+dependencies = [
+    "sympy>=1.11", # Specify your required SymPy version
+]
+
+[project.urls] # Optional
+"Homepage" = "https://github.com/moiseszeleny/LRSM-with-Spheno.git" # Example URL
