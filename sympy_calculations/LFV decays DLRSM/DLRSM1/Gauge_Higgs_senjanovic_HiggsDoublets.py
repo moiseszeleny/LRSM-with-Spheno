@@ -3,14 +3,14 @@ from sympy import sqrt, sin, cos, tan, trace, solve, Matrix, Function, factor
 from sympy.physics import msigma 
 from sympy.physics.quantum import Dagger
 
-from symbolic_tools import build_mass_matrix, invert_dict
+from .symbolic_tools import build_mass_matrix, invert_dict
 
-from potential_senjanovic_HiggsDoublets import ChiL, ChiR, Phi
-from potential_senjanovic_HiggsDoublets import change_scalar_fields, complex_scalar_fields, change_scalar_fields_approx
-from potential_senjanovic_HiggsDoublets import chiL0, chiR0, chiLp, chiLm, chiRp, chiRm
-from potential_senjanovic_HiggsDoublets import phi10, phi20, phi1p, phi1m, phi2p, phi2m
-from potential_senjanovic_HiggsDoublets import vevL, vevR, vevPhi, k1, k2, vL, vR
-from potential_senjanovic_HiggsDoublets import epsilon
+from .potential_senjanovic_HiggsDoublets import ChiL, ChiR, Phi
+from .potential_senjanovic_HiggsDoublets import change_scalar_fields, complex_scalar_fields, change_scalar_fields_approx
+from .potential_senjanovic_HiggsDoublets import chiL0, chiR0, chiLp, chiLm, chiRp, chiRm
+from .potential_senjanovic_HiggsDoublets import phi10, phi20, phi1p, phi1m, phi2p, phi2m
+from .potential_senjanovic_HiggsDoublets import vevL, vevR, vevPhi, k1, k2, vL, vR
+from .potential_senjanovic_HiggsDoublets import epsilon
 
 # Guage Higgs Lagrangian DLRSM
 

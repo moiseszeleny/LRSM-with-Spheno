@@ -19,18 +19,18 @@ from sympy import factor, sqrt, conjugate
 from sympy import IndexedBase, symbols 
 
 # Local imports from the project structure
-from FeynmanRules_senjanovic_SW import (
+from .FeynmanRules_senjanovic_SW import (
     interactions_gauge_scalars, interactions_gauge_scalars_approx,
     interactions_scalars, interactions_scalars_approx
 )
-from potential_senjanovic_HiggsDoublets import H10, vR, k1
-from potential_senjanovic_HiggsDoublets import (
+from .potential_senjanovic_HiggsDoublets import H10, vR, k1
+from .potential_senjanovic_HiggsDoublets import (
     GRp, GLp, HLp, HRp, HRm, GRm, GLm, HLm
 )
-from Gauge_Higgs_senjanovic_HiggsDoublets import (
+from .Gauge_Higgs_senjanovic_HiggsDoublets import (
     W1p, W1m, W2p, Z1, W2m, g # Added g
 )
-from dirac import diracPL, diracPR, DiracGamma
+from .dirac import diracPL, diracPR, DiracGamma
 
 # --- Constants & Type Definitions ---
 

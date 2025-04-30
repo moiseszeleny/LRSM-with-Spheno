@@ -3,7 +3,7 @@ from sympy import trace, factor, conjugate, Matrix
 from sympy.physics import msigma 
 from sympy.physics.quantum import Dagger
 from sympy import solve
-from symbolic_tools import build_mass_matrix
+from .symbolic_tools import build_mass_matrix
 from sympy import Dummy
 from sympy import eye
 from sympy import Eq
