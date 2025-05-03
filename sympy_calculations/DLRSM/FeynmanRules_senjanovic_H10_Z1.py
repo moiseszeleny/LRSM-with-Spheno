@@ -263,6 +263,9 @@ interactionsWm_n_l = lambda i,a: {###########
     for dict_interaction in [interactionsW1m_n_l(i,a), interactionsW2m_n_l(i,a)]
 }
 
+interactionsH10_ll = lambda a: {
+    (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
+}
 ###########
 # Interactions of charged scalars with leptons
 ###########

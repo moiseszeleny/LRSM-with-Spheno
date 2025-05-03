@@ -290,6 +290,9 @@ interactionsW2p_n_l = lambda i, a: {
 interactionsW2m_n_l = lambda i, a: {
     (W2m, ladj[a], n[i]): (g / 2) * QR[a, i] * gamma_mu * diracPR
 }
+interactionsH10_ll = lambda a: {
+    (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
+}
 
 # Combined interactions (using dictionary unpacking)
 interactionsWp_n_l = lambda i, a: {
