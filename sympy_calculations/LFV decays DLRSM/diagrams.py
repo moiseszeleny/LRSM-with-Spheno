@@ -2534,3 +2534,517 @@ bubble_HR_ni = BubbleSF(
     mass_list
 )
 
+# SFF (GL ni nj) loop: (particle, Mass Symbol)}
+# --- Vertex Construction ---
+# Vertex 1: H10 - n_i - n_j (SFF)
+# ---------------------------------
+nu_index_i = i # Index for nu_index
+nu_index_j = j # Index for nu_index
+internal_neutrino_i = (n[nu_index_i], nadj[nu_index_i], mn[nu_index_i])
+internal_neutrino_j = (n[nu_index_j], nadj[nu_index_j], mn[nu_index_j])
+
+particles_v1 = {external_scalar[0], internal_neutrino_i[0], internal_neutrino_j[1]} # {H10, n[i], nadj[j]}
+interaction_dict_v1 = interactionsH10_nn(nu_index_i, nu_index_j) # Pass indices
+
+try:
+    c1 = find_interaction_coefficient(particles_v1, interaction_dict_v1, "H10-ni-nadj[j]")
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found: {c1}")
+    c1L, c1R = get_chiral_couplings(c1)
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v1 = VertexSFF(c1R, c1L)
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found:\nL={c1L},\nR={c1R}")
+except ValueError as e:
+    # Handle error appropriately, maybe exit or use a default value if applicable
+    raise ValueError(f"Vertex 1 interaction not found: {e}")
+
+# Vertex 2: GLp - nadj_j - l_b (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v2 = {internal_GL_plus[0], internal_neutrino_j[1], external_lepton[0]} # {GLp, nadj[j], l[b]}
+interaction_dict_v2 = interactionsSp_n_l(nu_index_j, lepton_index) # Pass indices
+
+try:
+    # Assuming the interaction dict keys *are* the vertex particles:
+    # We need the key tuple that matches our particles to get the coefficient
+    c2 = None
+    for interaction_key, coeff in interaction_dict_v2.items():
+        # Use set equality for exact match of particles at the vertex
+        if set(interaction_key) == particles_v2:
+            c2 = coeff
+            break
+    if c2 is None:
+        raise ValueError("No interaction match for vertex2") # More specific error
+
+    # Original logic check (less strict, might find interactions with extra particles):
+    # c2 = find_interaction_coefficient(particles_v2, interaction_dict_v2, f"GLp-nbar[{nu_index_j}]-l[{lepton_index}]")
+
+    c2L, c2R = get_chiral_couplings(c2) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v2 = VertexSFF(c2R, c2L)
+    print(f"Vertex 2 (GLp-nbar[{nu_index_j}]-l[{lepton_index}]) coupling found:\nL={c2L},\nR={c2R}")
+except ValueError as e:
+    print(f"Error finding Vertex 2 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSp_n_l({nu_index_j}, {lepton_index})):")
+    print(interaction_dict_v2)
+    raise ValueError(f"Vertex 2 interaction not found: {e}")
+
+# Vertex 3: GLm - ladj_a - n_i (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v3 = {internal_GL_minus[0], external_antilepton[1], internal_neutrino_i[0]} # {GLm, ladj[a], n[i]}
+interaction_dict_v3 = interactionsSm_n_l(nu_index_i, antilep_index) # Pass indices
+
+try:
+    # Similar to v2, find the exact interaction term
+    c3 = None
+    for interaction_key, coeff in interaction_dict_v3.items():
+        if set(interaction_key) == particles_v3:
+            c3 = coeff
+            break
+    if c3 is None:
+        raise ValueError("No interaction match for vertex3") # More specific error
+
+    # Original logic check:
+    # c3 = find_interaction_coefficient(particles_v3, interaction_dict_v3, f"GLm-lbar[{antilep_index}]-n[{nu_index_i}]")
+
+    c3L, c3R = get_chiral_couplings(c3) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v3 = VertexSFF(c3R, c3L)
+    print(f"Vertex 3 (GLm-lbar[{antilep_index}]-n[{nu_index_i}]) coupling found: L={c3L}, R={c3R}")
+except ValueError as e:
+    print(f"Error finding Vertex 3 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSm_n_l({nu_index_i}, {antilep_index})):")
+    print(interaction_dict_v3)
+    raise ValueError(f"Vertex 3 interaction not found: {e}")
+
+# --- Diagram Instantiation ---
+# Assemble the list of mass symbols in the correct order for TriangleSFF
+# mH10, ml[a], ml[b], mW1 ,mn[i], mn[j]
+mass_list = [
+    external_scalar[1],         # mH10
+    external_antilepton[2],     # ml[a]
+    external_lepton[2],         # ml[b]
+    internal_GL_plus[1],        # mW1 (for GLp)
+    internal_neutrino_i[2],     # mn[i]
+    internal_neutrino_j[2],     # mn[j]
+]
+print("Mass List for TriangleSFF:", mass_list)
+# Create the TriangleSFF diagram object
+# Assumes v1 connects external scalar & n[i] & nadj[j]
+# Assumes v2 connects GLp, nbar[j], l[b]
+# Assumes v3 connects GLm, l_a, n[i]
+# Check LFVXD.Hdecay_diagrams_v2.TriangleSFF documentation for exact vertex/particle ordering if unsure.
+triangle_GL_nin_j = TriangleSFF(
+    v1, # Vertex connected to H10, n[i], nadj[j]
+    v2, # Vertex connected to GLp, nbar[j], l[b]
+    v3, # Vertex connected to GLm, l_a, n[i]
+    mass_list
+)
+
+# SFF (GR ni nj) loop: (particle, Mass Symbol)}
+# --- Vertex Construction ---
+# Vertex 1: H10 - n_i - n_j (SFF)
+# ---------------------------------
+particles_v1 = {external_scalar[0], internal_neutrino_i[0], internal_neutrino_j[1]} # {H10, n[i], nadj[j]}
+interaction_dict_v1 = interactionsH10_nn(nu_index_i, nu_index_j) # Pass indices
+
+try:
+    c1 = find_interaction_coefficient(particles_v1, interaction_dict_v1, "H10-ni-nadj[j]")
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found: {c1}")
+    c1L, c1R = get_chiral_couplings(c1)
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v1 = VertexSFF(c1R, c1L)
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found:\nL={c1L},\nR={c1R}")
+except ValueError as e:
+    # Handle error appropriately, maybe exit or use a default value if applicable
+    raise ValueError(f"Vertex 1 interaction not found: {e}")
+
+# Vertex 2: GRp - nadj_j - l_b (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v2 = {internal_GR_plus[0], internal_neutrino_j[1], external_lepton[0]} # {GRp, nadj[j], l[b]}
+interaction_dict_v2 = interactionsSp_n_l(nu_index_j, lepton_index) # Pass indices
+
+try:
+    # Assuming the interaction dict keys *are* the vertex particles:
+    # We need the key tuple that matches our particles to get the coefficient
+    c2 = None
+    for interaction_key, coeff in interaction_dict_v2.items():
+        # Use set equality for exact match of particles at the vertex
+        if set(interaction_key) == particles_v2:
+            c2 = coeff
+            break
+    if c2 is None:
+        raise ValueError("No interaction match for vertex2") # More specific error
+
+    # Original logic check (less strict, might find interactions with extra particles):
+    # c2 = find_interaction_coefficient(particles_v2, interaction_dict_v2, f"GRp-nbar[{nu_index_j}]-l[{lepton_index}]")
+
+    c2L, c2R = get_chiral_couplings(c2) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v2 = VertexSFF(c2R, c2L)
+    print(f"Vertex 2 (GRp-nbar[{nu_index_j}]-l[{lepton_index}]) coupling found:\nL={c2L},\nR={c2R}")
+except ValueError as e:
+    print(f"Error finding Vertex 2 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSp_n_l({nu_index_j}, {lepton_index})):")
+    print(interaction_dict_v2)
+    raise ValueError(f"Vertex 2 interaction not found: {e}")
+
+# Vertex 3: GRm - ladj_a - n_i (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v3 = {internal_GR_minus[0], external_antilepton[1], internal_neutrino_i[0]} # {GRm, ladj[a], n[i]}
+interaction_dict_v3 = interactionsSm_n_l(nu_index_i, antilep_index) # Pass indices
+
+try:
+    # Similar to v2, find the exact interaction term
+    c3 = None
+    for interaction_key, coeff in interaction_dict_v3.items():
+        if set(interaction_key) == particles_v3:
+            c3 = coeff
+            break
+    if c3 is None:
+        raise ValueError("No interaction match for vertex3") # More specific error
+
+    # Original logic check:
+    # c3 = find_interaction_coefficient(particles_v3, interaction_dict_v3, f"GRm-lbar[{antilep_index}]-n[{nu_index_i}]")
+
+    c3L, c3R = get_chiral_couplings(c3) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v3 = VertexSFF(c3R, c3L)
+    print(f"Vertex 3 (GRm-lbar[{antilep_index}]-n[{nu_index_i}]) coupling found: L={c3L}, R={c3R}")
+except ValueError as e:
+    print(f"Error finding Vertex 3 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSm_n_l({nu_index_i}, {antilep_index})):")
+    print(interaction_dict_v3)
+    raise ValueError(f"Vertex 3 interaction not found: {e}")
+
+# --- Diagram Instantiation ---
+# Assemble the list of mass symbols in the correct order for TriangleSFF
+# mH10, ml[a], ml[b], mW2 ,mn[i], mn[j]
+mass_list = [
+    external_scalar[1],         # mH10
+    external_antilepton[2],     # ml[a]
+    external_lepton[2],         # ml[b]
+    internal_GR_plus[1],        # mW2 (for GRp)
+    internal_neutrino_i[2],     # mn[i]
+    internal_neutrino_j[2],     # mn[j]
+]
+print("Mass List for TriangleSFF:", mass_list)
+# Create the TriangleSFF diagram object
+# Assumes v1 connects external scalar & n[i] & nadj[j]
+# Assumes v2 connects GRp, nbar[j], l[b]
+# Assumes v3 connects GRm, l_a, n[i]
+# Check LFVXD.Hdecay_diagrams_v2.TriangleSFF documentation for exact vertex/particle ordering if unsure.
+triangle_GR_nin_j = TriangleSFF(
+    v1, # Vertex connected to H10, n[i], nadj[j]
+    v2, # Vertex connected to GRp, nbar[j], l[b]
+    v3, # Vertex connected to GRm, l_a, n[i]
+    mass_list
+)
+
+# SFF (HR ni nj) loop: (particle, Mass Symbol)}
+# --- Vertex Construction ---
+# Vertex 1: H10 - n_i - n_j (SFF)
+# ---------------------------------
+particles_v1 = {external_scalar[0], internal_neutrino_i[0], internal_neutrino_j[1]} # {H10, n[i], nadj[j]}
+interaction_dict_v1 = interactionsH10_nn(nu_index_i, nu_index_j) # Pass indices
+
+try:
+    c1 = find_interaction_coefficient(particles_v1, interaction_dict_v1, "H10-ni-nadj[j]")
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found: {c1}")
+    c1L, c1R = get_chiral_couplings(c1)
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v1 = VertexSFF(c1R, c1L)
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found:\nL={c1L},\nR={c1R}")
+except ValueError as e:
+    # Handle error appropriately, maybe exit or use a default value if applicable
+    raise ValueError(f"Vertex 1 interaction not found: {e}")
+
+# Vertex 2: HRp - nadj_j - l_b (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v2 = {internal_HR_plus[0], internal_neutrino_j[1], external_lepton[0]} # {HRp, nadj[j], l[b]}
+interaction_dict_v2 = interactionsSp_n_l(nu_index_j, lepton_index) # Pass indices
+
+try:
+    # Assuming the interaction dict keys *are* the vertex particles:
+    # We need the key tuple that matches our particles to get the coefficient
+    c2 = None
+    for interaction_key, coeff in interaction_dict_v2.items():
+        # Use set equality for exact match of particles at the vertex
+        if set(interaction_key) == particles_v2:
+            c2 = coeff
+            break
+    if c2 is None:
+        raise ValueError("No interaction match for vertex2") # More specific error
+
+    # Original logic check (less strict, might find interactions with extra particles):
+    # c2 = find_interaction_coefficient(particles_v2, interaction_dict_v2, f"HRp-nbar[{nu_index_j}]-l[{lepton_index}]")
+
+    c2L, c2R = get_chiral_couplings(c2) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v2 = VertexSFF(c2R, c2L)
+    print(f"Vertex 2 (HRp-nbar[{nu_index_j}]-l[{lepton_index}]) coupling found:\nL={c2L},\nR={c2R}")
+except ValueError as e:
+    print(f"Error finding Vertex 2 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSp_n_l({nu_index_j}, {lepton_index})):")
+    print(interaction_dict_v2)
+    raise ValueError(f"Vertex 2 interaction not found: {e}")
+
+# Vertex 3: HRm - ladj_a - n_i (SFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v3 = {internal_HR_minus[0], external_antilepton[1], internal_neutrino_i[0]} # {HRm, ladj[a], n[i]}
+interaction_dict_v3 = interactionsSm_n_l(nu_index_i, antilep_index) # Pass indices
+
+try:
+    # Similar to v2, find the exact interaction term
+    c3 = None
+    for interaction_key, coeff in interaction_dict_v3.items():
+        if set(interaction_key) == particles_v3:
+            c3 = coeff
+            break
+    if c3 is None:
+        raise ValueError("No interaction match for vertex3") # More specific error
+
+    # Original logic check:
+    # c3 = find_interaction_coefficient(particles_v3, interaction_dict_v3, f"HRm-lbar[{antilep_index}]-n[{nu_index_i}]")
+
+    c3L, c3R = get_chiral_couplings(c3) 
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v3 = VertexSFF(c3R, c3L)
+    print(f"Vertex 3 (HRm-lbar[{antilep_index}]-n[{nu_index_i}]) coupling found: L={c3L}, R={c3R}")
+except ValueError as e:
+    print(f"Error finding Vertex 3 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsSm_n_l({nu_index_i}, {antilep_index})):")
+    print(interaction_dict_v3)
+    raise ValueError(f"Vertex 3 interaction not found: {e}")
+
+# --- Diagram Instantiation ---
+# Assemble the list of mass symbols in the correct order for TriangleSFF
+# mH10, ml[a], ml[b], mHR ,mn[i], mn[j]
+mass_list = [
+    external_scalar[1],         # mH10
+    external_antilepton[2],     # ml[a]
+    external_lepton[2],         # ml[b]
+    internal_HR_plus[1],        # mHR
+    internal_neutrino_i[2],     # mn[i]
+    internal_neutrino_j[2],     # mn[j]
+]
+print("Mass List for TriangleSFF:", mass_list)
+# Create the TriangleSFF diagram object
+# Assumes v1 connects external scalar & n[i] & nadj[j]
+# Assumes v2 connects HRp, nbar[j], l[b]
+# Assumes v3 connects HRm, l_a, n[i]
+# Check LFVXD.Hdecay_diagrams_v2.TriangleSFF documentation for exact vertex/particle ordering if unsure.
+triangle_HR_nin_j = TriangleSFF(
+    v1, # Vertex connected to H10, n[i], nadj[j]
+    v2, # Vertex connected to HRp, nbar[j], l[b]
+    v3, # Vertex connected to HRm, l_a, n[i]
+    mass_list
+)
+
+# VFF (W1 ni nj) loop: (particle, Mass Symbol)}
+# --- Vertex Construction ---
+# Vertex 1: H10 - n_i - n_j (SFF)
+# ---------------------------------
+particles_v1 = {external_scalar[0], internal_neutrino_i[0], internal_neutrino_j[1]} # {H10, n[i], nadj[j]}
+interaction_dict_v1 = interactionsH10_nn(nu_index_i, nu_index_j) # Pass indices
+
+try:
+    c1 = find_interaction_coefficient(particles_v1, interaction_dict_v1, "H10-ni-nadj[j]")
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found: {c1}")
+    c1L, c1R = get_chiral_couplings(c1)
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v1 = VertexSFF(c1R, c1L)
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found:\nL={c1L},\nR={c1R}")
+except ValueError as e:
+    # Handle error appropriately, maybe exit or use a default value if applicable
+    raise ValueError(f"Vertex 1 interaction not found: {e}")
+
+# Vertex 2: W1p - nadj_j - l_b (VFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v2 = {internal_W1_plus[0], internal_neutrino_j[1], external_lepton[0]} # {W1p, nadj[j], l[b]}
+interaction_dict_v2 = interactionsWp_n_l(nu_index_j, lepton_index) # Pass indices
+
+try:
+    # Assuming the interaction dict keys *are* the vertex particles:
+    # We need the key tuple that matches our particles to get the coefficient
+    c2 = None
+    for interaction_key, coeff in interaction_dict_v2.items():
+        # Use set equality for exact match of particles at the vertex
+        if set(interaction_key) == particles_v2:
+            c2 = coeff
+            break
+    if c2 is None:
+        raise ValueError("No interaction match for vertex2") # More specific error
+
+    # Original logic check (less strict, might find interactions with extra particles):
+    # c2 = find_interaction_coefficient(particles_v2, interaction_dict_v2, f"W1p-nbar[{nu_index_j}]-l[{lepton_index}]")
+
+    c2L, c2R = get_chiral_couplings_gamma_mu(c2) 
+    # VertexVFF expects (Right Coupling, Left Coupling)
+    v2 = VertexVFF(c2R, c2L)
+    print(f"Vertex 2 (W1p-nbar[{nu_index_j}]-l[{lepton_index}]) coupling found:\nL={c2L},\nR={c2R}")
+except ValueError as e:
+    print(f"Error finding Vertex 2 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsWp_n_l({nu_index_j}, {lepton_index})):")
+    print(interaction_dict_v2)
+    raise ValueError(f"Vertex 2 interaction not found: {e}")
+
+# Vertex 3: W1m - ladj_a - n_i (VFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v3 = {internal_W1_minus[0], external_antilepton[1], internal_neutrino_i[0]} # {W1m, ladj[a], n[i]}
+interaction_dict_v3 = interactionsWm_n_l(nu_index_i, antilep_index) # Pass indices
+
+try:
+    # Similar to v2, find the exact interaction term
+    c3 = None
+    for interaction_key, coeff in interaction_dict_v3.items():
+        if set(interaction_key) == particles_v3:
+            c3 = coeff
+            break
+    if c3 is None:
+        raise ValueError("No interaction match for vertex3") # More specific error
+
+    # Original logic check:
+    # c3 = find_interaction_coefficient(particles_v3, interaction_dict_v3, f"W1m-lbar[{antilep_index}]-n[{nu_index_i}]")
+
+    c3L, c3R = get_chiral_couplings_gamma_mu(c3) 
+    # VertexVFF expects (Right Coupling, Left Coupling)
+    v3 = VertexVFF(c3R, c3L)
+    print(f"Vertex 3 (W1m-lbar[{antilep_index}]-n[{nu_index_i}]) coupling found: L={c3L}, R={c3R}")
+except ValueError as e:
+    print(f"Error finding Vertex 3 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsWm_n_l({nu_index_i}, {antilep_index})):")
+    print(interaction_dict_v3)
+    raise ValueError(f"Vertex 3 interaction not found: {e}")
+
+# --- Diagram Instantiation ---
+# Assemble the list of mass symbols in the correct order for TriangleVFF
+# mH10, ml[a], ml[b], mW1, mn[i], mn[j]
+mass_list = [
+    external_scalar[1],         # mH10
+    external_antilepton[2],     # ml[a]
+    external_lepton[2],         # ml[b]
+    internal_W1_plus[1],        # mW1
+    internal_neutrino_i[2],     # mn[i]
+    internal_neutrino_j[2],     # mn[j]
+]
+print("Mass List for TriangleVFF:", mass_list)
+# Create the TriangleVFF diagram object
+# Assumes v1 connects external scalar & n[i] & nadj[j]
+# Assumes v2 connects W1p, nbar[j], l[b]
+# Assumes v3 connects W1m, l_a, n[i]
+# Check LFVXD.Hdecay_diagrams_v2.TriangleVFF documentation for exact vertex/particle ordering if unsure.
+triangle_W1_nin_j = TriangleVFF(
+    v1, # Vertex connected to H10, n[i], nadj[j]
+    v2, # Vertex connected to W1p, nbar[j], l[b]
+    v3, # Vertex connected to W1m, l_a, n[i]
+    mass_list
+)
+
+# VFF (W2 ni nj) loop: (particle, Mass Symbol)}
+# --- Vertex Construction ---
+# Vertex 1: H10 - n_i - n_j (SFF)
+# ---------------------------------
+particles_v1 = {external_scalar[0], internal_neutrino_i[0], internal_neutrino_j[1]} # {H10, n[i], nadj[j]}
+interaction_dict_v1 = interactionsH10_nn(nu_index_i, nu_index_j) # Pass indices
+
+try:
+    c1 = find_interaction_coefficient(particles_v1, interaction_dict_v1, "H10-ni-nadj[j]")
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found: {c1}")
+    c1L, c1R = get_chiral_couplings(c1)
+    # VertexSFF expects (Right Coupling, Left Coupling)
+    v1 = VertexSFF(c1R, c1L)
+    print(f"Vertex 1 (H10-ni-nadj[j]) coupling found:\nL={c1L},\nR={c1R}")
+except ValueError as e:
+    # Handle error appropriately, maybe exit or use a default value if applicable
+    raise ValueError(f"Vertex 1 interaction not found: {e}")
+
+# Vertex 2: W2p - nadj_j - l_b (VFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v2 = {internal_W2_plus[0], internal_neutrino_j[1], external_lepton[0]} # {W2p, nadj[j], l[b]}
+interaction_dict_v2 = interactionsWp_n_l(nu_index_j, lepton_index) # Pass indices
+
+try:
+    # Assuming the interaction dict keys *are* the vertex particles:
+    # We need the key tuple that matches our particles to get the coefficient
+    c2 = None
+    for interaction_key, coeff in interaction_dict_v2.items():
+        # Use set equality for exact match of particles at the vertex
+        if set(interaction_key) == particles_v2:
+            c2 = coeff
+            break
+    if c2 is None:
+        raise ValueError("No interaction match for vertex2") # More specific error
+
+    # Original logic check (less strict, might find interactions with extra particles):
+    # c2 = find_interaction_coefficient(particles_v2, interaction_dict_v2, f"W2p-nbar[{nu_index_j}]-l[{lepton_index}]")
+
+    c2L, c2R = get_chiral_couplings_gamma_mu(c2) 
+    # VertexVFF expects (Right Coupling, Left Coupling)
+    v2 = VertexVFF(c2R, c2L)
+    print(f"Vertex 2 (W2p-nbar[{nu_index_j}]-l[{lepton_index}]) coupling found:\nL={c2L},\nR={c2R}")
+except ValueError as e:
+    print(f"Error finding Vertex 2 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsWp_n_l({nu_index_j}, {lepton_index})):")
+    print(interaction_dict_v2)
+    raise ValueError(f"Vertex 2 interaction not found: {e}")
+
+# Vertex 3: W2m - ladj_a - n_i (VFF)
+# ---------------------------------
+# Note: The interaction function needs the specific indices
+particles_v3 = {internal_W2_minus[0], external_antilepton[1], internal_neutrino_i[0]} # {W2m, ladj[a], n[i]}
+interaction_dict_v3 = interactionsWm_n_l(nu_index_i, antilep_index) # Pass indices
+
+try:
+    # Similar to v2, find the exact interaction term
+    c3 = None
+    for interaction_key, coeff in interaction_dict_v3.items():
+        if set(interaction_key) == particles_v3:
+            c3 = coeff
+            break
+    if c3 is None:
+        raise ValueError("No interaction match for vertex3") # More specific error
+
+    # Original logic check:
+    # c3 = find_interaction_coefficient(particles_v3, interaction_dict_v3, f"W2m-lbar[{antilep_index}]-n[{nu_index_i}]")
+
+    c3L, c3R = get_chiral_couplings_gamma_mu(c3) 
+    # VertexVFF expects (Right Coupling, Left Coupling)
+    v3 = VertexVFF(c3R, c3L)
+    print(f"Vertex 3 (W2m-lbar[{antilep_index}]-n[{nu_index_i}]) coupling found: L={c3L}, R={c3R}")
+except ValueError as e:
+    print(f"Error finding Vertex 3 interaction: {e}")
+    print(f"Interaction Dict Searched (interactionsWm_n_l({nu_index_i}, {antilep_index})):")
+    print(interaction_dict_v3)
+    raise ValueError(f"Vertex 3 interaction not found: {e}")
+
+# --- Diagram Instantiation ---
+# Assemble the list of mass symbols in the correct order for TriangleVFF
+# mH10, ml[a], ml[b], mW2, mn[i], mn[j]
+mass_list = [
+    external_scalar[1],         # mH10
+    external_antilepton[2],     # ml[a]
+    external_lepton[2],         # ml[b]
+    internal_W2_plus[1],        # mW2
+    internal_neutrino_i[2],     # mn[i]
+    internal_neutrino_j[2],     # mn[j]
+]
+print("Mass List for TriangleVFF:", mass_list)
+# Create the TriangleVFF diagram object
+# Assumes v1 connects external scalar & n[i] & nadj[j]
+# Assumes v2 connects W2p, nbar[j], l[b]
+# Assumes v3 connects W2m, l_a, n[i]
+# Check LFVXD.Hdecay_diagrams_v2.TriangleVFF documentation for exact vertex/particle ordering if unsure.
+triangle_W2_nin_j = TriangleVFF(
+    v1, # Vertex connected to H10, n[i], nadj[j]
+    v2, # Vertex connected to W2p, nbar[j], l[b]
+    v3, # Vertex connected to W2m, l_a, n[i]
+    mass_list
+)

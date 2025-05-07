@@ -232,6 +232,7 @@ gamma_mu = DiracGamma(mu)
 gamma_nu = DiracGamma(nu)
 QL = IndexedBase('Q_L')
 QR = IndexedBase('Q_R')
+Omega = IndexedBase('Omega')
 n = IndexedBase('n')
 nadj = IndexedBase(r'\overline{n}')
 l = IndexedBase(r'\ell')
@@ -262,9 +263,13 @@ interactionsWm_n_l = lambda i,a: {###########
     list(dict_interaction.keys())[0]:list(dict_interaction.values())[0]
     for dict_interaction in [interactionsW1m_n_l(i,a), interactionsW2m_n_l(i,a)]
 }
+################################
 
 interactionsH10_ll = lambda a: {
     (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
+}
+interactionsH10_nn = lambda i, j: {
+    (H10, n[i], nadj[j]): (1 / (sqrt2*k1)) * Omega[i,j] * diracPL + (1 / (sqrt2*k1)) * conjugate(Omega[i, j]) * diracPR
 }
 ###########
 # Interactions of charged scalars with leptons

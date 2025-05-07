@@ -112,6 +112,8 @@ def f0np(y):
     '''
     # if y == 1:
     #     out = -1
+    if y == mpf(0):
+        return mpf('nan') # y=0 is a singularity, result is undefined or infinite. NaN is safest.
     # else:
     #     out = y*log(-1.0*y) - y*log1p(-y) + log1p(-1.0/y) - 1.0
     # return out
@@ -128,6 +130,8 @@ def f1np(y):
     '''
     # if y == 1:
     #     out = -mpf('3')/2
+    if y == mpf(0):
+        return mpf('nan') # y=0 is a singularity, result is undefined or infinite. NaN is safest.
     # else:
     #     out = mp.power(y, 2)*log(-y) -\
     #         mp.power(y, 2)*log1p(-y) -\

@@ -269,6 +269,7 @@ ladj = IndexedBase(r'\overline{\ell}') # Adjoint charged lepton field
 TRL = IndexedBase('T_{RL}') # Yukawa-related matrix
 K = IndexedBase('K')        # Yukawa-related matrix
 J = IndexedBase('J')        # Yukawa-related matrix
+Omega = IndexedBase('Omega') # Yukawa-related matrix (neutrino mass matrix)
 ml = IndexedBase(r'm_\ell') # Charged lepton mass (diagonal matrix m_l[a,a] or just m_l[a])
 # mn = IndexedBase('m_n') # Neutrino mass (not directly used in these vertices)
 sqrt2 = sqrt(2)
@@ -290,10 +291,14 @@ interactionsW2p_n_l = lambda i, a: {
 interactionsW2m_n_l = lambda i, a: {
     (W2m, ladj[a], n[i]): (g / 2) * QR[a, i] * gamma_mu * diracPR
 }
+###################################
 interactionsH10_ll = lambda a: {
     (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
 }
-
+interactionsH10_nn = lambda i, j: {
+    (H10, n[i], nadj[j]): (1 / (sqrt2*k1)) * Omega[i,j] * diracPL + (1 / (sqrt2*k1)) * conjugate(Omega[i, j]) * diracPR
+}
+################################
 # Combined interactions (using dictionary unpacking)
 interactionsWp_n_l = lambda i, a: {
     **interactionsW1p_n_l(i, a),
@@ -315,8 +320,8 @@ interactionsGLm_n_l = lambda i, a: {
 }
 interactionsGLp_n_l = lambda i, a: {
     (GLp, nadj[i], l[a]): (sqrt2 / k1) * (
-        - TRL[a, i] * diracPL
-        + ml[a] * conjugate(QL[i, a]) * diracPR # Check if ml[a] or ml[a,a]
+        - TRL[i, a] * diracPL
+        + ml[a] * conjugate(QL[a, i]) * diracPR # Check if ml[a] or ml[a,a]
     )
 }
 
@@ -328,8 +333,8 @@ interactionsGRm_n_l = lambda i, a: {
 }
 interactionsGRp_n_l = lambda i, a: {
     (GRp, nadj[i], l[a]): (sqrt2 / vR) * (
-        - ml[a] * conjugate(QR[i, a]) * diracPL # Check if ml[a] or ml[a,a]
-        + conjugate(J[i, a]) * diracPR
+        - ml[a] * conjugate(QR[a, i]) * diracPL # Check if ml[a] or ml[a,a]
+        + conjugate(J[a, i]) * diracPR
     )
 }
 

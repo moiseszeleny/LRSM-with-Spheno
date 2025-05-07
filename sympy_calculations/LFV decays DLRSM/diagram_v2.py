@@ -1,4 +1,5 @@
 from sympy import symbols, IndexedBase, Expr, Symbol
+from functools import lru_cache
 from DLRSM1.symbolic_tools import momentum
 import logging
 # --- DLRSM1 Imports ---
@@ -13,6 +14,7 @@ from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import (
     interactionsH10_W2mSp_dict_approx,
     interactionsH10_WW_dict_approx,
     interactionsH10_ll,
+    interactionsH10_nn,
     CHARGED_PARTICLES_P,
     CHARGED_PARTICLES_M
 )
@@ -45,7 +47,7 @@ from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import (
 ) # Gauge Boson Masses
 # Particle symbols and indices
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import (
-    ml, i, j, a, b, nadj, n, l, ladj, gamma_mu
+    ml, mn, i, j, a, b, nadj, n, l, ladj, gamma_mu
 )
 # Dirac structure
 from DLRSM1.dirac import diracPL, diracPR
@@ -72,11 +74,10 @@ from LFVXD.vertexes_v2 import (
     VertexSSpVm
 )
 
-# --- Particle Definitions ---
-mn = IndexedBase('mn') # Neutrino mass symbol
+
 
 # Helper to get chiral couplings (reduces repetition)
-from sympy import Expr
+@lru_cache(maxsize=None)
 def get_chiral_couplings(interaction_term: Expr) -> tuple[Expr, Expr]:
     """Extracts Left (PL) and Right (PR) chiral couplings."""
     term_expanded = interaction_term.expand()
@@ -84,6 +85,7 @@ def get_chiral_couplings(interaction_term: Expr) -> tuple[Expr, Expr]:
     cR = term_expanded.coeff(diracPR)
     return cL, cR
 
+@lru_cache(maxsize=None)
 def get_chiral_couplings_gamma_mu(interaction_term: Expr) -> tuple[Expr, Expr]:
     """Extracts Left (PL) and Right (PR) chiral couplings."""
     term_expanded = interaction_term.expand()
@@ -91,6 +93,7 @@ def get_chiral_couplings_gamma_mu(interaction_term: Expr) -> tuple[Expr, Expr]:
     cR = term_expanded.coeff(gamma_mu*diracPR)
     return cL, cR
 
+@lru_cache(maxsize=None)
 def get_momentum_couplings(interaction_term: Expr, H1: Symbol, H2: Symbol) -> Expr:
     """Extracts momentum couplings for H-V-S or H-S-V vertices."""
     # Assuming H1 and H2 are the two particles in the interaction term
@@ -419,6 +422,112 @@ def create_bubble_diagram(
 
     return diagram
 
+def create_triangle_diagram_two_fermion(
+    diagram_name: str,
+    internal_fermion1: tuple, # Tuple (particle, antiparticle, mass_symbol, index_symbol) e.g., (n[i], nadj[i], mn[i], i)
+    internal_fermion2: tuple, # Tuple (particle, antiparticle, mass_symbol, index_symbol) e.g., (n[j], nadj[j], mn[j], j)
+    internal_boson: tuple, # Tuple (particle_plus, particle_minus, mass_symbol) e.g., (W1p, W1m, mW1)
+    boson_type: str, # 'Scalar' or 'Vector'
+    diagram_class: type # TriangleSFF or TriangleVFF
+):
+    """
+    Creates a triangle diagram object with two distinct internal fermions (e.g., n[i], n[j]).
+
+    Args:
+        diagram_name: A descriptive name for the diagram (for logging).
+        internal_fermion1: Tuple (particle, antiparticle, mass_symbol, index_symbol) for the first fermion (e.g., n[i]).
+        internal_fermion2: Tuple (particle, antiparticle, mass_symbol, index_symbol) for the second fermion (e.g., n[j]).
+        internal_boson: Tuple (particle_plus, particle_minus, mass_symbol) for the internal boson.
+        boson_type: String 'Scalar' or 'Vector' indicating the type of the internal boson.
+        diagram_class: The class for the overall triangle diagram (TriangleSFF or TriangleVFF).
+
+    Returns:
+        The instantiated triangle diagram object.
+
+    Raises:
+        ValueError: If interactions cannot be found or inputs are invalid.
+    """
+    logging.info(f"--- Creating Diagram: {diagram_name} ---")
+
+    fermion1_index = internal_fermion1[3]
+    fermion2_index = internal_fermion2[3]
+
+    # Determine vertex types and interaction functions based on boson_type
+    if boson_type == 'Scalar':
+        v2_type = VertexSFF
+        v3_type = VertexSFF
+        v2_interaction_func = interactionsSp_n_l
+        v3_interaction_func = interactionsSm_n_l
+        coupling_extractor = get_chiral_couplings
+    elif boson_type == 'Vector':
+        v2_type = VertexVFF
+        v3_type = VertexVFF
+        v2_interaction_func = interactionsWp_n_l
+        v3_interaction_func = interactionsWm_n_l
+        coupling_extractor = get_chiral_couplings_gamma_mu
+    else:
+        raise ValueError(f"Invalid boson_type: {boson_type}. Must be 'Scalar' or 'Vector'.")
+
+    internal_boson_plus = (internal_boson[0], internal_boson[2])
+    internal_boson_minus = (internal_boson[1], internal_boson[2])
+
+    # --- Vertex 1 Construction (H10 - n[i] - nadj[j]) ---
+    particles_v1 = {external_scalar[0], internal_fermion1[0], internal_fermion2[1]}
+    v1_desc = f"{external_scalar[0].name}-{internal_fermion1[0].name}-{internal_fermion2[1].name}"
+    interaction_dict_v1 = interactionsH10_nn(fermion1_index, fermion2_index)
+    try:
+        c1_term = find_interaction_coefficient(particles_v1, interaction_dict_v1, v1_desc)
+        c1L, c1R = get_chiral_couplings(c1_term)
+        v1 = VertexSFF(c1R, c1L) # Always SFF for H-n-n
+        logging.info(f"Vertex 1 ({v1_desc}) coupling found: L={c1L}, R={c1R}")
+    except ValueError as e:
+        logging.error(f"Vertex 1 interaction error for {diagram_name}: {e}")
+        raise
+
+    # --- Vertex 2 Construction (InternalBoson+ - nadj[j] - l[b]) ---
+    particles_v2 = {internal_boson_plus[0], internal_fermion2[1], external_lepton[0]}
+    v2_desc = f"{internal_boson_plus[0].name}-{internal_fermion2[1].name}-{external_lepton[0].name}"
+    interaction_dict_v2 = v2_interaction_func(fermion2_index, lepton_index)
+    try:
+        c2_term = next(coeff for interaction_key, coeff in interaction_dict_v2.items() if set(interaction_key) == particles_v2)
+        c2L, c2R = coupling_extractor(c2_term)
+        v2 = v2_type(c2R, c2L)
+        logging.info(f"Vertex 2 ({v2_desc}) coupling found: L={c2L}, R={c2R}")
+    except (StopIteration, ValueError) as e:
+        logging.error(f"Vertex 2 interaction error for {diagram_name}: {e}")
+        logging.error(f"Interaction Dict Searched (v2): {interaction_dict_v2}")
+        raise ValueError(f"Exact interaction match not found for {particles_v2}") from e
+
+    # --- Vertex 3 Construction (InternalBoson- - ladj[a] - n[i]) ---
+    particles_v3 = {internal_boson_minus[0], external_antilepton[1], internal_fermion1[0]}
+    v3_desc = f"{internal_boson_minus[0].name}-{external_antilepton[1].name}-{internal_fermion1[0].name}"
+    interaction_dict_v3 = v3_interaction_func(fermion1_index, antilep_index)
+    try:
+        c3_term = next(coeff for interaction_key, coeff in interaction_dict_v3.items() if set(interaction_key) == particles_v3)
+        c3L, c3R = coupling_extractor(c3_term)
+        v3 = v3_type(c3R, c3L)
+        logging.info(f"Vertex 3 ({v3_desc}) coupling found: L={c3L}, R={c3R}")
+    except (StopIteration, ValueError) as e:
+        logging.error(f"Vertex 3 interaction error for {diagram_name}: {e}")
+        logging.error(f"Interaction Dict Searched (v3): {interaction_dict_v3}")
+        raise ValueError(f"Exact interaction match not found for {particles_v3}") from e
+
+    # --- Diagram Instantiation ---
+    # Order for TriangleSFF/VFF: mH10, ml[a], ml[b], m_boson, m_fermion1, m_fermion2
+    mass_list = [
+        external_scalar[1],         # mH10
+        external_antilepton[2],     # ml[a]
+        external_lepton[2],         # ml[b]
+        internal_boson[2],          # Mass of the internal boson
+        internal_fermion1[2],       # mn[i]
+        internal_fermion2[2]        # mn[j]
+    ]
+    logging.info(f"Mass List for {diagram_class.__name__}: {mass_list}")
+
+    diagram = diagram_class(v1, v2, v3, mass_list)
+    logging.info(f"Successfully created {diagram_name}")
+
+    return diagram
 ################################33
 # Diagram Creation Calls
 ################################33
@@ -426,6 +535,11 @@ def create_bubble_diagram(
 # Example usage (replace the old blocks with calls like this):
 # Note: You would need to define all internal particle tuples first
 internal_neutrino = (n[nu_index], nadj[nu_index], mn[nu_index])
+# Define internal neutrinos with indices for two-fermion loops
+nu_index_i = i # Use existing i
+nu_index_j = j # Use existing j
+internal_neutrino_i = (n[nu_index_i], nadj[nu_index_i], mn[nu_index_i], nu_index_i)
+internal_neutrino_j = (n[nu_index_j], nadj[nu_index_j], mn[nu_index_j], nu_index_j)
 internal_GL_plus = (GLp, mW1)
 internal_GL_minus = (GLm, mW1)
 internal_GR_plus = (GRp, mW2)
@@ -651,6 +765,41 @@ refactored_bubble_HR_ni = create_bubble_diagram(
     antilep_index, 'Scalar',
     BubbleSF)
 
+#################################
+# Triangle Two-Fermion Diagrams
+#################################
+
+# TriangleSFF (Scalar boson, n[i], n[j])
+refactored_triangle_GL_ninj = create_triangle_diagram_two_fermion(
+    "triangle_GL_ninj (SFF)",
+    internal_neutrino_i, internal_neutrino_j, internal_GL_boson,
+    'Scalar', TriangleSFF
+)
+
+refactored_triangle_GR_ninj = create_triangle_diagram_two_fermion(
+    "triangle_GR_ninj (SFF)",
+    internal_neutrino_i, internal_neutrino_j, internal_GR_boson,
+    'Scalar', TriangleSFF
+)
+
+refactored_triangle_HR_ninj = create_triangle_diagram_two_fermion(
+    "triangle_HR_ninj (SFF)",
+    internal_neutrino_i, internal_neutrino_j, internal_HR_boson,
+    'Scalar', TriangleSFF
+)
+
+# TriangleVFF (Vector boson, n[i], n[j])
+refactored_triangle_W1_ninj = create_triangle_diagram_two_fermion(
+    "triangle_W1_ninj (VFF)",
+    internal_neutrino_i, internal_neutrino_j, internal_W1_boson,
+    'Vector', TriangleVFF
+)
+
+refactored_triangle_W2_ninj = create_triangle_diagram_two_fermion(
+    "triangle_W2_ninj (VFF)",
+    internal_neutrino_i, internal_neutrino_j, internal_W2_boson,
+    'Vector', TriangleVFF
+)
 
 # You would then replace all the original diagram creation blocks with calls
 # to create_triangle_diagram, passing the correct arguments for each case.
@@ -671,13 +820,22 @@ all_diagrams["ni_GRp_W2m"] = refactored_triangle_ni_GRp_W2m
 all_diagrams["ni_HRp_W2m"] = refactored_triangle_ni_HRp_W2m
 
 # Add bubble diagrams to the dictionary
-all_diagrams["ni_W1_FV"] = refactored_bubble_ni_W1
-all_diagrams["ni_W2_FV"] = refactored_bubble_ni_W2
-all_diagrams["W1_ni_VF"] = refactored_bubble_W1_ni
-all_diagrams["W2_ni_VF"] = refactored_bubble_W2_ni
-all_diagrams["ni_GL_FS"] = refactored_bubble_ni_GL
-all_diagrams["ni_GR_FS"] = refactored_bubble_ni_GR
-all_diagrams["ni_HR_FS"] = refactored_bubble_ni_HR
-all_diagrams["GL_ni_SF"] = refactored_bubble_GL_ni
-all_diagrams["GR_ni_SF"] = refactored_bubble_GR_ni
-all_diagrams["HR_ni_SF"] = refactored_bubble_HR_ni
+all_diagrams["ni_W1"] = refactored_bubble_ni_W1
+all_diagrams["ni_W2"] = refactored_bubble_ni_W2
+all_diagrams["W1_ni"] = refactored_bubble_W1_ni
+all_diagrams["W2_ni"] = refactored_bubble_W2_ni
+all_diagrams["ni_GL"] = refactored_bubble_ni_GL
+all_diagrams["ni_GR"] = refactored_bubble_ni_GR
+all_diagrams["ni_HR"] = refactored_bubble_ni_HR
+all_diagrams["GL_ni"] = refactored_bubble_GL_ni
+all_diagrams["GR_ni"] = refactored_bubble_GR_ni
+all_diagrams["HR_ni"] = refactored_bubble_HR_ni
+
+# Add two-fermion triangle diagrams to the dictionary
+all_diagrams["GL_ninj"] = refactored_triangle_GL_ninj
+all_diagrams["GR_ninj"] = refactored_triangle_GR_ninj
+all_diagrams["HR_ninj"] = refactored_triangle_HR_ninj
+all_diagrams["W1_ninj"] = refactored_triangle_W1_ninj
+all_diagrams["W2_ninj"] = refactored_triangle_W2_ninj
+
+print(f"{len(all_diagrams)} diagrams created and stored in all_diagrams dictionary.")
