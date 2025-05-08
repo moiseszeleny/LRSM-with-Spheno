@@ -1,7 +1,7 @@
 from sympy import Symbol, init_printing, conjugate, sin, cos, factor, Matrix
 from sympy import lambdify, Symbol, symbols
 from sympy.physics.quantum import Dagger
-from LFVXD.numeric.mpmath_definitions import B1_0, B1_1
+from LFVXD.numeric.qcdloop_pv import B0, B1
 
 from diagram_v2 import all_diagrams
 
@@ -16,6 +16,13 @@ from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, Omega, m
 
 from neutrinos import UpmnsStandardParametrization, NuOscObservables
 Nudata = NuOscObservables
+
+# light neutrino data
+th12,th13,th23 = symbols(r'\theta_{12}, \theta_{13}, \theta_{23}')
+mixing_angles = Nudata().substitutions(th12,th13,th23)
+
+Upmns_val = UpmnsStandardParametrization(th12,th13,th23).subs(mixing_angles)
+###
 
 URmat = URmni
 URT = URmat.T
@@ -107,39 +114,51 @@ Jmat = (TSRDagger + SRLmat).applyfunc(
 ).subs(mns_dummys).simplify().subs(dummys_mns)
 JDagger = Dagger(Jmat).subs(mns_dummys).simplify().subs(dummys_mns)
 
-
+# symbolic variables to replace
 mla, mlb, mni = symbols('m_{l_a}, m_{l_b}, m_{n_i}', positive=True)
+
 QLai = symbols('Q_{Lai}')
 QLbic = symbols(r'\overline{Q_{Lbi}}')
 TRLib = symbols('T_{RLib}')
 TRLiac  = symbols(r'\overline{T_{RLia}}')
 
-AL = all_diagrams['ni_GL'].AL().factor()
-AR = all_diagrams['ni_GL'].AR().factor()
+# Symbolic changes
+symbolic_changes = {
+    ml[a]:mla,
+    ml[b]:mlb,
+    mn[i]:mni,
+    QL[a,i]:QLai,
+    conjugate(QL[b, i]):QLbic,
+    TRL[i, b]:TRLib,
+    conjugate(TRL[i, a]):TRLiac
+}
+#symbolic form factors
+symbolic_formfactor = {
+    interaction:{
+        'AL':diagram.AL().factor().subs(symbolic_changes),
+        'AR':diagram.AR().factor().subs(symbolic_changes)
+    } for interaction, diagram in all_diagrams.items()
+}
 
-AR_sym = AR.subs(ml[a], mla).subs(ml[b], mlb).subs(mn[i], mni).subs(
-    QL[a,i], QLai
-).subs(
-    conjugate(QL[b, i]), QLbic
-).subs(
-    TRL[i, b], TRLib
-).subs(
-    conjugate(TRL[i, a]), TRLiac
-)
-AL_sym = AL.subs(ml[a], mla).subs(ml[b], mlb).subs(mn[i], mni).subs(
-    QL[a,i], QLai
-).subs(
-    conjugate(QL[b, i]), QLbic
-).subs(
-    TRL[i, b], TRLib
-).subs(
-    conjugate(TRL[i, a]), TRLiac
-)
+# Passarino-Veltman functions definitions
+pv_functions = {
+    'B1_0':B0,
+    'B1_1':B1
+}
 
-th12,th13,th23 = symbols(r'\theta_{12}, \theta_{13}, \theta_{23}')
-mixing_angles = Nudata().substitutions(th12,th13,th23)
-
-Upmns_val = UpmnsStandardParametrization(th12,th13,th23).subs(mixing_angles)
+# Lambdify symbolic form factors
+function_formfactors = {
+    'ni_GL':{
+        'AL':lambdify(
+    [QLai, QLbic, TRLib, TRLiac, mW1, mni, mla, mlb, k1],
+    symbolic_formfactor['ni_GL']['AL'], modules=[{'B1_0':B0, 'B1_1':B1},'mpmath']
+    ),
+        'AR':lambdify(
+    [QLai, QLbic, TRLib, TRLiac, mW1, mni, mla, mlb, k1],
+    symbolic_formfactor['ni_GL']['AR'], modules=[{'B1_0':B0, 'B1_1':B1},'mpmath']
+    )
+    }
+}
 
 Unu_changes = {
         Unu[i,j]:Upmns_val[i,j] for i in range(3) for j in range(3)
@@ -148,12 +167,4 @@ Unu_changes = {
 QL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], QLmat.subs(
     Unu_changes
 ), 'mpmath')
-
-AL_lamb = lambdify(
-    [QLai, QLbic, TRLib, TRLiac, mW1, mni, mla, mlb, k1],
-    AL_sym, modules=[{'B1_0':B1_0, 'B1_1':B1_1},'mpmath']
-)
-AR_lamb = lambdify(
-    [QLai, QLbic, TRLib, TRLiac, mW1, mni, mla, mlb, k1],
-    AR_sym, modules=[{'B1_0':B1_0, 'B1_1':B1_1},'mpmath']
-)
+TRL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], TRLmat, 'mpmath')
