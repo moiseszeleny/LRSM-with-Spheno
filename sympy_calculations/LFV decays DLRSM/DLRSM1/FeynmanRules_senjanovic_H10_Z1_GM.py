@@ -281,13 +281,13 @@ sqrt2 = sqrt(2)
 #       Adjust indices if convention is different.
 
 interactionsW1p_n_l = lambda i, a: {
-    (W1p, nadj[i], l[a]): (g / 2) * conjugate(QL[i, a]) * gamma_mu * diracPL
+    (W1p, nadj[i], l[a]): (g / 2) * conjugate(QL[a, i]) * gamma_mu * diracPL
 }
 interactionsW1m_n_l = lambda i, a: {
     (W1m, ladj[a], n[i]): (g / 2) * QL[a, i] * gamma_mu * diracPL
 }
 interactionsW2p_n_l = lambda i, a: {
-    (W2p, nadj[i], l[a]): (g / 2) * conjugate(QR[i, a]) * gamma_mu * diracPR
+    (W2p, nadj[i], l[a]): (g / 2) * conjugate(QR[a, i]) * gamma_mu * diracPR
 }
 interactionsW2m_n_l = lambda i, a: {
     (W2m, ladj[a], n[i]): (g / 2) * QR[a, i] * gamma_mu * diracPR
@@ -348,8 +348,8 @@ interactionsHRm_n_l = lambda i, a: {
 }
 interactionsHRp_n_l = lambda i, a: {
     (HRp, nadj[i], l[a]): (sqrt2 / k1) * ( # Verify VEV: k1 or vR? Assumed k1 like GLp
-        - conjugate(K[i, a]) * diracPR
-        + ml[a] * conjugate(QR[i, a]) * diracPL # Check if ml[a] or ml[a,a]
+        - conjugate(K[a, i]) * diracPR
+        + ml[a] * conjugate(QR[a, i]) * diracPL # Check if ml[a] or ml[a,a]
     )
 }
 
