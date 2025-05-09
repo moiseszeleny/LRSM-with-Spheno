@@ -1,7 +1,7 @@
 from sympy import Symbol, init_printing, conjugate, sin, cos, factor, Matrix
 from sympy import lambdify, Symbol, symbols
 from sympy.physics.quantum import Dagger
-from LFVXD.numeric.qcdloop_pv import B0, B1
+from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1 
 
 from diagram_v2 import all_diagrams
 from LFVXD.PaVe2 import D as Dim
@@ -165,10 +165,10 @@ symbolic_formfactor = {
 
 # Passarino-Veltman functions definitions
 pv_functions = {
-    'B1_0':B0,
-    'B2_0':B0,
-    'B1_1':B1,
-    'B2_1':B1
+    'B1_0':B1_0,
+    'B2_0':B2_0,
+    'B1_1':B1_1,
+    'B2_1':B2_1
 }
 
 # Helper function to create lambdified form factor pairs
@@ -180,68 +180,68 @@ def _create_lambdified_ff_pair(al_expr, ar_expr, arg_symbols_list, pv_funcs_dict
     }
 
 # Common symbolic arguments for form factors
-_common_ff_args_sym = [mni, mla, mlb, k1]
+_common_ff_args_sym = [mni, mla, mlb]
 
 # Lambdify symbolic form factors
 function_formfactors = {
     'ni_GL': _create_lambdified_ff_pair(
         symbolic_formfactor['ni_GL']['AL'],
         symbolic_formfactor['ni_GL']['AR'],
-        [QLai, QLbic, TRLib, TRLiac, mW1] + _common_ff_args_sym,
+        [QLai, QLbic, TRLib, TRLiac, mW1] + _common_ff_args_sym + [k1],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
     'GL_ni': _create_lambdified_ff_pair(
         symbolic_formfactor['GL_ni']['AL'],
         symbolic_formfactor['GL_ni']['AR'],
-        [QLbi, QLaic, TRLia, TRLibc, mW1] + _common_ff_args_sym,
+        [QLbi, QLaic, TRLia, TRLibc, mW1] + _common_ff_args_sym + [k1],
         pv_functions
     ),
     'ni_GR': _create_lambdified_ff_pair(
         symbolic_formfactor['ni_GR']['AL'],
         symbolic_formfactor['ni_GR']['AR'],
-        [QRai, QRbic, Jai, Jbic, mW2] + _common_ff_args_sym + [vR],
+        [QRai, QRbic, Jai, Jbic, mW2] + _common_ff_args_sym + [k1, vR],
         pv_functions
     ),
     'GR_ni': _create_lambdified_ff_pair(
         symbolic_formfactor['GR_ni']['AL'],
         symbolic_formfactor['GR_ni']['AR'],
-        [QRbi, QRaic, Jbi, Jaic, mW2] + _common_ff_args_sym + [vR],
+        [QRbi, QRaic, Jbi, Jaic, mW2] + _common_ff_args_sym + [k1, vR],
         pv_functions
     ),
     'ni_HR': _create_lambdified_ff_pair(
         symbolic_formfactor['ni_HR']['AL'],
         symbolic_formfactor['ni_HR']['AR'],
-        [QRai, QRbic, Kai, Kbic, mHR] + _common_ff_args_sym,
+        [QRai, QRbic, Kai, Kbic, mHR] + _common_ff_args_sym + [k1],
         pv_functions
     ),
     'HR_ni': _create_lambdified_ff_pair(
         symbolic_formfactor['HR_ni']['AL'],
         symbolic_formfactor['HR_ni']['AR'],
-        [QRbi, QRaic, Kbi, Kaic, mHR] + _common_ff_args_sym,
+        [QRbi, QRaic, Kbi, Kaic, mHR] + _common_ff_args_sym + [k1],
         pv_functions
     ),
     'ni_W1': _create_lambdified_ff_pair(
         symbolic_formfactor['ni_W1']['AL'],
         symbolic_formfactor['ni_W1']['AR'],
-        [QLai, QLbic, mW1] + _common_ff_args_sym + [g],
+        [QLai, QLbic, mW1] + _common_ff_args_sym + [k1, g],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
     'W1_ni': _create_lambdified_ff_pair(
         symbolic_formfactor['W1_ni']['AL'],
         symbolic_formfactor['W1_ni']['AR'],
-        [QLbi, QLaic, mW1] + _common_ff_args_sym + [g],
+        [QLbi, QLaic, mW1] + _common_ff_args_sym + [k1, g],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
     'ni_W2': _create_lambdified_ff_pair(
         symbolic_formfactor['ni_W2']['AL'],
         symbolic_formfactor['ni_W2']['AR'],
-        [QRai, QRbic, mW2] + _common_ff_args_sym + [g],
+        [QRai, QRbic, mW2] + _common_ff_args_sym + [k1, g],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
     'W2_ni': _create_lambdified_ff_pair(
         symbolic_formfactor['W2_ni']['AL'],
         symbolic_formfactor['W2_ni']['AR'],
-        [QRbi, QRaic, mW2] + _common_ff_args_sym + [g],
+        [QRbi, QRaic, mW2] + _common_ff_args_sym + [k1, g],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
 }

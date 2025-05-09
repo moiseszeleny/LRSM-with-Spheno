@@ -1,4 +1,3 @@
-# pv.py
 import qcdloop as ql
 
 def A0(m1sq, mu2=1.0):
@@ -20,7 +19,7 @@ def B0(p2, m1sq, m2sq, mu2=1.0):
     Compute the scalar B0 Passarino-Veltman function.
 
     Parameters:
-        p2 (float): External momentum squared.
+        p2 (float): External squared momentum.
         m1sq (float): Mass squared of first propagator.
         m2sq (float): Mass squared of second propagator.
         mu2 (float): Renormalization scale squared (default: 1.0).
@@ -31,24 +30,59 @@ def B0(p2, m1sq, m2sq, mu2=1.0):
     bubble = ql.Bubble()
     return bubble.integral(mu2, [m1sq, m2sq], [p2])[0]
 
-def C0(p12, p23, p31, m1sq, m2sq, m3sq, mu2=1.0):
+def B1_0(ma, M0, M1, mu2=1.0):
     """
-    Compute the scalar C0 Passarino-Veltman function.
+    Compute the scalar B1_0 Passarino-Veltman function.
 
     Parameters:
-        p12 (float): Squared momentum p_1^2.
-        p23 (float): Squared momentum p_2^2.
-        p31 (float): Squared momentum (p_1+p_2)^2.
-        m1sq (float): Mass squared of propagator opposite p_1 (Denner's m_1^2).
-        m2sq (float): Mass squared of propagator opposite p_2 (Denner's m_2^2).
-        m3sq (float): Mass squared of propagator opposite p_1+p_2 (Denner's m_0^2).
+        mi (float): External lepton i mass.
+        M0 (float): Mass of the first propagator.
+        M1 (float): Mass of the second propagator.
         mu2 (float): Renormalization scale squared (default: 1.0).
 
     Returns:
-        complex: C0 result.
+        complex: B1_0 result.
     """
-    triangle = ql.Triangle()
-    return triangle.integral(mu2, [m1sq, m2sq, m3sq], [p12, p23, p31])[0]
+    p2 = ma**2
+    m1sq = M0**2
+    m2sq = M1**2
+    return B0(p2, m1sq, m2sq, mu2)
+
+def B2_0(mb, M0, M2, mu2=1.0):
+    """
+    Compute the scalar B2_0 Passarino-Veltman function.
+
+    Parameters:
+        mb (float): External lepton ia mass.
+        M0 (float): Mass of the first propagator.
+        M2 (float): Mass of the second propagator.
+        mu2 (float): Renormalization scale squared (default: 1.0).
+
+    Returns:
+        complex: B1_0 result.
+    """
+    p2 = mb**2
+    m1sq = M0**2
+    m2sq = M2**2
+    return B0(p2, m1sq, m2sq, mu2)
+
+def B12_0(mX, M1, M2, mu2=1.0):
+    """
+    Compute the scalar B12_0 Passarino-Veltman function.
+
+    Parameters:
+        mX (float): External X = S, V mass.
+        M1 (float): Mass of the first propagator.
+        M2 (float): Mass of the second propagator.
+        mu2 (float): Renormalization scale squared (default: 1.0).
+
+    Returns:
+        complex: B12_0 result.
+    """
+    p2 = mX**2
+    m1sq = M1**2
+    m2sq = M2**2
+    return B0(p2, m1sq, m2sq, mu2)
 
 
 def B1(p2, m1sq, m2sq, mu2=1.0):
@@ -102,6 +136,68 @@ def B1(p2, m1sq, m2sq, mu2=1.0):
 
     return numerator / (2.0 * p2)
 
+def B1_1(ma, M0, M1, mu2=1.0):
+    """
+    Compute the scalar B1_1 Passarino-Veltman function coefficient.
+    B_mu = p_mu B1_1
+
+    Parameters:
+        ma (float): External lepton
+        M0 (float): Mass of the first propagator.
+        M1 (float): Mass of the second propagator.
+    
+    Returns:
+        complex: B1_1 result.
+    """
+    p2 = ma**2
+    m1sq = M0**2
+    m2sq = M1**2
+    return -B1(p2, m1sq, m2sq, mu2)
+
+def B2_1(mb, M0, M2, mu2=1.0):
+    """
+    Compute the scalar B2_1 Passarino-Veltman function coefficient.
+    B_mu = p_mu B
+
+    Parameters:
+        mb (float): External lepton
+        M0 (float): Mass of the first propagator.
+        M2 (float): Mass of the second propagator.
+    
+    Returns:
+        complex: B2_1 result.
+    """
+    p2 = mb**2
+    m1sq = M0**2
+    m2sq = M2**2
+    return B1(p2, m1sq, m2sq, mu2)
+
+def C0(p12, p23, p31, m1sq, m2sq, m3sq, mu2=1.0):
+    """
+    Compute the scalar C0 Passarino-Veltman function.
+
+    Parameters:
+        p12 (float): Squared momentum p_1^2.
+        p23 (float): Squared momentum p_2^2.
+        p31 (float): Squared momentum (p_1+p_2)^2.
+        m1sq (float): Mass squared of propagator opposite p_1 (Denner's m_1^2).
+        m2sq (float): Mass squared of propagator opposite p_2 (Denner's m_2^2).
+        m3sq (float): Mass squared of propagator opposite p_1+p_2 (Denner's m_0^2).
+        mu2 (float): Renormalization scale squared (default: 1.0).
+
+    Returns:
+        complex: C0 result.
+    """
+    triangle = ql.Triangle()
+    return triangle.integral(mu2, [m1sq, m2sq, m3sq], [p12, p23, p31])[0]
+
+def C0_(mX, mi, mj, M0, M1, M2, mu2=1.0):
+    """
+    Compute the scalar C0_ Passarino Veltman function changing the notation
+    to agree with LFV X decays with X = S, V. In our notation, the Passarino-Veltman
+    functions for numerical evaluation depends on masses not squared masses.
+    """
+    return C0(mX**2, mi**2, mj**2, M0**2, M1**2, M2**2, mu2)
 
 def C_coeffs(p1sq, p2sq, p1p2sq, m1sq, m2sq, m3sq, mu2=1.0):
     """
@@ -144,10 +240,24 @@ def C1(p12, p23, p31, m1sq, m2sq, m3sq, mu2=1.0):
     """Compute C1 Passarino-Veltman coefficient. See C0 docstring for parameters."""
     return C_coeffs(p12, p23, p31, m1sq, m2sq, m3sq, mu2)[0]
 
-
 def C2(p12, p23, p31, m1sq, m2sq, m3sq, mu2=1.0):
     """Compute C2 Passarino-Veltman coefficient. See C0 docstring for parameters."""
     return C_coeffs(p12, p23, p31, m1sq, m2sq, m3sq, mu2)[1]
+
+def C2_(mX, mi, mj, M0, M1, M2, mu2=1.0):
+    """
+    Compute the scalar C2_ Passarino Veltman function
+    """
+    return C2(mX**2, mi**2, mj**2, M0**2, M1**2, M2**2, mu2)
+
+def C1_(mX, mi, mj, M0, M1, M2, mu2=1.0):
+    """
+    Compute the scalar C1_ Passarino Veltman function
+    """
+    C0p = C0_(mX, mi, mj, M0, M1, M2, mu2)
+    C2p = C2_(mX, mi, mj, M0, M1, M2, mu2)
+    C1p = C1(mX**2, mi**2, mj**2, M0**2, M1**2, M2**2, mu2)
+    return C1p + C2p + C0p
 
     
 if __name__ == '__main__':
