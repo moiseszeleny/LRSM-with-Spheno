@@ -10,7 +10,7 @@ from DLRSM1.block_diagonalization_iss import ULmni, URmni, USmni, I3, eigenvalsM
 from DLRSM1.block_diagonalization_iss import dict_Mii2, dict_muii, dict_Mii2_sqrt, dict_sqrt_muii_MDi, dict_Mii, mns_dummys, dummys_mns
 from DLRSM1.block_diagonalization_iss import Unu
 
-from DLRSM1.potential_senjanovic_HiggsDoublets import alpha1, alpha2, alpha3, lamb1, lamb2, rho1, k1, vR, mHR, mH10
+from DLRSM1.potential_senjanovic_HiggsDoublets import alpha13, alpha12, alpha23, lamb12, rho1, k1, vR, mHR, mH10
 from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import mW1, mW2, g
 
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, Omega, ml, mn, i, j, a, b
@@ -56,8 +56,7 @@ GSRmat = (USDagger*USc*(eigenvalsMnu)*URDagger*URc).applyfunc(
     lambda x:x.factor(deep=True)
 ).subs(mns_dummys).simplify().subs(dummys_mns)
 
-a13 = alpha1 + alpha3
-Gamma_mat = (GRLmat - ((a13)/(2*rho1))*epsilon**2*Dagger(GSRmat)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
+Gamma_mat = (GRLmat - ((alpha13)/(2*rho1))*epsilon**2*Dagger(GSRmat)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
     lambda x: x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
 )
 
@@ -127,10 +126,10 @@ Kai = symbols('K_{ai}')
 Kbi = symbols('K_{bi}')
 Kaic = symbols(r'\overline{K_{ai}}')
 Kbic = symbols(r'\overline{K_{bi}}')
-alpha13 = symbols(r'\alpha_{13}') # alpha1 + alpha3
-lamb12 = symbols(r'\lambda_{12}') # lamb1 + lamb2
-alpha12 = symbols(r'\alpha_{12}') # alpha1 + alpha2 > 0
-alpha23 = symbols(r'\alpha_{23}') # alpha2 - alpha3 > 0
+#alpha13 = symbols(r'\alpha_{13}') # alpha1 + alpha3
+#lamb12 = symbols(r'\lambda_{12}') # lamb1 + lamb2
+#alpha12 = symbols(r'\alpha_{12}') # alpha1 + alpha2 > 0
+#alpha23 = symbols(r'\alpha_{23}') # alpha2 - alpha3 > 0
 
 # Symbolic changes
 symbolic_changes = {
@@ -158,11 +157,11 @@ symbolic_changes = {
     conjugate(K[a,i]):Kaic,
     conjugate(K[b,i]):Kbic,
     Dim:4,
-    alpha1 + alpha3: alpha13,
-    alpha2 - alpha3: alpha23,
-    alpha1 + alpha2: alpha12,
-    2*lamb1 + 2*lamb2: 2*lamb12,
-    lamb1 + lamb2: lamb12
+    #alpha1 + alpha3: alpha13,
+    #alpha2 - alpha3: alpha23,
+    #alpha1 + alpha2: alpha12,
+    #2*lamb1 + 2*lamb2: 2*lamb12,
+    #lamb1 + lamb2: lamb12
 }
 #symbolic form factors
 bubbles = ['ni_GL', 'GL_ni', 'ni_GR', 'GR_ni', 'ni_HR', 'HR_ni', 'ni_W1', 'W1_ni', 'ni_W2', 'W2_ni']
@@ -185,7 +184,7 @@ symbolic_formfactor_bubble = {
 #    **symbolic_formfactor_bubble,
 #    **symbolic_formfactor_triangle_onefermion
 #}
-triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm', 'ni_W1p_W1m']
+triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm', 'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m']
 triangle_diagrams_onefermion = {interaction:all_diagrams[interaction] for interaction in triangles_onefermion}
 symbolic_formfactor_triangle_onefermion = {
     interaction:{
@@ -198,13 +197,13 @@ symbolic_formfactor_triangle_onefermion = {
     } for interaction, diagram in triangle_diagrams_onefermion.items()
 }
 
-symbolic_formfactor_triangle_onefermion['ni_HRp_HRm'] = {}
-symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AL'] = all_diagrams['ni_HRp_HRm'].AL().expand().collect(
-            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
-        ).subs(symbolic_changes)
-symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AR'] = all_diagrams['ni_HRp_HRm'].AR().expand().collect(
-            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
-        ).subs(symbolic_changes)
+#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm'] = {}
+#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AL'] = all_diagrams['ni_HRp_HRm'].AL().expand().collect(
+#            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
+#        ).subs(symbolic_changes)
+#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AR'] = all_diagrams['ni_HRp_HRm'].AR().expand().collect(
+#            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
+#        ).subs(symbolic_changes)
 
 symbolic_formfactor = {
     **symbolic_formfactor_bubble,
@@ -317,6 +316,12 @@ function_formfactors = {
         symbolic_formfactor['ni_W1p_W1m']['AL'],
         symbolic_formfactor['ni_W1p_W1m']['AR'],
         [QLai, QLbic, mW1, mH10] + _common_ff_args_sym + [k1, g],
+        pv_functions  # Assuming pv_functions is suitable for all
+    ),
+    'ni_W2p_W2m': _create_lambdified_ff_pair(
+        symbolic_formfactor['ni_W2p_W2m']['AL'],
+        symbolic_formfactor['ni_W2p_W2m']['AR'],
+        [QRai, QRbic, mW2, mH10] + _common_ff_args_sym + [k1, g, rho1, alpha13],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
 }
@@ -472,6 +477,14 @@ _interaction_configs = {
         'boson_mass_key': ['mW1_val', 'mH10_val'],
         'extra_param_keys': ['k1_val', 'g_val']
     },
+    'ni_W2p_W2m': {
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
 }
 
 def _calculate_interaction_formfactors(
@@ -604,7 +617,7 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
         'GR_ni', 'ni_HR', 'HR_ni', 
         'ni_W1', 'W1_ni', 'ni_W2', 
         'W2_ni', 'ni_GLp_GLm', 'ni_GRp_GRm',
-        'ni_HRp_HRm', 'ni_W1p_W1m'
+        'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m'
     ]
     for int_key in interaction_types:
         if verbose:
@@ -663,7 +676,7 @@ if __name__ == '__main__':
     mtau_val = mp.mpf('1.776')
     ml_vals = [
         me_val,
-        mmu_val,
+        mmu_val,gi
         mtau_val
     ]
     

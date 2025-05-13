@@ -81,7 +81,13 @@ ChiRDaggerChiR = (ChiRDagger*ChiR)[0]
 ## Potential parameters
 mu12, mu22 = symbols(r'\mu_1^2, \mu_2^2', real=True)
 lamb1, lamb2, lamb3, lamb4, lamb5, lamb6 = symbols(r'\lambda_1, \lambda_2, \lambda_3, \lambda_4, \lambda_5, \lambda_6', real=True)
+lamb12 = symbols(r'\lambda_{12}', real=True)
+#lamb12 = lamb1 + lamb2
 alpha1, alpha2, alpha3 = symbols(r'\alpha_1, \alpha_2, \alpha_3', real=True)
+alpha13, alpha23, alpha12 = symbols(r'\alpha_{13}, \alpha_{23}, \alpha_{12}', real=True)
+#alpha13 = alpha1 + alpha3
+#alpha23 = alpha2 - alpha3
+#alpha12 = alpha1 + alpha2
 rho1, rho2,= symbols(r'\rho_1, \rho_2', real=True)
 
 ## Potential
@@ -497,6 +503,17 @@ change_scalars = solve(
 for key, value in change_scalars.items():
     change_scalars[key] = value.factor(deep=True)
 
+#from sympy import fraction
+#def simplify_fraction(frac):
+#    num, den = fraction(frac)
+#    num_simplify = num.expand().collect([vR], factor)
+#    den_simplify = den.expand().collect([vR], factor)
+#    return num_simplify/den_simplify
+
+#alpha13 = symbols(r'\alpha_{13}') 
+#change_scalars[chiR0r] = simplify_fraction(change_scalars[chiR0r]).subs(alpha1 + alpha3, alpha13)
+#change_scalars[phi10r] = simplify_fraction(change_scalars[phi10r]).subs(alpha1 + alpha3, alpha13)
+
 change_scalar_fields = {
     **change_scalars,
     **change_pseudo_scalars,
@@ -514,13 +531,13 @@ VLR_physical = VLRPhi_ri_tadpole_caso1.subs(
     complex_scalar_fields
 ).subs(
     change_scalar_fields
-)
+)#.subs(alpha1, alpha13 - alpha3)
 
 VLR_physical_approx = VLRPhi_ri_tadpole_caso1.subs(
     complex_scalar_fields
 ).subs(
     change_scalar_fields_approx
-).subs(k2,0).subs(vL, 0)
+).subs(k2,0).subs(vL, 0)#.subs(alpha1, alpha13 - alpha3)
 
 if __name__ == '__main__':
     from sympy import pprint

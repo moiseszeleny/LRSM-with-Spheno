@@ -1,5 +1,8 @@
 from sympy import symbols, IndexedBase, Expr, Symbol
 from DLRSM1.symbolic_tools import momentum
+from DLRSM1.potential_senjanovic_HiggsDoublets import rho1, vR
+from DLRSM1.potential_senjanovic_HiggsDoublets import potential_parameters_change
+from sympy import factor
 
 # --- DLRSM Imports ---
 # Feynman Rules specific to this calculation
@@ -27,6 +30,41 @@ interactionsH10_WmSp_dict_approx = {
     **interactionsH10_W2mSp_dict_approx
 }
 
+# changing alpha1 + alpha3 = alpha13
+# changing alpha2 - alpha3 = alpha23
+# changing alpha1 + alpha2 = alpha12
+# changing lamb1 + lamb2 = lamb12
+for vertex, interaction in interactionsH10_SS_dict_approx.items():
+    interaction_simplify = interaction.expand().collect(
+        rho1, lambda x:x.collect(vR, factor).subs(
+            potential_parameters_change
+        )
+    )
+    interactionsH10_SS_dict_approx[vertex] = interaction_simplify
+
+for vertex, interaction in interactionsH10_WW_dict_approx.items():
+    interaction_simplify = interaction.subs(potential_parameters_change)
+
+    interactionsH10_WW_dict_approx[vertex] = interaction_simplify
+
+for vertex, interaction in interactionsH10_WpSm_dict_approx.items():
+    interaction_simplify = interaction.expand().collect(
+        vR, lambda x:x.factor().subs(
+            potential_parameters_change
+        )
+    ).factor()
+    interactionsH10_WpSm_dict_approx[vertex] = interaction_simplify
+
+for vertex, interaction in interactionsH10_WmSp_dict_approx.items():
+    interaction_simplify = interaction.expand().collect(
+        vR, lambda x:x.factor().subs(
+            potential_parameters_change
+        )
+    ).factor()
+
+    interactionsH10_WmSp_dict_approx[vertex] = interaction_simplify
+
+###########
 particle_charge = {
     ptc:1 if ptc in CHARGED_PARTICLES_P else -1 if ptc in CHARGED_PARTICLES_M else 0
     for ptc in CHARGED_PARTICLES_P + CHARGED_PARTICLES_M
