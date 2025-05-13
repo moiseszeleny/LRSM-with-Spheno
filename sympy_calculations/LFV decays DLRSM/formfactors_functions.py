@@ -1,7 +1,7 @@
 from sympy import Symbol, init_printing, conjugate, sin, cos, factor, Matrix
 from sympy import lambdify, Symbol, symbols
 from sympy.physics.quantum import Dagger
-from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1 
+from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1, C0_, C1_, C2_
 
 from diagram_v2 import all_diagrams
 from LFVXD.PaVe2 import D as Dim
@@ -10,7 +10,7 @@ from DLRSM1.block_diagonalization_iss import ULmni, URmni, USmni, I3, eigenvalsM
 from DLRSM1.block_diagonalization_iss import dict_Mii2, dict_muii, dict_Mii2_sqrt, dict_sqrt_muii_MDi, dict_Mii, mns_dummys, dummys_mns
 from DLRSM1.block_diagonalization_iss import Unu
 
-from DLRSM1.potential_senjanovic_HiggsDoublets import alpha1, alpha3, rho1, k1, vR, mHR
+from DLRSM1.potential_senjanovic_HiggsDoublets import alpha1, alpha2, alpha3, lamb1, lamb2, rho1, k1, vR, mHR, mH10
 from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import mW1, mW2, g
 
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, Omega, ml, mn, i, j, a, b
@@ -127,6 +127,10 @@ Kai = symbols('K_{ai}')
 Kbi = symbols('K_{bi}')
 Kaic = symbols(r'\overline{K_{ai}}')
 Kbic = symbols(r'\overline{K_{bi}}')
+alpha13 = symbols(r'\alpha_{13}') # alpha1 + alpha3
+lamb12 = symbols(r'\lambda_{12}') # lamb1 + lamb2
+alpha12 = symbols(r'\alpha_{12}') # alpha1 + alpha2 > 0
+alpha23 = symbols(r'\alpha_{23}') # alpha2 - alpha3 > 0
 
 # Symbolic changes
 symbolic_changes = {
@@ -153,14 +157,58 @@ symbolic_changes = {
     K[b,i]:Kbi,
     conjugate(K[a,i]):Kaic,
     conjugate(K[b,i]):Kbic,
-    Dim:4
+    Dim:4,
+    alpha1 + alpha3: alpha13,
+    alpha2 - alpha3: alpha23,
+    alpha1 + alpha2: alpha12,
+    2*lamb1 + 2*lamb2: 2*lamb12,
+    lamb1 + lamb2: lamb12
 }
 #symbolic form factors
-symbolic_formfactor = {
+bubbles = ['ni_GL', 'GL_ni', 'ni_GR', 'GR_ni', 'ni_HR', 'HR_ni', 'ni_W1', 'W1_ni', 'ni_W2', 'W2_ni']
+bubble_diagrams = {interaction:all_diagrams[interaction] for interaction in bubbles}
+symbolic_formfactor_bubble = {
     interaction:{
         'AL':diagram.AL().factor().subs(symbolic_changes),
         'AR':diagram.AR().factor().subs(symbolic_changes)
-    } for interaction, diagram in all_diagrams.items()
+    } for interaction, diagram in bubble_diagrams.items()
+}
+#triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm']
+#triangle_diagrams_onefermion = {interaction:all_diagrams[interaction] for interaction in triangles_onefermion}
+#symbolic_formfactor_triangle_onefermion = {
+#    interaction:{
+#        'AL':diagram.AL().expand().collect([rho1], factor).subs(symbolic_changes),
+#        'AR':diagram.AR().expand().collect([rho1], factor).subs(symbolic_changes)
+#    } for interaction, diagram in triangle_diagrams_onefermion.items()
+#}
+#symbolic_formfactor = {
+#    **symbolic_formfactor_bubble,
+#    **symbolic_formfactor_triangle_onefermion
+#}
+triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm', 'ni_W1p_W1m']
+triangle_diagrams_onefermion = {interaction:all_diagrams[interaction] for interaction in triangles_onefermion}
+symbolic_formfactor_triangle_onefermion = {
+    interaction:{
+        'AL':diagram.AL().expand().collect(
+            [rho1], factor
+        ).subs(symbolic_changes),
+        'AR':diagram.AR().expand().collect(
+            [rho1], factor
+        ).subs(symbolic_changes)
+    } for interaction, diagram in triangle_diagrams_onefermion.items()
+}
+
+symbolic_formfactor_triangle_onefermion['ni_HRp_HRm'] = {}
+symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AL'] = all_diagrams['ni_HRp_HRm'].AL().expand().collect(
+            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
+        ).subs(symbolic_changes)
+symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AR'] = all_diagrams['ni_HRp_HRm'].AR().expand().collect(
+            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
+        ).subs(symbolic_changes)
+
+symbolic_formfactor = {
+    **symbolic_formfactor_bubble,
+    **symbolic_formfactor_triangle_onefermion
 }
 
 # Passarino-Veltman functions definitions
@@ -168,7 +216,10 @@ pv_functions = {
     'B1_0':B1_0,
     'B2_0':B2_0,
     'B1_1':B1_1,
-    'B2_1':B2_1
+    'B2_1':B2_1,
+    'C0': C0_,
+    'C1': C1_,
+    'C2': C2_
 }
 
 # Helper function to create lambdified form factor pairs
@@ -242,6 +293,30 @@ function_formfactors = {
         symbolic_formfactor['W2_ni']['AL'],
         symbolic_formfactor['W2_ni']['AR'],
         [QRbi, QRaic, mW2] + _common_ff_args_sym + [k1, g],
+        pv_functions  # Assuming pv_functions is suitable for all
+    ),
+    'ni_GLp_GLm': _create_lambdified_ff_pair(
+        symbolic_formfactor['ni_GLp_GLm']['AL'],
+        symbolic_formfactor['ni_GLp_GLm']['AR'],
+        [QLai, QLbic, TRLib, TRLiac, mW1, mH10] + _common_ff_args_sym + [k1, rho1, alpha13, lamb12],
+        pv_functions  # Assuming pv_functions is suitable for all
+    ),
+    'ni_GRp_GRm': _create_lambdified_ff_pair(
+        symbolic_formfactor['ni_GRp_GRm']['AL'],
+        symbolic_formfactor['ni_GRp_GRm']['AR'],
+        [QRai, QRbic, Jai, Jbic, mW2, mH10] + _common_ff_args_sym + [k1, vR, rho1, alpha13, lamb12],
+        pv_functions  # Assuming pv_functions is suitable for all
+    ),
+    'ni_HRp_HRm': _create_lambdified_ff_pair(
+        symbolic_formfactor['ni_HRp_HRm']['AL'],
+        symbolic_formfactor['ni_HRp_HRm']['AR'],
+        [QRai, QRbic, Kai, Kbic, mHR, mH10] + _common_ff_args_sym + [k1, vR, rho1, alpha13, alpha12, alpha23, lamb12],
+        pv_functions  # Assuming pv_functions is suitable for all
+    ),
+    'ni_W1p_W1m': _create_lambdified_ff_pair(
+        symbolic_formfactor['ni_W1p_W1m']['AL'],
+        symbolic_formfactor['ni_W1p_W1m']['AR'],
+        [QLai, QLbic, mW1, mH10] + _common_ff_args_sym + [k1, g],
         pv_functions  # Assuming pv_functions is suitable for all
     ),
 }
@@ -359,6 +434,44 @@ _interaction_configs = {
         'boson_mass_key': 'mW2_val',
         'extra_param_keys': ['k1_val', 'g_val']
     },
+    'ni_GLp_GLm': {
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'TRL','idx_keys': ('i', 'b'), 'conj': False},
+            {'matrix_name': 'TRL','idx_keys': ('i', 'a'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val', 'lamb12_val']
+    },
+    'ni_GRp_GRm': {
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'J','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'J','idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'lamb12_val']
+    },
+    'ni_HRp_HRm': {
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'K','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'K','idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'alpha12_val', 'alpha23_val', 'lamb12_val']
+    },
+    'ni_W1p_W1m': {
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val']
+    },
 }
 
 def _calculate_interaction_formfactors(
@@ -366,12 +479,12 @@ def _calculate_interaction_formfactors(
     # Lambdified matrices
     QL_val, TRL_val, QR_val, J_val, K_val,
     # Masses Bosons
-    mW1_val, mW2_val, mHR_val,
+    mW1_val, mW2_val, mHR_val, mH10_val,
     # vev 
     k1_val, vR_val,
     # extra parameters
-    g_val,
-    # Masses
+    g_val, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val,
+    # Masses fermions
     mni_masses, ml_a_val, ml_b_val,
     # Indices
     a_idx, b_idx,
@@ -391,7 +504,8 @@ def _calculate_interaction_formfactors(
     }
     parameter_values = {
         'mW1_val': mW1_val, 'mW2_val': mW2_val, 'mHR_val': mHR_val,
-        'k1_val': k1_val, 'vR_val': vR_val, 'g_val': g_val
+        'k1_val': k1_val, 'vR_val': vR_val, 'g_val': g_val, 'mH10_val': mH10_val,
+        'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val
     }
 
     for i in range(num_neutrinos):
@@ -420,7 +534,12 @@ def _calculate_interaction_formfactors(
             current_ff_args.append(val)
 
         # 2. Boson mass
-        current_ff_args.append(parameter_values[config['boson_mass_key']])
+        if isinstance(config['boson_mass_key'], list):
+            for key in config['boson_mass_key']:
+                current_ff_args.append(parameter_values[key])
+        else:
+            current_ff_args.append(parameter_values[config['boson_mass_key']])
+        #current_ff_args.append(parameter_values[config['boson_mass_key']])
         
         # 3. Common particle masses (mni, mla, mlb)
         current_ff_args.extend([mni_val, ml_a_val, ml_b_val])
@@ -441,12 +560,14 @@ def _calculate_interaction_formfactors(
             
     return {'AL': al_sum, 'AR': ar_sum}
 
-def formfactors_neutrino_sum(mns_vals, ml_vals_list, mW2_val, mHR_val, idx_a, idx_b, k1_val=mp.mpf('246'), vR_val=mp.mpf('5000'), mW1_val=mp.mpf('80.3692'), verbose=False):
+def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a, idx_b, k1_val=mp.mpf('246'), vR_val=mp.mpf('5000'), mW1_val=mp.mpf('80.3692'), mH10_val=mp.mpf('125'), mHR_val=mp.mpf('1600'), verbose=False):
     """
     Calculates the sum of form factors for different interactions.
     """
     eps_val = k1_val / vR_val
     g_val = 2*mW1_val/k1_val
+    mW2_squared_val = (mW1_val**2/k1_val**2)*(k1_val**2 + vR_val**2)
+    mW2_val = mp.sqrt(mW2_squared_val)
 
     # The lambdified functions for mixing matrices expect 6 heavy neutrino mass arguments (mNi[3] to mNi[8])
     if len(mns_vals) < 9:
@@ -469,15 +590,22 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, mW2_val, mHR_val, idx_a, id
         "num_neutrinos": num_total_neutrinos,
         "QL_val": QL_val, "TRL_val": TRL_val, "QR_val": QR_val,
         "J_val": J_val, "K_val": K_val,
-        "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val,
-        "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val,
+        "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val, 'mH10_val':mH10_val,
+        "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val, 
+        'rho1_val':rho1_val, 'alpha13_val':alpha13_val, 'alpha12_val':alpha12_val, 'alpha23_val':alpha23_val, 'lamb12_val':lamb12_val,
         "mni_masses": mns_vals,
         "ml_a_val": ml_vals_list[idx_a], "ml_b_val": ml_vals_list[idx_b],
         "a_idx": idx_a, "b_idx": idx_b,
         "verbose": verbose
     }
 
-    interaction_types = ['ni_GL', 'GL_ni', 'ni_GR', 'GR_ni', 'ni_HR', 'HR_ni', 'ni_W1', 'W1_ni', 'ni_W2', 'W2_ni']
+    interaction_types = [
+        'ni_GL', 'GL_ni', 'ni_GR', 
+        'GR_ni', 'ni_HR', 'HR_ni', 
+        'ni_W1', 'W1_ni', 'ni_W2', 
+        'W2_ni', 'ni_GLp_GLm', 'ni_GRp_GRm',
+        'ni_HRp_HRm', 'ni_W1p_W1m'
+    ]
     for int_key in interaction_types:
         if verbose:
             print(f"Calculating form factors for interaction type: {int_key}")
@@ -493,10 +621,20 @@ if __name__ == '__main__':
     # Numeric benchmark
     k1_val = mp.mpf('246')
     vR_val = mp.mpf('5000')
+    mW1_val = mp.mpf('80.3692')
     epsilon_val = k1_val/vR_val
-    mW1_val = mp.mpf('80')
-    mW2_val = mp.mpf('1000')
-    mHR_val = mp.mpf('2000')
+    mW2_squared_val = (mW1_val**2/k1_val**2)*(k1_val**2 + vR_val**2)
+    mW2_val = mp.sqrt(mW2_squared_val)
+
+    rho1_val = mp.mpf('0.1')
+    alpha13_val = mp.mpf('0.1')
+    alpha12_val = mp.mpf('0.1')
+    alpha23_val = mp.mpf('0.1') # alpha2 - alpha3 > 0
+    lamb12_val = mp.mpf('0.1')
+    #alpha2_3 = mp.mpf('0.2') # alpha2 - alpha3 > 0
+    mHR_squared_val = (alpha23_val)*(k1_val**2 + vR_val**2)
+    mHR_val = mp.sqrt(mHR_squared_val)
+    mH10_val = mp.mpf('125')
 
     d21 = mp.mpf(str(Nudata.squareDm21.central))*mp.mpf('1e-18')# factor to convert eV^2 to GeV^2
     d31 = mp.mpf(str(Nudata.squareDm31.central))*mp.mpf('1e-18')
@@ -528,16 +666,19 @@ if __name__ == '__main__':
         mmu_val,
         mtau_val
     ]
+    
 
-    ff = formfactors_neutrino_sum(mni_vals, ml_vals, mW2_val, mHR_val, 1, 2, k1_val=k1_val, vR_val=vR_val, verbose=True)
+    ff = formfactors_neutrino_sum(mni_vals, ml_vals, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a=1, idx_b=2, k1_val=k1_val, vR_val=vR_val, mHR_val=mHR_val, verbose=True)
 
     ALsum = 0
     ARsum = 0
     for interaction, formfactor in ff.items():
+        ffL = formfactor['AL']
+        ffR = formfactor['AR']
         print('Diagram: ', interaction)
-        print('AL: ', formfactor['AL'])
-        print('AR: ', formfactor['AR'])
-        ALsum += formfactor['AL']
-        ARsum += formfactor['AR']
+        print(f'AL = {ffL}')
+        print(f'AR = {ffR}')
+        ALsum += ffL
+        ARsum += ffR
     print('ALsum: ', ALsum)
     print('ARsum: ', ARsum)
