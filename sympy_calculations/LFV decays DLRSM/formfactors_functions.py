@@ -1,7 +1,7 @@
 from sympy import Symbol, init_printing, conjugate, sin, cos, factor, Matrix
 from sympy import lambdify, Symbol, symbols
 from sympy.physics.quantum import Dagger
-from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1, C0_, C1_, C2_
+from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1, B12_0, C0_, C1_, C2_
 
 from diagram_v2 import all_diagrams
 from LFVXD.PaVe2 import D as Dim
@@ -126,10 +126,6 @@ Kai = symbols('K_{ai}')
 Kbi = symbols('K_{bi}')
 Kaic = symbols(r'\overline{K_{ai}}')
 Kbic = symbols(r'\overline{K_{bi}}')
-#alpha13 = symbols(r'\alpha_{13}') # alpha1 + alpha3
-#lamb12 = symbols(r'\lambda_{12}') # lamb1 + lamb2
-#alpha12 = symbols(r'\alpha_{12}') # alpha1 + alpha2 > 0
-#alpha23 = symbols(r'\alpha_{23}') # alpha2 - alpha3 > 0
 
 # Symbolic changes
 symbolic_changes = {
@@ -157,11 +153,6 @@ symbolic_changes = {
     conjugate(K[a,i]):Kaic,
     conjugate(K[b,i]):Kbic,
     Dim:4,
-    #alpha1 + alpha3: alpha13,
-    #alpha2 - alpha3: alpha23,
-    #alpha1 + alpha2: alpha12,
-    #2*lamb1 + 2*lamb2: 2*lamb12,
-    #lamb1 + lamb2: lamb12
 }
 #symbolic form factors
 bubbles = ['ni_GL', 'GL_ni', 'ni_GR', 'GR_ni', 'ni_HR', 'HR_ni', 'ni_W1', 'W1_ni', 'ni_W2', 'W2_ni']
@@ -172,19 +163,12 @@ symbolic_formfactor_bubble = {
         'AR':diagram.AR().factor().subs(symbolic_changes)
     } for interaction, diagram in bubble_diagrams.items()
 }
-#triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm']
-#triangle_diagrams_onefermion = {interaction:all_diagrams[interaction] for interaction in triangles_onefermion}
-#symbolic_formfactor_triangle_onefermion = {
-#    interaction:{
-#        'AL':diagram.AL().expand().collect([rho1], factor).subs(symbolic_changes),
-#        'AR':diagram.AR().expand().collect([rho1], factor).subs(symbolic_changes)
-#    } for interaction, diagram in triangle_diagrams_onefermion.items()
-#}
-#symbolic_formfactor = {
-#    **symbolic_formfactor_bubble,
-#    **symbolic_formfactor_triangle_onefermion
-#}
-triangles_onefermion = ['ni_GLp_GLm', 'ni_GRp_GRm', 'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m']
+
+triangles_onefermion = [
+    'ni_GLp_GLm', 'ni_GRp_GRm', 'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m',
+    'ni_GRp_HRm', 'ni_HRp_GRm', 'ni_W1p_GLm', 'ni_W2p_GRm', 'ni_W2p_HRm',
+    'ni_GLp_W1m', 'ni_GRp_W2m', 'ni_HRp_W2m'
+]
 triangle_diagrams_onefermion = {interaction:all_diagrams[interaction] for interaction in triangles_onefermion}
 symbolic_formfactor_triangle_onefermion = {
     interaction:{
@@ -197,14 +181,6 @@ symbolic_formfactor_triangle_onefermion = {
     } for interaction, diagram in triangle_diagrams_onefermion.items()
 }
 
-#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm'] = {}
-#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AL'] = all_diagrams['ni_HRp_HRm'].AL().expand().collect(
-#            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
-#        ).subs(symbolic_changes)
-#symbolic_formfactor_triangle_onefermion['ni_HRp_HRm']['AR'] = all_diagrams['ni_HRp_HRm'].AR().expand().collect(
-#            [rho1], lambda x: x.collect([vR], lambda x:x.factor())
-#        ).subs(symbolic_changes)
-
 symbolic_formfactor = {
     **symbolic_formfactor_bubble,
     **symbolic_formfactor_triangle_onefermion
@@ -216,9 +192,19 @@ pv_functions = {
     'B2_0':B2_0,
     'B1_1':B1_1,
     'B2_1':B2_1,
+    'B12_0':B12_0,
     'C0': C0_,
     'C1': C1_,
     'C2': C2_
+}
+
+# Helper map from string keys in _interaction_configs to actual SymPy symbols
+# This is used to programmatically build the argument lists for lambdify.
+symbol_map_from_config_keys = {
+    'mW1_val': mW1, 'mW2_val': mW2, 'mHR_val': mHR, 'mH10_val': mH10,
+    'k1_val': k1, 'vR_val': vR, 'g_val': g,
+    'rho1_val': rho1, 'alpha13_val': alpha13, 'alpha12_val': alpha12,
+    'alpha23_val': alpha23, 'lamb12_val': lamb12
 }
 
 # Helper function to create lambdified form factor pairs
@@ -231,100 +217,6 @@ def _create_lambdified_ff_pair(al_expr, ar_expr, arg_symbols_list, pv_funcs_dict
 
 # Common symbolic arguments for form factors
 _common_ff_args_sym = [mni, mla, mlb]
-
-# Lambdify symbolic form factors
-function_formfactors = {
-    'ni_GL': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_GL']['AL'],
-        symbolic_formfactor['ni_GL']['AR'],
-        [QLai, QLbic, TRLib, TRLiac, mW1] + _common_ff_args_sym + [k1],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'GL_ni': _create_lambdified_ff_pair(
-        symbolic_formfactor['GL_ni']['AL'],
-        symbolic_formfactor['GL_ni']['AR'],
-        [QLbi, QLaic, TRLia, TRLibc, mW1] + _common_ff_args_sym + [k1],
-        pv_functions
-    ),
-    'ni_GR': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_GR']['AL'],
-        symbolic_formfactor['ni_GR']['AR'],
-        [QRai, QRbic, Jai, Jbic, mW2] + _common_ff_args_sym + [k1, vR],
-        pv_functions
-    ),
-    'GR_ni': _create_lambdified_ff_pair(
-        symbolic_formfactor['GR_ni']['AL'],
-        symbolic_formfactor['GR_ni']['AR'],
-        [QRbi, QRaic, Jbi, Jaic, mW2] + _common_ff_args_sym + [k1, vR],
-        pv_functions
-    ),
-    'ni_HR': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_HR']['AL'],
-        symbolic_formfactor['ni_HR']['AR'],
-        [QRai, QRbic, Kai, Kbic, mHR] + _common_ff_args_sym + [k1],
-        pv_functions
-    ),
-    'HR_ni': _create_lambdified_ff_pair(
-        symbolic_formfactor['HR_ni']['AL'],
-        symbolic_formfactor['HR_ni']['AR'],
-        [QRbi, QRaic, Kbi, Kaic, mHR] + _common_ff_args_sym + [k1],
-        pv_functions
-    ),
-    'ni_W1': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_W1']['AL'],
-        symbolic_formfactor['ni_W1']['AR'],
-        [QLai, QLbic, mW1] + _common_ff_args_sym + [k1, g],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'W1_ni': _create_lambdified_ff_pair(
-        symbolic_formfactor['W1_ni']['AL'],
-        symbolic_formfactor['W1_ni']['AR'],
-        [QLbi, QLaic, mW1] + _common_ff_args_sym + [k1, g],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_W2': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_W2']['AL'],
-        symbolic_formfactor['ni_W2']['AR'],
-        [QRai, QRbic, mW2] + _common_ff_args_sym + [k1, g],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'W2_ni': _create_lambdified_ff_pair(
-        symbolic_formfactor['W2_ni']['AL'],
-        symbolic_formfactor['W2_ni']['AR'],
-        [QRbi, QRaic, mW2] + _common_ff_args_sym + [k1, g],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_GLp_GLm': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_GLp_GLm']['AL'],
-        symbolic_formfactor['ni_GLp_GLm']['AR'],
-        [QLai, QLbic, TRLib, TRLiac, mW1, mH10] + _common_ff_args_sym + [k1, rho1, alpha13, lamb12],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_GRp_GRm': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_GRp_GRm']['AL'],
-        symbolic_formfactor['ni_GRp_GRm']['AR'],
-        [QRai, QRbic, Jai, Jbic, mW2, mH10] + _common_ff_args_sym + [k1, vR, rho1, alpha13, lamb12],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_HRp_HRm': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_HRp_HRm']['AL'],
-        symbolic_formfactor['ni_HRp_HRm']['AR'],
-        [QRai, QRbic, Kai, Kbic, mHR, mH10] + _common_ff_args_sym + [k1, vR, rho1, alpha13, alpha12, alpha23, lamb12],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_W1p_W1m': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_W1p_W1m']['AL'],
-        symbolic_formfactor['ni_W1p_W1m']['AR'],
-        [QLai, QLbic, mW1, mH10] + _common_ff_args_sym + [k1, g],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-    'ni_W2p_W2m': _create_lambdified_ff_pair(
-        symbolic_formfactor['ni_W2p_W2m']['AL'],
-        symbolic_formfactor['ni_W2p_W2m']['AR'],
-        [QRai, QRbic, mW2, mH10] + _common_ff_args_sym + [k1, g, rho1, alpha13],
-        pv_functions  # Assuming pv_functions is suitable for all
-    ),
-}
 
 # mixing matrix numeric
 Unu_changes = {
@@ -348,6 +240,7 @@ K_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], Kma
 # Configuration for _calculate_interaction_formfactors
 _interaction_configs = {
     'ni_GL': {
+        'ordered_coupling_symbols': [QLai, QLbic, TRLib, TRLiac],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -358,6 +251,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val']
     },
     'GL_ni': {
+        'ordered_coupling_symbols': [QLbi, QLaic, TRLia, TRLibc],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': True},
@@ -368,6 +262,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val']
     },
     'ni_GR': {
+        'ordered_coupling_symbols': [QRai, QRbic, Jai, Jbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -378,6 +273,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'vR_val']
     },
     'GR_ni': {
+        'ordered_coupling_symbols': [QRbi, QRaic, Jbi, Jaic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': True},
@@ -388,6 +284,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'vR_val']
     },
     'ni_HR': {
+        'ordered_coupling_symbols': [QRai, QRbic, Kai, Kbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -398,6 +295,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val']
     },
     'HR_ni': {
+        'ordered_coupling_symbols': [QRbi, QRaic, Kbi, Kaic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': True},
@@ -408,6 +306,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val']
     },
     'ni_W1': {
+        'ordered_coupling_symbols': [QLai, QLbic],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True}
@@ -416,6 +315,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'g_val']
     },
     'W1_ni': {
+        'ordered_coupling_symbols': [QLbi, QLaic],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': True}
@@ -424,6 +324,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'g_val']
     },
     'ni_W2': {
+        'ordered_coupling_symbols': [QRai, QRbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True}
@@ -432,6 +333,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'g_val']
     },
     'W2_ni': {
+        'ordered_coupling_symbols': [QRbi, QRaic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': True}
@@ -440,6 +342,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'g_val']
     },
     'ni_GLp_GLm': {
+        'ordered_coupling_symbols': [QLai, QLbic, TRLib, TRLiac],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -450,6 +353,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val', 'lamb12_val']
     },
     'ni_GRp_GRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Jai, Jbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -460,6 +364,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'lamb12_val']
     },
     'ni_HRp_HRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Kai, Kbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
@@ -470,6 +375,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'alpha12_val', 'alpha23_val', 'lamb12_val']
     },
     'ni_W1p_W1m': {
+        'ordered_coupling_symbols': [QLai, QLbic],
         'couplings': [
             {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True}
@@ -478,6 +384,7 @@ _interaction_configs = {
         'extra_param_keys': ['k1_val', 'g_val']
     },
     'ni_W2p_W2m': {
+        'ordered_coupling_symbols': [QRai, QRbic],
         'couplings': [
             {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
             {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True}
@@ -485,7 +392,132 @@ _interaction_configs = {
         'boson_mass_key': ['mW2_val', 'mH10_val'],
         'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
     },
+    'ni_GRp_HRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Kai, Jbic],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'K','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'J','idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mW2_val', 'mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'alpha12_val', 'alpha23_val', 'lamb12_val']
+    },
+    'ni_HRp_GRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Jai, Kbic],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'J','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'K','idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'alpha12_val', 'alpha23_val', 'lamb12_val']
+    },
+    'ni_W1p_GLm': {
+        'ordered_coupling_symbols': [QLai, QLbic, TRLiac],
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'TRL', 'idx_keys': ('i', 'a'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val']
+    },
+    'ni_W2p_GRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Jai],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'J', 'idx_keys': ('a', 'i'), 'conj': False}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
+    'ni_W2p_HRm': {
+        'ordered_coupling_symbols': [QRai, QRbic, Kai],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'K', 'idx_keys': ('a', 'i'), 'conj': False}
+        ],
+        'boson_mass_key': ['mW2_val', 'mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
+    'ni_GLp_W1m': {
+        'ordered_coupling_symbols': [QLai, QLbic, TRLib],
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'TRL', 'idx_keys': ('i', 'b'), 'conj': False}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val']
+    },
+    'ni_GRp_W2m': {
+        'ordered_coupling_symbols': [QRai, QRbic, Jbic],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'J', 'idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
+    'ni_HRp_W2m': {
+        'ordered_coupling_symbols': [QRai, QRbic, Kbic],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'i'), 'conj': True},
+            {'matrix_name': 'K', 'idx_keys': ('b', 'i'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
 }
+
+# Lambdify symbolic form factors
+function_formfactors = {}
+for int_key, config in _interaction_configs.items():
+    al_expr = symbolic_formfactor[int_key]['AL']
+    ar_expr = symbolic_formfactor[int_key]['AR']
+
+    # Construct the ordered list of symbols for lambdify's arguments
+    current_lambdify_args_syms = []
+    
+    # 1. Coupling symbols (defined in config)
+    current_lambdify_args_syms.extend(config['ordered_coupling_symbols'])
+    
+    # 2. Boson mass symbols
+    boson_mass_keys = config['boson_mass_key']
+    if isinstance(boson_mass_keys, list):
+        for k_val_str in boson_mass_keys:
+            current_lambdify_args_syms.append(symbol_map_from_config_keys[k_val_str])
+    else:
+        current_lambdify_args_syms.append(symbol_map_from_config_keys[boson_mass_keys])
+        
+    # 3. Common fermion mass symbols
+    current_lambdify_args_syms.extend(_common_ff_args_sym) # [mni, mla, mlb]
+    
+    # 4. Extra parameter symbols
+    for k_val_str in config['extra_param_keys']:
+        current_lambdify_args_syms.append(symbol_map_from_config_keys[k_val_str])
+
+    # Validation: Check if all free symbols in the expressions are covered
+    module_symbols = {Symbol(name) for name in pv_functions.keys()}
+    actual_free_symbols = al_expr.free_symbols.union(ar_expr.free_symbols)
+    provided_symbols_set = set(current_lambdify_args_syms)
+    
+    missing_symbols = actual_free_symbols - provided_symbols_set - module_symbols
+    if missing_symbols:
+        raise ValueError(
+            f"For interaction '{int_key}', the following symbols are in the expressions "
+            f"but not in the generated argument list for lambdify: {missing_symbols}.\n"
+            f"AL free symbols: {al_expr.free_symbols}\nAR free symbols: {ar_expr.free_symbols}\n"
+            f"Generated arg list: {current_lambdify_args_syms}"
+        )
+
+    function_formfactors[int_key] = _create_lambdified_ff_pair(al_expr, ar_expr, current_lambdify_args_syms, pv_functions)
 
 def _calculate_interaction_formfactors(
     interaction_key, num_neutrinos,
@@ -611,17 +643,22 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
         "a_idx": idx_a, "b_idx": idx_b,
         "verbose": verbose
     }
+    
 
     interaction_types = [
         'ni_GL', 'GL_ni', 'ni_GR', 
         'GR_ni', 'ni_HR', 'HR_ni', 
         'ni_W1', 'W1_ni', 'ni_W2', 
         'W2_ni', 'ni_GLp_GLm', 'ni_GRp_GRm',
-        'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m'
+        'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m',
+        'ni_GRp_HRm', 'ni_HRp_GRm', 'ni_W1p_GLm',
+        'ni_W2p_GRm', 'ni_W2p_HRm', 'ni_GLp_W1m',
+        'ni_GRp_W2m', 'ni_HRp_W2m'
     ]
     for int_key in interaction_types:
         if verbose:
             print(f"Calculating form factors for interaction type: {int_key}")
+            print(f"common_calc_args: ", common_calc_args)
         all_form_factors[int_key] = _calculate_interaction_formfactors(
             interaction_key=int_key,
             **common_calc_args
@@ -676,7 +713,7 @@ if __name__ == '__main__':
     mtau_val = mp.mpf('1.776')
     ml_vals = [
         me_val,
-        mmu_val,gi
+        mmu_val,
         mtau_val
     ]
     
@@ -693,5 +730,5 @@ if __name__ == '__main__':
         print(f'AR = {ffR}')
         ALsum += ffL
         ARsum += ffR
-    print('ALsum: ', ALsum)
-    print('ARsum: ', ARsum)
+    #print('ALsum: ', ALsum)
+    #print('ARsum: ', ARsum)
