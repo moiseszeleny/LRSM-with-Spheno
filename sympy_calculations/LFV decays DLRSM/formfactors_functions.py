@@ -248,7 +248,7 @@ symbol_map_from_config_keys = {
     'mW1_val': mW1, 'mW2_val': mW2, 'mHR_val': mHR, 'mH10_val': mH10,
     'k1_val': k1, 'vR_val': vR, 'g_val': g,
     'rho1_val': rho1, 'alpha13_val': alpha13, 'alpha12_val': alpha12,
-    'alpha23_val': alpha23, 'lamb12_val': lamb12
+    'alpha23_val': alpha23, 'lamb12_val': lamb12, 'epsilon_val': epsilon
 }
 
 # Helper function to create lambdified form factor pairs
@@ -541,7 +541,7 @@ _interaction_configs = {
             {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
         ],
         'boson_mass_key': ['mW1_val', 'mH10_val'],
-        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val']
+        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val', 'epsilon_val']
     },
     'GR_ninj': {
         'ordered_coupling_symbols': [
@@ -559,7 +559,7 @@ _interaction_configs = {
             {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
         ],
         'boson_mass_key': ['mW2_val', 'mH10_val'],
-        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val']
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val', 'epsilon_val']
     },
     'HR_ninj': {
         'ordered_coupling_symbols': [
@@ -577,7 +577,7 @@ _interaction_configs = {
             {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
         ],
         'boson_mass_key': ['mHR_val', 'mH10_val'],
-        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val']
+        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val', 'epsilon_val']
     },
     'W1_ninj': {
         'ordered_coupling_symbols': [
@@ -595,7 +595,7 @@ _interaction_configs = {
             {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
         ],
         'boson_mass_key': ['mW1_val', 'mH10_val'],
-        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
+        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val', 'epsilon_val']
     },
     'W2_ninj': {
         'ordered_coupling_symbols': [
@@ -611,7 +611,7 @@ _interaction_configs = {
             {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
         ],
         'boson_mass_key': ['mW2_val', 'mH10_val'],
-        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
+        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val', 'epsilon_val']
     },
 }
 
@@ -671,7 +671,7 @@ def _calculate_interaction_formfactors(
     # vev 
     k1_val, vR_val,
     # extra parameters
-    g_val, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val,
+    g_val, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, epsilon_val,
     # Masses fermions
     mni_masses, ml_a_val, ml_b_val,
     # Indices
@@ -694,7 +694,8 @@ def _calculate_interaction_formfactors(
     parameter_values = {
         'mW1_val': mW1_val, 'mW2_val': mW2_val, 'mHR_val': mHR_val,
         'k1_val': k1_val, 'vR_val': vR_val, 'g_val': g_val, 'mH10_val': mH10_val,
-        'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val
+        'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 
+        'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val, 'epsilon_val': epsilon_val
     }
 
     if interaction_key in two_neutrino_interactions:
@@ -800,7 +801,7 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
     """
     Calculates the sum of form factors for different interactions.
     """
-    eps_val = k1_val / vR_val
+    epsilon_val = k1_val / vR_val
     g_val = 2*mW1_val/k1_val
     mW2_squared_val = (mW1_val**2/k1_val**2)*(k1_val**2 + vR_val**2)
     mW2_val = mp.sqrt(mW2_squared_val)
@@ -813,13 +814,13 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
     # mns_vals[3] corresponds to mN_3, ..., mns_vals[8] corresponds to mN_8.
     mns_heavy_args = mns_vals[3:9]
 
-    QL_val = QL_lamb(eps_val, *mns_heavy_args)
-    TRL_val = TRL_lamb(eps_val, *mns_heavy_args)
-    QR_val = QR_lamb(eps_val, *mns_heavy_args)
-    J_val = J_lamb(eps_val, *mns_heavy_args)
-    K_val = K_lamb(eps_val, *mns_heavy_args)
-    OmegaRL_val = OmegaRL_lamb(eps_val, *mns_heavy_args)
-    OmegaSR_val = OmegaSR_lamb(eps_val, *mns_heavy_args)
+    QL_val = QL_lamb(epsilon_val, *mns_heavy_args)
+    TRL_val = TRL_lamb(epsilon_val, *mns_heavy_args)
+    QR_val = QR_lamb(epsilon_val, *mns_heavy_args)
+    J_val = J_lamb(epsilon_val, *mns_heavy_args)
+    K_val = K_lamb(epsilon_val, *mns_heavy_args)
+    OmegaRL_val = OmegaRL_lamb(epsilon_val, *mns_heavy_args)
+    OmegaSR_val = OmegaSR_lamb(epsilon_val, *mns_heavy_args)
     
     num_total_neutrinos = len(mns_vals)
     all_form_factors = {}
@@ -830,7 +831,7 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
         "J_val": J_val, "K_val": K_val,
         "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val, 'mH10_val':mH10_val,
         "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val, 
-        'rho1_val':rho1_val, 'alpha13_val':alpha13_val, 'alpha12_val':alpha12_val, 'alpha23_val':alpha23_val, 'lamb12_val':lamb12_val,
+        'rho1_val':rho1_val, 'alpha13_val':alpha13_val, 'alpha12_val':alpha12_val, 'alpha23_val':alpha23_val, 'lamb12_val':lamb12_val, 'epsilon_val':epsilon_val,
         "mni_masses": mns_vals,
         "ml_a_val": ml_vals_list[idx_a], "ml_b_val": ml_vals_list[idx_b],
         "a_idx": idx_a, "b_idx": idx_b,

@@ -3,7 +3,7 @@ from sympy import DiagonalMatrix
 from sympy import cos, sin, tan, pi, Dummy
 from sympy import solve, sqrt, conjugate, fraction
 from sympy.physics.quantum import Dagger
-
+from DLRSM1.potential_senjanovic_HiggsDoublets import epsilon
 
 
 n = 3
@@ -13,7 +13,7 @@ mu = MatrixSymbol(r'mu', n,n)
 #mu = DiagonalMatrix(mu)
 Z3 = ZeroMatrix(n,n)
 I3 = Identity(3)
-epsilon = symbols(r'\epsilon', positive=True)
+#epsilon = symbols(r'\epsilon', positive=True)
 
 
 MLRiss_mDp0 = BlockMatrix(

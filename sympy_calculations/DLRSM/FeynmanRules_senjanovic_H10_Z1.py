@@ -21,7 +21,7 @@ from FeynmanRules_senjanovic_SW import interactions_gauge_scalars
 from FeynmanRules_senjanovic_SW import interactions_gauge_scalars_approx
 from FeynmanRules_senjanovic_SW import interactions_scalars, interactions_scalars_approx
 
-from potential_senjanovic_HiggsDoublets import H10, vR, k1
+from potential_senjanovic_HiggsDoublets import H10, vR, k1, epsilon
 from potential_senjanovic_HiggsDoublets import GRp, GLp, HLp, HRp, HRm, GRm, GLm, HLm
 from potential_senjanovic_HiggsDoublets import alpha13, rho1
 from Gauge_Higgs_senjanovic_HiggsDoublets import W1p, W1m, W2p, Z1, W2m
@@ -335,7 +335,7 @@ interactionsH10_ll = lambda a: {
 
 interactionsH10_nn = lambda i, j: {
     (H10, n[i], nadj[j]): (
-        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*conjugate(OmegaSR[i,j])) * diracPL + 
-        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*OmegaSR[i,j]) * diracPR
+        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*epsilon**2*conjugate(OmegaSR[i,j])) * diracPL + 
+        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*epsilon**2*OmegaSR[i,j]) * diracPR
     )
 }
