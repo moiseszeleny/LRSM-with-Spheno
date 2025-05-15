@@ -101,89 +101,7 @@ Ul_matrixDagger = BlockMatrix(
     ]
 )
 
-#UnuTUNTUsTMLRissUsUNUnu = block_collapse(Unu_matrixT*UNTUsTMLRissUsUN*Unu_matrix)
-#UnuTUNTUsTMLRissUsUNUnu = block_collapse(
-#    UnuTUNTUsTMLRissUsUNUnu.subs(CN, cos(pi/4)*I3).subs(
-#        SN, sin(pi/4)*I3
-#    )
-#)
-
-#xi_approximations = {
-#    (sin(epsilon)**2).subs(sin(epsilon), sinxi_approx): (sin(epsilon)**2).subs(sin(epsilon), sinxi_approx).series(epsilon, 0, 3).removeO(),
-#    epsilon/(1 + epsilon**2): (epsilon/(1 + epsilon**2)).series(epsilon, 0, 3).removeO(),
-#    sqrt(1 + epsilon**2):(sqrt(1 + epsilon**2)).series(epsilon, 0, 3).removeO()
-#}
-
-#UnuDaggerUNTUsTMLRissUsUNUnu = UnuTUNTUsTMLRissUsUNUnu.subs(xi_approximations)
-
-#for i in range(1,3):
-#    for j in range(1,3):
-#        blij = UnuTUNTUsTMLRissUsUNUnu_sinxi.blocks[i,j]
-#        blij_collapsed = block_collapse(blij.expand().simplify())
-#        UnuTUNTUsTMLRissUsUNUnu_sinxi = UnuTUNTUsTMLRissUsUNUnu_sinxi.subs(blij, blij_collapsed) 
-#
-
-
-#UnuTUNTUsTMLRissUsUNUnu_sinxi = block_collapse(Unu_matrixT*UNTUsTMLRissUsUN_sinxi*Unu_matrix)
-#UnuTUNTUsTMLRissUsUNUnu_sinxi = block_collapse(UnuTUNTUsTMLRissUsUNUnu_sinxi.subs(CN, cos(pi/4)*I3).subs(SN, sin(pi/4)*I3))
-
-#UnuTUNTUsTMLRissUsUNUnu_diag = block_collapse(
-#    UnuTUNTUsTMLRissUsUNUnu.subs(
-#    MD, DiagonalMatrix(MD)
-#)
-#)
-
 mnu = DiagonalMatrix(MatrixSymbol(r'm_\nu',3,3))
-
-#UnuTUNTUsTMLRissUsUNUnu_diag = UnuTUNTUsTMLRissUsUNUnu_diag.subs(
-#    epsilon**2*Unu.T*mu*Unu, mnu
-    #mu,(1/epsilon**2)*Unu*mnu*Unu.T
-#)
-
-#UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = block_collapse(
-#    UnuTUNTUsTMLRissUsUNUnu_sinxi.subs(
-#    MD, DiagonalMatrix(MD)
-#)#.subs(CN, cos(pi/4)*In).subs(SN, sin(pi/4)*In)
-#)
-
-#UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.subs(
-#    sin(epsilon)**2*Unu.T*mu*Unu, mnu
-    #mu,(1/sin(epsilon)**2)*Unu*mnu*Unu.T
-#)
-
-#for i in range(0,3):
-#    for j in range(0,3):
-#        blij = UnuTUNTUsTMLRissUsUNUnu_diag.blocks[i,j]
-#        blij_collapsed = block_collapse(blij.expand().simplify())
-#        UnuTUNTUsTMLRissUsUNUnu_diag= UnuTUNTUsTMLRissUsUNUnu_diag.subs(blij, blij_collapsed)
-
-#UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = block_collapse(
-#    UnuTUNTUsTMLRissUsUNUnu_sinxi.subs(
-#    MD, DiagonalMatrix(MD)
-#)#.subs(CN, cos(pi/4)*In).subs(SN, sin(pi/4)*In)
-#)
-
-#UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.subs(
-#    sin(epsilon)**2*Unu.T*mu*Unu, mnu
-    #mu,(1/sin(epsilon)**2)*Unu*mnu*Unu.T
-#)
-
-#for i in range(0,3):
-#    for j in range(0,3):
-#        blij = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.blocks[i,j]
-#        blij_collapsed = block_collapse(blij.expand().simplify())
-#        UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.subs(blij, blij_collapsed)
-
-#UnuTUNTUsTMLRissUsUNUnu_diag_sinxi = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.subs(Unu.T*Unu, I3)
-#UnuTUNTUsTMLRissUsUNUnu_explicit = UnuTUNTUsTMLRissUsUNUnu_diag.subs(epsilon, 0).as_explicit()
-#UnuTUNTUsTMLRissUsUNUnu_explicit_sinxi = UnuTUNTUsTMLRissUsUNUnu_diag_sinxi.subs(epsilon, 0).as_explicit()
-
-
-###########3
-#U = block_collapse(Us*UN*conjugate(Unu_matrix)).subs(cos(epsilon), 1)
-#Uf = block_collapse((Dagger(Ul_matrix)*Us*UN*conjugate(Unu_matrix)).subs(cos(epsilon), 1))
-#Ufinv = block_collapse((Unu_matrix.T*UNT*UsT*Ul_matrix).subs(cos(epsilon), 1))
-
 
 UnuTUNTUsTMLRissUsUNUnu2 = block_collapse(
     block_collapse(Unu_matrixT*UNTUsTMLRissUsUN*Unu_matrix).expand().subs(
@@ -384,8 +302,8 @@ dict_muii = {
 
 dict_Mii2 = {}
 for key, value in dict_Mii.items():
-    print(f"Key: {key}, Value: {value}")
-    print("\n")
+    #print(f"Key: {key}, Value: {value}")
+    #print("\n")
     dict_Mii2[key] = value.subs(dict_muii)
 
 dict_Mii2_sqrt = {

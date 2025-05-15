@@ -13,7 +13,7 @@ from DLRSM1.block_diagonalization_iss import Unu
 from DLRSM1.potential_senjanovic_HiggsDoublets import alpha13, alpha12, alpha23, lamb12, rho1, k1, vR, mHR, mH10
 from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import mW1, mW2, g
 
-from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, Omega, ml, mn, i, j, a, b
+from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, OmegaRL, OmegaSR, ml, mn, i, j, a, b
 
 from neutrinos import UpmnsStandardParametrization, NuOscObservables
 Nudata = NuOscObservables
@@ -56,11 +56,14 @@ GSRmat = (USDagger*USc*(eigenvalsMnu)*URDagger*URc).applyfunc(
     lambda x:x.factor(deep=True)
 ).subs(mns_dummys).simplify().subs(dummys_mns)
 
-Gamma_mat = (GRLmat - ((alpha13)/(2*rho1))*epsilon**2*Dagger(GSRmat)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
-    lambda x: x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
-)
+OmegaRLmat = (GRLmat + GRLmat.T).applyfunc(factor)
+OmegaSRmat = (GSRmat + GSRmat.T).applyfunc(factor)
 
-Omega_mat = (Gamma_mat + Gamma_mat.T).applyfunc(lambda x:x.expand().collect(rho1, factor))
+#Gamma_mat = (GRLmat - ((alpha13)/(2*rho1))*epsilon**2*Dagger(GSRmat)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
+#    lambda x: x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
+#)
+
+#Omega_mat = (Gamma_mat + Gamma_mat.T).applyfunc(lambda x:x.expand().collect(rho1, factor))
 
 QLDagger = (ULDagger*Vl).subs(mns_dummys).simplify().subs(dummys_mns)
 QLmat = Dagger(QLDagger).subs(mns_dummys).simplify().subs(dummys_mns)
@@ -104,54 +107,83 @@ Jmat = (TSRDagger + SRLmat).applyfunc(
 JDagger = Dagger(Jmat).subs(mns_dummys).simplify().subs(dummys_mns)
 
 # symbolic variables to replace
-mla, mlb, mni = symbols('m_{l_a}, m_{l_b}, m_{n_i}', positive=True)
+mla, mlb, mni, mnj = symbols('m_{l_a}, m_{l_b}, m_{n_i}, m_{n_j}', positive=True)
 
 QLai = symbols('Q_{Lai}')
 QLbi = symbols('Q_{Lbi}')
+QLbj = symbols('Q_{Lbj}')
 QLaic = symbols(r'\overline{Q_{Lai}}')
 QLbic = symbols(r'\overline{Q_{Lbi}}')
+QLbjc = symbols(r'\overline{Q_{Lbj}}')
 QRai = symbols('Q_{Rai}')
 QRbi = symbols('Q_{Rbi}')
+QRbj = symbols('Q_{Rbj}')
 QRaic = symbols(r'\overline{Q_{Rai}}')
 QRbic = symbols(r'\overline{Q_{Rbi}}')
+QRbjc = symbols(r'\overline{Q_{Rbj}}')
 TRLib = symbols('T_{RLib}')
+TRLjb = symbols('T_{RLjb}')
 TRLia = symbols('T_{RLia}')
 TRLiac  = symbols(r'\overline{T_{RLia}}')
 TRLibc  = symbols(r'\overline{T_{RLib}}')
+TRLjbc  = symbols(r'\overline{T_{RLjb}}')
 Jai = symbols('J_{ai}')
 Jbi = symbols('J_{bi}')
+Jbj = symbols('J_{bj}')
 Jaic = symbols(r'\overline{J_{ai}}')
 Jbic = symbols(r'\overline{J_{bi}}')
+Jbjc = symbols(r'\overline{J_{bj}}')
 Kai = symbols('K_{ai}')
 Kbi = symbols('K_{bi}')
+Kbj = symbols('K_{bj}')
 Kaic = symbols(r'\overline{K_{ai}}')
 Kbic = symbols(r'\overline{K_{bi}}')
+Kbjc = symbols(r'\overline{K_{bj}}')
+OmegaRLij = symbols(r'\Omega_{RLij}')
+OmegaRLijc = symbols(r'\overline{\Omega_{RLij}}')
+OmegaSRij = symbols(r'\Omega_{SRij}')
+OmegaSRijc = symbols(r'\overline{\Omega_{SRij}}')
 
 # Symbolic changes
 symbolic_changes = {
     ml[a]:mla,
     ml[b]:mlb,
     mn[i]:mni,
+    mn[j]:mnj,
     QL[a,i]:QLai,
     QL[b,i]:QLbi,
+    QL[b,j]:QLbj,
     conjugate(QL[a, i]):QLaic,
     conjugate(QL[b, i]):QLbic,
+    conjugate(QL[b, j]):QLbjc,
     QR[a,i]:QRai,
     QR[b,i]:QRbi,
+    QR[b,j]:QRbj,
     conjugate(QR[a, i]):QRaic,
     conjugate(QR[b, i]):QRbic,
+    conjugate(QR[b, j]):QRbjc,
     TRL[i, a]:TRLia,
     TRL[i, b]:TRLib,
+    TRL[j, b]:TRLjb,
     conjugate(TRL[i, a]):TRLiac,
     conjugate(TRL[i, b]):TRLibc,
+    conjugate(TRL[j, b]):TRLjbc,
     J[a,i]:Jai,
     J[b,i]:Jbi,
+    J[b,j]:Jbj,
     conjugate(J[a,i]):Jaic,
     conjugate(J[b,i]):Jbic,
+    conjugate(J[b,j]):Jbjc,
     K[a,i]:Kai,
     K[b,i]:Kbi,
+    K[b,j]:Kbj,
     conjugate(K[a,i]):Kaic,
     conjugate(K[b,i]):Kbic,
+    conjugate(K[b,j]):Kbjc,
+    OmegaRL[i, j]:OmegaRLij,
+    conjugate(OmegaRL[i,j]):OmegaRLijc,
+    OmegaSR[i, j]:OmegaSRij,
+    conjugate(OmegaSR[i,j]):OmegaSRijc,
     Dim:4,
 }
 #symbolic form factors
@@ -181,9 +213,21 @@ symbolic_formfactor_triangle_onefermion = {
     } for interaction, diagram in triangle_diagrams_onefermion.items()
 }
 
+triangles_twofermion = [
+    'GL_ninj', 'GR_ninj', 'HR_ninj', 'W1_ninj', 'W2_ninj'
+]
+triangle_diagrams_twofermion = {interaction:all_diagrams[interaction] for interaction in triangles_twofermion}
+symbolic_formfactor_triangle_twofermion = {
+    interaction:{
+        'AL':diagram.AL().factor().subs(symbolic_changes),
+        'AR':diagram.AR().factor().subs(symbolic_changes)
+    } for interaction, diagram in triangle_diagrams_twofermion.items()
+}
+
 symbolic_formfactor = {
     **symbolic_formfactor_bubble,
-    **symbolic_formfactor_triangle_onefermion
+    **symbolic_formfactor_triangle_onefermion,
+    **symbolic_formfactor_triangle_twofermion
 }
 
 # Passarino-Veltman functions definitions
@@ -217,6 +261,7 @@ def _create_lambdified_ff_pair(al_expr, ar_expr, arg_symbols_list, pv_funcs_dict
 
 # Common symbolic arguments for form factors
 _common_ff_args_sym = [mni, mla, mlb]
+_common_ff_args_sym_GL_ninj = [mni, mnj, mla, mlb] # For GL_ninj
 
 # mixing matrix numeric
 Unu_changes = {
@@ -234,6 +279,12 @@ J_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], Jma
     Unu_changes
 ), 'mpmath')
 K_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], Kmat.subs(
+    Unu_changes
+), 'mpmath')
+OmegaRL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], OmegaRLmat.subs(
+    Unu_changes
+), 'mpmath')
+OmegaSR_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], OmegaSRmat.subs(
     Unu_changes
 ), 'mpmath')
 
@@ -474,8 +525,97 @@ _interaction_configs = {
         'boson_mass_key': ['mW2_val', 'mHR_val', 'mH10_val'],
         'extra_param_keys': ['k1_val', 'vR_val', 'g_val', 'rho1_val', 'alpha13_val']
     },
+    'GL_ninj': {
+        'ordered_coupling_symbols': [
+            QLai, QLbjc, TRLjb, TRLiac, 
+            OmegaRLij, OmegaRLijc, OmegaSRij, OmegaSRijc
+        ],
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'TRL','idx_keys': ('j', 'b'), 'conj': False},
+            {'matrix_name': 'TRL','idx_keys': ('i', 'a'), 'conj': True},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val']
+    },
+    'GR_ninj': {
+        'ordered_coupling_symbols': [
+            QRai, QRbjc, Jai, Jbjc,  
+            OmegaRLij, OmegaRLijc, OmegaSRij, OmegaSRijc
+        ],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'J','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'J','idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'vR_val', 'rho1_val', 'alpha13_val']
+    },
+    'HR_ninj': {
+        'ordered_coupling_symbols': [
+            QRai, QRbjc, Kai, Kbjc,  
+            OmegaRLij, OmegaRLijc, OmegaSRij, OmegaSRijc
+        ],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'K','idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'K','idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
+        ],
+        'boson_mass_key': ['mHR_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'rho1_val', 'alpha13_val']
+    },
+    'W1_ninj': {
+        'ordered_coupling_symbols': [
+            QLai, QLbjc, TRLjb, TRLiac, 
+            OmegaRLij, OmegaRLijc, OmegaSRij, OmegaSRijc
+        ],
+        'couplings': [
+            {'matrix_name': 'QL', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QL', 'idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'TRL','idx_keys': ('j', 'b'), 'conj': False},
+            {'matrix_name': 'TRL','idx_keys': ('i', 'a'), 'conj': True},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW1_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
+    'W2_ninj': {
+        'ordered_coupling_symbols': [
+            QRai, QRbjc, 
+            OmegaRLij, OmegaRLijc, OmegaSRij, OmegaSRijc
+        ],
+        'couplings': [
+            {'matrix_name': 'QR', 'idx_keys': ('a', 'i'), 'conj': False},
+            {'matrix_name': 'QR', 'idx_keys': ('b', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaRL','idx_keys': ('i', 'j'), 'conj': True},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': False},
+            {'matrix_name': 'OmegaSR','idx_keys': ('i', 'j'), 'conj': True}
+        ],
+        'boson_mass_key': ['mW2_val', 'mH10_val'],
+        'extra_param_keys': ['k1_val', 'g_val', 'rho1_val', 'alpha13_val']
+    },
 }
 
+two_neutrino_interactions = ['GL_ninj', 'GR_ninj', 'HR_ninj', 'W1_ninj', 'W2_ninj']
 # Lambdify symbolic form factors
 function_formfactors = {}
 for int_key, config in _interaction_configs.items():
@@ -496,8 +636,11 @@ for int_key, config in _interaction_configs.items():
     else:
         current_lambdify_args_syms.append(symbol_map_from_config_keys[boson_mass_keys])
         
-    # 3. Common fermion mass symbols
-    current_lambdify_args_syms.extend(_common_ff_args_sym) # [mni, mla, mlb]
+    # 3. Fermion mass symbols
+    if int_key in two_neutrino_interactions:
+        current_lambdify_args_syms.extend(_common_ff_args_sym_GL_ninj)
+    else:
+        current_lambdify_args_syms.extend(_common_ff_args_sym)
     
     # 4. Extra parameter symbols
     for k_val_str in config['extra_param_keys']:
@@ -522,7 +665,7 @@ for int_key, config in _interaction_configs.items():
 def _calculate_interaction_formfactors(
     interaction_key, num_neutrinos,
     # Lambdified matrices
-    QL_val, TRL_val, QR_val, J_val, K_val,
+    QL_val, TRL_val, QR_val, J_val, K_val, OmegaRL_val, OmegaSR_val,
     # Masses Bosons
     mW1_val, mW2_val, mHR_val, mH10_val,
     # vev 
@@ -545,7 +688,8 @@ def _calculate_interaction_formfactors(
 
     # Map keys to actual matrix and parameter values
     matrix_values = {
-        'QL': QL_val, 'TRL': TRL_val, 'QR': QR_val, 'J': J_val, 'K': K_val
+        'QL': QL_val, 'TRL': TRL_val, 'QR': QR_val, 'J': J_val, 'K': K_val,
+        'OmegaRL': OmegaRL_val, 'OmegaSR': OmegaSR_val
     }
     parameter_values = {
         'mW1_val': mW1_val, 'mW2_val': mW2_val, 'mHR_val': mHR_val,
@@ -553,55 +697,102 @@ def _calculate_interaction_formfactors(
         'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val
     }
 
-    for i in range(num_neutrinos):
-        if verbose:
-            print(f"  Calculating for {interaction_key}, neutrino index i = {i} (lepton_a index: {a_idx}, lepton_b index: {b_idx})")
+    if interaction_key in two_neutrino_interactions:
+        for i in range(num_neutrinos):
+            mni_val = mni_masses[i]
+            for j in range(num_neutrinos): # Inner loop for j (for two neutrinos ni nj)
+                mnj_val = mni_masses[j]
+                if verbose:
+                    print(f"  Calculating for {interaction_key}, neutrino indices i={i}, j={j} (lepton_a index: {a_idx}, lepton_b index: {b_idx})")
 
-        mni_val = mni_masses[i]
+                current_ff_args = []
+                # 1. Coupling matrix elements
+                for c_desc in config['couplings']:
+                    matrix = matrix_values[c_desc['matrix_name']]
+                    resolved_indices = []
+                    for idx_key in c_desc['idx_keys']:
+                        if idx_key == 'a': resolved_indices.append(a_idx)
+                        elif idx_key == 'b': resolved_indices.append(b_idx)
+                        elif idx_key == 'i': resolved_indices.append(i)
+                        elif idx_key == 'j': resolved_indices.append(j) # Handle 'j'
+                        else: raise ValueError(f"Unknown index key {idx_key} in _interaction_configs for {interaction_key}")
+                    
+                    val = matrix[tuple(resolved_indices)]
+                    if c_desc['conj']:
+                        val = mp.conj(val)
+                    current_ff_args.append(val)
 
-        current_ff_args = []
-        
-        # 1. Coupling matrix elements
-        for c_desc in config['couplings']:
-            matrix = matrix_values[c_desc['matrix_name']]
+                # 2. Boson mass
+                if isinstance(config['boson_mass_key'], list):
+                    for key in config['boson_mass_key']:
+                        current_ff_args.append(parameter_values[key])
+                else:
+                    current_ff_args.append(parameter_values[config['boson_mass_key']])
+                
+                # 3. Particle masses (mni, mnj, mla, mlb for two neutrino diagrams)
+                current_ff_args.extend([mni_val, mnj_val, ml_a_val, ml_b_val])
+                
+                # 4. Extra parameters
+                for param_key in config['extra_param_keys']:
+                    current_ff_args.append(parameter_values[param_key])
+                
+                if verbose:
+                    print('interaction_key: ',interaction_key)
+                    print(f'current_ff_args (i={i}, j={j}): ', current_ff_args)
+                    
+                al_contrib = ff_calculator_AL(*current_ff_args)
+                ar_contrib = ff_calculator_AR(*current_ff_args)
+
+                al_sum += al_contrib
+                ar_sum += ar_contrib
+    else: # Original logic for interactions with a single neutrino loop
+        for i in range(num_neutrinos):
+            if verbose:
+                print(f"  Calculating for {interaction_key}, neutrino index i = {i} (lepton_a index: {a_idx}, lepton_b index: {b_idx})")
+
+            mni_val = mni_masses[i]
+
+            current_ff_args = []
             
-            # Resolve index keys ('a', 'b', 'i') to actual index values
-            resolved_indices = []
-            for idx_key in c_desc['idx_keys']:
-                if idx_key == 'a': resolved_indices.append(a_idx)
-                elif idx_key == 'b': resolved_indices.append(b_idx)
-                elif idx_key == 'i': resolved_indices.append(i) # current neutrino loop index
-                else: raise ValueError(f"Unknown index key {idx_key} in _interaction_configs for {interaction_key}")
-            
-            val = matrix[tuple(resolved_indices)]
-            if c_desc['conj']:
-                val = mp.conj(val)
-            current_ff_args.append(val)
+            for c_desc in config['couplings']:
+                matrix = matrix_values[c_desc['matrix_name']]
+                
+                # Resolve index keys ('a', 'b', 'i') to actual index values
+                resolved_indices = []
+                for idx_key in c_desc['idx_keys']:
+                    if idx_key == 'a': resolved_indices.append(a_idx)
+                    elif idx_key == 'b': resolved_indices.append(b_idx)
+                    elif idx_key == 'i': resolved_indices.append(i) # current neutrino loop index
+                    else: raise ValueError(f"Unknown index key {idx_key} in _interaction_configs for {interaction_key}")
+                
+                val = matrix[tuple(resolved_indices)]
+                if c_desc['conj']:
+                    val = mp.conj(val)
+                current_ff_args.append(val)
 
-        # 2. Boson mass
-        if isinstance(config['boson_mass_key'], list):
-            for key in config['boson_mass_key']:
-                current_ff_args.append(parameter_values[key])
-        else:
-            current_ff_args.append(parameter_values[config['boson_mass_key']])
-        #current_ff_args.append(parameter_values[config['boson_mass_key']])
-        
-        # 3. Common particle masses (mni, mla, mlb)
-        current_ff_args.extend([mni_val, ml_a_val, ml_b_val])
-        
-        # 4. Extra parameters (k1_val, vR_val if applicable)
-        for param_key in config['extra_param_keys']:
-            current_ff_args.append(parameter_values[param_key])
-        
-        if verbose:
-            print('interaction_key: ',interaction_key)
-            print('current_ff_args: ', current_ff_args)
+            # 2. Boson mass
+            if isinstance(config['boson_mass_key'], list):
+                for key in config['boson_mass_key']:
+                    current_ff_args.append(parameter_values[key])
+            else:
+                current_ff_args.append(parameter_values[config['boson_mass_key']])
             
-        al_contrib = ff_calculator_AL(*current_ff_args)
-        ar_contrib = ff_calculator_AR(*current_ff_args) # AR uses the same arguments
+            # 3. Common particle masses (mni, mla, mlb)
+            current_ff_args.extend([mni_val, ml_a_val, ml_b_val])
+            
+            # 4. Extra parameters (k1_val, vR_val if applicable)
+            for param_key in config['extra_param_keys']:
+                current_ff_args.append(parameter_values[param_key])
+            
+            if verbose:
+                print('interaction_key: ',interaction_key)
+                print('current_ff_args: ', current_ff_args)
+                
+            al_contrib = ff_calculator_AL(*current_ff_args)
+            ar_contrib = ff_calculator_AR(*current_ff_args) # AR uses the same arguments
 
-        al_sum += al_contrib
-        ar_sum += ar_contrib
+            al_sum += al_contrib
+            ar_sum += ar_contrib
             
     return {'AL': al_sum, 'AR': ar_sum}
 
@@ -627,13 +818,15 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
     QR_val = QR_lamb(eps_val, *mns_heavy_args)
     J_val = J_lamb(eps_val, *mns_heavy_args)
     K_val = K_lamb(eps_val, *mns_heavy_args)
+    OmegaRL_val = OmegaRL_lamb(eps_val, *mns_heavy_args)
+    OmegaSR_val = OmegaSR_lamb(eps_val, *mns_heavy_args)
     
     num_total_neutrinos = len(mns_vals)
     all_form_factors = {}
 
     common_calc_args = {
         "num_neutrinos": num_total_neutrinos,
-        "QL_val": QL_val, "TRL_val": TRL_val, "QR_val": QR_val,
+        "QL_val": QL_val, "TRL_val": TRL_val, "QR_val": QR_val, "OmegaRL_val": OmegaRL_val, "OmegaSR_val": OmegaSR_val,
         "J_val": J_val, "K_val": K_val,
         "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val, 'mH10_val':mH10_val,
         "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val, 
@@ -654,7 +847,8 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
         'ni_GRp_HRm', 'ni_HRp_GRm', 'ni_W1p_GLm',
         'ni_W2p_GRm', 'ni_W2p_HRm', 'ni_GLp_W1m',
         'ni_GRp_W2m', 'ni_HRp_W2m'
-    ]
+    ] + two_neutrino_interactions
+
     for int_key in interaction_types:
         if verbose:
             print(f"Calculating form factors for interaction type: {int_key}")

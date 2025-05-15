@@ -23,6 +23,7 @@ from FeynmanRules_senjanovic_SW import interactions_scalars, interactions_scalar
 
 from potential_senjanovic_HiggsDoublets import H10, vR, k1
 from potential_senjanovic_HiggsDoublets import GRp, GLp, HLp, HRp, HRm, GRm, GLm, HLm
+from potential_senjanovic_HiggsDoublets import alpha13, rho1
 from Gauge_Higgs_senjanovic_HiggsDoublets import W1p, W1m, W2p, Z1, W2m
 
 ###########
@@ -265,12 +266,6 @@ interactionsWm_n_l = lambda i,a: {###########
 }
 ################################
 
-interactionsH10_ll = lambda a: {
-    (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
-}
-interactionsH10_nn = lambda i, j: {
-    (H10, n[i], nadj[j]): (1 / (sqrt2*k1)) * Omega[i,j] * diracPL + (1 / (sqrt2*k1)) * conjugate(Omega[i, j]) * diracPR
-}
 ###########
 # Interactions of charged scalars with leptons
 ###########
@@ -279,6 +274,8 @@ interactionsH10_nn = lambda i, j: {
 TRL = IndexedBase('T_{RL}')
 K = IndexedBase('K')
 J = IndexedBase('J')
+OmegaRL = IndexedBase(r'\Omega_{RL}')
+OmegaSR = IndexedBase(r'\Omega_{SR}')
 ml = IndexedBase('m_\ell')
 mn = IndexedBase('m_n')
 sqrt2 = sqrt(2)
@@ -330,4 +327,15 @@ interactionsSp_n_l = lambda i,a: {
 interactionsSm_n_l = lambda i,a: {
     list(dict_interaction.keys())[0]:list(dict_interaction.values())[0]
     for dict_interaction in [interactionsGLm_n_l(i,a), interactionsGRm_n_l(i,a), interactionsHRm_n_l(i,a)]
+}
+
+interactionsH10_ll = lambda a: {
+    (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
+}
+
+interactionsH10_nn = lambda i, j: {
+    (H10, n[i], nadj[j]): (
+        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*conjugate(OmegaSR[i,j])) * diracPL + 
+        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*OmegaSR[i,j]) * diracPR
+    )
 }

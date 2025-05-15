@@ -25,7 +25,8 @@ from .FeynmanRules_senjanovic_SW import (
 )
 from .potential_senjanovic_HiggsDoublets import H10, vR, k1
 from .potential_senjanovic_HiggsDoublets import (
-    GRp, GLp, HLp, HRp, HRm, GRm, GLm, HLm
+    GRp, GLp, HLp, HRp, HRm, GRm, GLm, HLm, 
+    alpha13, rho1
 )
 from .Gauge_Higgs_senjanovic_HiggsDoublets import (
     W1p, W1m, W2p, Z1, W2m, g # Added g
@@ -269,7 +270,9 @@ ladj = IndexedBase(r'\overline{\ell}') # Adjoint charged lepton field
 TRL = IndexedBase('T_{RL}') # Yukawa-related matrix
 K = IndexedBase('K')        # Yukawa-related matrix
 J = IndexedBase('J')        # Yukawa-related matrix
-Omega = IndexedBase('Omega') # Yukawa-related matrix (neutrino mass matrix)
+OmegaRL = IndexedBase(r'\Omega_{RL}')
+OmegaSR = IndexedBase(r'\Omega_{SR}')
+#Omega = IndexedBase('Omega') # Yukawa-related matrix (neutrino mass matrix)
 ml = IndexedBase(r'm_\ell') # Charged lepton mass (diagonal matrix m_l[a,a] or just m_l[a])
 mn = IndexedBase('mn') # Neutrino mass symbol
 # mn = IndexedBase('m_n') # Neutrino mass (not directly used in these vertices)
@@ -297,7 +300,10 @@ interactionsH10_ll = lambda a: {
     (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
 }
 interactionsH10_nn = lambda i, j: {
-    (H10, n[i], nadj[j]): (1 / (sqrt2*k1)) * Omega[i,j] * diracPL + (1 / (sqrt2*k1)) * conjugate(Omega[i, j]) * diracPR
+    (H10, n[i], nadj[j]): (
+        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*conjugate(OmegaSR[i,j])) * diracPL + 
+        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*OmegaSR[i,j]) * diracPR
+    )
 }
 ########################################
 # Combined interactions (using dictionary unpacking)
