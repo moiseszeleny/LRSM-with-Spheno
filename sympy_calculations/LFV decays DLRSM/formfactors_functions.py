@@ -662,158 +662,157 @@ for int_key, config in _interaction_configs.items():
 
     function_formfactors[int_key] = _create_lambdified_ff_pair(al_expr, ar_expr, current_lambdify_args_syms, pv_functions)
 
+import concurrent.futures
+
+def _single_ff_args(args):
+    # Unpack all arguments
+    (
+        interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
+        ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, args_indices
+    ) = args
+
+    if interaction_key in two_neutrino_interactions:
+        i, j = args_indices
+        mni_val = mni_masses[i]
+        mnj_val = mni_masses[j]
+        current_ff_args = []
+        for c in couplings:
+            mat = matrix_values[c['matrix_name']]
+            idx = tuple(
+                a_idx if k == 'a' else b_idx if k == 'b' else i if k == 'i' else j
+                for k in c['idx_keys']
+            )
+            val = mat[idx]
+            if c['conj']:
+                val = mp.conj(val)
+            current_ff_args.append(val)
+        # Boson mass
+        if isinstance(boson_mass_key, list):
+            current_ff_args.extend(param_values[k] for k in boson_mass_key)
+        else:
+            current_ff_args.append(param_values[boson_mass_key])
+        # Particle masses
+        current_ff_args.extend([mni_val, mnj_val, ml_a_val, ml_b_val])
+        # Extra params
+        current_ff_args.extend(param_values[k] for k in extra_param_keys)
+        return ff_AL(*current_ff_args), ff_AR(*current_ff_args)
+    else:
+        i = args_indices
+        mni_val = mni_masses[i]
+        current_ff_args = []
+        for c in couplings:
+            mat = matrix_values[c['matrix_name']]
+            idx = tuple(
+                a_idx if k == 'a' else b_idx if k == 'b' else i
+                for k in c['idx_keys']
+            )
+            val = mat[idx]
+            if c['conj']:
+                val = mp.conj(val)
+            current_ff_args.append(val)
+        if isinstance(boson_mass_key, list):
+            current_ff_args.extend(param_values[k] for k in boson_mass_key)
+        else:
+            current_ff_args.append(param_values[boson_mass_key])
+        current_ff_args.extend([mni_val, ml_a_val, ml_b_val])
+        current_ff_args.extend(param_values[k] for k in extra_param_keys)
+        return ff_AL(*current_ff_args), ff_AR(*current_ff_args)
+
 def _calculate_interaction_formfactors(
     interaction_key, num_neutrinos,
-    # Lambdified matrices
     QL_val, TRL_val, QR_val, J_val, K_val, OmegaRL_val, OmegaSR_val,
-    # Masses Bosons
     mW1_val, mW2_val, mHR_val, mH10_val,
-    # vev 
     k1_val, vR_val,
-    # extra parameters
     g_val, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, epsilon_val,
-    # Masses fermions
     mni_masses, ml_a_val, ml_b_val,
-    # Indices
     a_idx, b_idx,
-    verbose=False
+    verbose=False,
+    parallel=False,  # new argument
+    max_workers=None # new argument
 ):
     """Helper function to sum form factor contributions for a given interaction type."""
     al_sum = mp.mpf(0)
     ar_sum = mp.mpf(0)
 
     config = _interaction_configs[interaction_key]
-    ff_calculator_AL = function_formfactors[interaction_key]['AL']
-    ff_calculator_AR = function_formfactors[interaction_key]['AR']
+    ff_AL = function_formfactors[interaction_key]['AL']
+    ff_AR = function_formfactors[interaction_key]['AR']
 
-    # Map keys to actual matrix and parameter values
+    # Pre-resolve matrix and parameter values for faster access
     matrix_values = {
         'QL': QL_val, 'TRL': TRL_val, 'QR': QR_val, 'J': J_val, 'K': K_val,
         'OmegaRL': OmegaRL_val, 'OmegaSR': OmegaSR_val
     }
-    parameter_values = {
+    param_values = {
         'mW1_val': mW1_val, 'mW2_val': mW2_val, 'mHR_val': mHR_val,
         'k1_val': k1_val, 'vR_val': vR_val, 'g_val': g_val, 'mH10_val': mH10_val,
         'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 
         'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val, 'epsilon_val': epsilon_val
     }
+    couplings = config['couplings']
+    boson_mass_key = config['boson_mass_key']
+    extra_param_keys = config['extra_param_keys']
 
-    if interaction_key in two_neutrino_interactions:
-        for i in range(num_neutrinos):
-            mni_val = mni_masses[i]
-            for j in range(num_neutrinos): # Inner loop for j (for two neutrinos ni nj)
-                mnj_val = mni_masses[j]
-                if verbose:
-                    print(f"  Calculating for {interaction_key}, neutrino indices i={i}, j={j} (lepton_a index: {a_idx}, lepton_b index: {b_idx})")
-
-                current_ff_args = []
-                # 1. Coupling matrix elements
-                for c_desc in config['couplings']:
-                    matrix = matrix_values[c_desc['matrix_name']]
-                    resolved_indices = []
-                    for idx_key in c_desc['idx_keys']:
-                        if idx_key == 'a': resolved_indices.append(a_idx)
-                        elif idx_key == 'b': resolved_indices.append(b_idx)
-                        elif idx_key == 'i': resolved_indices.append(i)
-                        elif idx_key == 'j': resolved_indices.append(j) # Handle 'j'
-                        else: raise ValueError(f"Unknown index key {idx_key} in _interaction_configs for {interaction_key}")
-                    
-                    val = matrix[tuple(resolved_indices)]
-                    if c_desc['conj']:
-                        val = mp.conj(val)
-                    current_ff_args.append(val)
-
-                # 2. Boson mass
-                if isinstance(config['boson_mass_key'], list):
-                    for key in config['boson_mass_key']:
-                        current_ff_args.append(parameter_values[key])
-                else:
-                    current_ff_args.append(parameter_values[config['boson_mass_key']])
-                
-                # 3. Particle masses (mni, mnj, mla, mlb for two neutrino diagrams)
-                current_ff_args.extend([mni_val, mnj_val, ml_a_val, ml_b_val])
-                
-                # 4. Extra parameters
-                for param_key in config['extra_param_keys']:
-                    current_ff_args.append(parameter_values[param_key])
-                
-                if verbose:
-                    print('interaction_key: ',interaction_key)
-                    print(f'current_ff_args (i={i}, j={j}): ', current_ff_args)
-                    
-                al_contrib = ff_calculator_AL(*current_ff_args)
-                ar_contrib = ff_calculator_AR(*current_ff_args)
-
-                al_sum += al_contrib
-                ar_sum += ar_contrib
-    else: # Original logic for interactions with a single neutrino loop
-        for i in range(num_neutrinos):
-            if verbose:
-                print(f"  Calculating for {interaction_key}, neutrino index i = {i} (lepton_a index: {a_idx}, lepton_b index: {b_idx})")
-
-            mni_val = mni_masses[i]
-
-            current_ff_args = []
-            
-            for c_desc in config['couplings']:
-                matrix = matrix_values[c_desc['matrix_name']]
-                
-                # Resolve index keys ('a', 'b', 'i') to actual index values
-                resolved_indices = []
-                for idx_key in c_desc['idx_keys']:
-                    if idx_key == 'a': resolved_indices.append(a_idx)
-                    elif idx_key == 'b': resolved_indices.append(b_idx)
-                    elif idx_key == 'i': resolved_indices.append(i) # current neutrino loop index
-                    else: raise ValueError(f"Unknown index key {idx_key} in _interaction_configs for {interaction_key}")
-                
-                val = matrix[tuple(resolved_indices)]
-                if c_desc['conj']:
-                    val = mp.conj(val)
-                current_ff_args.append(val)
-
-            # 2. Boson mass
-            if isinstance(config['boson_mass_key'], list):
-                for key in config['boson_mass_key']:
-                    current_ff_args.append(parameter_values[key])
-            else:
-                current_ff_args.append(parameter_values[config['boson_mass_key']])
-            
-            # 3. Common particle masses (mni, mla, mlb)
-            current_ff_args.extend([mni_val, ml_a_val, ml_b_val])
-            
-            # 4. Extra parameters (k1_val, vR_val if applicable)
-            for param_key in config['extra_param_keys']:
-                current_ff_args.append(parameter_values[param_key])
-            
-            if verbose:
-                print('interaction_key: ',interaction_key)
-                print('current_ff_args: ', current_ff_args)
-                
-            al_contrib = ff_calculator_AL(*current_ff_args)
-            ar_contrib = ff_calculator_AR(*current_ff_args) # AR uses the same arguments
-
-            al_sum += al_contrib
-            ar_sum += ar_contrib
-            
+    if parallel:
+        if interaction_key in two_neutrino_interactions:
+            index_pairs = [(i, j) for i in range(num_neutrinos) for j in range(num_neutrinos)]
+        else:
+            index_pairs = list(range(num_neutrinos))
+        # Prepare argument tuples for each job
+        job_args = [
+            (
+                interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
+                ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, idx
+            )
+            for idx in index_pairs
+        ]
+        # Use ThreadPoolExecutor instead of ProcessPoolExecutor to avoid pickling errors
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            results = list(executor.map(_single_ff_args, job_args))
+        for ffL, ffR in results:
+            al_sum += ffL
+            ar_sum += ffR
+    else:
+        if interaction_key in two_neutrino_interactions:
+            for i, mni_val in enumerate(mni_masses):
+                for j, mnj_val in enumerate(mni_masses):
+                    ffL, ffR = _single_ff_args((
+                        interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
+                        ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, (i, j)
+                    ))
+                    al_sum += ffL
+                    ar_sum += ffR
+        else:
+            for i, mni_val in enumerate(mni_masses):
+                ffL, ffR = _single_ff_args((
+                    interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
+                    ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, i
+                ))
+                al_sum += ffL
+                ar_sum += ffR
     return {'AL': al_sum, 'AR': ar_sum}
 
-def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a, idx_b, k1_val=mp.mpf('246'), vR_val=mp.mpf('5000'), mW1_val=mp.mpf('80.3692'), mH10_val=mp.mpf('125'), mHR_val=mp.mpf('1600'), verbose=False):
+def formfactors_neutrino_sum(
+    mns_vals, ml_vals_list, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val,
+    idx_a, idx_b, k1_val=mp.mpf('246'), vR_val=mp.mpf('5000'), mW1_val=mp.mpf('80.3692'),
+    mH10_val=mp.mpf('125'), mHR_val=mp.mpf('1600'), verbose=False,
+    parallel=False, max_workers=None
+):
     """
     Calculates the sum of form factors for different interactions.
+    Optimized: precompute all matrix elements for all neutrino indices.
     """
     epsilon_val = k1_val / vR_val
-    g_val = 2*mW1_val/k1_val
-    mW2_squared_val = (mW1_val**2/k1_val**2)*(k1_val**2 + vR_val**2)
-    mW2_val = mp.sqrt(mW2_squared_val)
+    g_val = 2 * mW1_val / k1_val
+    mW2_val = mp.sqrt((mW1_val**2 / k1_val**2) * (k1_val**2 + vR_val**2))
 
-    # The lambdified functions for mixing matrices expect 6 heavy neutrino mass arguments (mNi[3] to mNi[8])
     if len(mns_vals) < 9:
-        raise ValueError(f"mns_vals must contain at least 9 neutrino masses in ISS (3 light, and 6 heavy for mNi[3]..mNi[8]). Received {len(mns_vals)}.")
-
-    # Heavy neutrino mass components for lambdified functions (mNi[3] to mNi[8])
-    # mns_vals[3] corresponds to mN_3, ..., mns_vals[8] corresponds to mN_8.
+        raise ValueError(
+            f"mns_vals must contain at least 9 neutrino masses in ISS (3 light, and 6 heavy for mNi[3]..mNi[8]). Received {len(mns_vals)}."
+        )
     mns_heavy_args = mns_vals[3:9]
 
+    # Precompute all mixing matrices
     QL_val = QL_lamb(epsilon_val, *mns_heavy_args)
     TRL_val = TRL_lamb(epsilon_val, *mns_heavy_args)
     QR_val = QR_lamb(epsilon_val, *mns_heavy_args)
@@ -821,44 +820,73 @@ def formfactors_neutrino_sum(mns_vals, ml_vals_list, rho1_val, alpha13_val, alph
     K_val = K_lamb(epsilon_val, *mns_heavy_args)
     OmegaRL_val = OmegaRL_lamb(epsilon_val, *mns_heavy_args)
     OmegaSR_val = OmegaSR_lamb(epsilon_val, *mns_heavy_args)
-    
+
     num_total_neutrinos = len(mns_vals)
     all_form_factors = {}
+
+    # Precompute all matrix elements for all indices
+    # Each matrix is assumed to be indexable by [i, j] or [i] as needed
+    matrix_cache = {
+        'QL': QL_val,
+        'TRL': TRL_val,
+        'QR': QR_val,
+        'J': J_val,
+        'K': K_val,
+        'OmegaRL': OmegaRL_val,
+        'OmegaSR': OmegaSR_val
+    }
+
+    # Precompute all possible matrix elements for all relevant indices
+    # This avoids repeated indexing and conjugation in the inner loops
+    matrix_elements = {}
+    for name, mat in matrix_cache.items():
+        # Try to cache all possible 2D and 1D accesses
+        try:
+            shape = mat.shape
+            if len(shape) == 2:
+                matrix_elements[name] = {(i, j): mat[i, j] for i in range(shape[0]) for j in range(shape[1])}
+            elif len(shape) == 1:
+                matrix_elements[name] = {i: mat[i] for i in range(shape[0])}
+            else:
+                matrix_elements[name] = mat
+        except Exception:
+            matrix_elements[name] = mat
 
     common_calc_args = {
         "num_neutrinos": num_total_neutrinos,
         "QL_val": QL_val, "TRL_val": TRL_val, "QR_val": QR_val, "OmegaRL_val": OmegaRL_val, "OmegaSR_val": OmegaSR_val,
         "J_val": J_val, "K_val": K_val,
-        "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val, 'mH10_val':mH10_val,
-        "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val, 
-        'rho1_val':rho1_val, 'alpha13_val':alpha13_val, 'alpha12_val':alpha12_val, 'alpha23_val':alpha23_val, 'lamb12_val':lamb12_val, 'epsilon_val':epsilon_val,
+        "mW1_val": mW1_val, "mW2_val": mW2_val, "mHR_val": mHR_val, 'mH10_val': mH10_val,
+        "k1_val": k1_val, "vR_val": vR_val, "g_val": g_val,
+        'rho1_val': rho1_val, 'alpha13_val': alpha13_val, 'alpha12_val': alpha12_val, 'alpha23_val': alpha23_val, 'lamb12_val': lamb12_val, 'epsilon_val': epsilon_val,
         "mni_masses": mns_vals,
         "ml_a_val": ml_vals_list[idx_a], "ml_b_val": ml_vals_list[idx_b],
         "a_idx": idx_a, "b_idx": idx_b,
         "verbose": verbose
     }
-    
 
     interaction_types = [
-        'ni_GL', 'GL_ni', 'ni_GR', 
-        'GR_ni', 'ni_HR', 'HR_ni', 
-        'ni_W1', 'W1_ni', 'ni_W2', 
+        'ni_GL', 'GL_ni', 'ni_GR',
+        'GR_ni', 'ni_HR', 'HR_ni',
+        'ni_W1', 'W1_ni', 'ni_W2',
         'W2_ni', 'ni_GLp_GLm', 'ni_GRp_GRm',
-        'ni_HRp_HRm', 'ni_W1p_W1m',  'ni_W2p_W2m',
+        'ni_HRp_HRm', 'ni_W1p_W1m', 'ni_W2p_W2m',
         'ni_GRp_HRm', 'ni_HRp_GRm', 'ni_W1p_GLm',
         'ni_W2p_GRm', 'ni_W2p_HRm', 'ni_GLp_W1m',
         'ni_GRp_W2m', 'ni_HRp_W2m'
     ] + two_neutrino_interactions
 
+    # Optionally, parallelize this loop if you want (requires more code)
     for int_key in interaction_types:
         if verbose:
             print(f"Calculating form factors for interaction type: {int_key}")
-            print(f"common_calc_args: ", common_calc_args)
         all_form_factors[int_key] = _calculate_interaction_formfactors(
             interaction_key=int_key,
+            parallel=parallel,
+            max_workers=max_workers,
             **common_calc_args
         )
-        
+
     return all_form_factors
 
 if __name__ == '__main__':
@@ -913,7 +941,7 @@ if __name__ == '__main__':
     ]
     
 
-    ff = formfactors_neutrino_sum(mni_vals, ml_vals, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a=1, idx_b=2, k1_val=k1_val, vR_val=vR_val, mHR_val=mHR_val, verbose=True)
+    ff = formfactors_neutrino_sum(mni_vals, ml_vals, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a=1, idx_b=2, k1_val=k1_val, vR_val=vR_val, mHR_val=mHR_val, verbose=True, parallel=True, max_workers=4)
 
     ALsum = 0
     ARsum = 0
