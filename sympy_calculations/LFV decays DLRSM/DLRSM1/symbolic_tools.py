@@ -1,4 +1,4 @@
-from sympy import diff, S, factorial, Mul, Function, I, Symbol, expand, Pow, cancel
+from sympy import diff, S, factorial, Mul, Function, I, Symbol, expand, Pow, cancel, Poly, Add, Integer
 from sympy.utilities.iterables import multiset_permutations
 from sympy import derive_by_array
 
@@ -22,63 +22,126 @@ class PartialMu(Function):
         # Apply the rule: ∂_μ(G^+) = i p(G^+) G^+
         return I * momentum(field) * field
 
+# Renamed original function to be the fallback, with corrections and improvements
+def _extract_interaction_coefficients_fallback(L, fields_set, parameters):
+    """
+    Fallback method for extracting interaction coefficients.
+    Processes term by term after expansion.
+    (Internal use)
+    """
+    # fields_set is already a set of Symbol objects
+    L_expanded = expand(L)
+    interaction_dict = {}
+
+    for term in L_expanded.as_ordered_terms():
+        if term == S.Zero:
+            continue
+
+        detected_fields_for_term = []
+        
+        # Corrected field and exponent detection logic
+        for f_symbol in fields_set:
+            # Optimization: only consider f_symbol if it's in the term's free symbols
+            if f_symbol not in term.free_symbols:
+                continue
+
+            exponent_of_f = 0
+            if term.is_Mul:
+                for factor in term.args:
+                    if factor == f_symbol:
+                        exponent_of_f += 1
+                    elif factor.is_Pow and factor.base == f_symbol:
+                        # Ensure exponent is integer for this extraction method
+                        if isinstance(factor.exp, (int, Integer)):
+                            exponent_of_f += int(factor.exp)
+            elif term.is_Pow:
+                if term.base == f_symbol and isinstance(term.exp, (int, Integer)):
+                    exponent_of_f = int(term.exp)
+            elif term == f_symbol: # term is the field itself
+                exponent_of_f = 1
+            
+            if exponent_of_f > 0:
+                detected_fields_for_term.extend([f_symbol] * exponent_of_f)
+
+        # Sort fields using SymPy's canonical sort key for dictionary key consistency
+        term_fields_tuple = tuple(sorted(detected_fields_for_term, key=lambda s: s.sort_key()))
+        num_fields = len(term_fields_tuple)
+
+        field_product = Mul(*term_fields_tuple) if term_fields_tuple else S.One
+        
+        # Use cancel to simplify the coefficient
+        coefficient = cancel(term / field_product)
+
+        if num_fields not in interaction_dict:
+            interaction_dict[num_fields] = {}
+
+        # Sum coefficients correctly
+        current_coeff = interaction_dict[num_fields].get(term_fields_tuple, S.Zero)
+        interaction_dict[num_fields][term_fields_tuple] = current_coeff + coefficient
+            
+    return interaction_dict
+
 def extract_interaction_coefficients(L, fields, parameters):
     """
     Extracts interaction coefficients from a Lagrangian.
+    Tries a fast Poly-based method first, then falls back to a robust term-by-term method.
 
     Args:
         L (sympy expression): The Lagrangian containing fields and parameters.
         fields (iterable): A list or set of sympy symbols representing the fields.
-        parameters (set): A set of sympy symbols and functions representing parameters.
+        parameters (set): A set of sympy symbols and functions representing parameters (currently unused in logic but kept for signature).
 
     Returns:
         dict: A nested dictionary with:
             - Outer key: Number of interacting fields.
-            - Inner key: Tuple of interacting fields (sorted).
+            - Inner key: Tuple of interacting fields (sorted canonically).
             - Value: Coefficient of the interaction term.
     """
     # Ensure fields is a set of valid SymPy objects
     fields = {f for f in fields if isinstance(f, Symbol)}
     
-    # Expand the Lagrangian
-    L_expanded = expand(L)
+    if not fields: # No fields to analyze
+        # If L is 0, result is {}. If L is non-zero constant, result is {0: {(): L}}
+        return {0: {(): L}} if L != S.Zero else {}
 
-    # Initialize the classification dictionary
-    interaction_dict = {}
+    # Sort fields_tuple for canonical Poly representation and fallback consistency
+    fields_tuple = tuple(sorted(list(fields), key=lambda s: s.sort_key()))
+    
+    poly_L = None
+    try:
+        # Attempt to convert to Poly; domain='EX' for general symbolic coefficients.
+        poly_L = L.as_poly(*fields_tuple, domain='EX')
+    except Exception: # Catch potential errors during as_poly conversion (e.g. PolificationFailed)
+        poly_L = None # Ensure poly_L is None if conversion fails
 
-    # Iterate over each term in the expanded Lagrangian
-    for term in L_expanded.as_ordered_terms():
-        detected_fields = []
-        
-        for f in fields:
-            if f in term.free_symbols:
-                exponent = 1
-                for subterm in term.as_ordered_factors():
-                    if isinstance(subterm, Pow) and subterm.base == f:
-                        exponent = subterm.exp
-                detected_fields.extend([f] * exponent)  # Count each appearance
+    if poly_L is not None:
+        # Fast path using Poly object
+        interaction_dict_poly = {}
+        for monom_exps, coeff in poly_L.terms():
+            if coeff == S.Zero: # Skip zero-coefficient terms
+                continue
 
-        term_fields = tuple(sorted(detected_fields, key=lambda x: str(x)))
-        num_fields = len(term_fields)
+            detected_fields_list = []
+            for field_symbol, exponent in zip(fields_tuple, monom_exps):
+                # Exponents from Poly.terms() are Python integers
+                detected_fields_list.extend([field_symbol] * exponent)
+            
+            # Sort fields using SymPy's canonical sort key
+            term_fields_tuple_poly = tuple(sorted(detected_fields_list, key=lambda s: s.sort_key()))
+            num_fields_poly = len(term_fields_tuple_poly)
 
-        # Extract the coefficient by dividing the term by the product of detected fields
-        field_product = Mul(*term_fields) if term_fields else 1  # Avoid empty product
-        coefficient = cancel(term / field_product)  # Ensure full cancellation
-
-        # Ensure all fields are completely removed
-        #coefficient = coefficient.subs({f: 1 for f in term_fields})
-
-        # Store in dictionary
-        if num_fields not in interaction_dict:
-            interaction_dict[num_fields] = {}
-
-        # Sum coefficients correctly for repeated field interactions
-        if term_fields in interaction_dict[num_fields]:
-            interaction_dict[num_fields][term_fields] += coefficient
-        else:
-            interaction_dict[num_fields][term_fields] = coefficient
-
-    return interaction_dict
+            if num_fields_poly not in interaction_dict_poly:
+                interaction_dict_poly[num_fields_poly] = {}
+            
+            # Sum coefficients correctly
+            current_coeff_poly = interaction_dict_poly[num_fields_poly].get(term_fields_tuple_poly, S.Zero)
+            interaction_dict_poly[num_fields_poly][term_fields_tuple_poly] = current_coeff_poly + coeff
+        return interaction_dict_poly
+    else:
+        # Fallback to the corrected term-by-term method
+        # A print statement can be useful for debugging when fallback is triggered:
+        # print("Info: Lagrangian could not be processed efficiently as Poly. Falling back to term-by-term method.")
+        return _extract_interaction_coefficients_fallback(L, fields, parameters)
 
 def test_feynman_coefficients(Lagrangian, fields, parameters):
     """ Test the Feynman coefficient extraction function by reconstructing the Lagrangian. """
