@@ -192,7 +192,7 @@ ParameterDefinitions = {
      DependenceSPheno -> None, 
      Real -> True, 
      LesHouches -> {LRINPUT, 100}, 
-     LaTeX -> "\\mu", 
+     LaTeX -> "\\mu_{1}^2", 
      OutputName -> MU12}}, 
 
 {mu22,{ 
@@ -231,7 +231,7 @@ ParameterDefinitions = {
      DependenceOptional -> None, 
      DependenceSPheno -> None, 
      Real -> True, 
-     LesHouches -> {LRINPUT, 7}, 
+     LesHouches -> {LRINPUT, 8}, 
      LaTeX -> "\\rho_1", 
      OutputName -> RHO1}}, 
 
@@ -414,7 +414,7 @@ ParameterDefinitions = {
      DependenceSPheno -> None, 
      Real -> False, 
      LesHouches -> MuxMIX, 
-     LaTeX -> "\mu_{X}", 
+     LaTeX -> "\\mu_{X}", 
      OutputName -> Mux}}, 
 
 {YL,{ 
@@ -462,7 +462,7 @@ ParameterDefinitions = {
      DependenceSPheno -> None, 
      Real -> False, 
      LesHouches -> Yt, 
-     LaTeX -> "\tilde{Y}", 
+     LaTeX -> "\\tilde{Y}", 
      OutputName -> Yt}},
 
 {YL1,{ 
@@ -526,10 +526,10 @@ ParameterDefinitions = {
      DependenceNum -> None, 
      DependenceOptional -> None, 
      DependenceSPheno -> None, 
-      Real -> False,
-      LesHouches -> ZMMIX,
-      LaTeX -> "Z^\nu",
-      OutputName -> ZM}},
+     Real -> False,
+     LesHouches -> ZMMIX,
+     LaTeX -> "Z^{\\nu}",
+     OutputName -> ZM}},
 
 {ZW,{
      Description -> "W Mixing Matrix",
@@ -577,5 +577,5 @@ ParameterDefinitions = {
      Real -> False,
      LesHouches -> {LRSM, 2},
      LaTeX -> "M_{VWLm}",
-     OutputName -> Mvwlm}} 
+     OutputName -> Mvwlm}}
 } 

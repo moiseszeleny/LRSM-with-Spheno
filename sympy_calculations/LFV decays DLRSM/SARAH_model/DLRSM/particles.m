@@ -3,7 +3,7 @@
 (* ###############            EWSB       ################# *) 
 
 ParticleDefinitions[EWSB] = { 
- 
+
 
 {Ah,{ 
      Description -> "Pseudo-Scalar Higgs", 
@@ -49,11 +49,23 @@ ParticleDefinitions[EWSB] = {
      Description -> "Neutrinos", 
      FeynArtsNr -> 1, 
      LaTeX -> "\\nu", 
-     Mass -> {LesHouches, LesHouches, LesHouches, LesHouches, LesHouches, LesHouches}, 
+     Mass -> {
+     LesHouches, LesHouches, LesHouches,
+     LesHouches, LesHouches, LesHouches,
+     LesHouches, LesHouches, LesHouches
+     }, 
      OutputName -> "nu", 
-     PDG -> {12, 14, 16, 6000012, 6000014, 6000016}, 
+     PDG -> {
+     12, 14, 16, 
+     6000012, 6000014, 6000016,
+     99198,99199,99197
+     }, 
      ElectricCharge -> 0, 
-     Width -> {External, External, External, External, External, External}}}, 
+     Width -> {
+     External, External, External,
+     External, External, External,
+     External, External, External
+     }}}, 
 
 {gG,{ 
      Description -> "Gluon Ghost", 
@@ -147,21 +159,12 @@ ParticleDefinitions[EWSB] = {
 {Hpm,{ 
      Description -> "Charged Higgs", 
      FeynArtsNr -> {0, 0, 3, 303}, 
-     LaTeX -> {"H^-","H^+"}, 
+     LaTeX -> "H^\\pm"(*{"H^-","H^+"}*), 
      Mass -> {0, 0, LesHouches, LesHouches}, 
-     OutputName -> {"Hm","Hp"}, 
+     OutputName -> "Hpm" (*{"Hm","Hp"}*), 
      PDG -> {0, 0, -37, -47}, 
      ElectricCharge -> -1, 
      Width -> {0, 0, External, External}}}, 
-
-{Hppmm,{ 
-     FeynArtsNr -> {2337, 3447}, 
-     LaTeX -> {"\\delta^{c--}","\\delta^{c++}"}, 
-     Mass -> LesHouches, 
-     OutputName -> {"Hmm","Hpp"}, 
-     PDG -> {-9000055, -9000065}, 
-     ElectricCharge -> -2, 
-     Width -> Automatic}}, 
 
 {VG,{ 
      Description -> "Gluon", 
@@ -189,7 +192,7 @@ ParticleDefinitions[EWSB] = {
      FeynArtsNr -> 3, 
      LaTeX -> {"W^-","W^+"}, 
      Mass -> Dependence, 
-     MassDependence -> Sqrt[Mass[VZ]^2/2 + Sqrt[-((Pi*Mass[VZ]^2)/(Sqrt[2]*aEWinv*Gf)) + Mass[VZ]^4/4]], 
+     MassDependence -> Sqrt[Mass[VZ]^2/2 Cos[ThetaW]^2], 
      OutputName -> {"WLm","WLp"}, 
      PDG -> {-24}, 
      ElectricCharge -> -1, 
@@ -234,62 +237,42 @@ ParticleDefinitions[EWSB] = {
 (* ###############            GaugeES       ################# *) 
 
 ParticleDefinitions[GaugeES] = { 
- 
 
-{deltaL0,{ 
+
+{chiL0,{ 
      FeynArtsNr -> {511}, 
-     LaTeX -> "\\Delta_{1L0}", 
+     LaTeX -> "\\chi_{L0}", 
      Mass -> Automatic, 
-     OutputName -> "dlt1L0", 
+     OutputName -> "chiL0", 
      PDG -> {0}, 
      ElectricCharge -> 0, 
      Width -> {0}}}, 
 
-{deltaLp,{ 
+{chiLp,{ 
      FeynArtsNr -> {512}, 
-     LaTeX -> {"\\Delta_{L}^+","\\Delta_{L}^-"}, 
+     LaTeX -> {"\\chi_{L}^+","\\chi_{L}^-"}, 
      Mass -> Automatic, 
-     OutputName -> {"dlt1Lp","dlt1Lm"}, 
+     OutputName -> {"chiLp","chiLm"}, 
      PDG -> {0}, 
      ElectricCharge -> 1, 
-     Width -> {0}}}, 
+     Width -> {0}}},
 
-{deltaLpp,{ 
-     Description -> "LH Doubly-Charged Higgs", 
-     FeynArtsNr -> {5053}, 
-     LaTeX -> {"HL^{++}","HL^{--}"}, 
-     Mass -> {0}, 
-     OutputName -> {"HLpp","HLmm"}, 
-     PDG -> {0}, 
-     ElectricCharge -> 2, 
-     Width -> {0}}}, 
-
-{deltaR0,{ 
+{chiR0,{ 
      FeynArtsNr -> {501}, 
-     LaTeX -> "\\Delta_{1R0}", 
+     LaTeX -> "\\chi_{R0}", 
      Mass -> Automatic, 
-     OutputName -> "dlt1R0", 
+     OutputName -> "chiR0", 
      PDG -> {0}, 
      ElectricCharge -> 0, 
      Width -> {0}}}, 
 
-{deltaRp,{ 
+{chiRp,{ 
      FeynArtsNr -> {502}, 
-     LaTeX -> {"\\Delta_{R}^+","\\Delta_{R}^-"}, 
+     LaTeX -> {"\\chi_{R}^+","\\chi_{R}^-"}, 
      Mass -> Automatic, 
-     OutputName -> {"dlt1Rp","dlt1Rm"}, 
+     OutputName -> {"chiRp","chiRm"}, 
      PDG -> {0}, 
      ElectricCharge -> 1, 
-     Width -> {0}}}, 
-
-{deltaRpp,{ 
-     Description -> "RH Doubly-Charged Higgs", 
-     FeynArtsNr -> {5052}, 
-     LaTeX -> {"HR^{++}","HR^{--}"}, 
-     Mass -> {0}, 
-     OutputName -> {"HRpp","HRmm"}, 
-     PDG -> {0}, 
-     ElectricCharge -> 2, 
      Width -> {0}}}, 
 
 {Fd1,{ 
@@ -364,6 +347,13 @@ ParticleDefinitions[GaugeES] = {
      PDG -> {0, 0, 0}, 
      Width -> {0, 0, 0}}}, 
 
+{Fs,     {   Description -> "s neutrino", 
+		PDG -> {99198,99199,99197},
+          FeynArtsNr -> 20,                  
+		LaTeX -> "S_1",
+          ElectricCharge -> 0,
+          OutputName -> "S1" }}, 
+
 {gB,{ 
      Description -> "B-Boson Ghost", 
      FeynArtsNr -> 1, 
@@ -371,7 +361,7 @@ ParticleDefinitions[GaugeES] = {
      Mass -> 0, 
      OutputName -> "gB", 
      PDG -> {0}, 
-     Width -> 0}}, 
+     Width -> 0}},
 
 {gG,{ 
      Description -> "Gluon Ghost", 
@@ -413,7 +403,7 @@ ParticleDefinitions[GaugeES] = {
      FeynArtsNr -> {4}, 
      LaTeX -> {"H_1^-","H_1^+"}, 
      Mass -> {0}, 
-     OutputName -> {"Hm","Hp"}, 
+     OutputName -> {"H1m","H1p"}, 
      PDG -> {0}, 
      ElectricCharge -> -1, 
      Width -> {0}}}, 
@@ -436,6 +426,7 @@ ParticleDefinitions[GaugeES] = {
      PDG -> {0}, 
      Width -> Automatic}}, 
 
+
 {VB,{ 
      Description -> "B-Boson", 
      FeynArtsNr -> 1, 
@@ -443,7 +434,7 @@ ParticleDefinitions[GaugeES] = {
      Mass -> 0, 
      OutputName -> "B", 
      PDG -> {0}, 
-     Width -> 0}}, 
+     Width -> 0}},
 
 {VG,{ 
      Description -> "Gluon", 
@@ -503,7 +494,13 @@ WeylFermionAndIndermediate = {
      LaTeX -> "e_R"}}, 
 
 {nuR,{ 
-     LaTeX -> "\\nu_R"}}, 
+     LaTeX -> "\\nu_R"}},
+
+{s1,{ 
+     LaTeX -> "s_1"}},
+
+{S1,{ 
+     LaTeX -> "S_1"}},
 
 {DL,{ 
      LaTeX -> "D_L"}}, 
@@ -550,15 +547,15 @@ WeylFermionAndIndermediate = {
 {phiL0,{ 
      LaTeX -> "\\phi_{L0}"}}, 
 
-{deltaR,{ 
-     LaTeX -> "\\hat{\\Delta}^c"}}, 
+{chiR,{ 
+     LaTeX -> "\\hat{\\chi_R}^c"}}, 
 
 {Phi,{ 
      LaTeX -> "\\Phi"}}, 
 
 
-{deltaL,{ 
-     LaTeX -> "{\\delta}_{l}"   (* auto generated LaTeX name *)}}, 
+{chiL,{ 
+     LaTeX -> "{\\chi}_{l}"   (* auto generated LaTeX name *)}}, 
 
 {LLbar,{ 
      LaTeX -> "\\bar{ll}"   (* auto generated LaTeX name *)}}, 

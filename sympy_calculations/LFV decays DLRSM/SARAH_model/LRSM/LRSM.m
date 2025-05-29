@@ -90,11 +90,11 @@ contractionBeta3b= Delta[lef1,lef2] epsTensor[lef2b,lef3] epsTensor[rig3,rig4b] 
 
 
 LagNoHC = ( mu12 contractionMu12 Phi.conj[Phi]           
-           - mu22 ( conj[Phi].conj[Phi]
-           +  Phi.Phi )
-           + muLR2 ( deltaR.conj[deltaR]  
-           + deltaL.conj[deltaL]  )
-           - lam1 contractionLam1 Phi.conj[Phi].Phi.conj[Phi] 
+          - mu22 ( conj[Phi].conj[Phi]
+          +  Phi.Phi )
+          + muLR2 ( deltaR.conj[deltaR]  
+          + deltaL.conj[deltaL]  )
+          - lam1 contractionLam1 Phi.conj[Phi].Phi.conj[Phi] 
           - lam2 ( contractionLam2a conj[Phi].conj[Phi].conj[Phi].conj[Phi] 
           + contractionLam2b Phi.Phi.Phi.Phi )
           - lam3 contractionLam3 conj[Phi].conj[Phi].Phi.Phi
