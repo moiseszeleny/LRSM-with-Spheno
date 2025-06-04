@@ -55,35 +55,35 @@ LagNoHC = (
   -mu12 Delta[rig1,rig2] Delta[lef2,lef1] Phi.conj[Phi]
   + lam1 Delta[rig1,rig2] Delta[lef2,lef1] Delta[rig3,rig4] Delta[lef4,lef3] 
         Phi.conj[Phi].Phi.conj[Phi]
-  + lam2 Delta[rig1,rig4] Delta[rig3,rig2] Delta[lef2,lef1] Delta[lef4,lef3] 
+  + lam2 Delta[lef1,lef2] Delta[rig2,rig3] Delta[lef3,lef4] Delta[rig1,rig4] 
         Phi.conj[Phi].Phi.conj[Phi] 
   + (1/2) lam3 (
-      epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
-      + epsTensor[rig1,lef2] epsTensor[lef1,rig2] epsTensor[lef4,lef3] epsTensor[rig4,rig3] Phi.Phi.Phi.Phi
-      + 2 epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] conj[Phi].conj[Phi].Phi.Phi                              
+      epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[lef3,lef4] epsTensor[rig3,rig4] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
+      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig34,rig43] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
+      + 2 epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] conj[Phi].conj[Phi].Phi.Phi                              
   )
   + (1/2) lam4 (
-      epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] conj[Phi].conj[Phi].Phi.Phi 
-      + epsTensor[rig1,lef2] epsTensor[lef1,rig2] epsTensor[lef4,lef3] epsTensor[rig4,rig3] Phi.Phi.Phi.Phi
-      - 2 epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] conj[Phi].conj[Phi].Phi.Phi                                    
+      epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[lef3,lef4] epsTensor[rig3,rig4] conj[Phi].conj[Phi].conj[Phi].conj[Phi] 
+      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig34,rig43] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
+      - 2 epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] conj[Phi].conj[Phi].Phi.Phi                                    
     )
-  - lam5 epsTensor[lef2,rig2] Delta[lef4, lef3] Delta[lef3, rig4] epsTensor[rig3,rig1] conj[Phi].Phi.Phi.conj[Phi] 
+  + lam5 epsTensor[rig2,rig3] epsTensor[rig1,rig4] Delta[lef1, lef2] Delta[lef3, lef4] conj[Phi].Phi.Phi.conj[Phi] 
   + (1/2) lam6 (
-    epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
-    + epsTensor[lef2,lef1] epsTensor[rig2,rig1] epsTensor[lef4,lef3] epsTensor[rig4,rig3] Phi.Phi.Phi.Phi
+    epsTensor[lef1,lef2] epsTensor[rig2,rig3] epsTensor[lef3,lef4] epsTensor[rig4,rig1] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
+    + epsTensor[lef1,rig1] epsTensor[lef1,rig1] epsTensor[rig2,rig3] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
     )
   - mu22 (conj[chiL].chiL + conj[chiR].chiR)
   + rho1 conj[chiL].chiL.conj[chiL].chiL + rho1 conj[chiR].chiR.conj[chiR].chiR             (* ρ₁ (χ_L†χ_L)² + (χ_R†χ_R)² *)
   + rho2 conj[chiL].chiL.conj[chiR].chiR                                                   (* ρ₂ χ_L†χ_L χ_R†χ_R *)
-  + alp1 Delta[rig1,rig2] Delta[lef2,lef1] Phi.conj[Phi].conj[chiL].chiL
-  + alp1 Delta[rig1,rig2] Delta[lef2,lef1] Phi.conj[Phi].conj[chiR].chiR
+  + alp1 Delta[rig1,rig2] Delta[lef1,lef2] Phi.conj[Phi].conj[chiL].chiL
+  + alp1 Delta[rig1,rig2] Delta[lef1,lef2] Phi.conj[Phi].conj[chiR].chiR
   + alp2 (
-      conj[chiL].Phi.conj[Phi].chiL 
-      + conj[chiR].conj[Phi].Phi.chiR
+      Delta[lef1, lef2] Delta[rig2, rig3] Delta[lef3, lef4] conj[chiL].Phi.conj[Phi].chiL 
+      + Delta[rig1, rig2] Delta[lef2, lef3] Delta[rig3, rig4] conj[chiR].conj[Phi].Phi.chiR
     )                                                                                      (* α₂ χ_L†ΦΦ†χ_L + χ_R†Φ†Φχ_R *)
   + alp3 (
-      - epsTensor[lef2,rig2] Delta[lef4, lef3] Delta[lef3, rig4] epsTensor[rig3,rig1] conj[chiL].Phi.conj[Phi].chiL 
-      - epsTensor[lef2,rig2] Delta[lef4, lef3] Delta[lef3, rig4] epsTensor[rig3,rig1] conj[chiR].conj[Phi].Phi.chiR
+      epsTensor[lef2,lef1] epsTensor[lef3,lef4] Delta[rig2, rig3] conj[chiL].conj[Phi].Phi.chiL 
+      + epsTensor[rig1,rig2] epsTensor[rig4,rig3] Delta[lef2, lef3] conj[chiR].Phi.conj[Phi].chiR
     ) 
 )
 
@@ -92,7 +92,7 @@ LagHC = - ( Y Phi.LLbar.LR
           + Yt conj[Phi].LLbar.LR 
           + YQ1 QLbar.Phi.QR 
           - YQ2 QLbar.conj[Phi].QR 
-          + YL conj[S1].conj[chiL].LLbar + YR S1.chiR.LR + Mux S1.conj[S1]
+          (*+ YL conj[S1].LLbar.chiL + YR S1.conj[chiR].LR + Mux S1.conj[S1]*)
           );
 
 
@@ -105,11 +105,11 @@ DEFINITION[EWSB][GaugeSector] =
 DEFINITION[EWSB][VEVs]={
 {H0,       {k1, 1/Sqrt[2]}, 
                     {sigmaH10, I/Sqrt[2]},{phiH10, 1/Sqrt[2]}},
-{HPrime0, {k2, 1/Sqrt[2]}, 
+{HPrime0, {0, 1/Sqrt[2]}, 
                     {sigmaH20, I/Sqrt[2]},{phiH20,1/Sqrt[2]}},
 {chiR0, {vR, 1/Sqrt[2]}, 
                     {sigmaR0, I/Sqrt[2]},{phiR0,1/Sqrt[2]}},
-{chiL0, {vL, 1/Sqrt[2]}, 
+{chiL0, {0, 1/Sqrt[2]}, 
                     {sigmaL0, I/Sqrt[2]},{phiL0,1/Sqrt[2]}} };
 
 DEFINITION[EWSB][MatterSector]=   
