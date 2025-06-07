@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 20:21 on 28.5.2025   
+! File created at 13:29 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -191,91 +191,6 @@ InputValueforYt= .True.
     Call ReadMatrixC(99,3,3,YtIN,1, "YtIN",kont)
 
  
-   Else If (read_line(7:13).Eq."GAUGEIN") Then 
-    Call Read_GAUGEIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:15).Eq."IMGAUGEIN") Then 
-    Call Read_GAUGEIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:15).Eq."LRINPUTIN") Then 
-    Call Read_LRINPUTIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:17).Eq."IMLRINPUTIN") Then 
-    Call Read_LRINPUTIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:11).Eq."VEVIN") Then 
-    Call Read_VEVIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:13).Eq."IMVEVIN") Then 
-    Call Read_VEVIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:12).Eq."HMIXIN") Then 
-    Call Read_HMIXIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."IMHMIXIN") Then 
-    Call Read_HMIXIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:12).Eq."PHIWIN") Then 
-    Call Read_PHIWIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."IMPHIWIN") Then 
-    Call Read_PHIWIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."THETAWIN") Then 
-    Call Read_THETAWIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:16).Eq."IMTHETAWIN") Then 
-    Call Read_THETAWIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:13).Eq."GAUGEIN") Then 
-    Call Read_GAUGEIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:15).Eq."IMGAUGEIN") Then 
-    Call Read_GAUGEIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:15).Eq."LRINPUTIN") Then 
-    Call Read_LRINPUTIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:17).Eq."IMLRINPUTIN") Then 
-    Call Read_LRINPUTIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:11).Eq."VEVIN") Then 
-    Call Read_VEVIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:13).Eq."IMVEVIN") Then 
-    Call Read_VEVIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:12).Eq."HMIXIN") Then 
-    Call Read_HMIXIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."IMHMIXIN") Then 
-    Call Read_HMIXIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:12).Eq."PHIWIN") Then 
-    Call Read_PHIWIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."IMPHIWIN") Then 
-    Call Read_PHIWIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."THETAWIN") Then 
-    Call Read_THETAWIN(99,0,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:16).Eq."IMTHETAWIN") Then 
-    Call Read_THETAWIN(99,1,i_model,set_mod_par,kont) 
- 
-   Else If (read_line(7:14).Eq."MUXMIXIN") Then 
-InputValueforMux= .True. 
-    Call ReadMatrixC(99,3,3,MuxIN,0, "MuxIN",kont)
-
- 
-   Else If (read_line(7:16).Eq."IMMUXMIXIN") Then 
-     If (i_cpv.Lt.2) Then  
-       Call Warn_CPV(i_cpv,"IMMux") 
-       Cycle 
-     End If 
-    Call ReadMatrixC(99,3,3,MuxIN,1, "MuxIN",kont)
-
- 
    Else If (read_line(7:10).Eq."YLIN") Then 
 InputValueforYL= .True. 
     Call ReadMatrixC(99,3,3,YLIN,0, "YLIN",kont)
@@ -301,6 +216,55 @@ InputValueforYR= .True.
      End If 
     Call ReadMatrixC(99,3,3,YRIN,1, "YRIN",kont)
 
+ 
+   Else If (read_line(7:14).Eq."MUXMIXIN") Then 
+InputValueforMux= .True. 
+    Call ReadMatrixC(99,3,3,MuxIN,0, "MuxIN",kont)
+
+ 
+   Else If (read_line(7:16).Eq."IMMUXMIXIN") Then 
+     If (i_cpv.Lt.2) Then  
+       Call Warn_CPV(i_cpv,"IMMux") 
+       Cycle 
+     End If 
+    Call ReadMatrixC(99,3,3,MuxIN,1, "MuxIN",kont)
+
+ 
+   Else If (read_line(7:13).Eq."GAUGEIN") Then 
+    Call Read_GAUGEIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:15).Eq."IMGAUGEIN") Then 
+    Call Read_GAUGEIN(99,1,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:15).Eq."LRINPUTIN") Then 
+    Call Read_LRINPUTIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:17).Eq."IMLRINPUTIN") Then 
+    Call Read_LRINPUTIN(99,1,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:11).Eq."VEVIN") Then 
+    Call Read_VEVIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:13).Eq."IMVEVIN") Then 
+    Call Read_VEVIN(99,1,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:12).Eq."HMIXIN") Then 
+    Call Read_HMIXIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:14).Eq."IMHMIXIN") Then 
+    Call Read_HMIXIN(99,1,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:12).Eq."PHIWIN") Then 
+    Call Read_PHIWIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:14).Eq."IMPHIWIN") Then 
+    Call Read_PHIWIN(99,1,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:14).Eq."THETAWIN") Then 
+    Call Read_THETAWIN(99,0,i_model,set_mod_par,kont) 
+ 
+   Else If (read_line(7:16).Eq."IMTHETAWIN") Then 
+    Call Read_THETAWIN(99,1,i_model,set_mod_par,kont) 
  
    Else If (read_line(7:13).Eq."GAUGEIN") Then 
     Call Read_GAUGEIN(99,0,i_model,set_mod_par,kont) 
@@ -1778,23 +1742,20 @@ Write(io_L,104) 9,Real(RHO2,dp), "# RHO2"
 Write(io_L,104) 16,Real(ALP2,dp), "# ALP2" 
 Write(io_L,104) 20,Real(ALP3,dp), "# ALP3" 
 Write(io_L,104) 6,Real(LAM5,dp), "# LAM5" 
+Write(io_L,104) 7,Real(LAM6,dp), "# LAM6" 
 Write(io_L,104) 4,Real(LAM3,dp), "# LAM3" 
 Write(io_L,104) 5,Real(LAM4,dp), "# LAM4" 
-Write(io_L,104) 7,Real(LAM6,dp), "# LAM6" 
 Write(io_L,104) 100,Real(MU12,dp), "# MU12" 
 Write(io_L,104) 98,Real(MU22,dp), "# MU22" 
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block VEV Q=",Q,"# (Renormalization Scale)" 
 Write(io_L,104) 4,Real(vR,dp), "# vR" 
-Write(io_L,104) 3,Real(vL,dp), "# vL" 
 Write(io_L,104) 4,Real(vR,dp), "# vR" 
-Write(io_L,104) 3,Real(vL,dp), "# vL" 
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block HMIX Q=",Q,"# (Renormalization Scale)" 
 Write(io_L,104) 102,Real(k1,dp), "# k1" 
-Write(io_L,104) 103,Real(k2,dp), "# k2" 
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block PHIW Q=",Q,"# (Renormalization Scale)" 
@@ -1805,7 +1766,27 @@ Write(io_L,106) "Block THETAW Q=",Q,"# (Renormalization Scale)"
 Write(io_L,104) 1,Real(ASin(Abs(ZZ(2,1))),dp), "# TW" 
 If (WriteTreeLevelTadpoleParameters) Then 
 If (HighScaleModel.Eq."LOW") Then 
+WriteNextBlock = .false. 
+If (OutputForMG) WriteNextBlock = .True. 
+Write(io_L,106) "Block TREELRINPUT Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,104) 100,Real(MU12Tree,dp), "# MU12" 
+Write(io_L,104) 98,Real(MU22Tree,dp), "# MU22" 
+WriteNextBlock = .false. 
+If (OutputForMG) WriteNextBlock = .True. 
+Write(io_L,106) "Block LOOPLRINPUT Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,104) 100,Real(MU121L,dp), "# MU12" 
+Write(io_L,104) 98,Real(MU221L,dp), "# MU22" 
 Else 
+WriteNextBlock = .false. 
+If (OutputForMG) WriteNextBlock = .True. 
+Write(io_L,106) "Block TREELRINPUT Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,104) 100,Real(MU12Tree,dp), "# MU12" 
+Write(io_L,104) 98,Real(MU22Tree,dp), "# MU22" 
+WriteNextBlock = .false. 
+If (OutputForMG) WriteNextBlock = .True. 
+Write(io_L,106) "Block LOOPLRINPUT Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,104) 100,Real(MU121L,dp), "# MU12" 
+Write(io_L,104) 98,Real(MU221L,dp), "# MU22" 
 End if 
 End if 
 Write(io_L,106) "Block Y Q=",Q,"# (Renormalization Scale)" 
@@ -1900,29 +1881,6 @@ Write(io_L,107)3,2,Aimag(Yt(3,2)), "# Aimag(Yt(3,2))"
 Write(io_L,107)3,3,Aimag(Yt(3,3)), "# Aimag(Yt(3,3))" 
 End If 
 
-Write(io_L,106) "Block MuxMIX Q=",Q,"# (Renormalization Scale)" 
-Write(io_L,107)1,1,Real(Mux(1,1),dp), "# Real(Mux(1,1),dp)" 
-Write(io_L,107)1,2,Real(Mux(1,2),dp), "# Real(Mux(1,2),dp)" 
-Write(io_L,107)1,3,Real(Mux(1,3),dp), "# Real(Mux(1,3),dp)" 
-Write(io_L,107)2,1,Real(Mux(2,1),dp), "# Real(Mux(2,1),dp)" 
-Write(io_L,107)2,2,Real(Mux(2,2),dp), "# Real(Mux(2,2),dp)" 
-Write(io_L,107)2,3,Real(Mux(2,3),dp), "# Real(Mux(2,3),dp)" 
-Write(io_L,107)3,1,Real(Mux(3,1),dp), "# Real(Mux(3,1),dp)" 
-Write(io_L,107)3,2,Real(Mux(3,2),dp), "# Real(Mux(3,2),dp)" 
-Write(io_L,107)3,3,Real(Mux(3,3),dp), "# Real(Mux(3,3),dp)" 
-If ((MaxVal(Abs(AImag(Mux))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMuxMIX Q=",Q,"# (Renormalization Scale)" 
-Write(io_L,107)1,1,Aimag(Mux(1,1)), "# Aimag(Mux(1,1))" 
-Write(io_L,107)1,2,Aimag(Mux(1,2)), "# Aimag(Mux(1,2))" 
-Write(io_L,107)1,3,Aimag(Mux(1,3)), "# Aimag(Mux(1,3))" 
-Write(io_L,107)2,1,Aimag(Mux(2,1)), "# Aimag(Mux(2,1))" 
-Write(io_L,107)2,2,Aimag(Mux(2,2)), "# Aimag(Mux(2,2))" 
-Write(io_L,107)2,3,Aimag(Mux(2,3)), "# Aimag(Mux(2,3))" 
-Write(io_L,107)3,1,Aimag(Mux(3,1)), "# Aimag(Mux(3,1))" 
-Write(io_L,107)3,2,Aimag(Mux(3,2)), "# Aimag(Mux(3,2))" 
-Write(io_L,107)3,3,Aimag(Mux(3,3)), "# Aimag(Mux(3,3))" 
-End If 
-
 Write(io_L,106) "Block YL Q=",Q,"# (Renormalization Scale)" 
 Write(io_L,107)1,1,Real(YL(1,1),dp), "# Real(YL(1,1),dp)" 
 Write(io_L,107)1,2,Real(YL(1,2),dp), "# Real(YL(1,2),dp)" 
@@ -1969,6 +1927,29 @@ Write(io_L,107)3,2,Aimag(YR(3,2)), "# Aimag(YR(3,2))"
 Write(io_L,107)3,3,Aimag(YR(3,3)), "# Aimag(YR(3,3))" 
 End If 
 
+Write(io_L,106) "Block MuxMIX Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,107)1,1,Real(Mux(1,1),dp), "# Real(Mux(1,1),dp)" 
+Write(io_L,107)1,2,Real(Mux(1,2),dp), "# Real(Mux(1,2),dp)" 
+Write(io_L,107)1,3,Real(Mux(1,3),dp), "# Real(Mux(1,3),dp)" 
+Write(io_L,107)2,1,Real(Mux(2,1),dp), "# Real(Mux(2,1),dp)" 
+Write(io_L,107)2,2,Real(Mux(2,2),dp), "# Real(Mux(2,2),dp)" 
+Write(io_L,107)2,3,Real(Mux(2,3),dp), "# Real(Mux(2,3),dp)" 
+Write(io_L,107)3,1,Real(Mux(3,1),dp), "# Real(Mux(3,1),dp)" 
+Write(io_L,107)3,2,Real(Mux(3,2),dp), "# Real(Mux(3,2),dp)" 
+Write(io_L,107)3,3,Real(Mux(3,3),dp), "# Real(Mux(3,3),dp)" 
+If ((MaxVal(Abs(AImag(Mux))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMuxMIX Q=",Q,"# (Renormalization Scale)" 
+Write(io_L,107)1,1,Aimag(Mux(1,1)), "# Aimag(Mux(1,1))" 
+Write(io_L,107)1,2,Aimag(Mux(1,2)), "# Aimag(Mux(1,2))" 
+Write(io_L,107)1,3,Aimag(Mux(1,3)), "# Aimag(Mux(1,3))" 
+Write(io_L,107)2,1,Aimag(Mux(2,1)), "# Aimag(Mux(2,1))" 
+Write(io_L,107)2,2,Aimag(Mux(2,2)), "# Aimag(Mux(2,2))" 
+Write(io_L,107)2,3,Aimag(Mux(2,3)), "# Aimag(Mux(2,3))" 
+Write(io_L,107)3,1,Aimag(Mux(3,1)), "# Aimag(Mux(3,1))" 
+Write(io_L,107)3,2,Aimag(Mux(3,2)), "# Aimag(Mux(3,2))" 
+Write(io_L,107)3,3,Aimag(Mux(3,3)), "# Aimag(Mux(3,3))" 
+End If 
+
 If (WriteGUTvalues) Then 
 Write(io_L,106) "Block GAUGEGUT Q=",M_GUT,"# (GUT scale)" 
 Write(io_L,104) 4,Real(gBLGUT,dp), "# gBL" 
@@ -1983,9 +1964,9 @@ Write(io_L,104) 9,Real(RHO2GUT,dp), "# RHO2"
 Write(io_L,104) 16,Real(ALP2GUT,dp), "# ALP2" 
 Write(io_L,104) 20,Real(ALP3GUT,dp), "# ALP3" 
 Write(io_L,104) 6,Real(LAM5GUT,dp), "# LAM5" 
+Write(io_L,104) 7,Real(LAM6GUT,dp), "# LAM6" 
 Write(io_L,104) 4,Real(LAM3GUT,dp), "# LAM3" 
 Write(io_L,104) 5,Real(LAM4GUT,dp), "# LAM4" 
-Write(io_L,104) 7,Real(LAM6GUT,dp), "# LAM6" 
 Write(io_L,104) 100,Real(MU12GUT,dp), "# MU12" 
 Write(io_L,104) 98,Real(MU22GUT,dp), "# MU22" 
 Write(io_L,106) "Block YGUT Q=",M_GUT,"# (GUT Scale)" 
@@ -2080,12 +2061,83 @@ Write(io_L,107)3,2,Aimag(YtGUT(3,2)), "# Aimag(YtGUT(3,2))"
 Write(io_L,107)3,3,Aimag(YtGUT(3,3)), "# Aimag(YtGUT(3,3))" 
 End If 
 
+Write(io_L,106) "Block YLGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Real(YLGUT(1,1),dp), "# Real(YLGUT(1,1),dp)" 
+Write(io_L,107)1,2,Real(YLGUT(1,2),dp), "# Real(YLGUT(1,2),dp)" 
+Write(io_L,107)1,3,Real(YLGUT(1,3),dp), "# Real(YLGUT(1,3),dp)" 
+Write(io_L,107)2,1,Real(YLGUT(2,1),dp), "# Real(YLGUT(2,1),dp)" 
+Write(io_L,107)2,2,Real(YLGUT(2,2),dp), "# Real(YLGUT(2,2),dp)" 
+Write(io_L,107)2,3,Real(YLGUT(2,3),dp), "# Real(YLGUT(2,3),dp)" 
+Write(io_L,107)3,1,Real(YLGUT(3,1),dp), "# Real(YLGUT(3,1),dp)" 
+Write(io_L,107)3,2,Real(YLGUT(3,2),dp), "# Real(YLGUT(3,2),dp)" 
+Write(io_L,107)3,3,Real(YLGUT(3,3),dp), "# Real(YLGUT(3,3),dp)" 
+If ((MaxVal(Abs(AImag(YLGUT))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMYLGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Aimag(YLGUT(1,1)), "# Aimag(YLGUT(1,1))" 
+Write(io_L,107)1,2,Aimag(YLGUT(1,2)), "# Aimag(YLGUT(1,2))" 
+Write(io_L,107)1,3,Aimag(YLGUT(1,3)), "# Aimag(YLGUT(1,3))" 
+Write(io_L,107)2,1,Aimag(YLGUT(2,1)), "# Aimag(YLGUT(2,1))" 
+Write(io_L,107)2,2,Aimag(YLGUT(2,2)), "# Aimag(YLGUT(2,2))" 
+Write(io_L,107)2,3,Aimag(YLGUT(2,3)), "# Aimag(YLGUT(2,3))" 
+Write(io_L,107)3,1,Aimag(YLGUT(3,1)), "# Aimag(YLGUT(3,1))" 
+Write(io_L,107)3,2,Aimag(YLGUT(3,2)), "# Aimag(YLGUT(3,2))" 
+Write(io_L,107)3,3,Aimag(YLGUT(3,3)), "# Aimag(YLGUT(3,3))" 
+End If 
+
+Write(io_L,106) "Block YRGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Real(YRGUT(1,1),dp), "# Real(YRGUT(1,1),dp)" 
+Write(io_L,107)1,2,Real(YRGUT(1,2),dp), "# Real(YRGUT(1,2),dp)" 
+Write(io_L,107)1,3,Real(YRGUT(1,3),dp), "# Real(YRGUT(1,3),dp)" 
+Write(io_L,107)2,1,Real(YRGUT(2,1),dp), "# Real(YRGUT(2,1),dp)" 
+Write(io_L,107)2,2,Real(YRGUT(2,2),dp), "# Real(YRGUT(2,2),dp)" 
+Write(io_L,107)2,3,Real(YRGUT(2,3),dp), "# Real(YRGUT(2,3),dp)" 
+Write(io_L,107)3,1,Real(YRGUT(3,1),dp), "# Real(YRGUT(3,1),dp)" 
+Write(io_L,107)3,2,Real(YRGUT(3,2),dp), "# Real(YRGUT(3,2),dp)" 
+Write(io_L,107)3,3,Real(YRGUT(3,3),dp), "# Real(YRGUT(3,3),dp)" 
+If ((MaxVal(Abs(AImag(YRGUT))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMYRGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Aimag(YRGUT(1,1)), "# Aimag(YRGUT(1,1))" 
+Write(io_L,107)1,2,Aimag(YRGUT(1,2)), "# Aimag(YRGUT(1,2))" 
+Write(io_L,107)1,3,Aimag(YRGUT(1,3)), "# Aimag(YRGUT(1,3))" 
+Write(io_L,107)2,1,Aimag(YRGUT(2,1)), "# Aimag(YRGUT(2,1))" 
+Write(io_L,107)2,2,Aimag(YRGUT(2,2)), "# Aimag(YRGUT(2,2))" 
+Write(io_L,107)2,3,Aimag(YRGUT(2,3)), "# Aimag(YRGUT(2,3))" 
+Write(io_L,107)3,1,Aimag(YRGUT(3,1)), "# Aimag(YRGUT(3,1))" 
+Write(io_L,107)3,2,Aimag(YRGUT(3,2)), "# Aimag(YRGUT(3,2))" 
+Write(io_L,107)3,3,Aimag(YRGUT(3,3)), "# Aimag(YRGUT(3,3))" 
+End If 
+
+Write(io_L,106) "Block MuxGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Real(MuxGUT(1,1),dp), "# Real(MuxGUT(1,1),dp)" 
+Write(io_L,107)1,2,Real(MuxGUT(1,2),dp), "# Real(MuxGUT(1,2),dp)" 
+Write(io_L,107)1,3,Real(MuxGUT(1,3),dp), "# Real(MuxGUT(1,3),dp)" 
+Write(io_L,107)2,1,Real(MuxGUT(2,1),dp), "# Real(MuxGUT(2,1),dp)" 
+Write(io_L,107)2,2,Real(MuxGUT(2,2),dp), "# Real(MuxGUT(2,2),dp)" 
+Write(io_L,107)2,3,Real(MuxGUT(2,3),dp), "# Real(MuxGUT(2,3),dp)" 
+Write(io_L,107)3,1,Real(MuxGUT(3,1),dp), "# Real(MuxGUT(3,1),dp)" 
+Write(io_L,107)3,2,Real(MuxGUT(3,2),dp), "# Real(MuxGUT(3,2),dp)" 
+Write(io_L,107)3,3,Real(MuxGUT(3,3),dp), "# Real(MuxGUT(3,3),dp)" 
+If ((MaxVal(Abs(AImag(MuxGUT))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMuxGUT Q=",M_GUT,"# (GUT Scale)" 
+Write(io_L,107)1,1,Aimag(MuxGUT(1,1)), "# Aimag(MuxGUT(1,1))" 
+Write(io_L,107)1,2,Aimag(MuxGUT(1,2)), "# Aimag(MuxGUT(1,2))" 
+Write(io_L,107)1,3,Aimag(MuxGUT(1,3)), "# Aimag(MuxGUT(1,3))" 
+Write(io_L,107)2,1,Aimag(MuxGUT(2,1)), "# Aimag(MuxGUT(2,1))" 
+Write(io_L,107)2,2,Aimag(MuxGUT(2,2)), "# Aimag(MuxGUT(2,2))" 
+Write(io_L,107)2,3,Aimag(MuxGUT(2,3)), "# Aimag(MuxGUT(2,3))" 
+Write(io_L,107)3,1,Aimag(MuxGUT(3,1)), "# Aimag(MuxGUT(3,1))" 
+Write(io_L,107)3,2,Aimag(MuxGUT(3,2)), "# Aimag(MuxGUT(3,2))" 
+Write(io_L,107)3,3,Aimag(MuxGUT(3,3)), "# Aimag(MuxGUT(3,3))" 
+End If 
+
 End if 
  
 Write(io_L,106) "Block AddPars Q=1.0000E00 # Additional parameters not appearing elsewhere; scale Q just a dummy" 
 Write(io_L,104) 2, Abs(gR), "# gR "  
-Write(io_L,104) 3, Abs(YL1), "# YL1 "  
-Write(io_L,104) 4, Abs(YL2), "# YL2 "  
+Write(io_L,104) 3, Abs(k2), "# k2 "  
+Write(io_L,104) 4, Abs(vL), "# vL "  
+Write(io_L,104) 5, Abs(YL1), "# YL1 "  
+Write(io_L,104) 6, Abs(YL2), "# YL2 "  
 Write(io_L,106) "Block MD Q=",Q,"# (  )" 
 Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
 Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
@@ -2132,10 +2184,22 @@ Write(io_L,100) "#   PDG code      mass          particle"
  Write(io_L,102) INT(Abs(PDGFv(7))),MFv(7),"# "//Trim(NameParticleFv(7))// "" 
  Write(io_L,102) INT(Abs(PDGFv(8))),MFv(8),"# "//Trim(NameParticleFv(8))// "" 
  Write(io_L,102) INT(Abs(PDGFv(9))),MFv(9),"# "//Trim(NameParticleFv(9))// "" 
- Write(io_L,102) INT(Abs(PDGhh(1))),Mhh(1),"# "//Trim(NameParticlehh(1))// "" 
- Write(io_L,102) INT(Abs(PDGhh(2))),Mhh(2),"# "//Trim(NameParticlehh(2))// "" 
- Write(io_L,102) INT(Abs(PDGhh(3))),Mhh(3),"# "//Trim(NameParticlehh(3))// "" 
- Write(io_L,102) INT(Abs(PDGhh(4))),Mhh(4),"# "//Trim(NameParticlehh(4))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(1))),                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(1),"# "//Trim(NameParticlehh(1))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(2))),                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(2),"# "//Trim(NameParticlehh(2))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(3))),                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(3),"# "//Trim(NameParticlehh(3))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(4))),                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(4),"# "//Trim(NameParticlehh(4))// "" 
  Write(io_L,102) INT(Abs(PDGHpm(3))),MHpm(3),"# "//Trim(NameParticleHpm(3))// "" 
  Write(io_L,102) INT(Abs(PDGHpm(4))),MHpm(4),"# "//Trim(NameParticleHpm(4))// "" 
 If (OutputForMG)  Write(io_L,102) 21,0._dp,"# VG" 
@@ -2148,32 +2212,20 @@ If (OutputForMG)  Write(io_L,102) 22,0._dp,"# VP"
  
 If (GetMassUncertainty) Then
 Write(io_L,100) "Block DMASS  # Overall uncertainty"
- Write(io_L,102) INT(Abs(25)), Sqrt(mass_uncertainty_Q(1)**2+mass_uncertainty_Yt(1)**2),"# Mhh(1) " 
- Write(io_L,102) INT(Abs(35)), Sqrt(mass_uncertainty_Q(2)**2+mass_uncertainty_Yt(2)**2),"# Mhh(2) " 
- Write(io_L,102) INT(Abs(335)), Sqrt(mass_uncertainty_Q(3)**2+mass_uncertainty_Yt(3)**2),"# Mhh(3) " 
- Write(io_L,102) INT(Abs(445)), Sqrt(mass_uncertainty_Q(4)**2+mass_uncertainty_Yt(4)**2),"# Mhh(4) " 
- Write(io_L,102) INT(Abs(36)), Sqrt(mass_uncertainty_Q(7)**2+mass_uncertainty_Yt(7)**2),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), Sqrt(mass_uncertainty_Q(8)**2+mass_uncertainty_Yt(8)**2),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), Sqrt(mass_uncertainty_Q(11)**2+mass_uncertainty_Yt(11)**2),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), Sqrt(mass_uncertainty_Q(12)**2+mass_uncertainty_Yt(12)**2),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(36)), Sqrt(mass_uncertainty_Q(3)**2+mass_uncertainty_Yt(3)**2),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), Sqrt(mass_uncertainty_Q(4)**2+mass_uncertainty_Yt(4)**2),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), Sqrt(mass_uncertainty_Q(7)**2+mass_uncertainty_Yt(7)**2),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), Sqrt(mass_uncertainty_Q(8)**2+mass_uncertainty_Yt(8)**2),"# MHpm(4) " 
 Write(io_L,100) "Block DMASSQ  # Scale uncertainty"
- Write(io_L,102) INT(Abs(25)), mass_uncertainty_Q(1),"# Mhh(1) " 
- Write(io_L,102) INT(Abs(35)), mass_uncertainty_Q(2),"# Mhh(2) " 
- Write(io_L,102) INT(Abs(335)), mass_uncertainty_Q(3),"# Mhh(3) " 
- Write(io_L,102) INT(Abs(445)), mass_uncertainty_Q(4),"# Mhh(4) " 
- Write(io_L,102) INT(Abs(36)), mass_uncertainty_Q(7),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), mass_uncertainty_Q(8),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Q(11),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Q(12),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(36)), mass_uncertainty_Q(3),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), mass_uncertainty_Q(4),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Q(7),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Q(8),"# MHpm(4) " 
 Write(io_L,100) "Block DMASST  # Top Matching uncertainty"
- Write(io_L,102) INT(Abs(25)), mass_uncertainty_Yt(1),"# Mhh(1) " 
- Write(io_L,102) INT(Abs(35)), mass_uncertainty_Yt(2),"# Mhh(2) " 
- Write(io_L,102) INT(Abs(335)), mass_uncertainty_Yt(3),"# Mhh(3) " 
- Write(io_L,102) INT(Abs(445)), mass_uncertainty_Yt(4),"# Mhh(4) " 
- Write(io_L,102) INT(Abs(36)), mass_uncertainty_Yt(7),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), mass_uncertainty_Yt(8),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Yt(11),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Yt(12),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(36)), mass_uncertainty_Yt(3),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), mass_uncertainty_Yt(4),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Yt(7),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Yt(8),"# MHpm(4) " 
 End if
 Write(io_L,106) "Block SCALARMIX Q=",Q,"# ()" 
 Write(io_L,107)1,1,ZH(1,1), "# ZH(1,1)" 
@@ -4792,18 +4844,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(1,icount).Gt.BrMin) Then 
@@ -4909,20 +4949,6 @@ Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, &
  & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
  & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -5051,18 +5077,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(2,icount),2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(2,icount).Gt.BrMin) Then 
@@ -5168,20 +5182,6 @@ Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, &
  & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
  & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -5310,18 +5310,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(3,icount).Gt.BrMin) Then 
@@ -5427,20 +5415,6 @@ Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, &
  & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
  & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -5569,18 +5543,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(4,icount).Gt.BrMin) Then 
@@ -5686,20 +5648,6 @@ Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, &
  & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
  & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7641,18 +7589,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -7713,18 +7649,6 @@ CurrentPDG2(1) = -PDGHpm(gt1)
 CurrentPDG2(2) = PDGhh(gt2) 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
  & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7818,18 +7742,6 @@ Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, &
  & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWRm)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 End if 
 If ((gTHpm(4).gt.MinWidth).or.(OutputForMG)) Then 
 Write(io_L,200) -INT(PDGHpm(4)),gTHpm(4),Trim(NameParticleHpm(4)) 
@@ -7866,18 +7778,6 @@ CurrentPDG2(1) = -PDGHpm(gt1)
 CurrentPDG2(2) = PDGAh(gt2) 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
  & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7944,18 +7844,6 @@ CurrentPDG2(1) = -PDGHpm(gt1)
 CurrentPDG2(2) = PDGhh(gt2) 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
  & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -8049,18 +7937,6 @@ Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, &
  & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWRm)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 End if 
 
  
@@ -8086,18 +7962,6 @@ Write(io_L,201) BRAh(3,icount),2,CurrentPDG2, &
  & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleVG)//" "//Trim(NameParticleVG)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRAh(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 4
   Do gt2=3, 4
 If (BRAh(3,icount).Gt.BrMin) Then 
@@ -8176,18 +8040,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2= gt1, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRAh(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=1, 4
 If (BRAh(3,icount).Gt.BrMin) Then 
@@ -8220,20 +8072,6 @@ Write(io_L,201) BRAh(3,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
 If (BRAh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGHpm(gt1) 
@@ -8296,18 +8134,6 @@ Write(io_L,201) BRAh(4,icount),2,CurrentPDG2, &
  & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleVG)//" "//Trim(NameParticleVG)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRAh(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 4
   Do gt2=3, 4
 If (BRAh(4,icount).Gt.BrMin) Then 
@@ -8386,18 +8212,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 1, 4
-  Do gt2= gt1, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRAh(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=1, 4
 If (BRAh(4,icount).Gt.BrMin) Then 
@@ -8430,20 +8244,6 @@ Write(io_L,201) BRAh(4,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
-Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
-Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
 If (BRAh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGHpm(gt1) 
@@ -8807,9 +8607,9 @@ Write(123,*) "RHO2= ",RHO2
 Write(123,*) "ALP2= ",ALP2
 Write(123,*) "ALP3= ",ALP3
 Write(123,*) "LAM5= ",LAM5
+Write(123,*) "LAM6= ",LAM6
 Write(123,*) "LAM3= ",LAM3
 Write(123,*) "LAM4= ",LAM4
-Write(123,*) "LAM6= ",LAM6
 Write(123,*) "Y11_r= ",Real(Y(1,1),dp)
 Write(123,*) "Y12_r= ",Real(Y(1,2),dp)
 Write(123,*) "Y13_r= ",Real(Y(1,3),dp)
@@ -8882,8 +8682,25 @@ Write(123,*) "Yt23_i= ",AImag(Yt(2,3))
 Write(123,*) "Yt31_i= ",AImag(Yt(3,1))
 Write(123,*) "Yt32_i= ",AImag(Yt(3,2))
 Write(123,*) "Yt33_i= ",AImag(Yt(3,3))
+Write(123,*) "YR11_r= ",Real(YR(1,1),dp)
+Write(123,*) "YR12_r= ",Real(YR(1,2),dp)
+Write(123,*) "YR13_r= ",Real(YR(1,3),dp)
+Write(123,*) "YR21_r= ",Real(YR(2,1),dp)
+Write(123,*) "YR22_r= ",Real(YR(2,2),dp)
+Write(123,*) "YR23_r= ",Real(YR(2,3),dp)
+Write(123,*) "YR31_r= ",Real(YR(3,1),dp)
+Write(123,*) "YR32_r= ",Real(YR(3,2),dp)
+Write(123,*) "YR33_r= ",Real(YR(3,3),dp)
+Write(123,*) "YR11_i= ",AImag(YR(1,1))
+Write(123,*) "YR12_i= ",AImag(YR(1,2))
+Write(123,*) "YR13_i= ",AImag(YR(1,3))
+Write(123,*) "YR21_i= ",AImag(YR(2,1))
+Write(123,*) "YR22_i= ",AImag(YR(2,2))
+Write(123,*) "YR23_i= ",AImag(YR(2,3))
+Write(123,*) "YR31_i= ",AImag(YR(3,1))
+Write(123,*) "YR32_i= ",AImag(YR(3,2))
+Write(123,*) "YR33_i= ",AImag(YR(3,3))
 Write(123,*) "k1= ",k1
-Write(123,*) "k2= ",k2
 Write(123,*) "" 
 Write(123,*) "" 
 
@@ -8930,10 +8747,22 @@ Write(123,*) "Mnu6= ", Abs(MFv(6))
 Write(123,*) "Mnu7= ", Abs(MFv(7)) 
 Write(123,*) "Mnu8= ", Abs(MFv(8)) 
 Write(123,*) "Mnu9= ", Abs(MFv(9)) 
-Write(123,*) "Mhh1= ", Abs(Mhh(1)) 
-Write(123,*) "Mhh2= ", Abs(Mhh(2)) 
-Write(123,*) "Mhh3= ", Abs(Mhh(3)) 
-Write(123,*) "Mhh4= ", Abs(Mhh(4)) 
+Write(123,*) "Mhh1= ", Abs(                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(1)) 
+Write(123,*) "Mhh2= ", Abs(                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(2)) 
+Write(123,*) "Mhh3= ", Abs(                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(3)) 
+Write(123,*) "Mhh4= ", Abs(                                                       2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(4)) 
 Write(123,*) "MHpm3= ", Abs(MHpm(3)) 
 Write(123,*) "MHpm4= ", Abs(MHpm(4)) 
 Write(123,*) "MWRm= ", Abs(MVWRm) 
@@ -9517,10 +9346,22 @@ Open(92,file="BR_t.dat",status="unknown")
 Open(93,file="LEP_HpHm_CS_ratios.dat",status="unknown") 
 Write(87,"(I1)",advance="No") 1 
 Write(88,"(I1)",advance="No") 1 
-Write(87,"(2e16.8)",advance="No") Mhh(1)
-Write(87,"(2e16.8)",advance="No") Mhh(2)
-Write(87,"(2e16.8)",advance="No") Mhh(3)
-Write(87,"(2e16.8)",advance="No") Mhh(4)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(1)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(2)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(3)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(4)
 Write(87,"(2e16.8)",advance="No") MAh(3)
 Write(87,"(2e16.8)",advance="No") MAh(4)
 Write(88,"(2e16.8)",advance="No") MHpm(3)
@@ -9741,10 +9582,22 @@ Open(91,file="BR_Hplus.dat",status="unknown")
 Open(92,file="BR_t.dat",status="unknown") 
 Write(87,"(I1)",advance="No") 1 
 Write(88,"(I1)",advance="No") 1 
-Write(87,"(2e16.8)",advance="No") Mhh(1)
-Write(87,"(2e16.8)",advance="No") Mhh(2)
-Write(87,"(2e16.8)",advance="No") Mhh(3)
-Write(87,"(2e16.8)",advance="No") Mhh(4)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(1)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(2)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(3)
+Write(87,"(2e16.8)",advance="No")                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(4)
 Write(87,"(2e16.8)",advance="No") MAh(3)
 Write(87,"(2e16.8)",advance="No") MAh(4)
 Write(88,"(2e16.8)",advance="No") MHpm(3)
@@ -14434,15 +14287,15 @@ InputValueforALP3= .True.
 Else If (i_par.Eq.6) Then 
 LAM5IN= wert 
 InputValueforLAM5= .True. 
+Else If (i_par.Eq.7) Then 
+LAM6IN= wert 
+InputValueforLAM6= .True. 
 Else If (i_par.Eq.4) Then 
 LAM3IN= wert 
 InputValueforLAM3= .True. 
 Else If (i_par.Eq.5) Then 
 LAM4IN= wert 
 InputValueforLAM4= .True. 
-Else If (i_par.Eq.7) Then 
-LAM6IN= wert 
-InputValueforLAM6= .True. 
 Else If (i_par.Eq.100) Then 
 MU12IN= wert 
 InputValueforMU12= .True. 
@@ -14478,12 +14331,8 @@ If ((read_line(1:1).Eq."B").Or.(read_line(1:1).Eq."b")) Exit! this loop
 Read(io,*) i_par,wert!,read_line 
 If (i_par.Eq.4) Then 
 vRIN= wert 
-Else If (i_par.Eq.3) Then 
-vLIN= wert 
 Else If (i_par.Eq.4) Then 
 vRIN= wert 
-Else If (i_par.Eq.3) Then 
-vLIN= wert 
 Else
 Write(ErrCan,*) "Error in routine "//NameOfUnit(Iname)
 If (i_c.Eq.0) Write(ErrCan,*) "Unknown entry for Block VEVIN ",i_par
@@ -14513,8 +14362,6 @@ If ((read_line(1:1).Eq."B").Or.(read_line(1:1).Eq."b")) Exit! this loop
 Read(io,*) i_par,wert!,read_line 
 If (i_par.Eq.102) Then 
 k1IN= wert 
-Else If (i_par.Eq.103) Then 
-k2IN= wert 
 Else
 Write(ErrCan,*) "Error in routine "//NameOfUnit(Iname)
 If (i_c.Eq.0) Write(ErrCan,*) "Unknown entry for Block HMIXIN ",i_par

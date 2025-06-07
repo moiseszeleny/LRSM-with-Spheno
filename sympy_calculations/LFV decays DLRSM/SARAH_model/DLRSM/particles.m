@@ -401,9 +401,9 @@ ParticleDefinitions[GaugeES] = {
 {Hm,{ 
      Description -> "Charged Higgs", 
      FeynArtsNr -> {4}, 
-     LaTeX -> {"H_1^-","H_1^+"}, 
+     LaTeX -> {"H_2^-","H_2^+"}, 
      Mass -> {0}, 
-     OutputName -> {"H1m","H1p"}, 
+     OutputName -> {"H2m","H2p"}, 
      PDG -> {0}, 
      ElectricCharge -> -1, 
      Width -> {0}}}, 
@@ -411,9 +411,9 @@ ParticleDefinitions[GaugeES] = {
 {Hp,{ 
      Description -> "Charged Higgs", 
      FeynArtsNr -> {500}, 
-     LaTeX -> {"H^+","H^-"}, 
+     LaTeX -> {"H_1^+","H_1^-"}, 
      Mass -> {0}, 
-     OutputName -> {"Hp","Hm"}, 
+     OutputName -> {"H1p","H1m"}, 
      PDG -> {0}, 
      ElectricCharge -> 1, 
      Width -> {0}}}, 

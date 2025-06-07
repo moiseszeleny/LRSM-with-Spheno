@@ -131,7 +131,7 @@ ParameterDefinitions = {
      DependenceSPheno -> None, 
      Real -> True, 
      LesHouches -> {LRINPUT, 1}, 
-     LaTeX -> "\\lambda", 
+     LaTeX -> "\\lambda_1", 
      OutputName -> LAM1}}, 
 
 {lam2,{ 

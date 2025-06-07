@@ -34,8 +34,8 @@ FermionFields[[5]] = {s1, 3, S1, 0,  1, 1,   1};
 
 
 ScalarFields[[1]]  = {Phi, 1, {{H0, Hp},{Hm, HPrime0}},      0,  2,  -2, 1}; 
-ScalarFields[[2]]  = {chiR,1, {chiRp, chiR0}, 1, 1, 2, 1};
-ScalarFields[[3]]  = {chiL,1, {chiLp, chiL0}, 1, 2, 1, 1};
+ScalarFields[[2]]  = {chiR,1, {chiRp, chiR0}, 1/2, 1, 2, 1};
+ScalarFields[[3]]  = {chiL,1, {chiLp, chiL0}, 1/2, 2, 1, 1};
 
 
 (*----------------------------------------------*)
@@ -59,18 +59,18 @@ LagNoHC = (
         Phi.conj[Phi].Phi.conj[Phi] 
   + (1/2) lam3 (
       epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[lef3,lef4] epsTensor[rig3,rig4] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
-      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig34,rig43] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
+      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
       + 2 epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] conj[Phi].conj[Phi].Phi.Phi                              
   )
   + (1/2) lam4 (
       epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[lef3,lef4] epsTensor[rig3,rig4] conj[Phi].conj[Phi].conj[Phi].conj[Phi] 
-      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig34,rig43] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
+      + epsTensor[rig1,rig2] epsTensor[lef1,lef2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
       - 2 epsTensor[lef1,lef2] epsTensor[rig1,rig2] epsTensor[rig3,rig4] epsTensor[lef3,lef4] conj[Phi].conj[Phi].Phi.Phi                                    
     )
   + lam5 epsTensor[rig2,rig3] epsTensor[rig1,rig4] Delta[lef1, lef2] Delta[lef3, lef4] conj[Phi].Phi.Phi.conj[Phi] 
   + (1/2) lam6 (
     epsTensor[lef1,lef2] epsTensor[rig2,rig3] epsTensor[lef3,lef4] epsTensor[rig4,rig1] conj[Phi].conj[Phi].conj[Phi].conj[Phi]
-    + epsTensor[lef1,rig1] epsTensor[lef1,rig1] epsTensor[rig2,rig3] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
+    + epsTensor[rig4,rig1] epsTensor[lef1,lef2] epsTensor[rig2,rig3] epsTensor[lef3,lef4] Phi.Phi.Phi.Phi
     )
   - mu22 (conj[chiL].chiL + conj[chiR].chiR)
   + rho1 conj[chiL].chiL.conj[chiL].chiL + rho1 conj[chiR].chiR.conj[chiR].chiR             (* ρ₁ (χ_L†χ_L)² + (χ_R†χ_R)² *)
@@ -91,14 +91,14 @@ LagNoHC = (
 LagHC = - ( Y Phi.LLbar.LR 
           + Yt conj[Phi].LLbar.LR 
           + YQ1 QLbar.Phi.QR 
-          - YQ2 QLbar.conj[Phi].QR 
-          (*+ YL conj[S1].LLbar.chiL + YR S1.conj[chiR].LR + Mux S1.conj[S1]*)
+          + YQ2 QLbar.conj[Phi].QR 
+          + YL epsTensor[lef1, lef2] LLbar.conj[chiL].s1 + YR epsTensor[rig1, rig2] conj[LR].conj[chiR].s1 + Mux/2 s1.s1
           );
 
 
 (* Gauge Sector *)
 DEFINITION[EWSB][GaugeSector] =
-{ {{VB,VWL[3],VWR[3]},{VP,VZ,VZR},ZZ},
+{ {{VWL[3],VWR[3],VB},{VZ,VZR,VP},ZZ},
   {{VWL[1],VWL[2],VWR[1],VWR[2]},{VWLm,conj[VWLm],VWRm,conj[VWRm]},ZW} };     
         
 (* ----- VEVs ---- *)
@@ -114,16 +114,16 @@ DEFINITION[EWSB][VEVs]={
 
 DEFINITION[EWSB][MatterSector]=   
     { (*Neutral scalars*)
-    {{phiH10,phiH20,phiR0,phiL0},{hh,ZH}},
+    {{phiH20,phiL0,phiH10,phiR0},{hh,ZH}},
       (*Pseudoscalars*)
-    {{sigmaH10,sigmaH20,sigmaR0,sigmaL0},{Ah,UP}},
+    {{sigmaH20,sigmaL0,sigmaH10,sigmaR0},{Ah,UP}},
       (*Singly charged scalars*)
-    {{Hp, conj[Hm], chiRp, chiLp},{Hpm,UC}},
+    {{conj[Hm], chiLp , Hp, chiRp},{Hpm,UC}},
       (*Fermions*)
     {{{dL}, {conj[dR]}}, {{DL,Vd}, {DR,Ud}}},
     {{{uL}, {conj[uR]}}, {{UL,Vu}, {UR,Uu}}},
     {{{eL}, {conj[eR]}}, {{EL,Ve}, {ER,Ue}}},
-    {{nuL,conj[nuR],conj[S1]},{Fv0,ZM}}
+    {{nuL,conj[nuR],S1},{Fv0,ZM}}
     (*,{{S1},{Fs,Mux}}*)
     };  
 

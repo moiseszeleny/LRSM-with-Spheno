@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 20:09 on 28.5.2025   
+! File created at 13:24 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1159,48 +1159,48 @@ Real(dp) :: MU222L
 Real(dp) :: mass_uncertainty_Q(30), mass_uncertainty_Yt(30), g_SM_save(62) 
 Logical :: GetMassUncertainty = .false. 
 Integer :: SolutionTadpoleNr = 1 
-Real(dp) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM3,LAM4,LAM6,MU12,MU22
+Real(dp) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
-Complex(dp) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3)
+Complex(dp) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp) :: gBLIN,g2IN,g3IN,LAM2IN,LAM1IN,ALP1IN,RHO1IN,RHO2IN,ALP2IN,ALP3IN,LAM5IN,              & 
-& LAM3IN,LAM4IN,LAM6IN,MU12IN,MU22IN
+& LAM6IN,LAM3IN,LAM4IN,MU12IN,MU22IN
 
-Complex(dp) :: YIN(3,3),YQ1IN(3,3),YQ2IN(3,3),YtIN(3,3)
+Complex(dp) :: YIN(3,3),YQ1IN(3,3),YQ2IN(3,3),YtIN(3,3),YLIN(3,3),YRIN(3,3),MuxIN(3,3)
 
 Real(dp) :: gBLMZ,g2MZ,g3MZ,LAM2MZ,LAM1MZ,ALP1MZ,RHO1MZ,RHO2MZ,ALP2MZ,ALP3MZ,LAM5MZ,              & 
-& LAM3MZ,LAM4MZ,LAM6MZ,MU12MZ,MU22MZ
+& LAM6MZ,LAM3MZ,LAM4MZ,MU12MZ,MU22MZ
 
-Complex(dp) :: YMZ(3,3),YQ1MZ(3,3),YQ2MZ(3,3),YtMZ(3,3)
+Complex(dp) :: YMZ(3,3),YQ1MZ(3,3),YQ2MZ(3,3),YtMZ(3,3),YLMZ(3,3),YRMZ(3,3),MuxMZ(3,3)
 
 Real(dp) :: gBLGUT,g2GUT,g3GUT,LAM2GUT,LAM1GUT,ALP1GUT,RHO1GUT,RHO2GUT,ALP2GUT,ALP3GUT,           & 
-& LAM5GUT,LAM3GUT,LAM4GUT,LAM6GUT,MU12GUT,MU22GUT
+& LAM5GUT,LAM6GUT,LAM3GUT,LAM4GUT,MU12GUT,MU22GUT
 
-Complex(dp) :: YGUT(3,3),YQ1GUT(3,3),YQ2GUT(3,3),YtGUT(3,3)
+Complex(dp) :: YGUT(3,3),YQ1GUT(3,3),YQ2GUT(3,3),YtGUT(3,3),YLGUT(3,3),YRGUT(3,3),MuxGUT(3,3)
 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
-& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
+& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
+& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
-Real(dp) :: k1,k2,vR,vL
+Real(dp) :: k1,vR
 
-Real(dp) :: k1IN,k2IN,vRIN,vLIN
+Real(dp) :: k1IN,vRIN
 
-Real(dp) :: k1Fix,k2Fix,vRFix,vLFix
+Real(dp) :: k1Fix,vRFix
 
 Real(dp) :: gPFu(3,441),gTFu(3),BRFu(3,441),gPFe(3,465),gTFe(3),BRFe(3,465),gPFd(3,441),          & 
-& gTFd(3),BRFd(3,441),gPhh(4,130),gThh(4),BRhh(4,130),gPFv(9,1083),gTFv(9),              & 
-& BRFv(9,1083),gPVZ(1,99),gTVZ,BRVZ(1,99),gPVZR(1,99),gTVZR,BRVZR(1,99),gPHpm(4,111),    & 
-& gTHpm(4),BRHpm(4,111),gPAh(4,127),gTAh(4),BRAh(4,127),gPVWLm(1,66),gTVWLm,             & 
+& gTFd(3),BRFd(3,441),gPhh(4,119),gThh(4),BRhh(4,119),gPFv(9,1083),gTFv(9),              & 
+& BRFv(9,1083),gPVZ(1,99),gTVZ,BRVZ(1,99),gPVZR(1,99),gTVZR,BRVZR(1,99),gPHpm(4,96),     & 
+& gTHpm(4),BRHpm(4,96),gPAh(4,111),gTAh(4),BRAh(4,111),gPVWLm(1,66),gTVWLm,              & 
 & BRVWLm(1,66),gPVWRm(1,66),gTVWRm,BRVWRm(1,66)
 
 Real(dp) :: gP1LFu(3,36),gT1LFu(3),BR1LFu(3,36),gP1LFe(3,60),gT1LFe(3),BR1LFe(3,60),              & 
-& gP1LFd(3,36),gT1LFd(3),BR1LFd(3,36),gP1Lhh(4,130),gT1Lhh(4),BR1Lhh(4,130),             & 
+& gP1LFd(3,36),gT1LFd(3),BR1LFd(3,36),gP1Lhh(4,119),gT1Lhh(4),BR1Lhh(4,119),             & 
 & gP1LFv(9,84),gT1LFv(9),BR1LFv(9,84),gP1LVZ(1,99),gT1LVZ,BR1LVZ(1,99),gP1LVZR(1,99),    & 
-& gT1LVZR,BR1LVZR(1,99),gP1LHpm(4,111),gT1LHpm(4),BR1LHpm(4,111),gP1LAh(4,127),          & 
-& gT1LAh(4),BR1LAh(4,127),gP1LVWLm(1,66),gT1LVWLm,BR1LVWLm(1,66),gP1LVWRm(1,66),         & 
+& gT1LVZR,BR1LVZR(1,99),gP1LHpm(4,96),gT1LHpm(4),BR1LHpm(4,96),gP1LAh(4,111),            & 
+& gT1LAh(4),BR1LAh(4,111),gP1LVWLm(1,66),gT1LVWLm,BR1LVWLm(1,66),gP1LVWRm(1,66),         & 
 & gT1LVWRm,BR1LVWRm(1,66)
 
 Real(dp) :: ratioFd(4,3),ratioFe(4,3),ratioFu(4,3),ratioHpm(4,4),ratioVWLm(4),ratioVWRm(4)
@@ -1212,7 +1212,7 @@ Real(dp) :: ratioPFd(4,3),ratioPFe(4,3),ratioPFu(4,3),ratioPHpm(4,4),ratioPVWLm(
 
 Complex(dp) :: ratioPGG(4),ratioPPP(4)
 
-Real(dp) :: gForTadpoles(92)
+Real(dp) :: gForTadpoles(144)
 Complex(dp) :: tForTadpoles(2)
 Real(dp) :: gBL_saveEP 
 Real(dp) :: g2_saveEP 
@@ -1221,6 +1221,9 @@ Complex(dp) :: Y_saveEP(3,3)
 Complex(dp) :: YQ1_saveEP(3,3) 
 Complex(dp) :: YQ2_saveEP(3,3) 
 Complex(dp) :: Yt_saveEP(3,3) 
+Complex(dp) :: YL_saveEP(3,3) 
+Complex(dp) :: YR_saveEP(3,3) 
+Complex(dp) :: Mux_saveEP(3,3) 
 Logical :: RotateNegativeFermionMasses=.True. 
 Logical,save::IgnoreNegativeMasses= .False.
 Logical,save::IgnoreMuSignFlip= .False.
@@ -1260,20 +1263,19 @@ Logical, save :: InputValueforRHO2 =.False.
 Logical, save :: InputValueforALP2 =.False. 
 Logical, save :: InputValueforALP3 =.False. 
 Logical, save :: InputValueforLAM5 =.False. 
+Logical, save :: InputValueforLAM6 =.False. 
 Logical, save :: InputValueforLAM3 =.False. 
 Logical, save :: InputValueforLAM4 =.False. 
-Logical, save :: InputValueforLAM6 =.False. 
 Logical, save :: InputValueforY =.False. 
 Logical, save :: InputValueforYQ1 =.False. 
 Logical, save :: InputValueforYQ2 =.False. 
 Logical, save :: InputValueforYt =.False. 
+Logical, save :: InputValueforYL =.False. 
+Logical, save :: InputValueforYR =.False. 
+Logical, save :: InputValueforMux =.False. 
 Logical, save :: InputValueforMU12 =.False. 
 Logical, save :: InputValueforMU22 =.False. 
 Logical, save :: InputValueforvR =.False. 
-Logical, save :: InputValueforvL =.False. 
-Logical, save :: InputValueforMux =.False. 
-Logical, save :: InputValueforYL =.False. 
-Logical, save :: InputValueforYR =.False. 
 Real (dp) :: vSM_Q 
 Real(dp), save :: RXiG = 1._dp 
 Real(dp), save :: RXiP = 1._dp 
@@ -1286,14 +1288,10 @@ Complex(dp) :: nuMixing(9,9)
 Complex(dp) :: temporaryValue 
 Complex(dp) :: MD(3,3)
 Complex(dp) :: gR
+Complex(dp) :: k2
+Complex(dp) :: vL
 Complex(dp) :: YL1
 Complex(dp) :: YL2
-Complex(dp) :: Mux(3, 3)
-Complex(dp) :: MuxIN(3, 3)
-Complex(dp) :: YL(3, 3)
-Complex(dp) :: YLIN(3, 3)
-Complex(dp) :: YR(3, 3)
-Complex(dp) :: YRIN(3, 3)
 Real(dp) :: vRinput
 Real(dp) :: vLinput
 Real(dp) :: k1input
@@ -1320,12 +1318,8 @@ Complex(dp) :: MD32
 Complex(dp) :: MD33
 Real(dp) :: k1MZ 
 Real(dp) :: k1SUSY 
-Real(dp) :: k2MZ 
-Real(dp) :: k2SUSY 
 Real(dp) :: vRMZ 
 Real(dp) :: vRSUSY 
-Real(dp) :: vLMZ 
-Real(dp) :: vLSUSY 
 ! For HiggsBounds 
 Real(dp) :: BR_HpHW(4,4)  = 0._dp
 Real(dp) :: BR_HpAW(4,4) = 0._dp
@@ -1966,13 +1960,16 @@ RHO2IN = 0._dp
 ALP2IN = 0._dp 
 ALP3IN = 0._dp 
 LAM5IN = 0._dp 
+LAM6IN = 0._dp 
 LAM3IN = 0._dp 
 LAM4IN = 0._dp 
-LAM6IN = 0._dp 
 YIN = 0._dp 
 YQ1IN = 0._dp 
 YQ2IN = 0._dp 
 YtIN = 0._dp 
+YLIN = 0._dp 
+YRIN = 0._dp 
+MuxIN = 0._dp 
 MU12IN = 0._dp 
 MU22IN = 0._dp 
 gBL = 0._dp 
@@ -1997,12 +1994,12 @@ ALP3 = 0._dp
 ALP3MZ = 0._dp 
 LAM5 = 0._dp 
 LAM5MZ = 0._dp 
+LAM6 = 0._dp 
+LAM6MZ = 0._dp 
 LAM3 = 0._dp 
 LAM3MZ = 0._dp 
 LAM4 = 0._dp 
 LAM4MZ = 0._dp 
-LAM6 = 0._dp 
-LAM6MZ = 0._dp 
 Y = 0._dp 
 YMZ = 0._dp 
 YQ1 = 0._dp 
@@ -2011,14 +2008,18 @@ YQ2 = 0._dp
 YQ2MZ = 0._dp 
 Yt = 0._dp 
 YtMZ = 0._dp 
+YL = 0._dp 
+YLMZ = 0._dp 
+YR = 0._dp 
+YRMZ = 0._dp 
+Mux = 0._dp 
+MuxMZ = 0._dp 
 MU12 = 0._dp 
 MU12MZ = 0._dp 
 MU22 = 0._dp 
 MU22MZ = 0._dp 
 k1IN = 0._dp 
-k2IN = 0._dp 
 vRIN = 0._dp 
-vLIN = 0._dp 
 MAh = 0._dp 
 MAh2 = 0._dp 
 MFd = 0._dp 
@@ -2029,8 +2030,6 @@ MFu = 0._dp
 MFu2 = 0._dp 
 MFv = 0._dp 
 MFv2 = 0._dp 
-Mhh = 0._dp 
-Mhh2 = 0._dp 
 MHpm = 0._dp 
 MHpm2 = 0._dp 
 MVWLm = 0._dp 
@@ -2055,10 +2054,10 @@ ZH = 0._dp
 ZM = 0._dp 
 ZW = 0._dp 
 ZZ = 0._dp 
+$Failed = 0._dp 
+List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = 0._dp 
 k1 = 0._dp 
-k2 = 0._dp 
 vR = 0._dp 
-vL = 0._dp 
 gPFu = 0._dp 
 gTFu = 0._dp 
 BRFu = 0._dp 
@@ -2136,15 +2135,15 @@ End Subroutine Set_All_Parameters_0
  
 
 
-Subroutine SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,k2,             & 
-& vR,vL,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM3,LAM4,LAM6,Y,              & 
-& YQ1,YQ2,Yt,MU12,MU22,MZsuffix)
+Subroutine SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,             & 
+& gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
+& Yt,YL,YR,Mux,MU12,MU22,MZsuffix)
 
-Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM3,LAM4,LAM6,MU12,MU22
+Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
-Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3)
+Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
-Real(dp),Intent(inout) :: k1,k2,vR,vL
+Real(dp),Intent(inout) :: k1,vR
 
 Logical,Intent(in)::MZsuffix 
 Real(dp), Intent(in) :: g1SM, g2SM, g3SM, vSM 
@@ -2154,7 +2153,7 @@ If (MZsuffix) Then
   g2MZ = g2SM 
   g3MZ = g3SM 
   k1MZ = vSM/Sqrt(1 + TanBeta**2) 
-  k2MZ = k1*TanBeta 
+  k2 = k1*TanBeta 
   UpYukawa = (vSM*YuSM)/k2 
   DownYukawa = (vSM*YdSM)/k1 
   ElectronYukawa = (vSM*YeSM)/k1 

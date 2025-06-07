@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 20:10 on 28.5.2025   
+! File created at 13:25 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -46,7 +46,10 @@ Integer :: i1, gt1, gt2, hLoc
 ! Checking if there are several generations of Scalars and what is the SM-like doublet
 hLoc = MaxLoc(Abs(ZH(2,:)),1)
 
-mh = Mhh(hLoc)
+mh =                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  2(hLoc)
 
 gamh =gThh(hLoc)
 
@@ -1509,7 +1512,10 @@ C2SRR  = O4dTRR(3,i1,3,i1)/norm
 Do iS =  1, 4
 HL = OH2qSL(3,i1,iS)
 HR = OH2qSR(3,i1,iS)
-mS = Mhh2(iS)
+mS =                                                        2                                  2
+    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
+{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
+                                              2                                  22(iS)
 C2LR = C2LR - HL*Conjg(HR)/(mS*norm)
 C1SLL = C1SLL - 0.5_dp*HL**2/(mS*norm)
 C1SRR = C1SRR - 0.5_dp*HR**2/(mS*norm)
