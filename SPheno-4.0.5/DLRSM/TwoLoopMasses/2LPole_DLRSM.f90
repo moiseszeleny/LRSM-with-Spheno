@@ -30,8 +30,8 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 Real(dp),Intent(in) :: k1,vR
 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -77,7 +77,7 @@ real(dp) :: delta2Ltadpoles(4)
 real(dp)  :: delta2Lmasses(4,4)
 real(dp)  :: delta2Lmassesah(4,4)
 Real(dp)  :: tad1LG(4)
-complex(dp) :: tad1Lmatrix$Failed(99,99)
+complex(dp) :: tad1Lmatrixhh(4,4)
 complex(dp) :: tad1LmatrixAh(4,4)
 complex(dp) :: tad1LmatrixHpm(4,4)
 
@@ -88,14 +88,12 @@ Pi2P(:,:)=0
 Qscale=getrenormalizationscale()
 epsfmass=0._dp
 epscouplings=1.0E-6_dp
-Call TreeMassesEffPot(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,              & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)       & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMassesEffPot(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,               & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
+& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
-Where (Abs($Failed/Qscale).lt.TwoLoopRegulatorMass )$Failed=Qscale*TwoLoopRegulatorMass
+Where (Abs(Mhh2/Qscale).lt.TwoLoopRegulatorMass )Mhh2=Qscale*TwoLoopRegulatorMass
 Where (Abs(MAh2/Qscale).lt.TwoLoopRegulatorMass )MAh2=Qscale*TwoLoopRegulatorMass
 Where (Abs(MHpm2/Qscale).lt.TwoLoopRegulatorMass )MHpm2=Qscale*TwoLoopRegulatorMass
 Call CouplingsFor2LPole3(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,           & 
@@ -168,10 +166,7 @@ coup1R = cplFvFvhhR(i1,i1,gE1)
   End do 
 
   Do i1 = 1, 4
-A0m = 1._dp/2._dp*(-J0(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),qscale)) 
+A0m = 1._dp/2._dp*(-J0(Mhh2(i1),qscale)) 
   Do gE1 = 1, 4
 coup1 = cplhhhhhh(gE1,i1,i1)
    temptad(gE1) = temptad(gE1)-real(coup1*A0m,dp) 
@@ -191,6 +186,69 @@ tad1LG=matmul(temptad*oo16Pi2,ZH)
 ! ----------------------------------
 ! ------- 1L2L SHIFTS --------
 ! ----------------------------------
+tad1Lmatrixhh=0._dp
+tad1Lmatrixhh(1,1)=tad1Lmatrixhh(1,1)+1/k1*tad1LG(3)
+tad1Lmatrixhh(2,2)=tad1Lmatrixhh(2,2)+1/vR*tad1LG(4)
+tad1Lmatrixhh(3,3)=tad1Lmatrixhh(3,3)+1/k1*tad1LG(3)
+tad1Lmatrixhh(4,4)=tad1Lmatrixhh(4,4)+1/vR*tad1LG(4)
+tad1Lmatrixhh=matmul(ZH,matmul(tad1Lmatrixhh,transpose(ZH)))
+do i1=1,4
+do i2=1,4
+ funcvalue= tad1Lmatrixhh(i2,i1)*BB(Mhh2(i1),Mhh2(i2),qscale)
+do gE1=1,4
+coup1 = cplhhhhhh(gE1,i1,i2)
+delta2Ltadpoles(gE1)=delta2Ltadpoles(gE1)+real(0.5_dp*coup1*1._dp*funcvalue,dp)
+end do
+do gE1=1,4
+do gE2=1,4
+coup1 = cplhhhhhhhh(gE1,gE2,i1,i2)
+delta2Lmasses(gE1,gE2)=delta2Lmasses(gE1,gE2)+real(0.5_dp*coup1*1._dp*funcvalue,dp)
+end do
+ end do
+end do 
+ end do
+do i1=1,4
+do i2=1,4
+do i3=1,4
+ funcvalue= tad1Lmatrixhh(i2,i3)*CCtilde(Mhh2(i1),Mhh2(i2),Mhh2(i3),qscale)
+do gE1=1,4
+do gE2=1,4
+coup1 = cplhhhhhh(gE1,i1,i2)
+coup2 = cplhhhhhh(gE2,i3,i1)
+delta2Lmasses(gE1,gE2)=delta2Lmasses(gE1,gE2)+real(coup1*coup2*1._dp*funcvalue,dp)
+end do
+ end do
+end do 
+ end do
+ end do
+do i1=1,4
+do i2=1,4
+do i3=1,4
+ funcvalue= tad1Lmatrixhh(i2,i3)*CCtilde(MAh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
+do gE1=1,4
+do gE2=1,4
+coup1 = cplAhAhhh(gE1,i1,i2)
+coup2 = cplAhAhhh(gE2,i1,i3)
+delta2LmassesAh(gE1,gE2)=delta2LmassesAh(gE1,gE2)+real(coup1*coup2*1._dp*funcvalue,dp)
+end do
+ end do
+end do 
+ end do
+ end do
+do i1=1,4
+do i2=1,4
+do i3=1,4
+ funcvalue= tad1Lmatrixhh(i2,i3)*CCtilde(MHpm2(i1),Mhh2(i2),Mhh2(i3),Qscale)
+do gE1=1,4
+do gE2=1,4
+coup1 = cplAhhhcHpm(gE1,i2,i1)
+coup2 = cplAhhhcHpm(gE2,i3,i1)
+delta2LmassesAh(gE1,gE2)=delta2LmassesAh(gE1,gE2)+real(coup1*coup2*2._dp*funcvalue,dp)
+end do
+ end do
+end do 
+ end do
+ end do
 tad1LmatrixAh=0._dp
 tad1LmatrixAh(1,1)=tad1LmatrixAh(1,1)+1/k1*tad1LG(3)
 tad1LmatrixAh(2,2)=tad1LmatrixAh(2,2)+1/vR*tad1LG(4)
@@ -229,10 +287,7 @@ end do
 do i1=1,4
 do i2=1,4
 do i3=1,4
- funcvalue= tad1LmatrixAh(i2,i3)*CCtilde(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),Qscale)
+ funcvalue= tad1LmatrixAh(i2,i3)*CCtilde(Mhh2(i1),MAh2(i2),MAh2(i3),Qscale)
 do gE1=1,4
 do gE2=1,4
 coup1 = cplAhAhhh(gE1,i2,i1)
@@ -309,13 +364,7 @@ end do
 do i1=1,4
 do i2=1,4
 do i3=1,4
- funcvalue= tad1LmatrixHpm(i2,i3)*CCtilde(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= tad1LmatrixHpm(i2,i3)*CCtilde(MHpm2(i1),Mhh2(i2),Mhh2(i3),Qscale)
 do gE1=1,4
 do gE2=1,4
 coup1 = cplAhhhcHpm(gE1,i2,i1)
@@ -368,10 +417,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*TfSSS(MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*TfSSS(MAh2(i1),MAh2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -417,10 +463,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*TfSSS(MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*TfSSS(MAh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -466,16 +509,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/6._dp*TfSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/6._dp*TfSSS(Mhh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -498,13 +532,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*TfSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*TfSSS(Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -527,10 +555,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*TfSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*TfSSS(Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -600,10 +625,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*TfSS(MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*TfSS(MAh2(i1),MAh2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -672,10 +694,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*TfSS(MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*TfSS(MAh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -721,13 +740,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp/4._dp*TfSS(Mhh2(i1),Mhh2(i2),MAh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -750,16 +763,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*TfSS(Mhh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -782,13 +786,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp/2._dp*TfSS(Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -811,10 +809,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp*TfSS(Mhh2(i1),MHpm2(i2),MAh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -837,13 +832,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*TfSS(Mhh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -866,10 +855,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*TfSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*TfSS(Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -915,10 +901,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*TfSS(MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*TfSS(MHpm2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -967,10 +950,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*TfSSSS(MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*TfSSSS(MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1022,10 +1002,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1077,10 +1054,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(MAh2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(MAh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1132,10 +1106,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1187,13 +1158,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*TfSSSS(Mhh2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1219,13 +1184,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(Mhh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1251,19 +1210,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/4._dp*TfSSSS(Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1289,16 +1236,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1324,13 +1262,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*TfSSSS(Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1356,10 +1288,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(Mhh2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1385,10 +1314,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(Mhh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1414,16 +1340,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(Mhh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1449,13 +1366,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1481,10 +1392,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1536,10 +1444,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1565,10 +1470,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(MHpm2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1594,13 +1496,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*TfSSSS(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*TfSSSS(MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1652,10 +1548,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1707,13 +1600,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*TfSSSS(MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*TfSSSS(MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -1739,10 +1626,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*TfSSSS(MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*TfSSSS(MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end do
@@ -2023,13 +1907,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*TfSSFF(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*TfSSFF(Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 if((MFd(i3) .gt. epsfmass) .and. (MFd(i4) .gt. epsfmass)) then 
@@ -2049,13 +1927,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i3)*MFd(i4)*TfSSFbFb(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= 3._dp*MFd(i3)*MFd(i4)*TfSSFbFb(Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2085,13 +1957,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*TfSSFF(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*TfSSFF(Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 if((MFe(i3) .gt. epsfmass) .and. (MFe(i4) .gt. epsfmass)) then 
@@ -2111,13 +1977,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= MFe(i3)*MFe(i4)*TfSSFbFb(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= MFe(i3)*MFe(i4)*TfSSFbFb(Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2147,13 +2007,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*TfSSFF(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*TfSSFF(Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 if((MFu(i3) .gt. epsfmass) .and. (MFu(i4) .gt. epsfmass)) then 
@@ -2173,13 +2027,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i3)*MFu(i4)*TfSSFbFb(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= 3._dp*MFu(i3)*MFu(i4)*TfSSFbFb(Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2209,13 +2057,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*TfSSFF(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*TfSSFF(Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 if((MFv(i3) .gt. epsfmass) .and. (MFv(i4) .gt. epsfmass)) then 
@@ -2235,13 +2077,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i3)*MFv(i4)*TfSSFbFb(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i3)*MFv(i4)*TfSSFbFb(Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2452,10 +2288,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -6._dp*MFd(i3)*TfFFFbS(MFd2(i1),MFd2(i2),MFd2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -6._dp*MFd(i3)*TfFFFbS(MFd2(i1),MFd2(i2),MFd2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2478,10 +2311,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -6._dp*MFd(i2)*TfFFbFS(MFd2(i1),MFd2(i2),MFd2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -6._dp*MFd(i2)*TfFFbFS(MFd2(i1),MFd2(i2),MFd2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2504,10 +2334,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*TfFbFbFbS(MFd2(i1),MFd2(i2),MFd2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*TfFbFbFbS(MFd2(i1),MFd2(i2),MFd2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2695,10 +2522,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*MFe(i3)*TfFFFbS(MFe2(i1),MFe2(i2),MFe2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*MFe(i3)*TfFFFbS(MFe2(i1),MFe2(i2),MFe2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2721,10 +2545,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*MFe(i2)*TfFFbFS(MFe2(i1),MFe2(i2),MFe2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*MFe(i2)*TfFFbFS(MFe2(i1),MFe2(i2),MFe2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -2747,10 +2568,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*TfFbFbFbS(MFe2(i1),MFe2(i2),MFe2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*TfFbFbFbS(MFe2(i1),MFe2(i2),MFe2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3016,10 +2834,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -6._dp*MFu(i3)*TfFFFbS(MFu2(i1),MFu2(i2),MFu2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -6._dp*MFu(i3)*TfFFFbS(MFu2(i1),MFu2(i2),MFu2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3042,10 +2857,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -6._dp*MFu(i2)*TfFFbFS(MFu2(i1),MFu2(i2),MFu2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -6._dp*MFu(i2)*TfFFbFS(MFu2(i1),MFu2(i2),MFu2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3068,10 +2880,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*TfFbFbFbS(MFu2(i1),MFu2(i2),MFu2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*TfFbFbFbS(MFu2(i1),MFu2(i2),MFu2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3259,10 +3068,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*MFv(i3)*TfFFFbS(MFv2(i1),MFv2(i2),MFv2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*MFv(i3)*TfFFFbS(MFv2(i1),MFv2(i2),MFv2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3285,10 +3091,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*MFv(i2)*TfFFbFS(MFv2(i1),MFv2(i2),MFv2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*MFv(i2)*TfFFbFS(MFv2(i1),MFv2(i2),MFv2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3311,10 +3114,7 @@ if(abs(prefactor) .gt. epscouplings) then
  end if
    End Do
 if(nonzerocoupling) then 
- funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*TfFbFbFbS(MFv2(i1),MFv2(i2),MFv2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*TfFbFbFbS(MFv2(i1),MFv2(i2),MFv2(i3),Mhh2(i4),Qscale)
  temptad=temptad+tempcouplingvector*funcvalue
 end if
 end if
@@ -3405,10 +3205,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3464,10 +3261,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3523,10 +3317,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3582,10 +3373,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3641,13 +3429,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3675,13 +3457,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3709,19 +3485,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3749,16 +3513,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3786,13 +3541,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3820,10 +3569,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3851,10 +3597,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3882,16 +3625,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3919,13 +3653,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -3953,10 +3681,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4012,10 +3737,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4043,10 +3765,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4074,13 +3793,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4136,10 +3849,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4195,13 +3905,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4229,10 +3933,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4340,10 +4041,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4418,10 +4116,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4471,13 +4166,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4502,16 +4191,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4536,13 +4216,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp/2._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4567,10 +4241,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4595,13 +4266,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4626,10 +4291,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4679,10 +4341,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*XfSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*XfSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4763,10 +4422,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4850,10 +4506,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4937,10 +4590,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -4996,16 +4646,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5033,19 +4674,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5073,16 +4702,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5110,13 +4730,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5144,16 +4758,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5181,13 +4786,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5215,10 +4814,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5246,13 +4842,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5280,10 +4870,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5339,10 +4926,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5398,10 +4982,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5457,10 +5038,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5516,13 +5094,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5550,16 +5122,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5587,13 +5150,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5621,10 +5178,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5652,13 +5206,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5686,10 +5234,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5745,10 +5290,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5804,10 +5346,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5835,13 +5374,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5869,10 +5402,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -5928,10 +5458,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6044,13 +5571,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*ZfSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*ZfSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6078,10 +5599,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6165,13 +5683,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6199,10 +5711,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -8._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -8._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6258,19 +5767,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/4._dp*ZfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6298,16 +5795,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*ZfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6335,13 +5823,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*ZfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6369,13 +5851,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*ZfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6403,13 +5879,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6437,10 +5907,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6468,10 +5935,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -8._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -8._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6526,10 +5990,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*SfSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*SfSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6579,10 +6040,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*SfSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*SfSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6632,16 +6090,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/6._dp*SfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/6._dp*SfSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6666,13 +6115,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*SfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*SfSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6697,10 +6140,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*SfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*SfSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6753,10 +6193,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6812,10 +6249,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6871,10 +6305,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6930,10 +6361,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -6989,13 +6417,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*UfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7023,13 +6445,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7057,19 +6473,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*UfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7097,16 +6501,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7134,13 +6529,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7168,10 +6557,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7199,10 +6585,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7230,16 +6613,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7267,13 +6641,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7301,10 +6669,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7332,10 +6697,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7391,10 +6753,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7450,10 +6809,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7481,10 +6837,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7512,16 +6865,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7549,13 +6893,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7583,10 +6921,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7642,10 +6977,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7701,13 +7033,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7735,10 +7061,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7825,10 +7148,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7890,10 +7210,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -7955,10 +7272,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8020,10 +7334,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8116,10 +7427,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8181,10 +7489,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8215,13 +7520,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8314,10 +7613,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8379,13 +7675,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8416,10 +7706,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8512,16 +7799,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8552,16 +7830,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8592,22 +7861,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8638,19 +7892,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8681,16 +7923,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8721,13 +7954,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8758,13 +7985,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8795,19 +8016,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8838,16 +8047,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8878,13 +8078,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8915,13 +8109,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8952,16 +8140,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -8992,10 +8171,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9026,13 +8202,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9063,16 +8233,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9103,10 +8264,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9137,10 +8295,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9171,13 +8326,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9208,10 +8357,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9242,16 +8388,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9282,13 +8419,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9319,10 +8450,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9353,10 +8481,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9387,10 +8512,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9483,10 +8605,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9517,10 +8636,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9582,10 +8698,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9616,10 +8729,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9650,13 +8760,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9687,13 +8791,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9724,10 +8822,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9758,10 +8853,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9823,10 +8915,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9888,13 +8977,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9925,13 +9008,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9962,13 +9039,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -9999,19 +9070,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10042,16 +9101,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10082,16 +9132,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10122,13 +9163,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10159,10 +9194,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10193,10 +9225,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10227,16 +9256,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10267,13 +9287,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10304,10 +9318,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10338,10 +9349,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10403,10 +9411,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10468,10 +9473,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10502,10 +9504,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10536,16 +9535,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10576,13 +9566,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10613,10 +9597,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10678,10 +9659,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10743,13 +9721,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10780,10 +9752,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10877,10 +9846,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -10942,10 +9908,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11007,13 +9970,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11044,13 +10001,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11081,10 +10032,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11115,10 +10063,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11180,10 +10125,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11276,10 +10218,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11372,13 +10311,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11409,13 +10342,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11446,10 +10373,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11480,10 +10404,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11514,10 +10435,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11548,10 +10466,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11613,10 +10528,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11647,10 +10559,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11681,13 +10590,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11749,10 +10652,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11845,10 +10745,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11910,10 +10807,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11944,13 +10838,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -11981,10 +10869,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12046,22 +10931,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12092,19 +10962,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12135,19 +10993,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12178,16 +11024,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12218,13 +11055,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12255,16 +11086,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12295,13 +11117,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12332,13 +11148,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12369,16 +11179,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12409,13 +11210,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12446,13 +11241,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12483,13 +11272,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12520,16 +11303,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12560,10 +11334,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12594,13 +11365,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12631,10 +11396,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12665,13 +11427,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12702,16 +11458,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12742,13 +11489,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12779,10 +11520,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -12875,10 +11613,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -13158,13 +11893,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*MFd(i3)*MFd(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*MFd(i3)*MFd(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13187,13 +11916,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -13224,13 +11947,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*MFe(i3)*MFe(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*MFe(i3)*MFe(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13253,13 +11970,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -13290,13 +12001,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*MFu(i3)*MFu(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*MFu(i3)*MFu(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13319,13 +12024,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -13356,13 +12055,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*MFv(i3)*MFv(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*MFv(i3)*MFv(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13385,13 +12078,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -13678,10 +12365,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i1)*MFd(i4)*MFd(i2)*MFd(i3)*MfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MFd(i1)*MFd(i4)*MFd(i2)*MFd(i3)*MfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13708,10 +12392,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i2)*MFd(i3)*MfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i2)*MFd(i3)*MfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13738,10 +12419,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i2)*MfFFbFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i2)*MfFFbFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13768,10 +12446,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i3)*MfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i3)*MfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -13797,10 +12472,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -14265,10 +12937,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i1)*MFe(i4)*MFe(i2)*MFe(i3)*MfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFe(i1)*MFe(i4)*MFe(i2)*MFe(i3)*MfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14295,10 +12964,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i2)*MFe(i3)*MfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i2)*MFe(i3)*MfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14325,10 +12991,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i2)*MfFFbFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i2)*MfFFbFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14355,10 +13018,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i3)*MfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i3)*MfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14384,10 +13044,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*MfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -14709,10 +13366,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i1)*MFu(i4)*MFu(i2)*MFu(i3)*MfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MFu(i1)*MFu(i4)*MFu(i2)*MFu(i3)*MfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14739,10 +13393,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i2)*MFu(i3)*MfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i2)*MFu(i3)*MfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14769,10 +13420,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i2)*MfFFbFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i2)*MfFFbFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14799,10 +13447,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i3)*MfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i3)*MfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -14828,10 +13473,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -15153,10 +13795,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*MfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*MfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15183,10 +13822,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i3)*MfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i3)*MfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15213,10 +13849,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i4)*MfFFbFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i4)*MfFFbFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15243,10 +13876,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i3)*MFv(i4)*MfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i3)*MFv(i4)*MfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15272,10 +13902,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -15667,13 +14294,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15699,13 +14320,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,Mhh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15731,13 +14346,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,Mhh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15774,13 +14383,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15806,13 +14409,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,Mhh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15838,13 +14435,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,Mhh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15881,13 +14472,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15913,13 +14498,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,Mhh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15945,13 +14524,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,Mhh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -15988,13 +14561,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,Mhh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16020,13 +14587,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,Mhh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16052,13 +14613,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i5)*MfSFSFFb(p2,Mhh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16799,16 +15354,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16832,16 +15378,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -16875,16 +15412,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16908,16 +15436,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -16951,16 +15470,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -16984,16 +15494,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17027,16 +15528,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17060,16 +15552,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSFF(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17103,10 +15586,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFd(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFd(i5)*VfSSSFbFb(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17130,10 +15610,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17167,10 +15644,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i4)*MFe(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFv(i4)*MFe(i5)*VfSSSFbFb(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17194,10 +15668,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSFF(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17463,10 +15934,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17490,10 +15958,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17527,10 +15992,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17554,10 +16016,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17591,10 +16050,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17618,10 +16074,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17655,10 +16108,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17682,10 +16132,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17719,13 +16166,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17749,13 +16190,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17789,13 +16224,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17819,13 +16248,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17859,13 +16282,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17889,13 +16306,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -17929,13 +16340,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -17959,13 +16364,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -18288,10 +16687,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*MFd(i4)*VfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*MFd(i4)*VfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -18318,10 +16714,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i1)*MFd(i3)*VfFbFFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFd(i1)*MFd(i3)*VfFbFFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -18348,10 +16741,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i1)*MFd(i4)*VfFbFFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i1)*MFd(i4)*VfFbFFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -18378,10 +16768,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i3)*MFd(i2)*VfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i3)*MFd(i2)*VfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -18408,10 +16795,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i3)*MFd(i4)*VfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFd(i3)*MFd(i4)*VfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -18437,10 +16821,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*VfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -18986,10 +17367,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*MFe(i4)*VfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*MFe(i4)*VfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19016,10 +17394,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i1)*MFe(i3)*VfFbFFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MFe(i1)*MFe(i3)*VfFbFFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19046,10 +17421,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i1)*MFe(i4)*VfFbFFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i1)*MFe(i4)*VfFbFFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19076,10 +17448,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i3)*MFe(i2)*VfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i3)*MFe(i2)*VfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19106,10 +17475,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i3)*MFe(i4)*VfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MFe(i3)*MFe(i4)*VfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19135,10 +17501,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -19344,10 +17707,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*MFu(i4)*VfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*MFu(i4)*VfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19374,10 +17734,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i1)*MFu(i3)*VfFbFFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFu(i1)*MFu(i3)*VfFbFFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19404,10 +17761,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i1)*MFu(i4)*VfFbFFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i1)*MFu(i4)*VfFbFFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19434,10 +17788,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i3)*MFu(i2)*VfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i3)*MFu(i2)*VfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19464,10 +17815,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i3)*MFu(i4)*VfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFu(i3)*MFu(i4)*VfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -19493,10 +17841,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*VfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -20042,10 +18387,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*VfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*VfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -20072,10 +18414,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i1)*MFv(i3)*VfFbFFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFv(i1)*MFv(i3)*VfFbFFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -20102,10 +18441,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i1)*MFv(i4)*VfFbFFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i1)*MFv(i4)*VfFbFFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -20132,10 +18468,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i3)*VfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i3)*VfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -20162,10 +18495,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i3)*MFv(i4)*VfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFv(i3)*MFv(i4)*VfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end if
@@ -20191,10 +18521,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcont=tempcont+tempcouplingmatrix*funcvalue
 end if
 end do
@@ -20345,10 +18672,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20404,10 +18728,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20463,10 +18784,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20522,10 +18840,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20581,13 +18896,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20615,13 +18924,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20649,19 +18952,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20689,16 +18980,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20726,13 +19008,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20760,10 +19036,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20791,10 +19064,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20822,16 +19092,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20859,13 +19120,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20893,10 +19148,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20952,10 +19204,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -20983,10 +19232,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21014,13 +19260,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*WfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21076,10 +19316,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21135,13 +19372,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21169,10 +19400,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*WfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21280,10 +19508,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21358,10 +19583,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21411,13 +19633,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),MAh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21442,16 +19658,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/4._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/4._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21476,13 +19683,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp/2._dp*XfSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21507,10 +19708,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21535,13 +19733,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21566,10 +19758,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*XfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*XfSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21619,10 +19808,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*XfSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*XfSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21675,13 +19861,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21709,16 +19889,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21746,13 +19917,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21780,10 +19945,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21811,13 +19973,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21845,10 +20001,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21904,10 +20057,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21963,10 +20113,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -21994,13 +20141,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp/2._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22028,10 +20169,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22059,10 +20197,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22090,13 +20225,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22124,10 +20253,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22155,10 +20281,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22186,13 +20309,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22220,10 +20337,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22279,10 +20393,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22338,10 +20449,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22397,10 +20505,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22456,13 +20561,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22490,16 +20589,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22527,13 +20617,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22561,10 +20645,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22592,13 +20673,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22626,10 +20701,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22685,10 +20757,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22744,10 +20813,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22775,13 +20841,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22809,10 +20869,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22868,10 +20925,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*YfSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22928,13 +20982,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*ZfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*ZfSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22962,10 +21010,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -22993,13 +21038,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23027,10 +21066,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*ZfSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23086,10 +21122,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23117,10 +21150,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -8._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -8._dp*ZfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23176,13 +21206,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23210,10 +21234,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23241,10 +21262,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -8._dp*ZfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
+ funcvalue= -8._dp*ZfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23349,13 +21367,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*SfSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),Qscale)
+ funcvalue= 1._dp/2._dp*SfSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23380,10 +21392,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*SfSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 2._dp*SfSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23433,13 +21442,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*SfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*SfSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23464,10 +21467,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*SfSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),Qscale)
+ funcvalue= 1._dp*SfSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23520,10 +21520,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*UfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -1._dp*UfSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23551,10 +21548,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23582,16 +21576,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp*UfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -1._dp*UfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23619,13 +21604,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23653,10 +21632,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23740,13 +21716,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23774,10 +21744,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23833,13 +21800,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23867,10 +21828,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23898,13 +21856,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23932,10 +21884,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23963,13 +21912,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -23997,10 +21940,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24028,13 +21968,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24062,10 +21996,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24093,10 +22024,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24152,10 +22080,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24211,10 +22136,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MAh2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MAh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24242,10 +22164,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MAh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24273,16 +22192,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24310,13 +22220,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24344,10 +22248,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24403,10 +22304,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24462,13 +22360,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),Qscale)
+ funcvalue= -2._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24496,10 +22388,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),Qscale)
+ funcvalue= -4._dp*UfSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24586,13 +22475,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24623,13 +22506,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24660,19 +22537,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24703,16 +22568,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24743,13 +22599,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24780,10 +22630,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24814,10 +22661,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24848,16 +22692,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24888,13 +22723,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24925,10 +22754,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24959,10 +22785,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -24993,13 +22816,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25061,10 +22878,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25095,13 +22909,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25194,10 +23002,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25259,13 +23064,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25296,10 +23095,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25392,13 +23188,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25429,10 +23219,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25463,13 +23250,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25500,10 +23281,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25534,13 +23312,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25571,10 +23343,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25605,13 +23374,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25642,10 +23405,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25676,10 +23436,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25710,13 +23467,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25747,10 +23498,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25781,13 +23529,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25818,16 +23560,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25858,10 +23591,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25892,10 +23622,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25926,13 +23653,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25963,10 +23684,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -25997,16 +23715,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26037,13 +23746,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26074,10 +23777,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26108,10 +23808,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26142,10 +23839,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26238,10 +23932,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26272,10 +23963,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26337,10 +24025,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26371,10 +24056,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26405,13 +24087,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26442,13 +24118,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26479,10 +24149,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26513,10 +24180,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26578,10 +24242,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MAh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26643,13 +24304,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26680,13 +24335,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26717,13 +24366,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26754,19 +24397,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26797,16 +24428,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26837,16 +24459,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26877,13 +24490,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26914,10 +24521,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26948,10 +24552,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -26982,16 +24583,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27022,13 +24614,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27059,10 +24645,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27093,10 +24676,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27158,10 +24738,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MAh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27223,10 +24800,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27257,10 +24831,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27291,16 +24862,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27331,13 +24893,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27368,10 +24924,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27433,10 +24986,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27498,13 +25048,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27535,10 +25079,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27632,16 +25173,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27672,13 +25204,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27709,13 +25235,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27746,10 +25266,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27780,13 +25297,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27817,13 +25328,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27854,13 +25359,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27891,13 +25390,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27928,10 +25421,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27962,10 +25452,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MAh2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MAh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -27996,16 +25483,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28036,13 +25514,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28073,10 +25545,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28107,13 +25576,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28144,10 +25607,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),Mhh2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28209,10 +25669,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MAh2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28305,10 +25762,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28339,10 +25793,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28373,10 +25824,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28407,10 +25855,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28472,10 +25917,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28506,10 +25948,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28540,13 +25979,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28608,10 +26041,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28704,10 +26134,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),MAh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28769,10 +26196,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28803,13 +26227,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28840,10 +26258,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,MAh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28905,13 +26320,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28942,16 +26351,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -28982,13 +26382,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29019,13 +26413,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),Mhh2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29056,13 +26444,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29093,16 +26475,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29133,10 +26506,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29167,13 +26537,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29204,10 +26568,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29238,13 +26599,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MAh2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MAh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29275,16 +26630,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29315,13 +26661,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MHpm2(i5),Qscale)
+ funcvalue= 2._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),Mhh2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29352,10 +26692,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MfSSSSS(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
+ funcvalue= 4._dp*MfSSSSS(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),MHpm2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29448,10 +26785,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*MfSSSSS(p2,MHpm2(i1),MHpm2(i2),MHpm2(i3),MHpm2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29731,13 +27065,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*MFd(i3)*MFd(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*MFd(i3)*MFd(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -29760,13 +27088,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFd2(i3),MFd2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFd2(i3),MFd2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29797,13 +27119,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*MFe(i3)*MFe(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*MFe(i3)*MFe(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -29826,13 +27142,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFe2(i3),MFe2(i4),Qscale)
+ funcvalue= -1._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFe2(i3),MFe2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29863,13 +27173,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*MFu(i3)*MFu(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*MFu(i3)*MFu(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -29892,13 +27196,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -3._dp/2._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFu2(i3),MFu2(i4),Qscale)
+ funcvalue= -3._dp/2._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFu2(i3),MFu2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -29929,13 +27227,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*MFv(i3)*MFv(i4)*WfSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*MFv(i3)*MFv(i4)*WfSSFbFb(p2,Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -29958,13 +27250,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= -1._dp/4._dp*WfSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MFv2(i3),MFv2(i4),Qscale)
+ funcvalue= -1._dp/4._dp*WfSSFF(p2,Mhh2(i1),Mhh2(i2),MFv2(i3),MFv2(i4),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -30251,10 +27537,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i1)*MFd(i4)*MFd(i2)*MFd(i3)*MfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MFd(i1)*MFd(i4)*MFd(i2)*MFd(i3)*MfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30281,10 +27564,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i2)*MFd(i3)*MfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i2)*MFd(i3)*MfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30311,10 +27591,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i2)*MfFFbFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i2)*MfFFbFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30341,10 +27618,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i3)*MfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i3)*MfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30370,10 +27644,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -30838,10 +28109,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i1)*MFe(i4)*MFe(i2)*MFe(i3)*MfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFe(i1)*MFe(i4)*MFe(i2)*MFe(i3)*MfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30868,10 +28136,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i2)*MFe(i3)*MfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i2)*MFe(i3)*MfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30898,10 +28163,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i2)*MfFFbFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i2)*MfFFbFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30928,10 +28190,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i3)*MfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i3)*MfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -30957,10 +28216,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*MfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*MfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -31282,10 +28538,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i1)*MFu(i4)*MFu(i2)*MFu(i3)*MfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MFu(i1)*MFu(i4)*MFu(i2)*MFu(i3)*MfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31312,10 +28565,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i2)*MFu(i3)*MfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i2)*MFu(i3)*MfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31342,10 +28592,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i2)*MfFFbFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i2)*MfFFbFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31372,10 +28619,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i3)*MfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i3)*MfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31401,10 +28645,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 3._dp*MfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -31726,10 +28967,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*MfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*MfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31756,10 +28994,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i3)*MfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i3)*MfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31786,10 +29021,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i4)*MfFFbFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i4)*MfFFbFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31816,10 +29048,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i3)*MFv(i4)*MfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i3)*MFv(i4)*MfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31845,10 +29074,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -31884,10 +29110,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,MAh2(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,MAh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31913,10 +29136,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,MAh2(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,MAh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31942,10 +29162,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,MAh2(i1),MFd2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,MAh2(i1),MFd2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -31982,10 +29199,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,MAh2(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,MAh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32011,10 +29225,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,MAh2(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,MAh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32040,10 +29251,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,MAh2(i1),MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,MAh2(i1),MFe2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32080,10 +29288,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,MAh2(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,MAh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32109,10 +29314,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,MAh2(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,MAh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32138,10 +29340,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,MAh2(i1),MFu2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,MAh2(i1),MFu2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32178,10 +29377,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,MAh2(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,MAh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32207,10 +29403,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,MAh2(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,MAh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32236,10 +29429,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i5)*MfSFSFFb(p2,MAh2(i1),MFv2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i5)*MfSFSFFb(p2,MAh2(i1),MFv2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32276,10 +29466,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i2)*MFd(i5)*MFd(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32305,10 +29492,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 12._dp*MFd(i4)*MfSFSFbF(p2,Mhh2(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32334,10 +29518,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i5)*MfSFSFFb(p2,Mhh2(i1),MFd2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32374,10 +29555,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i2)*MFe(i5)*MFe(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32403,10 +29581,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 4._dp*MFe(i4)*MfSFSFbF(p2,Mhh2(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32432,10 +29607,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i5)*MfSFSFFb(p2,Mhh2(i1),MFe2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32472,10 +29644,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i2)*MFu(i5)*MFu(i4)*MfSFbSFbFb(p2,Mhh2(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32501,10 +29670,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 12._dp*MFu(i4)*MfSFSFbF(p2,Mhh2(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32530,10 +29696,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i5)*MfSFSFFb(p2,Mhh2(i1),MFu2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32570,10 +29733,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i4)*MFv(i5)*MfSFbSFbFb(p2,Mhh2(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32599,10 +29759,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 2._dp*MFv(i4)*MfSFSFbF(p2,Mhh2(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -32628,10 +29785,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i5)*MfSFSFFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i5)*MfSFSFFb(p2,Mhh2(i1),MFv2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33024,13 +30178,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33054,13 +30202,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33094,13 +30236,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33124,13 +30260,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33164,13 +30294,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33194,13 +30318,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33234,13 +30352,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33264,13 +30376,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSFF(p2,MAh2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSFF(p2,MAh2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33420,10 +30526,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33447,10 +30550,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33484,10 +30584,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33511,10 +30608,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33548,10 +30642,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33575,10 +30666,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33612,10 +30700,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33639,10 +30724,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MAh2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSFF(p2,Mhh2(i1),MAh2(i2),MAh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33676,10 +30758,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFd(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFd(i5)*VfSSSFbFb(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33703,10 +30782,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFu2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -33740,10 +30816,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i4)*MFe(i5)*VfSSSFbFb(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFv(i4)*MFe(i5)*VfSSSFbFb(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -33767,10 +30840,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSFF(p2,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSFF(p2,Mhh2(i1),MHpm2(i2),MHpm2(i3),MFv2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34036,10 +31106,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34063,10 +31130,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34100,10 +31164,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34127,10 +31188,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 2._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34164,10 +31222,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34191,10 +31246,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 6._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34228,10 +31280,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34255,10 +31304,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),MAh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34292,13 +31338,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*MFd(i4)*MFd(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34322,13 +31362,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFd2(i4),MFd2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFd2(i4),MFd2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34362,13 +31396,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= MFe(i4)*MFe(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34392,13 +31420,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i4),MFe2(i5),Qscale)
+ funcvalue= 1._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFe2(i4),MFe2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34432,13 +31454,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*MFu(i4)*MFu(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34462,13 +31478,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFu2(i4),MFu2(i5),Qscale)
+ funcvalue= 3._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFu2(i4),MFu2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34502,13 +31512,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*MFv(i4)*MFv(i5)*VfSSSFbFb(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34532,13 +31536,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp/2._dp*VfSSSFF(p2,MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i4),MFv2(i5),Qscale)
+ funcvalue= 1._dp/2._dp*VfSSSFF(p2,MHpm2(i1),Mhh2(i2),Mhh2(i3),MFv2(i4),MFv2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -34861,10 +31859,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*MFd(i4)*VfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i1)*MFd(i3)*MFd(i2)*MFd(i4)*VfFbFbFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34891,10 +31886,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i1)*MFd(i3)*VfFbFFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFd(i1)*MFd(i3)*VfFbFFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34921,10 +31913,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i1)*MFd(i4)*VfFbFFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i1)*MFd(i4)*VfFbFFFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34951,10 +31940,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFd(i3)*MFd(i2)*VfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFd(i3)*MFd(i2)*VfFFbFbFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -34981,10 +31967,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFd(i3)*MFd(i4)*VfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFd(i3)*MFd(i4)*VfFFFbFbS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35010,10 +31993,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*VfFFFFS(p2,MFd2(i1),MFd2(i2),MFd2(i3),MFd2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -35559,10 +32539,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*MFe(i4)*VfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i1)*MFe(i3)*MFe(i2)*MFe(i4)*VfFbFbFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35589,10 +32566,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i1)*MFe(i3)*VfFbFFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MFe(i1)*MFe(i3)*VfFbFFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35619,10 +32593,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i1)*MFe(i4)*VfFbFFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i1)*MFe(i4)*VfFbFFFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35649,10 +32620,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFe(i3)*MFe(i2)*VfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFe(i3)*MFe(i2)*VfFFbFbFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35679,10 +32647,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 4._dp*MFe(i3)*MFe(i4)*VfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 4._dp*MFe(i3)*MFe(i4)*VfFFFbFbS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35708,10 +32673,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*VfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*VfFFFFS(p2,MFe2(i1),MFe2(i2),MFe2(i3),MFe2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -35917,10 +32879,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*MFu(i4)*VfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i1)*MFu(i3)*MFu(i2)*MFu(i4)*VfFbFbFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35947,10 +32906,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i1)*MFu(i3)*VfFbFFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFu(i1)*MFu(i3)*VfFbFFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -35977,10 +32933,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i1)*MFu(i4)*VfFbFFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i1)*MFu(i4)*VfFbFFFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36007,10 +32960,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*MFu(i3)*MFu(i2)*VfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*MFu(i3)*MFu(i2)*VfFFbFbFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36037,10 +32987,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 12._dp*MFu(i3)*MFu(i4)*VfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 12._dp*MFu(i3)*MFu(i4)*VfFFFbFbS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36066,10 +33013,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 6._dp*VfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 6._dp*VfFFFFS(p2,MFu2(i1),MFu2(i2),MFu2(i3),MFu2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do
@@ -36615,10 +33559,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*VfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i1)*MFv(i2)*MFv(i3)*MFv(i4)*VfFbFbFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36645,10 +33586,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i1)*MFv(i3)*VfFbFFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFv(i1)*MFv(i3)*VfFbFFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36675,10 +33613,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i1)*MFv(i4)*VfFbFFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i1)*MFv(i4)*VfFbFFFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36705,10 +33640,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= MFv(i2)*MFv(i3)*VfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= MFv(i2)*MFv(i3)*VfFFbFbFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36735,10 +33667,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 2._dp*MFv(i3)*MFv(i4)*VfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 2._dp*MFv(i3)*MFv(i4)*VfFFFbFbS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end if
@@ -36764,10 +33693,7 @@ if(abs(prefactor) .gt. epscouplings) then
    End Do
   End do
 if(nonzerocoupling) then 
- funcvalue= 1._dp*VfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i5),Qscale)
+ funcvalue= 1._dp*VfFFFFS(p2,MFv2(i1),MFv2(i2),MFv2(i3),MFv2(i4),Mhh2(i5),Qscale)
  tempcontah=tempcontah+tempcouplingmatrixah*funcvalue
 end if
 end do

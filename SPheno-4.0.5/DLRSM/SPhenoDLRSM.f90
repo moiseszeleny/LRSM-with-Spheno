@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:29 on 7.6.2025   
+! File created at 16:58 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -239,13 +239,13 @@ MD(3,1) = MD31
 MD(3,2) = MD32
 MD(3,3) = MD33
 vR = vRinput
-vL = vLinput
-k1 = Sqrt(-2*vL**2 + vSM**2)/Sqrt(1 + TanBeta**2)
-k2 = (TanBeta*Sqrt(-2*vL**2 + vSM**2))/Sqrt(1 + TanBeta**2)
-YQ2 = -Conjg((-(vHu*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + vHd*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YQ1 = Conjg((-(vHd*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + vHu*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YL2 = Conjg((sqrt(2._dp)*MD*vHu - vHd*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
-YL1 = Conjg((-(sqrt(2._dp)*MD*vHd) + vHu*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
+vL = 0
+k1 = vSM
+k2 = 0
+YQ2 = -Conjg((-(k2*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
+Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 
  
  ! Setting VEVs used for low energy constraints 
@@ -288,22 +288,20 @@ MD(3,1) = MD31
 MD(3,2) = MD32
 MD(3,3) = MD33
 vR = vRinput
-vL = vLinput
-k1 = Sqrt(-2*vL**2 + vSM**2)/Sqrt(1 + TanBeta**2)
-k2 = (TanBeta*Sqrt(-2*vL**2 + vSM**2))/Sqrt(1 + TanBeta**2)
-YQ2 = -Conjg((-(vHu*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + vHd*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YQ1 = Conjg((-(vHd*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + vHu*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YL2 = Conjg((sqrt(2._dp)*MD*vHu - vHd*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
-YL1 = Conjg((-(sqrt(2._dp)*MD*vHd) + vHu*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
+vL = 0
+k1 = vSM
+k2 = 0
+YQ2 = -Conjg((-(k2*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
+Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
-Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,           & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
+& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
+& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 
  If (SignOfMassChanged) Then  
@@ -342,14 +340,13 @@ TwoLoopMatching = .false.
 GuessTwoLoopMatchingBSM = .false. 
 End if 
 Call CalculateSpectrum(n_run,delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0)& 
-& ,List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))              & 
-& ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,               & 
-& Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
+& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
 n_tot =1
-mass_uncertainty_Yt(n_tot:n_tot+3) = {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}! difference will be taken later 
+mass_uncertainty_Yt(n_tot:n_tot+3) = Mhh! difference will be taken later 
 n_tot = n_tot + 4 
 mass_uncertainty_Yt(n_tot:n_tot+3) = MAh! difference will be taken later 
 n_tot = n_tot + 4 
@@ -369,24 +366,22 @@ GuessTwoLoopMatchingBSM = .false.
 End if 
   End if 
  Call CalculateSpectrum(n_run,delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0)& 
-& ,List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))              & 
-& ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,               & 
-& Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
+& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
   If (GetMassUncertainty) Then 
  Call GetScaleUncertainty(delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,MFe,              & 
-& MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
-& MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0)& 
-& ,List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))              & 
-& ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,               & 
-& Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mass_uncertainty_Q)
+& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
+& MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,               & 
+& gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
+& Yt,YL,YR,Mux,MU12,MU22,mass_uncertainty_Q)
 
   End if 
  End If 
  ! Save correct Higgs masses for calculation of L -> 3 L' 
-MhhL = List(List(k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0),List(0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0),List(0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)),List(0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2))
+MhhL = Mhh
 Mhh2L = MhhL**2 
 MAhL = MAh
 MAh2L = MAhL**2 
@@ -395,19 +390,15 @@ PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
 TW = ASin(Abs(ZZ(2,1)))
 If ((L_BR).And.(kont.Eq.0)) Then 
  Call CalculateBR(CalcTBD,ratioWoM,epsI,deltaM,kont,MAh,MAh2,MFd,MFd2,MFe,             & 
-& MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
-& MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0)& 
-& ,List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))              & 
-& ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,               & 
-& Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,gPFu,gTFu,BRFu,gPFe,gTFe,BRFe,gPFd,gTFd,              & 
-& BRFd,gPhh,gThh,BRhh,gPFv,gTFv,BRFv,gPVZ,gTVZ,BRVZ,gPVZR,gTVZR,BRVZR,gPHpm,             & 
-& gTHpm,BRHpm,gPAh,gTAh,BRAh,gPVWLm,gTVWLm,BRVWLm,gPVWRm,gTVWRm,BRVWRm)
+& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
+& MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,               & 
+& gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
+& Yt,YL,YR,Mux,MU12,MU22,gPFu,gTFu,BRFu,gPFe,gTFe,BRFe,gPFd,gTFd,BRFd,gPhh,              & 
+& gThh,BRhh,gPFv,gTFv,BRFv,gPVZ,gTVZ,BRVZ,gPVZR,gTVZR,BRVZR,gPHpm,gTHpm,BRHpm,           & 
+& gPAh,gTAh,BRAh,gPVWLm,gTVWLm,BRVWLm,gPVWRm,gTVWRm,BRVWRm)
 
-Call HiggsCrossSections(List(List(k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6)           & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0),List(0,((2._dp*(RHO1) - RHO2)           & 
-& *vR**2)/2._dp,0,0),List(0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR))             & 
-& ,List(0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2)),ratioGG,ratioPP,rHB_S_VWLm,           & 
-& rHB_S_VZ,rHB_S_S_Fu(:,3),CS_Higgs_LHC,kont)
+Call HiggsCrossSections(Mhh,ratioGG,ratioPP,rHB_S_VWLm,rHB_S_VZ,rHB_S_S_Fu(:,3)       & 
+& ,CS_Higgs_LHC,kont)
 
 Call HiggsCrossSections(MAh,ratioPGG,ratioPPP,0._dp*rHB_S_VWLm,0._dp*rHB_S_VZ,        & 
 & rHB_P_S_Fu(:,3),CS_PHiggs_LHC,kont)
@@ -436,12 +427,10 @@ MVZ2 = mz2
 MVWLm = mW 
 MVWLm2 = mW2 
 If (WriteParametersAtQ) Then 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 End If 
  
@@ -475,11 +464,10 @@ Write(*,*) "Finished!"
 Contains 
  
 Subroutine CalculateSpectrum(n_run,delta,WriteOut,kont,MAh,MAh2,MFd,MFd2,             & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0)& 
-& ,List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))              & 
-& ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,               & 
-& Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
+& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
 Implicit None 
 Integer, Intent(in) :: n_run 
@@ -492,20 +480,18 @@ Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6
 Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(inout) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
 Real(dp),Intent(inout) :: k1,vR
 
 kont = 0 
-Call FirstGuess(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Call FirstGuess(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 !If (kont.ne.0) Call TerminateProgram 
  
@@ -514,12 +500,11 @@ If (SPA_Convention) Call SetRGEScale(1.e3_dp**2)
 If (.Not.UseFixedScale) Then 
  Call SetRGEScale(160._dp**2) 
 End If
-Call Match_and_Run(delta,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,           & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)       & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),gBL,g2,g3,LAM2,LAM1,             & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,mGut,kont,WriteOut,n_run)
+Call Match_and_Run(delta,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,            & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,             & 
+& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGut,kont,              & 
+& WriteOut,n_run)
 
 If (kont.ne.0) Then 
  Write(*,*) "Error appeared in calculation of masses "
@@ -550,11 +535,11 @@ End Subroutine ReadingData
 
  
 Subroutine GetScaleUncertainty(delta,WriteOut,kont,MAhinput,MAh2input,MFdinput,       & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,k1input,vRinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,        & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,k1input,vRinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,        & 
 & RHO1input,RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,       & 
 & Yinput,YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,         & 
 & mass_Qerror)
@@ -574,10 +559,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -589,8 +574,8 @@ Real(dp) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU1
 Complex(dp) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -599,7 +584,7 @@ Real(dp) :: k1,vR
 kont = 0 
 Write(*,*) "Check scale uncertainty" 
 n_tot =1
-mass_in(n_tot:n_tot+3) = {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}input
+mass_in(n_tot:n_tot+3) = Mhhinput
 n_tot = n_tot + 4 
 mass_in(n_tot:n_tot+3) = MAhinput
 n_tot = n_tot + 4 
@@ -670,38 +655,24 @@ gBL = Sqrt(3._dp/2._dp)*gBL
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
-Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,           & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
+& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
+& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
-If (((Calculate_mh_within_SM).and.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2).gt.300._dp)).OR.(Force_mh_within_SM))Then
+If (((Calculate_mh_within_SM).and.(Mhh(2).gt.300._dp)).OR.(Force_mh_within_SM))Then
 g_SM=g_SM_save 
 tz=0.5_dp*Log(mZ2/Q**2)
 dt=tz/100._dp
 g_SM(1)=Sqrt(5._dp/3._dp)*g_SM(1) 
 Call odeint(g_SM,62,tz,0._dp,delta,dt,0._dp,rge62_SM,kont) 
 g_SM(1)=Sqrt(3._dp/5._dp)*g_SM(1) 
-Call Get_mh_pole_SM(g_SM,Q**2,delta,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1),mh_SM)
-                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1) = mh_SM**2 
-                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1) = mh_SM 
+Call Get_mh_pole_SM(g_SM,Q**2,delta,Mhh2(1),mh_SM)
+Mhh2(1) = mh_SM**2 
+Mhh(1) = mh_SM 
 End if
 n_tot =1
-mass_new(n_tot:n_tot+3) = {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}
+mass_new(n_tot:n_tot+3) = Mhh
 n_tot = n_tot + 4 
 mass_new(n_tot:n_tot+3) = MAh
 n_tot = n_tot + 4 

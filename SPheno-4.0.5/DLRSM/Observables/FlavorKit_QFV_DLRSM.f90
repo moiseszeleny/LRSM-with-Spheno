@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:25 on 7.6.2025   
+! File created at 16:50 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -22,11 +22,8 @@ Use StandardModel
  Contains 
  
 Subroutine CalculateBox2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,             & 
-& MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
-& MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)              & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
+& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
+& MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm, & 
 & cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
 & cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
 & cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
@@ -58,8 +55,7 @@ Subroutine CalculateBox2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,       
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -87,9 +83,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -201,10 +195,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -220,14 +211,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BOddllSLL=BOddllSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -347,10 +332,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -362,14 +344,8 @@ coup4L = cplcFeFeAhL(gt4,i3,i2)
 coup4R = cplcFeFeAhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mS2 = MAh(i2)
@@ -403,13 +379,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -421,24 +391,12 @@ coup4L = cplcFeFehhL(gt4,i3,i2)
 coup4R = cplcFeFehhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BOddllSLL=BOddllSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -467,10 +425,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -482,14 +437,8 @@ coup4L = cplcFeFeVZL(gt4,i3)
 coup4R = cplcFeFeVZR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mV2 = MVZ
@@ -521,10 +470,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -536,14 +482,8 @@ coup4L = cplcFeFeVZRL(gt4,i3)
 coup4R = cplcFeFeVZRR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mV2 = MVZR
@@ -620,10 +560,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -639,14 +576,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mV12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddllSLL=BOddllSLL - 4.*chargefactor*coup1L*coup2L*coup3L*coup4L*int1
@@ -805,10 +736,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -824,14 +752,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mV12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddllSLL=BOddllSLL - 4.*chargefactor*coup1L*coup2L*coup3L*coup4L*int1
@@ -993,10 +915,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -1012,14 +931,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BOddllSLL=BOddllSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -1149,10 +1062,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -1164,14 +1074,8 @@ coup4L = cplcFeFeAhL(i3,gt3,i2)
 coup4R = cplcFeFeAhR(i3,gt3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mS2 = MAh(i2)
@@ -1205,13 +1109,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -1223,24 +1121,12 @@ coup4L = cplcFeFehhL(i3,gt3,i2)
 coup4R = cplcFeFehhR(i3,gt3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BOddllSLL=BOddllSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -1269,10 +1155,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -1284,14 +1167,8 @@ coup4L = cplcFeFeVZL(i3,gt3)
 coup4R = cplcFeFeVZR(i3,gt3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mV2 = MVZ
@@ -1328,10 +1205,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -1343,14 +1217,8 @@ coup4L = cplcFeFeVZRL(i3,gt3)
 coup4R = cplcFeFeVZRR(i3,gt3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 mV2 = MVZR
@@ -1584,10 +1452,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -1603,14 +1468,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=C0D0check(mF22, mS22, mV12, mF12)
   int2=D00check(mF12, mF22, mS22, mV12)
   int3=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
@@ -1785,10 +1644,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -1804,14 +1660,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=C0D0check(mF22, mS22, mV12, mF12)
   int2=D00check(mF12, mF22, mS22, mV12)
   int3=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
@@ -2231,32 +2081,29 @@ Iname=Iname-1
 End Subroutine CalculateBox2d2L 
 
 Subroutine CalculatePengS2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,PSOddllSLL,PSOddllSRR,PSOddllSRL,PSOddllSLR,PSOddllVRR,PSOddllVLL,       & 
-& PSOddllVRL,PSOddllVLR,PSOddllTLL,PSOddllTLR,PSOddllTRL,PSOddllTRR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,PSOddllSLL,PSOddllSRR,PSOddllSRL,PSOddllSLR,PSOddllVRR,     & 
+& PSOddllVLL,PSOddllVRL,PSOddllVLR,PSOddllTLL,PSOddllTLR,PSOddllTRL,PSOddllTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -2267,8 +2114,7 @@ Subroutine CalculatePengS2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -2296,9 +2142,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -2386,14 +2230,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2435,10 +2273,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -2449,14 +2284,8 @@ coup3R = cplcFdFdhhR(gt2,i3,iProp)
 coup4L = cplcFeFehhL(gt4,gt3,iProp)
 coup4R = cplcFeFehhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -2466,14 +2295,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2537,14 +2360,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2607,14 +2424,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2676,14 +2487,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2745,14 +2550,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2814,14 +2613,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2884,14 +2677,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -2933,10 +2720,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdhhL(i3,gt1,iProp)
 coup3R = cplcFdFdhhR(i3,gt1,iProp)
@@ -2949,14 +2733,8 @@ coup4R = cplcFeFehhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -2964,14 +2742,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3035,14 +2807,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3105,14 +2871,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3174,14 +2934,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3243,14 +2997,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3312,14 +3060,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3382,14 +3124,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3452,14 +3188,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3521,14 +3251,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3591,14 +3315,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3640,10 +3358,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -3654,14 +3369,8 @@ coup3R = cplcFeFehhR(gt4,i3,iProp)
 coup4L = cplcFdFdhhL(gt2,gt1,iProp)
 coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 ! Mass of internal fermion 
@@ -3671,14 +3380,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3741,14 +3444,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3810,14 +3507,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3880,14 +3571,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -3950,14 +3635,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4019,14 +3698,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4089,14 +3762,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4138,10 +3805,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFeFehhL(i3,gt3,iProp)
 coup3R = cplcFeFehhR(i3,gt3,iProp)
@@ -4154,14 +3818,8 @@ coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFe(i3)-MFe(gt4)
 MFin2 = MFe2(i3)-MFe2(gt4)
@@ -4169,14 +3827,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4239,14 +3891,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4308,14 +3954,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFe(i3)
 MFin2 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -4422,10 +4062,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -4436,14 +4073,8 @@ coup3R = cplcFdFdAhR(gt2,i3,iProp)
 coup4L = cplcFeFeAhL(gt4,gt3,iProp)
 coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -4878,10 +4509,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdAhL(i3,gt1,iProp)
 coup3R = cplcFdFdAhR(i3,gt1,iProp)
@@ -4894,14 +4522,8 @@ coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -5525,10 +5147,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -5539,14 +5158,8 @@ coup3R = cplcFeFeAhR(gt4,i3,iProp)
 coup4L = cplcFdFdAhL(gt2,gt1,iProp)
 coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 ! Mass of internal fermion 
@@ -5981,10 +5594,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFeFeAhL(i3,gt3,iProp)
 coup3R = cplcFeFeAhR(i3,gt3,iProp)
@@ -5997,14 +5607,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFe(i3)-MFe(gt4)
 MFin2 = MFe2(i3)-MFe2(gt4)
@@ -6203,14 +5807,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6247,10 +5845,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -6261,27 +5856,15 @@ coup3R = cplcFdFdhhR(i3,i2,iProp)
 coup4L = cplcFeFehhL(gt4,gt3,iProp)
 coup4R = cplcFeFehhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6336,14 +5919,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6397,14 +5974,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6457,14 +6028,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6517,14 +6082,8 @@ mS12 = MAh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6572,14 +6131,8 @@ mV12 = MVZ2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6631,14 +6184,8 @@ mV12 = MVZR2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6674,13 +6221,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -6692,31 +6233,13 @@ coup4R = cplcFeFehhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6764,14 +6287,8 @@ mS12 = MAh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6822,14 +6339,8 @@ mV12 = MVZ2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6874,14 +6385,8 @@ mV12 = MVZR2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6927,14 +6432,8 @@ mS12 = MAh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -6985,14 +6484,8 @@ mV12 = MVZ2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7037,14 +6530,8 @@ mV12 = MVZR2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7089,14 +6576,8 @@ mV12 = MVWLm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7141,14 +6622,8 @@ mV12 = MVWRm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7194,14 +6669,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7252,14 +6721,8 @@ mV12 = MVWLm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7304,14 +6767,8 @@ mV12 = MVWRm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7357,14 +6814,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7416,14 +6867,8 @@ mV12 = MVWLm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7475,14 +6920,8 @@ mV12 = MVWRm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7535,14 +6974,8 @@ mS12 = MHpm2(i2)
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7591,14 +7024,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7651,14 +7078,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7712,14 +7133,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7771,14 +7186,8 @@ mV12 = MVWLm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7823,14 +7232,8 @@ mV12 = MVWRm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7876,14 +7279,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7934,14 +7331,8 @@ mV12 = MVWLm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -7986,14 +7377,8 @@ mV12 = MVWRm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8039,14 +7424,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8098,14 +7477,8 @@ mV12 = MVWLm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8157,14 +7530,8 @@ mV12 = MVWRm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8217,14 +7584,8 @@ mS12 = MHpm2(i2)
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8256,10 +7617,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -8270,27 +7628,15 @@ coup3R = cplcFeFehhR(i3,i2,iProp)
 coup4L = cplcFdFdhhL(gt2,gt1,iProp)
 coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8345,14 +7691,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8406,14 +7746,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8466,14 +7800,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8526,14 +7854,8 @@ mS12 = MAh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8581,14 +7903,8 @@ mV12 = MVZ2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8640,14 +7956,8 @@ mV12 = MVZR2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8683,13 +7993,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -8701,31 +8005,13 @@ coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8773,14 +8059,8 @@ mS12 = MAh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8831,14 +8111,8 @@ mV12 = MVZ2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8883,14 +8157,8 @@ mV12 = MVZR2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8936,14 +8204,8 @@ mS12 = MAh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -8994,14 +8256,8 @@ mV12 = MVZ2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -9046,14 +8302,8 @@ mV12 = MVZR2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -9100,14 +8350,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -9160,14 +8404,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -9260,10 +8498,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -9274,14 +8509,8 @@ coup3R = cplcFdFdAhR(i3,i2,iProp)
 coup4L = cplcFeFeAhL(gt4,gt3,iProp)
 coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -9489,10 +8718,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -9504,14 +8730,8 @@ coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -9548,10 +8768,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -9565,14 +8782,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -9606,10 +8817,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -9623,14 +8831,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -9668,10 +8870,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -9685,14 +8884,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -9730,10 +8923,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -9745,14 +8935,8 @@ coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -9792,10 +8976,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -9807,14 +8988,8 @@ coup4R = cplcFeFeAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -10727,10 +9902,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -10741,14 +9913,8 @@ coup3R = cplcFeFeAhR(i3,i2,iProp)
 coup4L = cplcFdFdAhL(gt2,gt1,iProp)
 coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 mF2 = MFe(i3)
@@ -10956,10 +10122,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -10971,14 +10134,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -11015,10 +10172,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeAhL(i1,gt3,i2)
 coup1R = cplcFeFeAhR(i1,gt3,i2)
@@ -11032,14 +10186,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -11073,10 +10221,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZL(i1,gt3)
 coup1R = cplcFeFeVZR(i1,gt3)
@@ -11090,14 +10235,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -11135,10 +10274,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZRL(i1,gt3)
 coup1R = cplcFeFeVZRR(i1,gt3)
@@ -11152,14 +10288,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -11197,10 +10327,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -11212,14 +10339,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -11259,10 +10380,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -11274,14 +10392,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -11440,32 +10552,29 @@ Iname=Iname-1
 End Subroutine CalculatePengS2d2L 
 
 Subroutine CalculatePengV2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,PVOddllSLL,PVOddllSRR,PVOddllSRL,PVOddllSLR,PVOddllVRR,PVOddllVLL,       & 
-& PVOddllVRL,PVOddllVLR,PVOddllTLL,PVOddllTLR,PVOddllTRL,PVOddllTRR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,PVOddllSLL,PVOddllSRR,PVOddllSRL,PVOddllSLR,PVOddllVRR,     & 
+& PVOddllVLL,PVOddllVRL,PVOddllVLR,PVOddllTLL,PVOddllTLR,PVOddllTRL,PVOddllTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -11476,8 +10585,7 @@ Subroutine CalculatePengV2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -11505,9 +10613,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -11635,10 +10741,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -11649,14 +10752,8 @@ coup3R = cplcFdFdVZR(gt2,i3)
 coup4L = cplcFeFeVZL(gt4,gt3)
 coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -12077,10 +11174,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdVZL(i3,gt1)
 coup3R = cplcFdFdVZR(i3,gt1)
@@ -12093,14 +11187,8 @@ coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -12704,10 +11792,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -12718,14 +11803,8 @@ coup3R = cplcFeFeVZR(gt4,i3)
 coup4L = cplcFdFdVZL(gt2,gt1)
 coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 ! Mass of internal fermion 
@@ -13146,10 +12225,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFeFeVZL(i3,gt3)
 coup3R = cplcFeFeVZR(i3,gt3)
@@ -13162,14 +12238,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFe(i3)-MFe(gt4)
 MFin2 = MFe2(i3)-MFe2(gt4)
@@ -13404,10 +12474,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -13418,14 +12485,8 @@ coup3R = cplcFdFdVZRR(gt2,i3)
 coup4L = cplcFeFeVZRL(gt4,gt3)
 coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -13846,10 +12907,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdVZRL(i3,gt1)
 coup3R = cplcFdFdVZRR(i3,gt1)
@@ -13862,14 +12920,8 @@ coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -14473,10 +13525,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -14487,14 +13536,8 @@ coup3R = cplcFeFeVZRR(gt4,i3)
 coup4L = cplcFdFdVZRL(gt2,gt1)
 coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 ! Mass of internal fermion 
@@ -14915,10 +13958,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFeFeVZRL(i3,gt3)
 coup3R = cplcFeFeVZRR(i3,gt3)
@@ -14931,14 +13971,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFe(i3)-MFe(gt4)
 MFin2 = MFe2(i3)-MFe2(gt4)
@@ -15168,10 +14202,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -15182,14 +14213,8 @@ coup3R = cplcFdFdVZR(i3,i2)
 coup4L = cplcFeFeVZL(gt4,gt3)
 coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -15393,10 +14418,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -15408,14 +14430,8 @@ coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -15450,10 +14466,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -15467,14 +14480,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -15506,10 +14513,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -15523,14 +14527,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -15561,10 +14559,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -15578,14 +14573,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -15616,10 +14605,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -15631,14 +14617,8 @@ coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -15671,10 +14651,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -15686,14 +14663,8 @@ coup4R = cplcFeFeVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -16752,10 +15723,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -16766,14 +15734,8 @@ coup3R = cplcFeFeVZR(i3,i2)
 coup4L = cplcFdFdVZL(gt2,gt1)
 coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 mF2 = MFe(i3)
@@ -16977,10 +15939,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -16992,14 +15951,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -17034,10 +15987,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeAhL(i1,gt3,i2)
 coup1R = cplcFeFeAhR(i1,gt3,i2)
@@ -17051,14 +16001,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -17090,10 +16034,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZL(i1,gt3)
 coup1R = cplcFeFeVZR(i1,gt3)
@@ -17107,14 +16048,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -17145,10 +16080,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZRL(i1,gt3)
 coup1R = cplcFeFeVZRR(i1,gt3)
@@ -17162,14 +16094,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -17200,10 +16126,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -17215,14 +16138,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -17255,10 +16172,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -17270,14 +16184,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -17473,10 +16381,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -17487,14 +16392,8 @@ coup3R = cplcFdFdVZRR(i3,i2)
 coup4L = cplcFeFeVZRL(gt4,gt3)
 coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -17698,10 +16597,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -17713,14 +16609,8 @@ coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -17755,10 +16645,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -17772,14 +16659,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -17811,10 +16692,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -17828,14 +16706,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -17866,10 +16738,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -17883,14 +16752,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -17921,10 +16784,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -17936,14 +16796,8 @@ coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -17976,10 +16830,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -17991,14 +16842,8 @@ coup4R = cplcFeFeVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -19057,10 +17902,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFe2(i2).gt.mf_l2(3)).Or.(MFe2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i2,gt3,i1)
 coup1R = cplcFeFehhR(i2,gt3,i1)
@@ -19071,14 +17913,8 @@ coup3R = cplcFeFeVZRR(i3,i2)
 coup4L = cplcFdFdVZRL(gt2,gt1)
 coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFe(i2)
 mF12 = MFe2(i2)
 mF2 = MFe(i3)
@@ -19282,10 +18118,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -19297,14 +18130,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -19339,10 +18166,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeAhL(i1,gt3,i2)
 coup1R = cplcFeFeAhR(i1,gt3,i2)
@@ -19356,14 +18180,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -19395,10 +18213,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZL(i1,gt3)
 coup1R = cplcFeFeVZR(i1,gt3)
@@ -19412,14 +18227,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -19450,10 +18259,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFeVZRL(i1,gt3)
 coup1R = cplcFeFeVZRR(i1,gt3)
@@ -19467,14 +18273,8 @@ mF1 = MFe(i1)
 mF12 = MFe2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -19505,10 +18305,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -19520,14 +18317,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -19560,10 +18351,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFe2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFeFehhL(i1,gt3,i2)
 coup1R = cplcFeFehhR(i1,gt3,i2)
@@ -19575,14 +18363,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFe(i1)
 mF12 = MFe2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -19733,32 +18515,29 @@ Iname=Iname-1
 End Subroutine CalculatePengV2d2L 
 
 Subroutine CalculateTreeS2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,TSOddllSLL,TSOddllSRR,TSOddllSRL,TSOddllSLR,TSOddllVRR,TSOddllVLL,       & 
-& TSOddllVRL,TSOddllVLR,TSOddllTLL,TSOddllTLR,TSOddllTRL,TSOddllTRR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,TSOddllSLL,TSOddllSRR,TSOddllSRL,TSOddllSLR,TSOddllVRR,     & 
+& TSOddllVLL,TSOddllVRL,TSOddllVLR,TSOddllTLL,TSOddllTLR,TSOddllTRL,TSOddllTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -19769,8 +18548,7 @@ Subroutine CalculateTreeS2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -19798,9 +18576,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -19869,14 +18645,8 @@ coup1R = cplcFdFdhhR(gt2,gt1,iProp)
 coup2L = cplcFeFehhL(gt4,gt3,iProp)
 coup2R = cplcFeFehhR(gt4,gt3,iProp)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -19933,32 +18703,29 @@ End Do
 End Subroutine CalculateTreeS2d2L 
 
 Subroutine CalculateTreeV2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,TVOddllSLL,TVOddllSRR,TVOddllSRL,TVOddllSLR,TVOddllVRR,TVOddllVLL,       & 
-& TVOddllVRL,TVOddllVLR,TVOddllTLL,TVOddllTLR,TVOddllTRL,TVOddllTRR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,TVOddllSLL,TVOddllSRR,TVOddllSRL,TVOddllSLR,TVOddllVRR,     & 
+& TVOddllVLL,TVOddllVRL,TVOddllVLR,TVOddllTLL,TVOddllTLR,TVOddllTRL,TVOddllTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -19969,8 +18736,7 @@ Subroutine CalculateTreeV2d2L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -19998,9 +18764,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -20123,11 +18887,8 @@ IMP2 = 1._dp/MP2
 End Subroutine CalculateTreeV2d2L 
 
 Subroutine CalculateBox2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,            & 
-& MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
-& MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)              & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
+& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
+& MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm, & 
 & cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
 & cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
 & cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
@@ -20158,8 +18919,7 @@ Subroutine CalculateBox2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,      
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -20187,9 +18947,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -20276,10 +19034,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -20295,14 +19050,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4L*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4R*int1
@@ -20395,10 +19144,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -20410,14 +19156,8 @@ coup4L = cplFvFvAhL(gt4,i3,i2)
 coup4R = cplFvFvAhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mS2 = MAh(i2)
@@ -20442,13 +19182,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -20460,24 +19194,12 @@ coup4L = cplFvFvhhL(gt4,i3,i2)
 coup4R = cplFvFvhhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4L*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4R*int1
@@ -20497,10 +19219,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -20512,14 +19231,8 @@ coup4L = cplFvFvVZL(gt4,i3)
 coup4R = cplFvFvVZR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mV2 = MVZ
@@ -20542,10 +19255,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -20557,14 +19267,8 @@ coup4L = cplFvFvVZRL(gt4,i3)
 coup4R = cplFvFvVZRR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mV2 = MVZR
@@ -20733,10 +19437,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,9
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -20752,14 +19453,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4L*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4R*int1
@@ -20882,10 +19577,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,9
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -20901,14 +19593,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4L*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4R*int1
@@ -21242,10 +19928,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -21261,14 +19944,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   BOddvvVRR=BOddvvVRR - 1.*chargefactor*coup1R*coup2L*coup3L*coup4R*int1
   BOddvvVLL=BOddvvVLL - 1.*chargefactor*coup1L*coup2R*coup3R*coup4L*int1
@@ -21361,10 +20038,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -21376,14 +20050,8 @@ coup4L = cplFvFvAhL(gt3,i3,i2)
 coup4R = cplFvFvAhR(gt3,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mS2 = MAh(i2)
@@ -21408,13 +20076,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -21426,24 +20088,12 @@ coup4L = cplFvFvhhL(gt3,i3,i2)
 coup4R = cplFvFvhhR(gt3,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   BOddvvVRR=BOddvvVRR - 1.*chargefactor*coup1R*coup2L*coup3L*coup4R*int1
   BOddvvVLL=BOddvvVLL - 1.*chargefactor*coup1L*coup2R*coup3R*coup4L*int1
@@ -21463,10 +20113,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -21478,14 +20125,8 @@ coup4L = cplFvFvVZL(gt3,i3)
 coup4R = cplFvFvVZR(gt3,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mV2 = MVZ
@@ -21508,10 +20149,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,9
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -21523,14 +20161,8 @@ coup4L = cplFvFvVZRL(gt3,i3)
 coup4R = cplFvFvVZRR(gt3,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 mV2 = MVZR
@@ -21699,10 +20331,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,9
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -21718,14 +20347,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4R*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4L*int1
@@ -21854,10 +20477,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,9
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -21873,14 +20493,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BOddvvVRR=BOddvvVRR+chargefactor*coup1R*coup2L*coup3R*coup4R*int1
   BOddvvVLL=BOddvvVLL+chargefactor*coup1L*coup2R*coup3L*coup4L*int1
@@ -22196,31 +20810,28 @@ Iname=Iname-1
 End Subroutine CalculateBox2d2nu 
 
 Subroutine CalculatePengS2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,PSOddvvVRR,PSOddvvVLL,PSOddvvVRL,PSOddvvVLR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,PSOddvvVRR,PSOddvvVLL,PSOddvvVRL,PSOddvvVLR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -22231,8 +20842,7 @@ Subroutine CalculatePengS2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,        
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -22260,9 +20870,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -22334,14 +20942,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22365,10 +20967,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -22379,14 +20978,8 @@ coup3R = cplcFdFdhhR(gt2,i3,iProp)
 coup4L = cplFvFvhhL(gt4,gt3,iProp)
 coup4R = cplFvFvhhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -22396,14 +20989,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22449,14 +21036,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22501,14 +21082,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22552,14 +21127,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22603,14 +21172,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22654,14 +21217,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22706,14 +21263,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22737,10 +21288,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdhhL(i3,gt1,iProp)
 coup3R = cplcFdFdhhR(i3,gt1,iProp)
@@ -22753,14 +21301,8 @@ coup4R = cplFvFvhhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -22768,14 +21310,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22821,14 +21357,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22873,14 +21403,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22924,14 +21448,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -22975,14 +21493,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23026,14 +21538,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFd(i3)
 MFin2 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23078,14 +21584,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23130,14 +21630,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23181,14 +21675,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23233,14 +21721,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23264,10 +21746,7 @@ Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
     Do i3=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -23280,14 +21759,8 @@ coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFv(i3)-MFv(gt3)
 MFin2 = MFv2(i3)-MFv2(gt3)
@@ -23295,14 +21768,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23347,14 +21814,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23398,14 +21859,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23449,14 +21904,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23500,14 +21949,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23552,14 +21995,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23605,14 +22042,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23657,14 +22088,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23708,14 +22133,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23760,14 +22179,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23791,10 +22204,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplFvFvhhL(gt3,i3,iProp)
 coup3R = cplFvFvhhR(gt3,i3,iProp)
@@ -23805,14 +22215,8 @@ coup1R = cplFvFvhhR(gt4,i2,i1)
 coup4L = cplcFdFdhhL(gt2,gt1,iProp)
 coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 ! Mass of internal fermion 
@@ -23822,14 +22226,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23874,14 +22272,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23925,14 +22317,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -23976,14 +22362,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -24027,14 +22407,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -24079,14 +22453,8 @@ If (Abs(MFin).gt.10E-10_dp) Then
 MFin = MFv(i3)
 MFin2 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -24158,10 +22526,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -24172,14 +22537,8 @@ coup3R = cplcFdFdAhR(gt2,i3,iProp)
 coup4L = cplFvFvAhL(gt4,gt3,iProp)
 coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -24488,10 +22847,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdAhL(i3,gt1,iProp)
 coup3R = cplcFdFdAhR(i3,gt1,iProp)
@@ -24504,14 +22860,8 @@ coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -24955,10 +23305,7 @@ Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
     Do i3=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -24971,14 +23318,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFv(i3)-MFv(gt3)
 MFin2 = MFv2(i3)-MFv2(gt3)
@@ -25422,10 +23763,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplFvFvAhL(gt3,i3,iProp)
 coup3R = cplFvFvAhR(gt3,i3,iProp)
@@ -25436,14 +23774,8 @@ coup1R = cplFvFvhhR(gt4,i2,i1)
 coup4L = cplcFdFdAhL(gt2,gt1,iProp)
 coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 ! Mass of internal fermion 
@@ -25727,14 +24059,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -25757,10 +24083,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -25771,27 +24094,15 @@ coup3R = cplcFdFdhhR(i3,i2,iProp)
 coup4L = cplFvFvhhL(gt4,gt3,iProp)
 coup4R = cplFvFvhhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -25832,14 +24143,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -25879,14 +24184,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -25925,14 +24224,8 @@ mF12 = MFd2(i2)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -25971,14 +24264,8 @@ mS12 = MAh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26017,14 +24304,8 @@ mV12 = MVZ2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26062,14 +24343,8 @@ mV12 = MVZR2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26091,13 +24366,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -26109,31 +24378,13 @@ coup4R = cplFvFvhhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26172,14 +24423,8 @@ mS12 = MAh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26216,14 +24461,8 @@ mV12 = MVZ2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26259,14 +24498,8 @@ mV12 = MVZR2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26303,14 +24536,8 @@ mS12 = MAh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26347,14 +24574,8 @@ mV12 = MVZ2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26390,14 +24611,8 @@ mV12 = MVZR2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26433,14 +24648,8 @@ mV12 = MVWLm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26476,14 +24685,8 @@ mV12 = MVWRm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26520,14 +24723,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26564,14 +24761,8 @@ mV12 = MVWLm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26607,14 +24798,8 @@ mV12 = MVWRm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26651,14 +24836,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26696,14 +24875,8 @@ mV12 = MVWLm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26741,14 +24914,8 @@ mV12 = MVWRm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26787,14 +24954,8 @@ mS12 = MHpm2(i2)
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26834,14 +24995,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26880,14 +25035,8 @@ mF12 = MFu2(i2)
 mF2 = MFu(i3)
 mF22 = MFu2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26927,14 +25076,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -26972,14 +25115,8 @@ mV12 = MVWLm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27015,14 +25152,8 @@ mV12 = MVWRm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27059,14 +25190,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27103,14 +25228,8 @@ mV12 = MVWLm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27146,14 +25265,8 @@ mV12 = MVWRm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27190,14 +25303,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27235,14 +25342,8 @@ mV12 = MVWLm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27280,14 +25381,8 @@ mV12 = MVWRm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27326,14 +25421,8 @@ mS12 = MHpm2(i2)
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27373,14 +25462,8 @@ mS12 = MAh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27419,14 +25502,8 @@ mV12 = MVZ2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27464,14 +25541,8 @@ mV12 = MVZR2
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27493,13 +25564,7 @@ Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -27511,31 +25576,13 @@ coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27574,14 +25621,8 @@ mS12 = MAh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27618,14 +25659,8 @@ mV12 = MVZ2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27661,14 +25696,8 @@ mV12 = MVZR2
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27705,14 +25734,8 @@ mS12 = MAh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27749,14 +25772,8 @@ mV12 = MVZ2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27792,14 +25809,8 @@ mV12 = MVZR2
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27820,10 +25831,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i2,i1)
 coup1R = cplFvFvhhR(gt3,i2,i1)
@@ -27834,27 +25842,15 @@ coup3R = cplFvFvhhR(i3,i2,iProp)
 coup4L = cplcFdFdhhL(gt2,gt1,iProp)
 coup4R = cplcFdFdhhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27895,14 +25891,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27942,14 +25932,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -27988,14 +25972,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28034,14 +26012,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28080,14 +26052,8 @@ mF12 = MFv2(i2)
 mF2 = MFv(i3)
 mF22 = MFv2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28126,14 +26092,8 @@ mS12 = MHpm2(i2)
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28172,14 +26132,8 @@ mV12 = MVWLm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28217,14 +26171,8 @@ mV12 = MVWRm2
 mS2 = MHpm(i3)
 mS22 = MHpm2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28262,14 +26210,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28306,14 +26248,8 @@ mV12 = MVWLm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28349,14 +26285,8 @@ mV12 = MVWRm2
 mV2 = MVWLm
 mV22 = MVWLm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28393,14 +26323,8 @@ mS12 = MHpm2(i2)
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28437,14 +26361,8 @@ mV12 = MVWLm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28480,14 +26398,8 @@ mV12 = MVWRm2
 mV2 = MVWRm
 mV22 = MVWRm2
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28526,14 +26438,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28573,14 +26479,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28619,14 +26519,8 @@ mF12 = MFe2(i2)
 mF2 = MFe(i3)
 mF22 = MFe2(i3)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -28691,10 +26585,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -28705,14 +26596,8 @@ coup3R = cplcFdFdAhR(i3,i2,iProp)
 coup4L = cplFvFvAhL(gt4,gt3,iProp)
 coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -28864,10 +26749,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -28879,14 +26761,8 @@ coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -28914,10 +26790,7 @@ Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -28931,14 +26804,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -28963,10 +26830,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -28980,14 +26844,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -29011,10 +26869,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -29028,14 +26883,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -29059,10 +26908,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -29074,14 +26920,8 @@ coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -29107,10 +26947,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -29122,14 +26959,8 @@ coup4R = cplFvFvAhR(gt4,gt3,iProp)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -29820,10 +27651,7 @@ Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -29835,14 +27663,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -29870,10 +27692,7 @@ Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvAhL(gt3,i1,i2)
 coup1R = cplFvFvAhR(gt3,i1,i2)
@@ -29887,14 +27706,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -29919,10 +27732,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZL(gt3,i1)
 coup1R = cplFvFvVZR(gt3,i1)
@@ -29936,14 +27746,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -29967,10 +27771,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZRL(gt3,i1)
 coup1R = cplFvFvVZRR(gt3,i1)
@@ -29984,14 +27785,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MAh(iProp)
 MP2 = MAh2(iProp)
@@ -30015,10 +27810,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -30030,14 +27822,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -30063,10 +27849,7 @@ chargefactor = 1
 Do iProp=1,4
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -30078,14 +27861,8 @@ coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -30112,10 +27889,7 @@ Do iProp=1,4
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i2,i1)
 coup1R = cplFvFvhhR(gt3,i2,i1)
@@ -30126,14 +27900,8 @@ coup3R = cplFvFvAhR(i3,i2,iProp)
 coup4L = cplcFdFdAhL(gt2,gt1,iProp)
 coup4R = cplcFdFdAhR(gt2,gt1,iProp)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 mF2 = MFv(i3)
@@ -30760,31 +28528,28 @@ Iname=Iname-1
 End Subroutine CalculatePengS2d2nu 
 
 Subroutine CalculatePengV2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,PVOddvvVRR,PVOddvvVLL,PVOddvvVRL,PVOddvvVLR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,PVOddvvVRR,PVOddvvVLL,PVOddvvVRL,PVOddvvVLR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -30795,8 +28560,7 @@ Subroutine CalculatePengV2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,        
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -30824,9 +28588,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -30930,10 +28692,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -30944,14 +28703,8 @@ coup3R = cplcFdFdVZR(gt2,i3)
 coup4L = cplFvFvVZL(gt4,gt3)
 coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -31316,10 +29069,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdVZL(i3,gt1)
 coup3R = cplcFdFdVZR(i3,gt1)
@@ -31332,14 +29082,8 @@ coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -31863,10 +29607,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -31879,14 +29620,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFv(i3)-MFv(gt3)
 MFin2 = MFv2(i3)-MFv2(gt3)
@@ -32410,10 +30145,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplFvFvVZL(gt3,i3)
 coup3R = cplFvFvVZR(gt3,i3)
@@ -32424,14 +30156,8 @@ coup1R = cplFvFvhhR(gt4,i2,i1)
 coup4L = cplcFdFdVZL(gt2,gt1)
 coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 ! Mass of internal fermion 
@@ -32797,10 +30523,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -32811,14 +30534,8 @@ coup3R = cplcFdFdVZRR(gt2,i3)
 coup4L = cplFvFvVZRL(gt4,gt3)
 coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -33183,10 +30900,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdVZRL(i3,gt1)
 coup3R = cplcFdFdVZRR(i3,gt1)
@@ -33199,14 +30913,8 @@ coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -33730,10 +31438,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -33746,14 +31451,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFv(i3)-MFv(gt3)
 MFin2 = MFv2(i3)-MFv2(gt3)
@@ -34277,10 +31976,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplFvFvVZRL(gt3,i3)
 coup3R = cplFvFvVZRR(gt3,i3)
@@ -34291,14 +31987,8 @@ coup1R = cplFvFvhhR(gt4,i2,i1)
 coup4L = cplcFdFdVZRL(gt2,gt1)
 coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 ! Mass of internal fermion 
@@ -34659,10 +32349,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -34673,14 +32360,8 @@ coup3R = cplcFdFdVZR(i3,i2)
 coup4L = cplFvFvVZL(gt4,gt3)
 coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -34852,10 +32533,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -34867,14 +32545,8 @@ coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -34901,10 +32573,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -34918,14 +32587,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -34949,10 +32612,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -34966,14 +32626,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -34996,10 +32650,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -35013,14 +32664,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -35043,10 +32688,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -35058,14 +32700,8 @@ coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -35090,10 +32726,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -35105,14 +32738,8 @@ coup4R = cplFvFvVZR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -35995,10 +33622,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -36010,14 +33634,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -36044,10 +33662,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvAhL(gt3,i1,i2)
 coup1R = cplFvFvAhR(gt3,i1,i2)
@@ -36061,14 +33676,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -36092,10 +33701,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZL(gt3,i1)
 coup1R = cplFvFvVZR(gt3,i1)
@@ -36109,14 +33715,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -36139,10 +33739,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZRL(gt3,i1)
 coup1R = cplFvFvVZRR(gt3,i1)
@@ -36156,14 +33753,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZ
 MP2 = MVZ2
@@ -36186,10 +33777,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -36201,14 +33789,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -36233,10 +33815,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -36248,14 +33827,8 @@ coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -36281,10 +33854,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i2,i1)
 coup1R = cplFvFvhhR(gt3,i2,i1)
@@ -36295,14 +33865,8 @@ coup3R = cplFvFvVZR(i3,i2)
 coup4L = cplcFdFdVZL(gt2,gt1)
 coup4R = cplcFdFdVZR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 mF2 = MFv(i3)
@@ -37109,10 +34673,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -37123,14 +34684,8 @@ coup3R = cplcFdFdVZRR(i3,i2)
 coup4L = cplFvFvVZRL(gt4,gt3)
 coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -37302,10 +34857,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -37317,14 +34869,8 @@ coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -37351,10 +34897,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -37368,14 +34911,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -37399,10 +34936,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -37416,14 +34950,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -37446,10 +34974,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -37463,14 +34988,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -37493,10 +35012,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -37508,14 +35024,8 @@ coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -37540,10 +35050,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -37555,14 +35062,8 @@ coup4R = cplFvFvVZRR(gt4,gt3)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -38445,10 +35946,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -38460,14 +35958,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Propagator and inverse propagator mass 
@@ -38494,10 +35986,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvAhL(gt3,i1,i2)
 coup1R = cplFvFvAhR(gt3,i1,i2)
@@ -38511,14 +36000,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -38542,10 +36025,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZL(gt3,i1)
 coup1R = cplFvFvVZR(gt3,i1)
@@ -38559,14 +36039,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -38589,10 +36063,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
     Do i3=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvVZRL(gt3,i1)
 coup1R = cplFvFvVZRR(gt3,i1)
@@ -38606,14 +36077,8 @@ mF1 = MFv(i1)
 mF12 = MFv2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Propagator and inverse propagator mass 
 MP = MVZR
 MP2 = MVZR2
@@ -38636,10 +36101,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -38651,14 +36113,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Propagator and inverse propagator mass 
@@ -38683,10 +36139,7 @@ End if
 chargefactor = 1 
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFv2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i1,i2)
 coup1R = cplFvFvhhR(gt3,i1,i2)
@@ -38698,14 +36151,8 @@ coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
 mF1 = MFv(i1)
 mF12 = MFv2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Propagator and inverse propagator mass 
@@ -38731,10 +36178,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,9
     Do i3=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFv2(i2).gt.mf_l2(3)).Or.(MFv2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplFvFvhhL(gt3,i2,i1)
 coup1R = cplFvFvhhR(gt3,i2,i1)
@@ -38745,14 +36189,8 @@ coup3R = cplFvFvVZRR(i3,i2)
 coup4L = cplcFdFdVZRL(gt2,gt1)
 coup4R = cplcFdFdVZRR(gt2,gt1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFv(i2)
 mF12 = MFv2(i2)
 mF2 = MFv(i3)
@@ -39514,31 +36952,28 @@ Iname=Iname-1
 End Subroutine CalculatePengV2d2nu 
 
 Subroutine CalculateTreeS2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,TSOddvvVRR,TSOddvvVLL,TSOddvvVRL,TSOddvvVLR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,TSOddvvVRR,TSOddvvVLL,TSOddvvVRL,TSOddvvVLR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -39549,8 +36984,7 @@ Subroutine CalculateTreeS2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,        
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -39578,9 +37012,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -39633,14 +37065,8 @@ coup1R = cplcFdFdhhR(gt2,gt1,iProp)
 coup2L = cplFvFvhhL(gt3,gt4,iProp)
 coup2R = cplFvFvhhR(gt3,gt4,iProp)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -39681,31 +37107,28 @@ End Do
 End Subroutine CalculateTreeS2d2nu 
 
 Subroutine CalculateTreeV2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,              & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,  & 
-& cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,     & 
-& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,               & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,TVOddvvVRR,TVOddvvVLL,TVOddvvVRL,TVOddvvVLR)
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,            & 
+& cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,               & 
+& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,              & 
+& cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,               & 
+& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
+& cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
+& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
+& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
+& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
+& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
+& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
+& cplHpmVWRmVZ,cplHpmVWRmVZR,TVOddvvVRR,TVOddvvVLL,TVOddvvVRL,TVOddvvVLR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -39716,8 +37139,7 @@ Subroutine CalculateTreeV2d2nu(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,        
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -39745,9 +37167,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
 & cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
 & cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)           & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -39838,27 +37258,24 @@ IMP2 = 1._dp/MP2
 End Subroutine CalculateTreeV2d2nu 
 
 Subroutine CalculateBox4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,               & 
-& MFu2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,     & 
-& cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,             & 
-& cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,             & 
-& cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,     & 
-& cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,              & 
-& cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,          & 
-& cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
-& cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,   & 
-& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,            & 
-& cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,             & 
-& cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,   & 
-& cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,       & 
-& BO4dSLL,BO4dSRR,BO4dSRL,BO4dSLR,BO4dVRR,BO4dVLL,BO4dVRL,BO4dVLR,BO4dTLL,               & 
-& BO4dTLR,BO4dTRL,BO4dTRR)
+& MFu2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,      & 
+& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,       & 
+& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,             & 
+& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,               & 
+& cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,         & 
+& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,               & 
+& cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,       & 
+& cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
+& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,           & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,BO4dSLL,BO4dSRR,BO4dSRL,BO4dSLR,BO4dVRR,BO4dVLL,BO4dVRL,BO4dVLR,         & 
+& BO4dTLL,BO4dTLR,BO4dTRL,BO4dTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -39868,9 +37285,8 @@ Subroutine CalculateBox4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,         
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -39891,10 +37307,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
 & cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
 & cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3)           & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)          & 
-& *vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)            & 
-& *k1*vR),-2*RHO1*vR**2
+& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -40006,10 +37419,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -40025,14 +37435,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BO4dSLL=BO4dSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -40152,10 +37556,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -40167,14 +37568,8 @@ coup4L = cplcFdFdAhL(gt4,i3,i2)
 coup4R = cplcFdFdAhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mS2 = MAh(i2)
@@ -40208,13 +37603,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -40226,24 +37615,12 @@ coup4L = cplcFdFdhhL(gt4,i3,i2)
 coup4R = cplcFdFdhhR(gt4,i3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BO4dSLL=BO4dSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -40272,10 +37649,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -40287,14 +37661,8 @@ coup4L = cplcFdFdVZL(gt4,i3)
 coup4R = cplcFdFdVZR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mV2 = MVZ
@@ -40326,10 +37694,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -40341,14 +37706,8 @@ coup4L = cplcFdFdVZRL(gt4,i3)
 coup4R = cplcFdFdVZRR(gt4,i3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mV2 = MVZR
@@ -40425,10 +37784,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -40444,14 +37800,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mV12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BO4dSLL=BO4dSLL - 4.*chargefactor*coup1L*coup2L*coup3L*coup4L*int1
@@ -40610,10 +37960,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -40629,14 +37976,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mV12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
   BO4dSLL=BO4dSLL - 4.*chargefactor*coup1L*coup2L*coup3L*coup4L*int1
@@ -40798,10 +38139,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MAh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i4)
 coup1R = cplcFdFdAhR(i1,gt1,i4)
@@ -40817,14 +38155,8 @@ mS1 = MAh(i4)
 mS12 = MAh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BO4dSLL=BO4dSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -40946,10 +38278,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -40961,14 +38290,8 @@ coup4L = cplcFdFdAhL(i3,gt3,i2)
 coup4R = cplcFdFdAhR(i3,gt3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mS2 = MAh(i2)
@@ -41002,13 +38325,7 @@ Do i1=1,3
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -41020,24 +38337,12 @@ coup4L = cplcFdFdhhL(i3,gt3,i2)
 coup4R = cplcFdFdhhR(i3,gt3,i2)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=D00check(mF12, mF22, mS22, mS12)
   int2=MMD0(mF1, mF2, mF12, mF22, mS22, mS12)
   BO4dSLL=BO4dSLL - 1.*chargefactor*coup1L*coup2L*coup3L*coup4L*int2
@@ -41066,10 +38371,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -41081,14 +38383,8 @@ coup4L = cplcFdFdVZL(i3,gt3)
 coup4R = cplcFdFdVZR(i3,gt3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mV2 = MVZ
@@ -41121,10 +38417,7 @@ chargefactor = 1
 Do i1=1,3
     Do i3=1,3
       Do i4=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(Mhh2(i4).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i4)
 coup1R = cplcFdFdhhR(i1,gt1,i4)
@@ -41136,14 +38429,8 @@ coup4L = cplcFdFdVZRL(i3,gt3)
 coup4R = cplcFdFdVZRR(i3,gt3)
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i4)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4)
+mS1 = Mhh(i4)
+mS12 = Mhh2(i4)
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
 mV2 = MVZR
@@ -41361,10 +38648,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -41380,14 +38664,8 @@ mV1 = MVZ
 mV12 = MVZ2
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=C0D0check(mF22, mS22, mV12, mF12)
   int2=D00check(mF12, mF22, mS22, mV12)
   int3=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
@@ -41554,10 +38832,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -41573,14 +38848,8 @@ mV1 = MVZR
 mV12 = MVZR2
 mF2 = MFd(i3)
 mF22 = MFd2(i3)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS2 = Mhh(i2)
+mS22 = Mhh2(i2)
   int1=C0D0check(mF22, mS22, mV12, mF12)
   int2=D00check(mF12, mF22, mS22, mV12)
   int3=MMD0(mF1, mF2, mF12, mF22, mS22, mV12)
@@ -42111,27 +39380,24 @@ Iname=Iname-1
 End Subroutine CalculateBox4d 
 
 Subroutine CalculateTreeS4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,             & 
-& MFu2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,     & 
-& cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,             & 
-& cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,             & 
-& cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,     & 
-& cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,              & 
-& cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,          & 
-& cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
-& cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,   & 
-& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,            & 
-& cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,             & 
-& cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,   & 
-& cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,       & 
-& TSO4dSLL,TSO4dSRR,TSO4dSRL,TSO4dSLR,TSO4dVRR,TSO4dVLL,TSO4dVRL,TSO4dVLR,               & 
-& TSO4dTLL,TSO4dTLR,TSO4dTRL,TSO4dTRR)
+& MFu2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,      & 
+& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,       & 
+& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,             & 
+& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,               & 
+& cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,         & 
+& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,               & 
+& cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,       & 
+& cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
+& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,           & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TSO4dSLL,TSO4dSRR,TSO4dSRL,TSO4dSLR,TSO4dVRR,TSO4dVLL,TSO4dVRL,          & 
+& TSO4dVLR,TSO4dTLL,TSO4dTLR,TSO4dTRL,TSO4dTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -42141,9 +39407,8 @@ Subroutine CalculateTreeS4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,       
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -42164,10 +39429,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
 & cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
 & cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3)           & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)          & 
-& *vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)            & 
-& *k1*vR),-2*RHO1*vR**2
+& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -42236,14 +39498,8 @@ coup1R = cplcFdFdhhR(gt2,gt1,iProp)
 coup2L = cplcFdFdhhL(gt4,gt3,iProp)
 coup2R = cplcFdFdhhR(gt4,gt3,iProp)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -42273,14 +39529,8 @@ coup1R = cplcFdFdhhR(gt4,gt1,iProp)
 coup2L = cplcFdFdhhL(gt2,gt3,iProp)
 coup2R = cplcFdFdhhR(gt2,gt3,iProp)
 ! Propagator and inverse propagator mass 
-MP =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(iProp)
-MP2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(iProp)
+MP = Mhh(iProp)
+MP2 = Mhh2(iProp)
 IMP = 1._dp/MP  
 IMP2 = 1._dp/MP2 
 ! Amplitude 
@@ -42368,27 +39618,24 @@ End Do
 End Subroutine CalculateTreeS4d 
 
 Subroutine CalculateTreeV4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,             & 
-& MFu2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,     & 
-& cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,             & 
-& cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,             & 
-& cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,     & 
-& cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,              & 
-& cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,          & 
-& cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
-& cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,   & 
-& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,            & 
-& cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,             & 
-& cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,   & 
-& cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,       & 
-& TVO4dSLL,TVO4dSRR,TVO4dSRL,TVO4dSLR,TVO4dVRR,TVO4dVLL,TVO4dVRL,TVO4dVLR,               & 
-& TVO4dTLL,TVO4dTLR,TVO4dTRL,TVO4dTRR)
+& MFu2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,      & 
+& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,       & 
+& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,             & 
+& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,               & 
+& cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,         & 
+& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,               & 
+& cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,       & 
+& cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
+& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,           & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TVO4dSLL,TVO4dSRR,TVO4dSRL,TVO4dSLR,TVO4dVRR,TVO4dVLL,TVO4dVRL,          & 
+& TVO4dVLR,TVO4dTLL,TVO4dTLR,TVO4dTRL,TVO4dTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -42398,9 +39645,8 @@ Subroutine CalculateTreeV4d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFu,       
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
@@ -42421,10 +39667,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
 & cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
 & cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),k1**2*(LAM2 - 4._dp*(LAM3)           & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)          & 
-& *vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)            & 
-& *k1*vR),-2*RHO1*vR**2
+& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -42604,17 +39847,14 @@ IMP2 = 1._dp/MP2
 
 End Subroutine CalculateTreeV4d 
 
-Subroutine CalculateA2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,MHpm,           & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhAhhh,cplAhcHpmcVWLm,cplAhcHpmcVWRm,     & 
-& cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,          & 
-& cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,              & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
-& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
-& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
-& OAh2qSL,OAh2qSR)
+Subroutine CalculateA2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,Mhh,            & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,               & 
+& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,      & 
+& cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,            & 
+& cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
+& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,  & 
+& cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,    & 
+& cplcFuFuAhR,OAh2qSL,OAh2qSR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -42624,9 +39864,8 @@ Subroutine CalculateA2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,MHpm,     
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
 & cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmVWLm(4,4),& 
@@ -42635,9 +39874,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),       & 
 & cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
 & cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),       & 
-& cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6)        & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,           & 
-& -2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4)
 
 Integer,Intent(in) :: gt1, gt2,gt3 
 Integer :: gt4 
@@ -42734,10 +39971,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -42746,14 +39980,8 @@ coup2R = cplcFdFdhhR(i3,i2,i1)
 coup3L = cplcFdFdAhL(gt2,i3,gt3)
 coup3R = cplcFdFdAhR(gt2,i3,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -43029,10 +40257,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdAhL(i3,gt1,gt3)
 coup3R = cplcFdFdAhR(i3,gt1,gt3)
@@ -43043,14 +40268,8 @@ coup1R = cplcFdFdhhR(gt2,i1,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -43326,10 +40545,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -43338,14 +40554,8 @@ coup2R = cplcFdFdhhR(gt2,i3,i1)
 coup3L = cplcFdFdAhL(i3,i2,gt3)
 coup3R = cplcFdFdAhR(i3,i2,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -43495,10 +40705,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -43508,14 +40715,8 @@ coup3 = cplAhAhhh(gt3,i3,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Amplitude 
@@ -43539,10 +40740,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(i1,gt1,i2)
 coup1R = cplcFdFdAhR(i1,gt1,i2)
@@ -43554,14 +40752,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=C0m(mF12, mS22, mS12)
   int2=C1m(mF12, mS22, mS12)
@@ -43582,10 +40774,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZL(i1,gt1)
 coup1R = cplcFdFdVZR(i1,gt1)
@@ -43597,14 +40786,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=B0(0._dp, mS22, mV12)
   int2=C0m(mF12, mS22, mV12)
@@ -43627,10 +40810,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdVZRL(i1,gt1)
 coup1R = cplcFdFdVZRR(i1,gt1)
@@ -43642,14 +40822,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=B0(0._dp, mS22, mV12)
   int2=C0m(mF12, mS22, mV12)
@@ -43672,10 +40846,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -43685,14 +40856,8 @@ coup3 = -cplAhhhVZ(gt3,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Amplitude 
@@ -43717,10 +40882,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -43730,14 +40892,8 @@ coup3 = -cplAhhhVZR(gt3,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Amplitude 
@@ -44083,11 +41239,8 @@ Iname=Iname-1
 End Subroutine CalculateA2q 
 
 Subroutine CalculateTreeSdulv(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,            & 
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,       & 
 & cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,            & 
 & cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
 & cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
@@ -44114,8 +41267,7 @@ Subroutine CalculateTreeSdulv(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),cplAhcVWRmVWLm(4),          & 
 & cplAhHpmcHpm(4,4,4),cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),cplcFdFdAhL(3,3,4),            & 
@@ -44137,10 +41289,7 @@ Complex(dp),Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm
 & cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),             & 
 & cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
 & cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplHpmcHpmVZ(4,4),             & 
-& cplHpmcHpmVZR(4,4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),  & 
-& k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)             & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmcHpmVZR(4,4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -44223,11 +41372,8 @@ End Do
 End Subroutine CalculateTreeSdulv 
 
 Subroutine CalculateTreeVdulv(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,               & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
-& MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)         & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,            & 
+& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,       & 
 & cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,            & 
 & cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,           & 
 & cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,     & 
@@ -44254,8 +41400,7 @@ Subroutine CalculateTreeVdulv(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
  
 Implicit None 
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),             & 
-& 0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),cplAhcVWRmVWLm(4),          & 
 & cplAhHpmcHpm(4,4,4),cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),cplcFdFdAhL(3,3,4),            & 
@@ -44277,10 +41422,7 @@ Complex(dp),Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm
 & cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),             & 
 & cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
 & cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplHpmcHpmVZ(4,4),             & 
-& cplHpmcHpmVZR(4,4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),  & 
-& k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)             & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmcHpmVZR(4,4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -44387,17 +41529,14 @@ IMP2 = 1._dp/MP2
 End Subroutine CalculateTreeVdulv 
 
 Subroutine CalculateGamma2Q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,            & 
-& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhhhVP,cplcFdFdAhL,cplcFdFdAhR,           & 
-& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,     & 
-& cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,              & 
-& cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuVPL,cplcFuFuVPR,cplcHpmcVWLmVP,       & 
-& cplcHpmcVWRmVP,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,            & 
-& cplhhVPVZ,cplhhVPVZR,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,OA2qSL,OA2qSR,             & 
-& OA2qVL,OA2qVR)
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhhhVP,           & 
+& cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVPL,cplcFdFdVPR,               & 
+& cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,         & 
+& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuVPL,cplcFuFuVPR,       & 
+& cplcHpmcVWLmVP,cplcHpmcVWRmVP,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWRmVPVWLm,            & 
+& cplcVWRmVPVWRm,cplhhVPVZ,cplhhVPVZR,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,            & 
+& OA2qSL,OA2qSR,OA2qVL,OA2qVR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -44407,9 +41546,8 @@ Subroutine CalculateGamma2Q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,      
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhhhVP(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3,4),              & 
 & cplcFdFdhhR(3,3,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),& 
@@ -44419,9 +41557,7 @@ Complex(dp),Intent(in) :: cplAhhhVP(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),c
 & cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),             & 
 & cplcHpmcVWLmVP(4),cplcHpmcVWRmVP(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWRmVPVWLm,      & 
 & cplcVWRmVPVWRm,cplhhVPVZ(4),cplhhVPVZR(4),cplHpmcHpmVP(4,4),cplHpmVPVWLm(4),           & 
-& cplHpmVPVWRm(4),k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)            & 
-&  + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),      & 
-& -((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplHpmVPVWRm(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3 
 Integer :: gt4 
@@ -44526,10 +41662,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i1,i2)
 coup1R = cplcFdFdhhR(gt1,i1,i2)
@@ -44540,14 +41673,8 @@ coup3R = -cplcFdFdVPL(i3,gt2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt1)
 MFin2 = MFd2(i3)-MFd2(gt1)
@@ -44835,10 +41962,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = -cplcFdFdVPR(gt1,i3)
 coup3R = -cplcFdFdVPL(gt1,i3)
@@ -44847,14 +41971,8 @@ coup2R = cplcFdFdhhR(i3,i2,i1)
 coup1L = cplcFdFdhhL(i2,gt2,i1)
 coup1R = cplcFdFdhhR(i2,gt2,i1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -45152,10 +42270,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MAh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i1,i2)
 coup1R = cplcFdFdhhR(gt1,i1,i2)
@@ -45165,14 +42280,8 @@ coup3 = cplAhhhVP(i3,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mS2 = MAh(i3)
 mS22 = MAh2(i3)
 ! Amplitude 
@@ -45199,10 +42308,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MAh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdAhL(gt1,i1,i2)
 coup1R = cplcFdFdAhR(gt1,i1,i2)
@@ -45214,14 +42320,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mS1 = MAh(i2)
 mS12 = MAh2(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=C00g(mF12, mS22, mS12)
   int2=C0C1C2(mF12, mS22, mS12)
@@ -45245,10 +42345,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = -cplcFdFdVZR(gt1,i1)
 coup1R = -cplcFdFdVZL(gt1,i1)
@@ -45260,14 +42357,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZ
 mV12 = MVZ2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=C0g(mF12, mS22, mV12)
   int2=C1g(mF12, mS22, mV12)
@@ -45289,10 +42380,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = -cplcFdFdVZRR(gt1,i1)
 coup1R = -cplcFdFdVZRL(gt1,i1)
@@ -45304,14 +42392,8 @@ mF1 = MFd(i1)
 mF12 = MFd2(i1)
 mV1 = MVZR
 mV12 = MVZR2
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=C0g(mF12, mS22, mV12)
   int2=C1g(mF12, mS22, mV12)
@@ -45333,10 +42415,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZ2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i1,i2)
 coup1R = cplcFdFdhhR(gt1,i1,i2)
@@ -45346,14 +42425,8 @@ coup3 = cplhhVPVZ(i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZ
 mV22 = MVZ2
 ! Amplitude 
@@ -45377,10 +42450,7 @@ End if
 chargefactor = 1 
 Do i1=1,3
   Do i2=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(MVZR2.gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i1,i2)
 coup1R = cplcFdFdhhR(gt1,i1,i2)
@@ -45390,14 +42460,8 @@ coup3 = cplhhVPVZR(i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 mV2 = MVZR
 mV22 = MVZR2
 ! Amplitude 
@@ -45768,10 +42832,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i2,i1)
 coup1R = cplcFdFdhhR(gt1,i2,i1)
@@ -45780,14 +42841,8 @@ coup2R = cplcFdFdhhR(i3,gt2,i1)
 coup3L = -cplcFdFdVPR(i2,i3)
 coup3R = -cplcFdFdVPL(i2,i3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -46062,14 +43117,12 @@ Iname=Iname-1
 End Subroutine CalculateGamma2Q 
 
 Subroutine CalculateGluon2Q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,            & 
-& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,         & 
-& cplcFdFdhhR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,              & 
-& cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,    & 
-& cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,             & 
-& cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuVGL,cplcFuFuVGR,OG2qSL,OG2qSR)
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplcFdFdAhL,         & 
+& cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVZL,               & 
+& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
+& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuVGL,cplcFuFuVGR,       & 
+& OG2qSL,OG2qSR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -46079,19 +43132,15 @@ Subroutine CalculateGluon2Q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,      
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),          & 
 & cplcFdFdVGL(3,3),cplcFdFdVGR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3), & 
 & cplcFdFdVZRR(3,3),cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplcFdFuVWLmL(3,3),        & 
 & cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFuFdcVWLmL(3,3),          & 
 & cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplcFuFdHpmL(3,3,4),       & 
-& cplcFuFdHpmR(3,3,4),cplcFuFuVGL(3,3),cplcFuFuVGR(3,3),k1**2*(LAM2 - 4._dp*(LAM3)       & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,((2._dp*(RHO1) - RHO2)          & 
-& *vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-((ALP1 + ALP3)            & 
-& *k1*vR),-2*RHO1*vR**2
+& cplcFuFdHpmR(3,3,4),cplcFuFuVGL(3,3),cplcFuFuVGR(3,3)
 
 Integer,Intent(in) :: gt1, gt2,gt3 
 Integer :: gt4 
@@ -46182,10 +43231,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i1,i2)
 coup1R = cplcFdFdhhR(gt1,i1,i2)
@@ -46196,14 +43242,8 @@ coup3R = -cplcFdFdVGL(i3,gt2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt1)
 MFin2 = MFd2(i3)-MFd2(gt1)
@@ -46435,10 +43475,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = -cplcFdFdVGR(gt1,i3)
 coup3R = -cplcFdFdVGL(gt1,i3)
@@ -46447,14 +43484,8 @@ coup2R = cplcFdFdhhR(i3,i2,i1)
 coup1L = cplcFdFdhhL(i2,gt2,i1)
 coup1R = cplcFdFdhhR(i2,gt2,i1)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -46692,10 +43723,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(gt1,i2,i1)
 coup1R = cplcFdFdhhR(gt1,i2,i1)
@@ -46704,14 +43732,8 @@ coup2R = cplcFdFdhhR(i3,gt2,i1)
 coup3L = -cplcFdFdVGR(i2,i3)
 coup3R = -cplcFdFdVGL(i2,i3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -46911,18 +43933,15 @@ Iname=Iname-1
 
 End Subroutine CalculateGluon2Q 
 
-Subroutine CalculateH2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,MHpm,           & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed,k1**2*(LAM2 - 4._dp*(LAM3) & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplAhAhhh,cplAhhhVZ,cplAhhhVZR,              & 
-& cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,     & 
-& cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,              & 
-& cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuhhL,cplcFuFuhhR,cplhhcHpmcVWLm,       & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,     & 
-& OH2qSL,OH2qSR)
+Subroutine CalculateH2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,Mhh,            & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,               & 
+& cplAhhhVZ,cplAhhhVZR,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,      & 
+& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
+& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,               & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuhhL,cplcFuFuhhR,       & 
+& cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,            & 
+& cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVZRVZR,           & 
+& cplhhVZVZ,cplhhVZVZR,OH2qSL,OH2qSR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -46932,9 +43951,8 @@ Subroutine CalculateH2q(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFd,MFd2,MFu,MFu2,MHpm,     
 ! ---------------------------------------------------------------- 
  
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,$Failed(4),0(4),0(4),0(4),0(4),0(4),0(4),             & 
-& 0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFu(3),MFu2(3),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),         & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),& 
 & cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),               & 
@@ -46944,10 +43962,7 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFd
 & cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),         & 
 & cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),           & 
 & cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),              & 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),         & 
-& k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)             & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3 
 Integer :: gt4 
@@ -46971,14 +43986,8 @@ MassEx1=MFd(gt1)
 MassEx12=MFd2(gt1) 
 MassEx2=MFd(gt2)  
 MassEx22=MFd2(gt2) 
-MassEx3=                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(gt3)  
-MassEx32=                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(gt3) 
+MassEx3=Mhh(gt3)  
+MassEx32=Mhh2(gt3) 
 ! ------------------------------ 
  ! Amplitudes for external states 
  ! {DownQuark, bar[DownQuark], HiggsBoson} 
@@ -47050,10 +44059,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -47062,14 +44068,8 @@ coup2R = cplcFdFdhhR(i3,i2,i1)
 coup3L = cplcFdFdhhL(gt2,i3,gt3)
 coup3R = cplcFdFdhhR(gt2,i3,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 ! Mass of internal fermion 
@@ -47345,10 +44345,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup3L = cplcFdFdhhL(i3,gt1,gt3)
 coup3R = cplcFdFdhhR(i3,gt1,gt3)
@@ -47359,14 +44356,8 @@ coup1R = cplcFdFdhhR(gt2,i1,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
 ! Mass of internal fermion 
 MFin = MFd(i3)-MFd(gt2)
 MFin2 = MFd2(i3)-MFd2(gt2)
@@ -47642,10 +44633,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
     Do i3=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
+If ((Mhh2(i1).gt.mf_l2(3)).Or.(MFd2(i2).gt.mf_l2(3)).Or.(MFd2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i2,gt1,i1)
 coup1R = cplcFdFdhhR(i2,gt1,i1)
@@ -47654,14 +44642,8 @@ coup2R = cplcFdFdhhR(gt2,i3,i1)
 coup3L = cplcFdFdhhL(i3,i2,gt3)
 coup3R = cplcFdFdhhR(i3,i2,gt3)
 ! Masses in loop
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)
+mS1 = Mhh(i1)
+mS12 = Mhh2(i1)
 mF1 = MFd(i2)
 mF12 = MFd2(i2)
 mF2 = MFd(i3)
@@ -47918,13 +44900,7 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
     Do i3=1,4
-If ((MFd2(i1).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(3)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(3))) Then
+If ((MFd2(i1).gt.mf_l2(3)).Or.(Mhh2(i2).gt.mf_l2(3)).Or.(Mhh2(i3).gt.mf_l2(3))) Then
 If (.not.OnlySM) Then 
 coup1L = cplcFdFdhhL(i1,gt1,i2)
 coup1R = cplcFdFdhhR(i1,gt1,i2)
@@ -47934,22 +44910,10 @@ coup3 = cplhhhhhh(gt3,i3,i2)
 ! Masses in loop
 mF1 = MFd(i1)
 mF12 = MFd2(i1)
-mS1 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2)
-mS12 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2)
-mS2 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i3)
-mS22 =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)
+mS1 = Mhh(i2)
+mS12 = Mhh2(i2)
+mS2 = Mhh(i3)
+mS22 = Mhh2(i3)
 ! Amplitude 
   int1=C0g(mF12, mS22, mS12)
   int2=C1g(mF12, mS22, mS12)

@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:24 on 7.6.2025   
+! File created at 16:50 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1179,8 +1179,8 @@ Real(dp) :: gBLGUT,g2GUT,g3GUT,LAM2GUT,LAM1GUT,ALP1GUT,RHO1GUT,RHO2GUT,ALP2GUT,A
 Complex(dp) :: YGUT(3,3),YQ1GUT(3,3),YQ2GUT(3,3),YtGUT(3,3),YLGUT(3,3),YRGUT(3,3),MuxGUT(3,3)
 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -1286,27 +1286,30 @@ Real(dp), save :: RXiZR = 1._dp
 Real(dp) :: nuMasses(9) 
 Complex(dp) :: nuMixing(9,9) 
 Complex(dp) :: temporaryValue 
-Complex(dp) :: MD(3,3)
 Complex(dp) :: gR
 Complex(dp) :: k2
 Complex(dp) :: vL
-Complex(dp) :: YL1
-Complex(dp) :: YL2
+Complex(dp) :: MD(1,1)
+Complex(dp) :: MD(1,2)
+Complex(dp) :: MD(1,3)
+Complex(dp) :: MD(2,1)
+Complex(dp) :: MD(2,2)
+Complex(dp) :: MD(2,3)
+Complex(dp) :: MD(3,1)
+Complex(dp) :: MD(3,2)
+Complex(dp) :: MD(3,3)
 Real(dp) :: vRinput
-Real(dp) :: vLinput
-Real(dp) :: k1input
-Real(dp) :: k2input
-Complex(dp) :: lam1input
-Complex(dp) :: lam2input
-Complex(dp) :: lam3input
-Complex(dp) :: lam4input
-Complex(dp) :: lam5input
-Complex(dp) :: lam6input
-Complex(dp) :: rho1input
-Complex(dp) :: rho2input
-Complex(dp) :: alp1input
-Complex(dp) :: alp2input
-Complex(dp) :: alp3input
+Real(dp) :: lam1input
+Real(dp) :: lam2input
+Real(dp) :: lam3input
+Real(dp) :: lam4input
+Real(dp) :: lam5input
+Real(dp) :: lam6input
+Real(dp) :: rho1input
+Real(dp) :: rho2input
+Real(dp) :: alp1input
+Real(dp) :: alp2input
+Real(dp) :: alp3input
 Complex(dp) :: MD11
 Complex(dp) :: MD12
 Complex(dp) :: MD13
@@ -2030,6 +2033,8 @@ MFu = 0._dp
 MFu2 = 0._dp 
 MFv = 0._dp 
 MFv2 = 0._dp 
+Mhh = 0._dp 
+Mhh2 = 0._dp 
 MHpm = 0._dp 
 MHpm2 = 0._dp 
 MVWLm = 0._dp 
@@ -2054,8 +2059,6 @@ ZH = 0._dp
 ZM = 0._dp 
 ZW = 0._dp 
 ZZ = 0._dp 
-$Failed = 0._dp 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = 0._dp 
 k1 = 0._dp 
 vR = 0._dp 
 gPFu = 0._dp 
@@ -2108,20 +2111,17 @@ ratioPVWRm =  0._dp
 ratioPGG =  0._dp  
 ratioPPP =  0._dp  
 vRinput= 0._dp 
-vLinput= 0._dp 
-k1input= 0._dp 
-k2input= 0._dp 
-lam1input=(0._dp,0._dp) 
-lam2input=(0._dp,0._dp) 
-lam3input=(0._dp,0._dp) 
-lam4input=(0._dp,0._dp) 
-lam5input=(0._dp,0._dp) 
-lam6input=(0._dp,0._dp) 
-rho1input=(0._dp,0._dp) 
-rho2input=(0._dp,0._dp) 
-alp1input=(0._dp,0._dp) 
-alp2input=(0._dp,0._dp) 
-alp3input=(0._dp,0._dp) 
+lam1input= 0._dp 
+lam2input= 0._dp 
+lam3input= 0._dp 
+lam4input= 0._dp 
+lam5input= 0._dp 
+lam6input= 0._dp 
+rho1input= 0._dp 
+rho2input= 0._dp 
+alp1input= 0._dp 
+alp2input= 0._dp 
+alp3input= 0._dp 
 MD11=(0._dp,0._dp) 
 MD12=(0._dp,0._dp) 
 MD13=(0._dp,0._dp) 

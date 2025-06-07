@@ -55,7 +55,7 @@ RunScans = {Scan1, Scan2,...};
 (*    PARAMETER RANGES                          *)
 (*----------------------------------------------*)
 
-DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,LRINPUTIN,MUXMIXIN,YIN,YLIN,YRIN,YTIN}; 
+DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,LRINPUTIN,MUXMIXIN,YLIN,YRIN}; 
  
 DEFINITION[a_][MODSEL]={ 
 {{1},{Value->0}}, 
@@ -72,20 +72,17 @@ DEFINITION[a_][SMINPUTS]={
 }; 
 DEFINITION[a_][MINPAR]={ 
 {{1},{Value->0}} (*vRinput*), 
-{{2},{Value->0}} (*vLinput*), 
-{{4},{Value->0}} (*k1input*), 
-{{5},{Value->0}} (*k2input*), 
-{{6},{Value->0}} (*lam1input*), 
-{{7},{Value->0}} (*lam2input*), 
-{{8},{Value->0}} (*lam3input*), 
-{{9},{Value->0}} (*lam4input*), 
-{{10},{Value->0}} (*lam5input*), 
-{{11},{Value->0}} (*lam6input*), 
-{{14},{Value->0}} (*rho1input*), 
-{{15},{Value->0}} (*rho2input*), 
-{{16},{Value->0}} (*alp1input*), 
-{{17},{Value->0}} (*alp2input*), 
-{{18},{Value->0}} (*alp3input*), 
+{{2},{Value->0}} (*lam1input*), 
+{{3},{Value->0}} (*lam2input*), 
+{{4},{Value->0}} (*lam3input*), 
+{{5},{Value->0}} (*lam4input*), 
+{{6},{Value->0}} (*lam5input*), 
+{{7},{Value->0}} (*lam6input*), 
+{{8},{Value->0}} (*rho1input*), 
+{{9},{Value->0}} (*rho2input*), 
+{{10},{Value->0}} (*alp1input*), 
+{{11},{Value->0}} (*alp2input*), 
+{{12},{Value->0}} (*alp3input*), 
 {{111},{Value->0}} (*MD11*), 
 {{112},{Value->0}} (*MD12*), 
 {{113},{Value->0}} (*MD13*), 
@@ -139,17 +136,6 @@ DEFINITION[a_][MUXMIXIN]={
 {{3,2},{Value->0}} , 
 {{3,3},{Value->0}} }; 
  
-DEFINITION[a_][YIN]={ 
-{{1,1},{Value->0}} , 
-{{1,2},{Value->0}} , 
-{{1,3},{Value->0}} , 
-{{2,1},{Value->0}} , 
-{{2,2},{Value->0}} , 
-{{2,3},{Value->0}} , 
-{{3,1},{Value->0}} , 
-{{3,2},{Value->0}} , 
-{{3,3},{Value->0}} }; 
- 
 DEFINITION[a_][YLIN]={ 
 {{1,1},{Value->0}} , 
 {{1,2},{Value->0}} , 
@@ -162,17 +148,6 @@ DEFINITION[a_][YLIN]={
 {{3,3},{Value->0}} }; 
  
 DEFINITION[a_][YRIN]={ 
-{{1,1},{Value->0}} , 
-{{1,2},{Value->0}} , 
-{{1,3},{Value->0}} , 
-{{2,1},{Value->0}} , 
-{{2,2},{Value->0}} , 
-{{2,3},{Value->0}} , 
-{{3,1},{Value->0}} , 
-{{3,2},{Value->0}} , 
-{{3,3},{Value->0}} }; 
- 
-DEFINITION[a_][YTIN]={ 
 {{1,1},{Value->0}} , 
 {{1,2},{Value->0}} , 
 {{1,3},{Value->0}} , 

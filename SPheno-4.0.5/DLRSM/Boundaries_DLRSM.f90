@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:24 on 7.6.2025   
+! File created at 16:50 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -513,11 +513,10 @@ End Subroutine Yukawas
 End Subroutine BoundarySM 
  
 Subroutine BoundaryBSM(i_run,g_SM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,            & 
-& MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
-& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)& 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,delta0,gMZ,kont)
+& MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,           & 
+& TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,           & 
+& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& delta0,gMZ,kont)
 
 Implicit None 
 Real(dp),Intent(out)::gMZ(:) 
@@ -527,8 +526,8 @@ Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6
 Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(inout) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -710,12 +709,10 @@ Call SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,gBL,         
 & g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
 & YL,YR,Mux,MU12,MU22,.False.)
 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 TW= Asin(Sqrt(sinw2_Q)) 
 
@@ -779,11 +776,8 @@ Call CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,ZDR,         
 & cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
 & cplcVWRmVWLmVZRVZR3)
 
-Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)        & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MVZ,               & 
-& MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,            & 
+Call Pi1LoopVZ(mZ2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,             & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
 & cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
 & cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,               & 
@@ -791,10 +785,7 @@ Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)  
 & cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
 & cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,dmZ2)
 
-treelambda =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1)/vSM**2
+treelambda = Mhh2(1)/vSM**2
 Call OneLoop_Z_W_SM(vSM,g1SM,g2SM,g3SM,treelambda,-YuSM,YdSM,YeSM,kont,               & 
 & dmZ2_SM,dmW2_SM,dmW2_0_SM)
 
@@ -836,12 +827,10 @@ Call SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,gBL,         
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 Call CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,ZDR,               & 
 & ZUL,ZUR,ZEL,ZER,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,             & 
@@ -882,17 +871,11 @@ Call CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,ZDR,         
 & cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
 & cplcVWRmVWLmVZRVZR3)
 
-treelambda =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1)/vSM**2
+treelambda = Mhh2(1)/vSM**2
 rMS_SM_save=rMS_SM
 rMS_SM=rMS
-Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)        & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MVZ,               & 
-& MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,            & 
+Call Pi1LoopVZ(mZ2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,             & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
 & cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
 & cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,               & 
@@ -941,12 +924,10 @@ Call SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,gBL,         
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 mW2 = MVWLm2
 mZ2 = MVZ2
@@ -989,11 +970,8 @@ Call CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,ZDR,         
 & cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
 & cplcVWRmVWLmVZRVZR3)
 
-Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)        & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MVZ,               & 
-& MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,            & 
+Call Pi1LoopVZ(mZ2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,             & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
 & cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
 & cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,               & 
@@ -1002,43 +980,34 @@ Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)  
 & cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,dmZ2)
 
 Call Pi1LoopVWLm(mW2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,              & 
-& MFv,MFv2,MFe,MFe2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)          & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,cplAhcVWLmVWRm, & 
-& cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,             & 
-& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,      & 
-& cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,     & 
-& cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,          & 
-& cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,      & 
-& cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
-& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
-& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,         & 
-& kont,dmW2)
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,            & 
+& cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
+& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
+& cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,      & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
+& cplcHpmcVWLmVP,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,           & 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,        & 
+& cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,              & 
+& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
+& cplcVWLmVWLmVZRVZR3,kont,dmW2)
 
 Call Pi1LoopVWLm(0._dp,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,            & 
-& MFv,MFv2,MFe,MFe2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)          & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,cplAhcVWLmVWRm, & 
-& cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,             & 
-& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,      & 
-& cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,     & 
-& cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,          & 
-& cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,      & 
-& cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
-& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
-& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,         & 
-& kont,dmW2_0)
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,            & 
+& cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
+& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
+& cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,      & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
+& cplcHpmcVWLmVP,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,           & 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,        & 
+& cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,              & 
+& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
+& cplcVWLmVWLmVZRVZR3,kont,dmW2_0)
 
-treelambda =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1)/vSM**2
+treelambda = Mhh2(1)/vSM**2
 Call OneLoop_Z_W_SM(vSM,g1SM,g2SM,g3SM,treelambda,-YuSM,YdSM,YeSM,kont,               & 
 & dmZ2_SM,dmW2_SM,dmW2_0_SM)
 
@@ -1053,10 +1022,8 @@ delta_rho0=MW2*(g1SM**2+g2SM**2)/g2SM**2/MZ2-1._dp
 rho=1._dp/(1._dp-delta_rho-delta_rho0)
 CosW2SinW2=(1._dp-sinW2_Q)*sinW2_Q
 If (IncludeDeltaVB) Then 
-Call DeltaVB(sinW2_Q,sinW2_Q,rho,0,-2*k1**2*(LAM1 + LAM2),MAh,MFe,MFv,MHpm,           & 
-& MVWLm,MVWRm,MVZR,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,((2._dp*(RHO1) - RHO2)           & 
-& *vR**2)/2._dp,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)              & 
-&  + ALP3)*vR**2)/2._dp,g2,gBL,k1,PhiW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,ZZ,delta)
+Call DeltaVB(sinW2_Q,sinW2_Q,rho,MAh,MFe,MFv,Mhh,MHpm,MVWLm,MVWRm,MVZR,               & 
+& g2,gBL,k1,PhiW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,ZZ,delta)
 
 Call DeltaVB_SM(sinW2_Q,sinW2_Q,g2SM,rho,delta_SM)
 
@@ -1138,11 +1105,8 @@ Call CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,ZDR,         
 & cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
 & cplcVWRmVWLmVZRVZR3)
 
-Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)        & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MVZ,               & 
-& MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,            & 
+Call Pi1LoopVZ(mZ2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,             & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
 & cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
 & cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,               & 
@@ -1151,21 +1115,18 @@ Call Pi1LoopVZ(mZ2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)  
 & cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,dmZ2)
 
 Call Pi1LoopVWLm(mW2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,              & 
-& MFv,MFv2,MFe,MFe2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)          & 
-&  + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,               & 
-& 0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR)             & 
-& ,-2*RHO1*vR**2,$Failed,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,cplAhcVWLmVWRm, & 
-& cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,             & 
-& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,      & 
-& cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,     & 
-& cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,          & 
-& cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,      & 
-& cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
-& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
-& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,         & 
-& kont,dmW2)
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,            & 
+& cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
+& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
+& cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,      & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
+& cplcHpmcVWLmVP,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,           & 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,        & 
+& cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,              & 
+& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
+& cplcVWLmVWLmVZRVZR3,kont,dmW2)
 
 Call OneLoop_Z_W_SM(v_MS,g1_MS,g2_MS,g3_MS,Lam_MS,Yu_MS,Yd_MS,Ye_MS,kont,             & 
 & dmZ2_SM,dmW2_SM,dmW2_0_SM)
@@ -1311,32 +1272,23 @@ Call CouplingsForSMfermions(YQ1,YQ2,UP,ZDL,ZDR,ZH,g3,gBL,g2,ZZ,UC,ZUL,ZUR,      
 & cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,              & 
 & cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR)
 
-Call Sigma1LoopFeMZ(p2,MFe,MFe2,MAh,MAh2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6)    & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,$Failed,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MFv,MFv2,MVWLm,           & 
-& MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,cplcUFeFehhR,               & 
-& cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,cplcUFeFeVZRR,       & 
-& cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,cplcUFeFvVWRmL,            & 
-& cplcUFeFvVWRmR,sigR_l,sigL_l,sigSL_l,sigSR_l)
+Call Sigma1LoopFeMZ(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,           & 
+& MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,       & 
+& cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,        & 
+& cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,             & 
+& cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigR_l,sigL_l,sigSL_l,sigSR_l)
 
-Call Sigma1LoopFdMZ(p2,MFd,MFd2,MAh,MAh2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6)    & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,$Failed,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MFu,MFu2,MVWLm,           & 
-& MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,cplcUFdFdhhR,               & 
-& cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,cplcUFdFdVZR,         & 
-& cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL,              & 
+Call Sigma1LoopFdMZ(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,           & 
+& MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,       & 
+& cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,         & 
+& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL, & 
 & cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigR_d,sigL_d,sigSL_d,sigSR_d)
 
 Call Sigma1LoopFuMZ(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,MVWRm2,          & 
-& MHpm,MHpm2,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)         & 
-& *vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2)& 
-& ,-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,$Failed,              & 
-& MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,         & 
-& cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,cplcUFuFuhhL,              & 
-& cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,cplcUFuFuVZL,         & 
-& cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigR_u,sigL_u,sigSL_u,sigSR_u)
+& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,     & 
+& cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,           & 
+& cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,         & 
+& cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigR_u,sigL_u,sigSL_u,sigSR_u)
 
 ! Take care of the new normalisation of Sigma 
 SigR_l = 0.5_dp*SigR_L 
@@ -1617,11 +1569,10 @@ End Subroutine Yukawas3
 End Subroutine BoundaryBSM 
  
 Subroutine Match_and_Run(delta0,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
-& MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
-& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)& 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),gBL,g2,g3,LAM2,LAM1,             & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,mGut,kont,WriteComment,niter)
+& MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,           & 
+& TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
+& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGut,              & 
+& kont,WriteComment,niter)
 
 Implicit None
 Logical,Intent(in) :: WriteComment
@@ -1646,8 +1597,8 @@ Complex(dp) :: cplAhAhUhh(4,4,4),cplAhUhhcHpm(4,4,4),cplAhUhhVP(4,4),cplAhUhhVZ(
 & cplUhhUhhVZVZ(4,4),cplUhhUhhVZRVZR(4,4)
 
 Real(dp),Intent(inout) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -1664,7 +1615,7 @@ NameOfUnit(Iname)='Match_and_Run'
 kont=0
 FoundResult= .False.
 n_tot =1
-mass_old(n_tot:n_tot+3) = {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}
+mass_old(n_tot:n_tot+3) = Mhh
 n_tot = n_tot + 4 
 mass_old(n_tot:n_tot+3) = MAh
 n_tot = n_tot + 4 
@@ -1696,12 +1647,10 @@ If (kont.Ne.0) Then
   Write(*,*) " Problem with RGE running. Errorcode:", kont 
   Call TerminateProgram 
 End If 
-Call BoundaryBSM(j,g_SM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,            & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)       & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,delta0,gB,kont)
+Call BoundaryBSM(j,g_SM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,             & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
+& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,delta0,gB,kont)
 
 If (kont.Ne.0) Then
 Iname=Iname-1
@@ -1755,13 +1704,13 @@ MD(3,1) = MD31
 MD(3,2) = MD32
 MD(3,3) = MD33
 vR = vRinput
-vL = vLinput
-k1 = Sqrt(-2*vL**2 + vSM**2)/Sqrt(1 + TanBeta**2)
-k2 = (TanBeta*Sqrt(-2*vL**2 + vSM**2))/Sqrt(1 + TanBeta**2)
-YQ2 = -Conjg((-(vHu*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + vHd*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YQ1 = Conjg((-(vHd*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + vHu*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YL2 = Conjg((sqrt(2._dp)*MD*vHu - vHd*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
-YL1 = Conjg((-(sqrt(2._dp)*MD*vHd) + vHu*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
+vL = 0
+k1 = vSM
+k2 = 0
+YQ2 = -Conjg((-(k2*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
+Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 End if
  
  ! ----------------------- 
@@ -1780,12 +1729,10 @@ Iname=Iname-1
     Write(*,*) " RGE running not possible. Errorcode:", kont 
     Call TerminateProgram
 End If
-Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,           & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
+& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
+& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
  FirstRun = .False. 
 If (kont.Ne.0) Then
@@ -1805,7 +1752,7 @@ End If
     Call TerminateProgram
 End If
 n_tot =1
-mass_new(n_tot:n_tot+3) = {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}
+mass_new(n_tot:n_tot+3) = Mhh
 n_tot = n_tot + 4 
 mass_new(n_tot:n_tot+3) = MAh
 n_tot = n_tot + 4 
@@ -1863,10 +1810,7 @@ mudim=Max(mudim,mZ2)
 tz=0.5_dp*Log(mZ2/mudim)
 dt=tz/100._dp 
 g_SM(1)=g_SM(1)*sqrt(5._dp/3._dp) 
-g_SM(4)=                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1)/g_SM(62)**2 
+g_SM(4)=Mhh2(1)/g_SM(62)**2 
 Call odeint(g_SM,62,0._dp,tz,delta0,dt,0._dp,rge62_SM,kont) 
 g_SM(1)=g_SM(1)/sqrt(5._dp/3._dp) 
 Lambda_MZ=g_SM(4) 
@@ -1882,36 +1826,19 @@ End Do
 If (CalculateOneLoopMassesSave) Then 
 CalculateOneLoopMasses =  CalculateOneLoopMassesSave 
 Write(*,*) "Calculate loop corrected masses " 
-Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,           & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
+& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
+& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
-If (((Calculate_mh_within_SM).and.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2).gt.300._dp)).OR.(Force_mh_within_SM))Then
+If (((Calculate_mh_within_SM).and.(Mhh(2).gt.300._dp)).OR.(Force_mh_within_SM))Then
 Write(*,*) "Calculate Higgs mass within effective SM " 
-Call Get_mh_pole_SM(g_SM,mudim,delta0,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1),mh_SM) 
-                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(1) = mh_SM**2 
-                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1) = mh_SM 
+Call Get_mh_pole_SM(g_SM,mudim,delta0,Mhh2(1),mh_SM) 
+Mhh2(1) = mh_SM**2 
+Mhh(1) = mh_SM 
 End if
 If (MatchZWpoleMasses) newWscale=0._dp
-MVwm_scale=smmwfit(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1),MFu(3),alphas_MZ)*(1._dp+0.5_dp*newWscale)
+MVwm_scale=smmwfit(Mhh(1),MFu(3),alphas_MZ)*(1._dp+0.5_dp*newWscale)
 MVWLm = MVwm_scale
 MVWLm2 = MVwm_scale**2
 mW = MVwm_scale
@@ -1941,12 +1868,10 @@ Iname=Iname-1
  
 End Subroutine Match_and_Run
  
-Subroutine FirstGuess(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,              & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)       & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,kont)
+Subroutine FirstGuess(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,               & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
+& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 Implicit None 
 Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
@@ -1954,8 +1879,8 @@ Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,L
 Complex(dp),Intent(out) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(out) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -2051,13 +1976,13 @@ MD(3,1) = MD31
 MD(3,2) = MD32
 MD(3,3) = MD33
 vR = vRinput
-vL = vLinput
-k1 = Sqrt(-2*vL**2 + vSM**2)/Sqrt(1 + TanBeta**2)
-k2 = (TanBeta*Sqrt(-2*vL**2 + vSM**2))/Sqrt(1 + TanBeta**2)
-YQ2 = -Conjg((-(vHu*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + vHd*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YQ1 = Conjg((-(vHd*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + vHu*vSM*Transpose(YdSM))/(-vHd**2 + vHu**2))
-YL2 = Conjg((sqrt(2._dp)*MD*vHu - vHd*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
-YL1 = Conjg((-(sqrt(2._dp)*MD*vHd) + vHu*vSM*Transpose(YeSM))/(-vHd**2 + vHu**2))
+vL = 0
+k1 = vSM
+k2 = 0
+YQ2 = -Conjg((-(k2*vSM*Matmul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
+Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
+Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 End if
  
  ! ----------------------- 
@@ -2065,12 +1990,10 @@ End if
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 MVWLm = mW 
 MVWLm2 = mW2 

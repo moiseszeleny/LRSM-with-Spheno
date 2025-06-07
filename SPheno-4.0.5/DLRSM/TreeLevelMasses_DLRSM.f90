@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:22 on 7.6.2025   
+! File created at 16:47 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -21,12 +21,10 @@ Logical :: SignOfMassChanged =.False.
 Logical :: SignOfMuChanged =.False.  
 Contains 
  
-Subroutine TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,              & 
-& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)       & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+Subroutine TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,               & 
+& Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
+& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 Implicit None 
  
@@ -35,8 +33,8 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(out) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -53,10 +51,8 @@ Call CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
 
 Call CalculateVWLmVWRm(g2,k1,vR,ZW,MVWLm,MVWRm,MVWLm2,MVWRm2,PhiW,kont)
 
-Call Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed},      & 
-&  {0, 0, $Failed, $Failed}}(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,               & 
-& LAM5,LAM6,LAM3,k1,vR,ZH,$Failed,0,0,0,0,$Failed,0,0,0,0,$Failed,$Failed,               & 
-& 0,0,$Failed,$Failed,$Failed,kont)
+Call CalculateMhh(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,             & 
+& LAM3,k1,vR,ZH,Mhh,Mhh2,kont)
 
 kontSave = kont 
 Call CalculateMAh(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,           & 
@@ -82,10 +78,9 @@ Call CalculateMFv(Mux,Y,YR,k1,vR,ZM,MFv,kont)
 MFv2 = MFv**2 
 
  
- Call SortGoldstones(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,          & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),kont)
+ Call SortGoldstones(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,            & 
+& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,kont)
 
 If (SignOfMassChanged) Then  
  If (.Not.IgnoreNegativeMasses) Then 
@@ -160,11 +155,10 @@ MFu2IN(1:2) = MFu2(1:2)
 End Subroutine RunningFermionMasses 
 
 Subroutine TreeMassesEffPot(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,             & 
-& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
-& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)& 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,GenerationMixing,kont)
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,             & 
+& UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,              & 
+& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& GenerationMixing,kont)
 
 Implicit None 
  
@@ -173,8 +167,8 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(out) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -191,10 +185,8 @@ Call CalculateVPVZVZREffPot(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
 
 Call CalculateVWLmVWRmEffPot(g2,k1,vR,ZW,MVWLm,MVWRm,MVWLm2,MVWRm2,PhiW,kont)
 
-Call Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed},      & 
-&  {0, 0, $Failed, $Failed}}EffPot(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,              & 
-& ALP3,LAM5,LAM6,LAM3,k1,vR,ZH,$Failed,0,0,0,0,$Failed,0,0,0,0,$Failed,$Failed,          & 
-& 0,0,$Failed,$Failed,$Failed,kont)
+Call CalculateMhhEffPot(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,            & 
+& LAM6,LAM3,k1,vR,ZH,Mhh,Mhh2,kont)
 
 kontSave = kont 
 Call CalculateMAhEffPot(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,               & 
@@ -243,18 +235,15 @@ Iname = Iname - 1
 End Subroutine  TreeMassesEffPot 
  
  
-Subroutine Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed,          & 
-&  $Failed}, {0, 0, $Failed, $Failed}}(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,               & 
-& ALP2,ALP3,LAM5,LAM6,LAM3,k1,vR,ZH,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0},             & 
-&  {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}},{{$Failed, 0, 0, 0},              & 
-&  {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2,kont)
+Subroutine CalculateMhh(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,            & 
+& LAM6,LAM3,k1,vR,ZH,Mhh,Mhh2,kont)
 
 Real(dp), Intent(in) :: MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,k1,vR
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr 
 Integer :: j1,j2,j3,j4, pos 
-Real(dp), Intent(out) :: {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(4), {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(4) 
+Real(dp), Intent(out) :: Mhh(4), Mhh2(4) 
 Real(dp), Intent(out) :: ZH(4,4) 
  
 Real(dp) :: mat(4,4)  
@@ -262,7 +251,7 @@ Real(dp) :: mat(4,4)
 Real(dp) ::  test(2) 
 
 Iname = Iname + 1 
-NameOfUnit(Iname) = 'Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}'
+NameOfUnit(Iname) = 'CalculateMhh'
  
 mat(1,1) = 0._dp 
 mat(1,1) = mat(1,1)-(k1**2*LAM1)
@@ -305,7 +294,7 @@ mat(4,4) = mat(4,4)-3*RHO1*vR**2
 End do 
 
  
-Call EigenSystem(mat,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2,ZH,ierr,test) 
+Call EigenSystem(mat,Mhh2,ZH,ierr,test) 
  
  
 If ((ierr.Eq.-8).Or.(ierr.Eq.-9)) Then 
@@ -327,35 +316,35 @@ End If
 
 
 Do i1=1,4
-  If (Abs({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1)).Le.MaxMassNumericalZero) {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) = 1.E-10_dp 
-  If ({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1).ne.{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1)) Then 
+  If (Abs(Mhh2(i1)).Le.MaxMassNumericalZero) Mhh2(i1) = 1.E-10_dp 
+  If (Mhh2(i1).ne.Mhh2(i1)) Then 
       Write(*,*) 'NaN appearing in '//NameOfUnit(Iname) 
       Call TerminateProgram 
     End If 
-  If ({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1).Ge.0._dp) Then 
-  {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(i1)=Sqrt({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) ) 
+  If (Mhh2(i1).Ge.0._dp) Then 
+  Mhh(i1)=Sqrt(Mhh2(i1) ) 
   Else 
     If (ErrorLevel.Ge.0) Then 
       Write(10,*) 'Warning from Subroutine '//NameOfUnit(Iname) 
-      Write(10,*) 'a mass squarred is negative: ',i1,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) 
+      Write(10,*) 'a mass squarred is negative: ',i1,Mhh2(i1) 
     End If 
-  {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(i1) = 1._dp 
+  Mhh(i1) = 1._dp 
      Write(ErrCan,*) 'Warning from routine '//NameOfUnit(Iname) 
      Write(ErrCan,*) 'in the calculation of the masses' 
      Write(ErrCan,*) 'occurred a negative mass squared!' 
-     Write(ErrCan,*) i1,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) 
+     Write(ErrCan,*) i1,Mhh2(i1) 
      Write(*,*) 'Warning from routine '//NameOfUnit(Iname) 
      Write(*,*) 'in the calculation of the masses' 
      Write(*,*) 'occurred a negative mass squared!' 
-     Write(*,*) i1,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) 
-  {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) = 1._dp 
+     Write(*,*) i1,Mhh2(i1) 
+  Mhh2(i1) = 1._dp 
    SignOfMassChanged = .True. 
 ! kont = -104 
  End if 
 End Do 
 Iname = Iname - 1 
  
-End Subroutine Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}} 
+End Subroutine CalculateMhh 
 
 Subroutine CalculateMAh(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,               & 
 & ALP3,LAM5,LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
@@ -1482,29 +1471,26 @@ PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
  
 End Subroutine CalculateVWLmVWRm 
 
-Subroutine Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed,          & 
-&  $Failed}, {0, 0, $Failed, $Failed}}EffPot(MU12,MU22,LAM2,LAM1,ALP1,RHO1,              & 
-& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,k1,vR,ZH,{{$Failed, 0, 0, 0}, {0, $Failed,               & 
-&  0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}},{{$Failed, 0,              & 
-&  0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2,kont)
+Subroutine CalculateMhhEffPot(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,           & 
+& LAM5,LAM6,LAM3,k1,vR,ZH,Mhh,Mhh2,kont)
 
 Real(dp), Intent(in) :: MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,k1,vR
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr 
 Integer :: j1,j2,j3,j4, pos 
-Real(dp), Intent(out) :: {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(4), {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(4) 
+Real(dp), Intent(out) :: Mhh(4), Mhh2(4) 
 Real(dp), Intent(out) :: ZH(4,4) 
  
 Real(dp) :: mat(4,4)  
 
-Real(dp) :: {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2temp(4), Q2 
+Real(dp) :: Mhh2temp(4), Q2 
 Real(dp) :: ZHtemp(4,4),ZHtemp2(4,4) 
  
 Real(dp) ::  test(2) 
 
 Iname = Iname + 1 
-NameOfUnit(Iname) = 'Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}'
+NameOfUnit(Iname) = 'CalculateMhh'
  
 mat(1,1) = 0._dp 
 mat(1,1) = mat(1,1)-(k1**2*LAM1)
@@ -1547,7 +1533,7 @@ mat(4,4) = mat(4,4)-3*RHO1*vR**2
 End do 
 
  
-Call EigenSystem(mat,{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2,ZH,ierr,test) 
+Call EigenSystem(mat,Mhh2,ZH,ierr,test) 
  
  
 ! Fix phases
@@ -1576,20 +1562,20 @@ End If
 
 
 Do i1=1,4
-  If ({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1).ne.{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1)) Then 
+  If (Mhh2(i1).ne.Mhh2(i1)) Then 
       Write(*,*) 'NaN appearing in '//NameOfUnit(Iname) 
       Call TerminateProgram 
     End If 
-  If ({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1).Ge.0._dp) Then 
-  {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(i1)=Sqrt({{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}2(i1) ) 
+  If (Mhh2(i1).Ge.0._dp) Then 
+  Mhh(i1)=Sqrt(Mhh2(i1) ) 
   Else 
-  {{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}(i1) = 1._dp 
+  Mhh(i1) = 1._dp 
 ! kont = -104 
  End if 
 End Do 
 Iname = Iname - 1 
  
-End Subroutine Calculate{{$Failed, 0, 0, 0}, {0, $Failed, 0, 0}, {0, 0, $Failed, $Failed}, {0, 0, $Failed, $Failed}}EffPot 
+End Subroutine CalculateMhhEffPot 
 
 Subroutine CalculateMAhEffPot(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,              & 
 & ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
@@ -2609,13 +2595,12 @@ End Subroutine  TreeMassesSM
  
  
 Subroutine SortGoldstones(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,               & 
-& MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
-& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)& 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),kont)
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,             & 
+& UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,kont)
 
 Real(dp),Intent(inout) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 

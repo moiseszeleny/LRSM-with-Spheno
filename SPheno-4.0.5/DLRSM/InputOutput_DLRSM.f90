@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:29 on 7.6.2025   
+! File created at 16:58 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -339,44 +339,27 @@ Read(io,*) i_par,wert!,read_line
 If (i_par.Eq.1) Then 
 vRinput= wert 
 Else If (i_par.Eq.2) Then 
-vLinput= wert 
+lam1input= wert 
+Else If (i_par.Eq.3) Then 
+lam2input= wert 
 Else If (i_par.Eq.4) Then 
-k1input= wert 
+lam3input= wert 
 Else If (i_par.Eq.5) Then 
-k2input= wert 
+lam4input= wert 
 Else If (i_par.Eq.6) Then 
-If (i_c.Eq.0) lam1input= Cmplx(wert,Aimag(lam1input),dp) 
-If (i_c.Eq.1) lam1input= Cmplx(Real(lam1input,dp),wert,dp) 
+lam5input= wert 
 Else If (i_par.Eq.7) Then 
-If (i_c.Eq.0) lam2input= Cmplx(wert,Aimag(lam2input),dp) 
-If (i_c.Eq.1) lam2input= Cmplx(Real(lam2input,dp),wert,dp) 
+lam6input= wert 
 Else If (i_par.Eq.8) Then 
-If (i_c.Eq.0) lam3input= Cmplx(wert,Aimag(lam3input),dp) 
-If (i_c.Eq.1) lam3input= Cmplx(Real(lam3input,dp),wert,dp) 
+rho1input= wert 
 Else If (i_par.Eq.9) Then 
-If (i_c.Eq.0) lam4input= Cmplx(wert,Aimag(lam4input),dp) 
-If (i_c.Eq.1) lam4input= Cmplx(Real(lam4input,dp),wert,dp) 
+rho2input= wert 
 Else If (i_par.Eq.10) Then 
-If (i_c.Eq.0) lam5input= Cmplx(wert,Aimag(lam5input),dp) 
-If (i_c.Eq.1) lam5input= Cmplx(Real(lam5input,dp),wert,dp) 
+alp1input= wert 
 Else If (i_par.Eq.11) Then 
-If (i_c.Eq.0) lam6input= Cmplx(wert,Aimag(lam6input),dp) 
-If (i_c.Eq.1) lam6input= Cmplx(Real(lam6input,dp),wert,dp) 
-Else If (i_par.Eq.14) Then 
-If (i_c.Eq.0) rho1input= Cmplx(wert,Aimag(rho1input),dp) 
-If (i_c.Eq.1) rho1input= Cmplx(Real(rho1input,dp),wert,dp) 
-Else If (i_par.Eq.15) Then 
-If (i_c.Eq.0) rho2input= Cmplx(wert,Aimag(rho2input),dp) 
-If (i_c.Eq.1) rho2input= Cmplx(Real(rho2input,dp),wert,dp) 
-Else If (i_par.Eq.16) Then 
-If (i_c.Eq.0) alp1input= Cmplx(wert,Aimag(alp1input),dp) 
-If (i_c.Eq.1) alp1input= Cmplx(Real(alp1input,dp),wert,dp) 
-Else If (i_par.Eq.17) Then 
-If (i_c.Eq.0) alp2input= Cmplx(wert,Aimag(alp2input),dp) 
-If (i_c.Eq.1) alp2input= Cmplx(Real(alp2input,dp),wert,dp) 
-Else If (i_par.Eq.18) Then 
-If (i_c.Eq.0) alp3input= Cmplx(wert,Aimag(alp3input),dp) 
-If (i_c.Eq.1) alp3input= Cmplx(Real(alp3input,dp),wert,dp) 
+alp2input= wert 
+Else If (i_par.Eq.12) Then 
+alp3input= wert 
 Else If (i_par.Eq.111) Then 
 If (i_c.Eq.0) MD11= Cmplx(wert,Aimag(MD11),dp) 
 If (i_c.Eq.1) MD11= Cmplx(Real(MD11,dp),wert,dp) 
@@ -1604,20 +1587,17 @@ If (GenerationMixing) Write(io_L,110) &
 &     6,1, " switching on flavour violation" 
 Write(io_L,100) "Block MINPAR  # Input parameters"
 Write(io_L,101) 1, Real(vRinput,dp) ,"# vRinput"
-Write(io_L,101) 2, Real(vLinput,dp) ,"# vLinput"
-Write(io_L,101) 4, Real(k1input,dp) ,"# k1input"
-Write(io_L,101) 5, Real(k2input,dp) ,"# k2input"
-Write(io_L,101) 6, Real(lam1input,dp) ,"# lam1input"
-Write(io_L,101) 7, Real(lam2input,dp) ,"# lam2input"
-Write(io_L,101) 8, Real(lam3input,dp) ,"# lam3input"
-Write(io_L,101) 9, Real(lam4input,dp) ,"# lam4input"
-Write(io_L,101) 10, Real(lam5input,dp) ,"# lam5input"
-Write(io_L,101) 11, Real(lam6input,dp) ,"# lam6input"
-Write(io_L,101) 14, Real(rho1input,dp) ,"# rho1input"
-Write(io_L,101) 15, Real(rho2input,dp) ,"# rho2input"
-Write(io_L,101) 16, Real(alp1input,dp) ,"# alp1input"
-Write(io_L,101) 17, Real(alp2input,dp) ,"# alp2input"
-Write(io_L,101) 18, Real(alp3input,dp) ,"# alp3input"
+Write(io_L,101) 2, Real(lam1input,dp) ,"# lam1input"
+Write(io_L,101) 3, Real(lam2input,dp) ,"# lam2input"
+Write(io_L,101) 4, Real(lam3input,dp) ,"# lam3input"
+Write(io_L,101) 5, Real(lam4input,dp) ,"# lam4input"
+Write(io_L,101) 6, Real(lam5input,dp) ,"# lam5input"
+Write(io_L,101) 7, Real(lam6input,dp) ,"# lam6input"
+Write(io_L,101) 8, Real(rho1input,dp) ,"# rho1input"
+Write(io_L,101) 9, Real(rho2input,dp) ,"# rho2input"
+Write(io_L,101) 10, Real(alp1input,dp) ,"# alp1input"
+Write(io_L,101) 11, Real(alp2input,dp) ,"# alp2input"
+Write(io_L,101) 12, Real(alp3input,dp) ,"# alp3input"
 Write(io_L,101) 111, Real(MD11,dp) ,"# MD11"
 Write(io_L,101) 112, Real(MD12,dp) ,"# MD12"
 Write(io_L,101) 113, Real(MD13,dp) ,"# MD13"
@@ -1628,17 +1608,6 @@ Write(io_L,101) 131, Real(MD31,dp) ,"# MD31"
 Write(io_L,101) 132, Real(MD32,dp) ,"# MD32"
 Write(io_L,101) 133, Real(MD33,dp) ,"# MD33"
 WriteNextBlock = .False. 
-If (Abs(Aimag(lam1input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(lam2input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(lam3input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(lam4input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(lam5input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(lam6input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(rho1input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(rho2input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(alp1input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(alp2input)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(alp3input)).gt.0._dp) WriteNextBlock = .True. 
 If (Abs(Aimag(MD11)).gt.0._dp) WriteNextBlock = .True. 
 If (Abs(Aimag(MD12)).gt.0._dp) WriteNextBlock = .True. 
 If (Abs(Aimag(MD13)).gt.0._dp) WriteNextBlock = .True. 
@@ -1650,39 +1619,6 @@ If (Abs(Aimag(MD32)).gt.0._dp) WriteNextBlock = .True.
 If (Abs(Aimag(MD33)).gt.0._dp) WriteNextBlock = .True. 
 If(WriteNextBlock) Then 
 Write(io_L,100) "Block IMMINPAR  # Input parameters"
-If (Abs(Aimag(lam1input)).gt.0._dp) Then 
-Write(io_L,101) 6, Aimag(lam1input) ,"# lam1input"
-End if 
-If (Abs(Aimag(lam2input)).gt.0._dp) Then 
-Write(io_L,101) 7, Aimag(lam2input) ,"# lam2input"
-End if 
-If (Abs(Aimag(lam3input)).gt.0._dp) Then 
-Write(io_L,101) 8, Aimag(lam3input) ,"# lam3input"
-End if 
-If (Abs(Aimag(lam4input)).gt.0._dp) Then 
-Write(io_L,101) 9, Aimag(lam4input) ,"# lam4input"
-End if 
-If (Abs(Aimag(lam5input)).gt.0._dp) Then 
-Write(io_L,101) 10, Aimag(lam5input) ,"# lam5input"
-End if 
-If (Abs(Aimag(lam6input)).gt.0._dp) Then 
-Write(io_L,101) 11, Aimag(lam6input) ,"# lam6input"
-End if 
-If (Abs(Aimag(rho1input)).gt.0._dp) Then 
-Write(io_L,101) 14, Aimag(rho1input) ,"# rho1input"
-End if 
-If (Abs(Aimag(rho2input)).gt.0._dp) Then 
-Write(io_L,101) 15, Aimag(rho2input) ,"# rho2input"
-End if 
-If (Abs(Aimag(alp1input)).gt.0._dp) Then 
-Write(io_L,101) 16, Aimag(alp1input) ,"# alp1input"
-End if 
-If (Abs(Aimag(alp2input)).gt.0._dp) Then 
-Write(io_L,101) 17, Aimag(alp2input) ,"# alp2input"
-End if 
-If (Abs(Aimag(alp3input)).gt.0._dp) Then 
-Write(io_L,101) 18, Aimag(alp3input) ,"# alp3input"
-End if 
 If (Abs(Aimag(MD11)).gt.0._dp) Then 
 Write(io_L,101) 111, Aimag(MD11) ,"# MD11"
 End if 
@@ -2133,11 +2069,103 @@ End If
 End if 
  
 Write(io_L,106) "Block AddPars Q=1.0000E00 # Additional parameters not appearing elsewhere; scale Q just a dummy" 
-Write(io_L,104) 2, Abs(gR), "# gR "  
-Write(io_L,104) 3, Abs(k2), "# k2 "  
-Write(io_L,104) 4, Abs(vL), "# vL "  
-Write(io_L,104) 5, Abs(YL1), "# YL1 "  
-Write(io_L,104) 6, Abs(YL2), "# YL2 "  
+Write(io_L,104) 1, Abs(gR), "# gR "  
+Write(io_L,104) 2, Abs(k2), "# k2 "  
+Write(io_L,104) 3, Abs(vL), "# vL "  
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
+Write(io_L,107)1,3,Real(MD(1,3),dp), "# Real(MD(1,3),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
+Write(io_L,107)1,3,Aimag(MD(1,3)), "# Aimag(MD(1,3))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
+Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
+Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
+Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
+Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
+Write(io_L,107)1,3,Real(MD(1,3),dp), "# Real(MD(1,3),dp)" 
+Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
+Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
+Write(io_L,107)2,3,Real(MD(2,3),dp), "# Real(MD(2,3),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
+Write(io_L,107)1,3,Aimag(MD(1,3)), "# Aimag(MD(1,3))" 
+Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
+Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
+Write(io_L,107)2,3,Aimag(MD(2,3)), "# Aimag(MD(2,3))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
+Write(io_L,107)3,1,Real(MD(3,1),dp), "# Real(MD(3,1),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
+Write(io_L,107)3,1,Aimag(MD(3,1)), "# Aimag(MD(3,1))" 
+End If 
+
+Write(io_L,106) "Block MD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
+Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
+Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
+Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
+Write(io_L,107)3,1,Real(MD(3,1),dp), "# Real(MD(3,1),dp)" 
+Write(io_L,107)3,2,Real(MD(3,2),dp), "# Real(MD(3,2),dp)" 
+If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
+Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
+Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
+Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
+Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
+Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
+Write(io_L,107)3,1,Aimag(MD(3,1)), "# Aimag(MD(3,1))" 
+Write(io_L,107)3,2,Aimag(MD(3,2)), "# Aimag(MD(3,2))" 
+End If 
+
 Write(io_L,106) "Block MD Q=",Q,"# (  )" 
 Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
 Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
@@ -2184,22 +2212,10 @@ Write(io_L,100) "#   PDG code      mass          particle"
  Write(io_L,102) INT(Abs(PDGFv(7))),MFv(7),"# "//Trim(NameParticleFv(7))// "" 
  Write(io_L,102) INT(Abs(PDGFv(8))),MFv(8),"# "//Trim(NameParticleFv(8))// "" 
  Write(io_L,102) INT(Abs(PDGFv(9))),MFv(9),"# "//Trim(NameParticleFv(9))// "" 
- Write(io_L,102) INT(Abs(PDGhh(1))),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1),"# "//Trim(NameParticlehh(1))// "" 
- Write(io_L,102) INT(Abs(PDGhh(2))),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2),"# "//Trim(NameParticlehh(2))// "" 
- Write(io_L,102) INT(Abs(PDGhh(3))),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(3),"# "//Trim(NameParticlehh(3))// "" 
- Write(io_L,102) INT(Abs(PDGhh(4))),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(4),"# "//Trim(NameParticlehh(4))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(1))),Mhh(1),"# "//Trim(NameParticlehh(1))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(2))),Mhh(2),"# "//Trim(NameParticlehh(2))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(3))),Mhh(3),"# "//Trim(NameParticlehh(3))// "" 
+ Write(io_L,102) INT(Abs(PDGhh(4))),Mhh(4),"# "//Trim(NameParticlehh(4))// "" 
  Write(io_L,102) INT(Abs(PDGHpm(3))),MHpm(3),"# "//Trim(NameParticleHpm(3))// "" 
  Write(io_L,102) INT(Abs(PDGHpm(4))),MHpm(4),"# "//Trim(NameParticleHpm(4))// "" 
 If (OutputForMG)  Write(io_L,102) 21,0._dp,"# VG" 
@@ -2212,20 +2228,32 @@ If (OutputForMG)  Write(io_L,102) 22,0._dp,"# VP"
  
 If (GetMassUncertainty) Then
 Write(io_L,100) "Block DMASS  # Overall uncertainty"
- Write(io_L,102) INT(Abs(36)), Sqrt(mass_uncertainty_Q(3)**2+mass_uncertainty_Yt(3)**2),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), Sqrt(mass_uncertainty_Q(4)**2+mass_uncertainty_Yt(4)**2),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), Sqrt(mass_uncertainty_Q(7)**2+mass_uncertainty_Yt(7)**2),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), Sqrt(mass_uncertainty_Q(8)**2+mass_uncertainty_Yt(8)**2),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(25)), Sqrt(mass_uncertainty_Q(1)**2+mass_uncertainty_Yt(1)**2),"# Mhh(1) " 
+ Write(io_L,102) INT(Abs(35)), Sqrt(mass_uncertainty_Q(2)**2+mass_uncertainty_Yt(2)**2),"# Mhh(2) " 
+ Write(io_L,102) INT(Abs(335)), Sqrt(mass_uncertainty_Q(3)**2+mass_uncertainty_Yt(3)**2),"# Mhh(3) " 
+ Write(io_L,102) INT(Abs(445)), Sqrt(mass_uncertainty_Q(4)**2+mass_uncertainty_Yt(4)**2),"# Mhh(4) " 
+ Write(io_L,102) INT(Abs(36)), Sqrt(mass_uncertainty_Q(7)**2+mass_uncertainty_Yt(7)**2),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), Sqrt(mass_uncertainty_Q(8)**2+mass_uncertainty_Yt(8)**2),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), Sqrt(mass_uncertainty_Q(11)**2+mass_uncertainty_Yt(11)**2),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), Sqrt(mass_uncertainty_Q(12)**2+mass_uncertainty_Yt(12)**2),"# MHpm(4) " 
 Write(io_L,100) "Block DMASSQ  # Scale uncertainty"
- Write(io_L,102) INT(Abs(36)), mass_uncertainty_Q(3),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), mass_uncertainty_Q(4),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Q(7),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Q(8),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(25)), mass_uncertainty_Q(1),"# Mhh(1) " 
+ Write(io_L,102) INT(Abs(35)), mass_uncertainty_Q(2),"# Mhh(2) " 
+ Write(io_L,102) INT(Abs(335)), mass_uncertainty_Q(3),"# Mhh(3) " 
+ Write(io_L,102) INT(Abs(445)), mass_uncertainty_Q(4),"# Mhh(4) " 
+ Write(io_L,102) INT(Abs(36)), mass_uncertainty_Q(7),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), mass_uncertainty_Q(8),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Q(11),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Q(12),"# MHpm(4) " 
 Write(io_L,100) "Block DMASST  # Top Matching uncertainty"
- Write(io_L,102) INT(Abs(36)), mass_uncertainty_Yt(3),"# MAh(3) " 
- Write(io_L,102) INT(Abs(46)), mass_uncertainty_Yt(4),"# MAh(4) " 
- Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Yt(7),"# MHpm(3) " 
- Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Yt(8),"# MHpm(4) " 
+ Write(io_L,102) INT(Abs(25)), mass_uncertainty_Yt(1),"# Mhh(1) " 
+ Write(io_L,102) INT(Abs(35)), mass_uncertainty_Yt(2),"# Mhh(2) " 
+ Write(io_L,102) INT(Abs(335)), mass_uncertainty_Yt(3),"# Mhh(3) " 
+ Write(io_L,102) INT(Abs(445)), mass_uncertainty_Yt(4),"# Mhh(4) " 
+ Write(io_L,102) INT(Abs(36)), mass_uncertainty_Yt(7),"# MAh(3) " 
+ Write(io_L,102) INT(Abs(46)), mass_uncertainty_Yt(8),"# MAh(4) " 
+ Write(io_L,102) INT(Abs(-37)), mass_uncertainty_Yt(11),"# MHpm(3) " 
+ Write(io_L,102) INT(Abs(-47)), mass_uncertainty_Yt(12),"# MHpm(4) " 
 End if
 Write(io_L,106) "Block SCALARMIX Q=",Q,"# ()" 
 Write(io_L,107)1,1,ZH(1,1), "# ZH(1,1)" 
@@ -8747,22 +8775,10 @@ Write(123,*) "Mnu6= ", Abs(MFv(6))
 Write(123,*) "Mnu7= ", Abs(MFv(7)) 
 Write(123,*) "Mnu8= ", Abs(MFv(8)) 
 Write(123,*) "Mnu9= ", Abs(MFv(9)) 
-Write(123,*) "Mhh1= ", Abs(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1)) 
-Write(123,*) "Mhh2= ", Abs(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2)) 
-Write(123,*) "Mhh3= ", Abs(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(3)) 
-Write(123,*) "Mhh4= ", Abs(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(4)) 
+Write(123,*) "Mhh1= ", Abs(Mhh(1)) 
+Write(123,*) "Mhh2= ", Abs(Mhh(2)) 
+Write(123,*) "Mhh3= ", Abs(Mhh(3)) 
+Write(123,*) "Mhh4= ", Abs(Mhh(4)) 
 Write(123,*) "MHpm3= ", Abs(MHpm(3)) 
 Write(123,*) "MHpm4= ", Abs(MHpm(4)) 
 Write(123,*) "MWRm= ", Abs(MVWRm) 
@@ -9346,22 +9362,10 @@ Open(92,file="BR_t.dat",status="unknown")
 Open(93,file="LEP_HpHm_CS_ratios.dat",status="unknown") 
 Write(87,"(I1)",advance="No") 1 
 Write(88,"(I1)",advance="No") 1 
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(3)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(4)
+Write(87,"(2e16.8)",advance="No") Mhh(1)
+Write(87,"(2e16.8)",advance="No") Mhh(2)
+Write(87,"(2e16.8)",advance="No") Mhh(3)
+Write(87,"(2e16.8)",advance="No") Mhh(4)
 Write(87,"(2e16.8)",advance="No") MAh(3)
 Write(87,"(2e16.8)",advance="No") MAh(4)
 Write(88,"(2e16.8)",advance="No") MHpm(3)
@@ -9582,22 +9586,10 @@ Open(91,file="BR_Hplus.dat",status="unknown")
 Open(92,file="BR_t.dat",status="unknown") 
 Write(87,"(I1)",advance="No") 1 
 Write(88,"(I1)",advance="No") 1 
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(1)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(2)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(3)
-Write(87,"(2e16.8)",advance="No")                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(4)
+Write(87,"(2e16.8)",advance="No") Mhh(1)
+Write(87,"(2e16.8)",advance="No") Mhh(2)
+Write(87,"(2e16.8)",advance="No") Mhh(3)
+Write(87,"(2e16.8)",advance="No") Mhh(4)
 Write(87,"(2e16.8)",advance="No") MAh(3)
 Write(87,"(2e16.8)",advance="No") MAh(4)
 Write(88,"(2e16.8)",advance="No") MHpm(3)

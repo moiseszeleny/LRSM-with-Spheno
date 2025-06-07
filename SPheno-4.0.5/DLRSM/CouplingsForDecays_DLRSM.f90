@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:29 on 7.6.2025   
+! File created at 16:58 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -25,11 +25,11 @@ Contains
  
  
 Subroutine CouplingsFor_Fu_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFuFuAhL,cplcFuFuAhR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFdcVWLmL,              & 
@@ -49,10 +49,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -68,8 +68,8 @@ Complex(dp),Intent(out) :: cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFdHpmL(3,
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -108,12 +108,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -136,6 +134,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -146,8 +146,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFuFuAhL = 0._dp 
 cplcFuFuAhR = 0._dp 
@@ -235,11 +233,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fu_decays_2B
  
 Subroutine CouplingsFor_Fe_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,       & 
@@ -259,10 +257,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -278,8 +276,8 @@ Complex(dp),Intent(out) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -318,12 +316,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -346,6 +342,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -356,8 +354,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFeFeAhL = 0._dp 
 cplcFeFeAhR = 0._dp 
@@ -445,11 +441,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fe_decays_2B
  
 Subroutine CouplingsFor_Fd_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,       & 
@@ -469,10 +465,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -488,8 +484,8 @@ Complex(dp),Intent(out) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -528,12 +524,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -556,6 +550,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -566,8 +562,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFdFdAhL = 0._dp 
 cplcFdFdAhR = 0._dp 
@@ -655,11 +649,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fd_decays_2B
  
 Subroutine CouplingsFor_hh_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplHiggsPP,cplHiggsGG,cplHiggsZZvirt,cplHiggsWWvirt,cplAhAhhh,cplAhhhHpm,      & 
@@ -681,10 +675,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -702,8 +696,8 @@ Complex(dp),Intent(out) :: cplHiggsPP(4),cplHiggsGG(4),cplHiggsZZvirt(4),cplHigg
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -764,12 +758,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -1007,6 +999,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -1017,8 +1011,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 !----------------------------------------------------
 ! Scalar Higgs coupling ratios 
@@ -1269,11 +1261,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_hh_decays_2B
  
 Subroutine CouplingsFor_Fv_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplFvFvAhL,cplFvFvAhR,cplFvFeHpmL,cplFvFeHpmR,cplFvFecVWLmL,cplFvFecVWLmR,     & 
@@ -1293,10 +1285,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -1312,8 +1304,8 @@ Complex(dp),Intent(out) :: cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFeHpmL(9,3,4
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -1352,12 +1344,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -1380,6 +1370,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -1390,8 +1382,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplFvFvAhL = 0._dp 
 cplFvFvAhR = 0._dp 
@@ -1479,11 +1469,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fv_decays_2B
  
 Subroutine CouplingsFor_VZ_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,         & 
@@ -1503,10 +1493,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -1522,8 +1512,8 @@ Complex(dp),Intent(out) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplc
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -1562,12 +1552,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -1590,6 +1578,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -1600,8 +1590,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplAhhhVZ = 0._dp 
 Do gt1 = 1, 4
@@ -1709,11 +1697,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_VZ_decays_2B
  
 Subroutine CouplingsFor_VZR_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,            & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,   & 
@@ -1733,10 +1721,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -1752,8 +1740,8 @@ Complex(dp),Intent(out) :: cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),c
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -1792,12 +1780,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -1820,6 +1806,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -1830,8 +1818,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplAhhhVZR = 0._dp 
 Do gt1 = 1, 4
@@ -1939,11 +1925,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_VZR_decays_2B
  
 Subroutine CouplingsFor_Hpm_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,            & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplAhAhcHpm,cplAhhhcHpm,cplAhHpmcHpm,cplAhcHpmcVWLm,cplAhcHpmcVWRm,            & 
@@ -1964,10 +1950,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -1985,8 +1971,8 @@ Complex(dp),Intent(out) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmcHpm(4,
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -2025,12 +2011,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -2053,6 +2037,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -2063,8 +2049,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplAhAhcHpm = 0._dp 
 Do gt1 = 1, 4
@@ -2258,11 +2242,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Hpm_decays_2B
  
 Subroutine CouplingsFor_Ah_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplPseudoHiggsPP,cplPseudoHiggsGG,cplAhAhhh,cplAhAhHpm,cplcFdFdAhL,            & 
@@ -2282,10 +2266,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -2302,8 +2286,8 @@ Complex(dp),Intent(out) :: cplPseudoHiggsPP(4),cplPseudoHiggsGG(4),cplAhAhhh(4,4
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -2364,12 +2348,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -2554,6 +2536,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -2564,8 +2548,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 !----------------------------------------------------
 ! Pseudo Scalar Higgs coupling ratios 
@@ -2766,11 +2748,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Ah_decays_2B
  
 Subroutine CouplingsFor_VWLm_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,           & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplAhcVWLmVWRm,cplAhcHpmcVWLm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,     & 
@@ -2790,10 +2772,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -2809,8 +2791,8 @@ Complex(dp),Intent(out) :: cplAhcVWLmVWRm(4),cplAhcHpmcVWLm(4,4),cplcFuFdcVWLmL(
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -2849,12 +2831,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -2877,6 +2857,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -2887,8 +2869,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplAhcHpmcVWLm = 0._dp 
 Do gt1 = 1, 4
@@ -2990,11 +2970,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_VWLm_decays_2B
  
 Subroutine CouplingsFor_VWRm_decays_2B(m_in,i1,MAhinput,MAh2input,MFdinput,           & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplAhcVWRmVWLm,cplAhcHpmcVWRm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,     & 
@@ -3014,10 +2994,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -3033,8 +3013,8 @@ Complex(dp),Intent(out) :: cplAhcVWRmVWLm(4),cplAhcHpmcVWRm(4,4),cplcFuFdcVWRmL(
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -3073,12 +3053,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -3101,6 +3079,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -3111,8 +3091,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplAhcHpmcVWRm = 0._dp 
 Do gt1 = 1, 4
@@ -3214,11 +3192,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_VWRm_decays_2B
  
 Subroutine CouplingsFor_Fu_decays_3B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,       & 
@@ -3244,10 +3222,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -3271,8 +3249,8 @@ Complex(dp),Intent(out) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -3311,12 +3289,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -3339,6 +3315,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -3349,8 +3327,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFdFdAhL = 0._dp 
 cplcFdFdAhR = 0._dp 
@@ -3646,11 +3622,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fu_decays_3B
  
 Subroutine CouplingsFor_Fe_decays_3B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,       & 
@@ -3676,10 +3652,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -3703,8 +3679,8 @@ Complex(dp),Intent(out) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -3743,12 +3719,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -3771,6 +3745,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -3781,8 +3757,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFdFdAhL = 0._dp 
 cplcFdFdAhR = 0._dp 
@@ -4078,11 +4052,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fe_decays_3B
  
 Subroutine CouplingsFor_Fd_decays_3B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,       & 
@@ -4108,10 +4082,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -4135,8 +4109,8 @@ Complex(dp),Intent(out) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -4175,12 +4149,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -4203,6 +4175,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -4213,8 +4187,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFdFdAhL = 0._dp 
 cplcFdFdAhR = 0._dp 
@@ -4510,11 +4482,11 @@ Iname = Iname - 1
 End subroutine CouplingsFor_Fd_decays_3B
  
 Subroutine CouplingsFor_Fv_decays_3B(m_in,i1,MAhinput,MAh2input,MFdinput,             & 
-& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,MHpminput,          & 
-& MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,           & 
-& MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,ZERinput,UPinput,              & 
-& ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,ZZinput,$Failedinput,      & 
-& $Failed,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
+& MFd2input,MFeinput,MFe2input,MFuinput,MFu2input,MFvinput,MFv2input,Mhhinput,           & 
+& Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
+& ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
+& ZZinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,              & 
 & RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,Yinput,          & 
 & YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,k1input,        & 
 & vRinput,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,       & 
@@ -4540,10 +4512,10 @@ Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),Y
 & Muxinput(3,3)
 
 Real(dp),Intent(in) :: MAhinput(4),MAh2input(4),MFdinput(3),MFd2input(3),MFeinput(3),MFe2input(3),           & 
-& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),MHpminput(4),MHpm2input(4),          & 
-& MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,MVZinput,MVZ2input,MVZRinput,            & 
-& MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),ZHinput(4,4),$Failedinput(4),   & 
-& $Failed(4)
+& MFuinput(3),MFu2input(3),MFvinput(9),MFv2input(9),Mhhinput(4),Mhh2input(4),            & 
+& MHpminput(4),MHpm2input(4),MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,              & 
+& MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput(4,4),UPinput(4,4),   & 
+& ZHinput(4,4)
 
 Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3),ZELinput(3,3),ZULinput(3,3),  & 
 & ZMinput(9,9),ZWinput(4,4),ZZinput(3,3)
@@ -4567,8 +4539,8 @@ Complex(dp),Intent(out) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3
 
 Integer :: i2, i3, gt1, gt2, gt3, kont 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -4607,12 +4579,10 @@ Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,        
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 ! --- Calculate running tree-level masses for loop induced couplings and Quark mixing matrices --- 
-Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,              & 
-& MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,               & 
-& ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,List(List($Failed,0,0,0),List(0,$Failed,0,0)           & 
-& ,List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)),k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
-& MU12,MU22,.True.,kont)
+Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
+& MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,.True.,kont)
 
 If (ExternalZfactors) Then 
 ! --- Use the 1-loop mixing matrices calculated at M_SUSY in the vertices --- 
@@ -4635,6 +4605,8 @@ MFu = MFuinput
 MFu2 = MFu2input 
 MFv = MFvinput 
 MFv2 = MFv2input 
+Mhh = Mhhinput 
+Mhh2 = Mhh2input 
 MHpm = MHpminput 
 MHpm2 = MHpm2input 
 MVWLm = MVWLminput 
@@ -4645,8 +4617,6 @@ MVZ = MVZinput
 MVZ2 = MVZ2input 
 MVZR = MVZRinput 
 MVZR2 = MVZR2input 
-$Failed = $Failedinput 
-List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed)) = List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))input 
 End if 
 cplcFdFdAhL = 0._dp 
 cplcFdFdAhR = 0._dp 

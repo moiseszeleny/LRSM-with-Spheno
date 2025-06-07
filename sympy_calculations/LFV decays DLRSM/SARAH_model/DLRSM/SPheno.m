@@ -3,21 +3,21 @@
 OnlyLowEnergySPheno = True;
 
 MINPAR={{1, vRinput},
-        {2, vLinput},
+        (*{2, vLinput},*)
         (*{3, TanBeta},*)
-        {4, k1input},
-        {5, k2input},
-        {6, lam1input},
-        {7, lam2input},
-        {8, lam3input},
-        {9, lam4input},
-        {10, lam5input},
-        {11, lam6input},
-        {14, rho1input},
-        {15, rho2input},
-        {16, alp1input},
-        {17, alp2input},
-        {18, alp3input},
+        (*{4, k1input},*)
+        (*{5, k2input},*)
+        {2, lam1input},
+        {3, lam2input},
+        {4, lam3input},
+        {5, lam4input},
+        {6, lam5input},
+        {7, lam6input},
+        {8, rho1input},
+        {9, rho2input},
+        {10, alp1input},
+        {11, alp2input},
+        {12, alp3input},
         {111, MD11},
         {112, MD12},
         {113, MD13},
@@ -29,11 +29,15 @@ MINPAR={{1, vRinput},
         {133, MD33}
         };
 
-RealParameters = {(*TanBeta,*)vRinput,vLinput, k1input, k2input};
+RealParameters = {
+    (*TanBeta,*)vRinput (*,vLinput, k1input, k2input*),
+    lam1input, lam2input, lam3input, lam4input, lam5input, lam6input,
+    rho1input, rho2input, alp1input, alp2input, alp3input
+};
 
 ParametersToSolveTadpoles = {mu12,mu22};
 
-AdditionalVariablesSPheno = {MD[3,3]};
+(*AdditionalVariablesSPheno = {MD[3,3]};*)
 
 BoundaryLowScaleInput={
     {g3, g3SM},
@@ -50,13 +54,16 @@ BoundaryLowScaleInput={
     {MD[3,2], MD32},
     {MD[3,3], MD33},
     {vR, vRinput},
-    {vL, vLinput},
-    {k1, Sqrt[vSM^2- 2 vL^2]*Cos[ArcTan[TanBeta]]},   
-    {k2, Sqrt[vSM^2-2 vL^2]*Sin[ArcTan[TanBeta]]},
-    {YQ2, -Conjg[(Transpose[YdSM]*vHd*vSM - (Matmul[Transpose[YuSM],Conjg[CKM]])*vSM*vHu)/(vHu^2-vHd^2)]},
-    {YQ1, Conjg[(-(MatMul[Transpose[YuSM],Conjg[CKM]])*vSM*vHd + Transpose[YdSM]*vHu*vSM)/(vHu^2-vHd^2)]}, 
-    {YL2, Conjg[(Sqrt[2]*vHu*MD - vSM*vHd*Transpose[YeSM])/(vHu^2-vHd^2)]},  
-    {YL1, Conjg[(-Sqrt[2]*vHd*MD + vSM*vHu*Transpose[YeSM])/(vHu^2-vHd^2)]}
+    (*{vL, vLinput},*)
+    {vL, 0},
+    {k1, vSM}, 
+    {k2, 0}, 
+    (*{k1, Sqrt[vSM^2- 2 vL^2]*Cos[ArcTan[TanBeta]]}, *)  
+    (*{k2, Sqrt[vSM^2-2 vL^2]*Sin[ArcTan[TanBeta]]},*)
+    {YQ2, -Conjg[(Transpose[YdSM]*k1*vSM - (Matmul[Transpose[YuSM],Conjg[CKM]])*vSM*k2)/(k2^2-k1^2)]},
+    {YQ1, Conjg[(-(MatMul[Transpose[YuSM],Conjg[CKM]])*vSM*k1 + Transpose[YdSM]*k2*vSM)/(k2^2-k1^2)]}, 
+    {Yt, Conjg[(Sqrt[2]*k2*MD - vSM*k1*Transpose[YeSM])/(k2^2-k1^2)]},  
+    {Y, Conjg[(-Sqrt[2]*k1*MD + vSM*k2*Transpose[YeSM])/(k2^2-k1^2)]}
 };
 
 QuadruplePrecision = {Fv};

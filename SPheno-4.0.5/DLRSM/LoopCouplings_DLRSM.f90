@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:23 on 7.6.2025   
+! File created at 16:47 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -185,23 +185,16 @@ End Function AlphaS_T
 
 
 
-Subroutine DeltaVB(sinW2,sinW2_dr,rho,0,-2*k1**2*(LAM1 + LAM2),MAh,MFe,               & 
-& MFv,MHpm,MVWLm,MVWRm,MVZR,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)      & 
-&  + ALP3)*vR**2)/2._dp,g2,gBL,k1,PhiW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,ZZ,res)
+Subroutine DeltaVB(sinW2,sinW2_dr,rho,MAh,MFe,MFv,Mhh,MHpm,MVWLm,MVWRm,               & 
+& MVZR,g2,gBL,k1,PhiW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,ZZ,res)
 
 Implicit None 
-Real(dp),Intent(in) :: 0(4),MAh(4),MFe(3),MFv(9),MHpm(4),MVWLm,MVWRm,MVZR,g2,gBL,k1,PhiW,UC(4,4),            & 
+Real(dp),Intent(in) :: MAh(4),MFe(3),MFv(9),Mhh(4),MHpm(4),MVWLm,MVWRm,MVZR,g2,gBL,k1,PhiW,UC(4,4),          & 
 & UP(4,4),vR,ZH(4,4)
 
-Complex(dp),Intent(in) :: -2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,((2._dp*(RHO1)            & 
-&  - RHO2)*vR**2)/2._dp,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2)      & 
-&  + ALP3)*vR**2)/2._dp,ZER(3,3),ZEL(3,3),Y(3,3),YR(3,3),Yt(3,3),ZM(9,9),ZZ(3,3)
+Complex(dp),Intent(in) :: ZER(3,3),ZEL(3,3),Y(3,3),YR(3,3),Yt(3,3),ZM(9,9),ZZ(3,3)
 
-Real(dp) :: MAh2(4),MFe2(3),MFv2(9),MHpm2(4),MVWLm2,MVWRm2,MVZR2
-
-Complex(dp) :: 2,-4*k1*(LAM1 + LAM2),-2*(ALP1 + ALP3)*k1*vR,-2*RHO1*vR2,PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(-22))))))))),& 
-& k1*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(PreDecrement(22)))))))))
+Real(dp) :: MAh2(4),MFe2(3),MFv2(9),Mhh2(4),MHpm2(4),MVWLm2,MVWRm2,MVZR2
 
 Complex(dp) :: cplAhcVWRmVWLm(4),cplAhHpmVWLm(4,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),            & 
 & cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),             & 
@@ -221,27 +214,14 @@ Complex(dp) :: D27m2, D0m2, vertex, phase
 Real(dp) :: cosW2, cosW2_Dr, chargefactor 
 Iname = Iname+1
 NameOfUnit(Iname) = "DeltaVB" 
-2 = 0**2 
--4 k1 (lam1 + lam2) =      2
--2 k1  (lam1 + lam2)**2 
 MAh2 = MAh**2 
 MFe2 = MFe**2 
 MFv2 = MFv**2 
+Mhh2 = Mhh**2 
 MHpm2 = MHpm**2 
 MVWLm2 = MVWLm**2 
 MVWRm2 = MVWRm**2 
 MVZR2 = MVZR**2 
--2 (alp1 + alp3) k1 vR = -((alp1 + alp3) k1 vR)**2 
--2 rho1 vR2 =           2
--2 rho1 vR**2 
---(--(--(--(--(--(--(--(--(-22))))))))) =                   2
-(2 rho1 - rho2) vR
--------------------
-         2**2 
-k1 (lam2 - 4 lam3 - lam5 - lam6) + --(--(--(--(--(--(--(--(--22)))))))) =                                                      2
-  2                                 (-alp2 + alp3) vR
-k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------
-                                            2**2 
 
  
  ! Fix neutrino phases 
@@ -514,18 +494,12 @@ End if
 chargefactor = 1 
 Do i1=1,9
   Do i2=1,4
-If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i2)
 coup1R = cplFvFvhhR(gt1,i1,i2)
 coup2R = Conjg(cplFvFvhhL(gt2,i1,i2))
 coup2L = Conjg(cplFvFvhhR(gt2,i1,i2))
-sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFv2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2))  
+sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFv2(i1),Mhh2(i2))  
 End if 
    End Do
   End Do
@@ -633,18 +607,12 @@ End if
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,3
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2))) Then
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2))) Then
 coup1L = cplcFeFehhL(i2,gt1,i1)
 coup1R = cplcFeFehhR(i2,gt1,i1)
 coup2R = Conjg(cplcFeFehhL(i2,gt2,i1))
 coup2L = Conjg(cplcFeFehhR(i2,gt2,i1))
-sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFe2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1))  
+sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFe2(i2),Mhh2(i1))  
 End if 
    End Do
   End Do
@@ -697,10 +665,7 @@ End Do
 chargefactor = 1 
 Do i1= 1,9
   Do i2= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MVWLm2.gt.mf_l2(2))) Then
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MVWLm2.gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i2)
 coup1R = cplFvFvhhR(gt1,i1,i2)
 coup2L = cplcFeFvVWLmL(gt2,i1)
@@ -741,10 +706,7 @@ End if
 chargefactor = 1 
 Do i1= 1,9
   Do i2= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2))) Then
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i2)
 coup1R = cplFvFvhhR(gt1,i1,i2)
 coup2L = cplcFeFvVWRmL(gt2,i1)
@@ -789,22 +751,13 @@ chargefactor = 1
 Do i1= 1,9
   Do i2= 1,4
    Do i3= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i2)
 coup1R = cplFvFvhhR(gt1,i1,i2)
 coup2L = cplcFeFvcHpmL(gt2,i1,i3)
 coup2R = cplcFeFvcHpmR(gt2,i1,i3)
 coup3 = cplhhHpmVWLm(i2,i3)
-vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3)) + B0(0._dp,                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MHpm2(i3)) +0.5_dp)) 
+vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),Mhh2(i2),MHpm2(i3)) + B0(0._dp,Mhh2(i2),MHpm2(i3)) +0.5_dp)) 
 End if 
    End Do
   End Do
@@ -830,10 +783,7 @@ chargefactor = 1
 Do i1= 1,4
   Do i2= 1,9
    Do i3= 1,3
-  If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2))) Then
+  If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i2,i1)
 coup1R = cplFvFvhhR(gt1,i2,i1)
 coup2L = cplcFeFehhL(gt2,i3,i1)
@@ -841,17 +791,8 @@ coup2R = cplcFeFehhR(gt2,i3,i1)
 coup3L = -cplcFeFvVWLmR(i3,i2)
 coup3R = -cplcFeFvVWLmL(i3,i2)
 vertex = vertex + chargefactor*(coup1L*coup2R*(-sqrt2*coup3R*MFv(i2)*MFe(i3)& 
-& *C0_3m(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),MFe2(i3)) + oosqrt2*coup3L* & 
-& (B0(0._dp,MFv2(i2),MFe2(i3))-0.5_dp +                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1)*C0_3m(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MFv2(i2),MFe2(i3))))) 
+& *C0_3m(Mhh2(i1),MFv2(i2),MFe2(i3)) + oosqrt2*coup3L* & 
+& (B0(0._dp,MFv2(i2),MFe2(i3))-0.5_dp +Mhh2(i1)*C0_3m(Mhh2(i1),MFv2(i2),MFe2(i3))))) 
 End if 
    End Do
   End Do
@@ -929,22 +870,13 @@ chargefactor = 1
 Do i1= 1,3
   Do i2= 1,4
    Do i3= 1,4
-  If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(2))) Then
+  If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2))) Then
 coup1L = cplcFeFvcHpmL(i1,gt1,i2)
 coup1R = cplcFeFvcHpmR(i1,gt1,i2)
 coup2L = cplcFeFehhL(gt2,i1,i3)
 coup2R = cplcFeFehhR(gt2,i1,i3)
 coup3 = -cplhhHpmVWLm(i3,i2)
-vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFe2(i1)*C0_3m(MFe2(i1),MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)) + B0(0._dp,MHpm2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3)) +0.5_dp)) 
+vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFe2(i1)*C0_3m(MFe2(i1),MHpm2(i2),Mhh2(i3)) + B0(0._dp,MHpm2(i2),Mhh2(i3)) +0.5_dp)) 
 End if 
    End Do
   End Do
@@ -955,10 +887,7 @@ chargefactor = 1
 Do i1= 1,3
   i2= 1
    Do i3= 1,4
-  If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWLm2.gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(2))) Then
+  If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWLm2.gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2))) Then
 coup1L = cplcFeFvVWLmL(i1,gt1)
 coup1R = cplcFeFvVWLmR(i1,gt1)
 coup2L = cplcFeFehhL(gt2,i1,i3)
@@ -973,10 +902,7 @@ chargefactor = 1
 Do i1= 1,3
   i2= 1
    Do i3= 1,4
-  If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(2))) Then
+  If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2))) Then
 coup1L = cplcFeFvVWRmL(i1,gt1)
 coup1R = cplcFeFvVWRmR(i1,gt1)
 coup2L = cplcFeFehhL(gt2,i1,i3)
@@ -1182,10 +1108,7 @@ Do i1=1,9
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFv2(i1).gt.mf_l2(2)).Or.(MAh2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(MAh2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(Mhh2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i4)
 coup1R = cplFvFvhhR(gt1,i1,i4)
 coup2L = cplFvFvAhL(gt2,i1,i2)
@@ -1194,10 +1117,7 @@ coup3L = cplcFeFeAhL(i3,gt3,i2)
 coup3R = cplcFeFeAhR(i3,gt3,i2)
 coup4L = cplcFeFehhL(gt4,i3,i4)
 coup4R = cplcFeFehhR(gt4,i3,i4)
-D27m2 = D27_Bagger(MAh2(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MFv2(i1),MFe2(i3))
+D27m2 = D27_Bagger(MAh2(i2),Mhh2(i4),MFv2(i1),MFe2(i3))
 If(Real(D27m2,dp).eq.Real(D27m2,dp)) Then 
 teil = teil + D27m2*chargefactor*coup1L*coup2R*coup3L*coup4R 
 End if
@@ -1234,10 +1154,7 @@ Do i1=1,9
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(MAh2(i4).gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(MAh2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvAhL(gt1,i1,i4)
 coup1R = cplFvFvAhR(gt1,i1,i4)
 coup2L = cplFvFvhhL(gt2,i1,i2)
@@ -1246,10 +1163,7 @@ coup3L = cplcFeFehhL(i3,gt3,i2)
 coup3R = cplcFeFehhR(i3,gt3,i2)
 coup4L = cplcFeFeAhL(gt4,i3,i4)
 coup4R = cplcFeFeAhR(gt4,i3,i4)
-D27m2 = D27_Bagger(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),MAh2(i4),MFv2(i1),MFe2(i3))
+D27m2 = D27_Bagger(Mhh2(i2),MAh2(i4),MFv2(i1),MFe2(i3))
 If(Real(D27m2,dp).eq.Real(D27m2,dp)) Then 
 teil = teil + D27m2*chargefactor*coup1L*coup2R*coup3L*coup4R 
 End if
@@ -1266,13 +1180,7 @@ Do i1=1,9
   Do i2=1,4
     Do i3=1,3
       Do i4=1,4
-If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(Mhh2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i4)
 coup1R = cplFvFvhhR(gt1,i1,i4)
 coup2L = cplFvFvhhL(gt2,i1,i2)
@@ -1281,13 +1189,7 @@ coup3L = cplcFeFehhL(i3,gt3,i2)
 coup3R = cplcFeFehhR(i3,gt3,i2)
 coup4L = cplcFeFehhL(gt4,i3,i4)
 coup4R = cplcFeFehhR(gt4,i3,i4)
-D27m2 = D27_Bagger(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4),MFv2(i1),MFe2(i3))
+D27m2 = D27_Bagger(Mhh2(i2),Mhh2(i4),MFv2(i1),MFe2(i3))
 If(Real(D27m2,dp).eq.Real(D27m2,dp)) Then 
 teil = teil + D27m2*chargefactor*coup1L*coup2R*coup3L*coup4R 
 End if
@@ -1303,10 +1205,7 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
     Do i3=1,3
-If ((MFv2(i1).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2))) Then
 coup1L = cplFvFvVZRL(gt1,i1)
 coup1R = cplFvFvVZRR(gt1,i1)
 coup2L = cplFvFvhhL(gt2,i1,i2)
@@ -1346,10 +1245,7 @@ chargefactor = 1
 Do i1=1,9
     Do i3=1,3
       Do i4=1,4
-If ((MFv2(i1).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i4).gt.mf_l2(2))) Then
+If ((MFv2(i1).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MFe2(i3).gt.mf_l2(2)).Or.(Mhh2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i4)
 coup1R = cplFvFvhhR(gt1,i1,i4)
 coup2L = cplFvFvVZRL(gt2,i1)
@@ -1434,10 +1330,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,9
       Do i4=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i4,i1)
 coup1R = cplFvFvhhR(gt1,i4,i1)
 coup2L = cplFvFvhhL(gt2,i2,i1)
@@ -1458,10 +1351,7 @@ Do i1=1,4
   Do i2=1,9
     Do i3=1,4
       Do i4=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i4,i1)
 coup1R = cplFvFvhhR(gt1,i4,i1)
 coup2L = cplFvFvhhL(gt2,i2,i1)
@@ -1470,14 +1360,8 @@ coup3L = cplcFeFvcHpmL(gt4,i2,i3)
 coup3R = cplcFeFvcHpmR(gt4,i2,i3)
 coup4L = cplFvFeHpmL(i4,gt3,i3)
 coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
-D27m2 = D27_Bagger(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
+D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
+D27m2 = D27_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
 If ((Real(D27m2,dp).eq.Real(D27m2,dp)).And.(Real(D0m2,dp).eq.Real(D0m2,dp))) Then 
 teil = teil + 0.5_dp*chargefactor*D27m2*coup1L*coup2R*coup3L*coup4R+D0m2*coup1L*coup2L*coup3R*coup4R 
 End if
@@ -1521,10 +1405,7 @@ Do i1=1,4
   Do i2=1,3
     Do i3=1,4
       Do i4=1,3
-If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
+If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFeHpmL(gt1,i4,i1)
 coup1R = cplFvFeHpmR(gt1,i4,i1)
 coup2L = cplcFeFvcHpmL(i2,gt2,i1)
@@ -1533,14 +1414,8 @@ coup3L = cplcFeFehhL(gt4,i2,i3)
 coup3R = cplcFeFehhR(gt4,i2,i3)
 coup4L = cplcFeFehhL(i4,gt3,i3)
 coup4R = cplcFeFehhR(i4,gt3,i3)
-D0m2 = D0_Bagger(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i2),MFe2(i4))*MFe(i2)*MFe(i4) 
-D27m2 = D27_Bagger(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFe2(i2),MFe2(i4))
+D0m2 = D0_Bagger(MHpm2(i1),Mhh2(i3),MFe2(i2),MFe2(i4))*MFe(i2)*MFe(i4) 
+D27m2 = D27_Bagger(MHpm2(i1),Mhh2(i3),MFe2(i2),MFe2(i4))
 If ((Real(D27m2,dp).eq.Real(D27m2,dp)).And.(Real(D0m2,dp).eq.Real(D0m2,dp))) Then 
 teil = teil + 0.5_dp*chargefactor*D27m2*coup1L*coup2R*coup3L*coup4R+D0m2*coup1L*coup2L*coup3R*coup4R 
 End if
@@ -1622,10 +1497,7 @@ chargefactor = 1
 Do i1=1,4
   Do i2=1,3
       Do i4=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i4,i1)
 coup1R = cplFvFvhhR(gt1,i4,i1)
 coup2L = cplcFeFehhL(gt4,i2,i1)
@@ -1646,10 +1518,7 @@ Do i1=1,4
   Do i2=1,3
     Do i3=1,4
       Do i4=1,9
-If ((                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i4,i1)
 coup1R = cplFvFvhhR(gt1,i4,i1)
 coup2L = cplcFeFehhL(gt4,i2,i1)
@@ -1658,10 +1527,7 @@ coup3L = cplcFeFvcHpmL(i2,gt2,i3)
 coup3R = cplcFeFvcHpmR(i2,gt2,i3)
 coup4L = cplFvFeHpmL(i4,gt3,i3)
 coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
+D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
 If (Real(D0m2,dp).eq.Real(D0m2,dp)) Then 
 teil = teil + 0.5_dp*chargefactor*D0m2*coup1L*coup2R*coup3R*coup4L 
 End if
@@ -1704,10 +1570,7 @@ Do i1=1,4
   Do i2=1,9
     Do i3=1,4
       Do i4=1,3
-If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
+If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
 coup1L = cplFvFeHpmL(gt1,i4,i1)
 coup1R = cplFvFeHpmR(gt1,i4,i1)
 coup2L = cplcFeFvcHpmL(gt4,i2,i1)
@@ -1716,10 +1579,7 @@ coup3L = cplFvFvhhL(gt2,i2,i3)
 coup3R = cplFvFvhhR(gt2,i2,i3)
 coup4L = cplcFeFehhL(i4,gt3,i3)
 coup4R = cplcFeFehhR(i4,gt3,i3)
-D0m2 = D0_Bagger(MHpm2(i1),                                                       2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  22(i3),MFv2(i2),MFe2(i4))*MFv(i2)*MFe(i4) 
+D0m2 = D0_Bagger(MHpm2(i1),Mhh2(i3),MFv2(i2),MFe2(i4))*MFv(i2)*MFe(i4) 
 If (Real(D0m2,dp).eq.Real(D0m2,dp)) Then 
 teil = teil + 0.5_dp*chargefactor*D0m2*coup1L*coup2R*coup3R*coup4L 
 End if

@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 13:24 on 7.6.2025   
+! File created at 16:49 on 7.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -18,9 +18,8 @@ Use ThreeBodyPhaseSpace
 Contains 
  
 Subroutine FeThreeBodyDecay(n_in,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
-& MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
-& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,$Failed,0,0,0,0,$Failed,0,              & 
-& 0,0,0,$Failed,$Failed,0,0,$Failed,$Failed,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,               & 
+& MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,           & 
+& TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
 & RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,             & 
 & gTAh,gThh,gTHpm,gTVWLm,gTVWRm,gTVZ,gTVZR,gFeFecFdFd,gFeFecFeFe,gFeFecFuFu,             & 
 & gFeFeFvFv,gFeFvcFuFd,epsI,deltaM,CheckRealStates,gT,gPartial,BR)
@@ -28,8 +27,8 @@ Subroutine FeThreeBodyDecay(n_in,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,       
 Implicit None 
  
 Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC(4,4),        & 
-& UP(4,4),ZH(4,4),$Failed(4),List(List($Failed,0,0,0),List(0,$Failed,0,0),List(0,0,$Failed,$Failed),List(0,0,$Failed,$Failed))(4)
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
 
 Complex(dp),Intent(in) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
 
@@ -127,19 +126,18 @@ End If
 Do i_run = i_start, i_end 
  
 Call CouplingsFor_Fe_decays_3B(MFe(i_run),i_run,MAh,MAh2,MFd,MFd2,MFe,MFe2,           & 
-& MFu,MFu2,MFv,MFv2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,$Failed,$Failed,0,0,0,               & 
-& 0,$Failed,0,0,0,0,$Failed,$Failed,0,0,$Failed,$Failed,gBL,g2,g3,LAM2,LAM1,             & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,k1,vR,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,    & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,             & 
-& cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,         & 
-& cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
-& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,cplcFuFuAhR,       & 
-& cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,deltaM)
+& MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
+& MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,           & 
+& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
+& MU12,MU22,k1,vR,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,           & 
+& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,             & 
+& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,           & 
+& cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFdcVWLmL,  & 
+& cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFuAhL,    & 
+& cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,              & 
+& cplcFuFuVZRR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,      & 
+& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplFvFvVZRL,cplFvFvVZRR,deltaM)
 
 IntegralVs = 0._dp 
 NVs = 0  
@@ -162,57 +160,47 @@ NSSst = 0
 
  
 gFeFecFdFdi = 0._dp 
-Call FeToFecFdFd(i_run,MFe,MFd,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,     & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,             & 
-& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,              & 
-& IntegralSSss,IntegralVs,IntegralVSss,IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,           & 
-& gTVZtemp,gTVZRtemp,gTAhtemp,gThhtemp,deltaM,epsI,check,gFeFecFdFdi)
+Call FeToFecFdFd(i_run,MFe,MFd,MVZ,MVZR,MAh,Mhh,cplcFdFdAhL,cplcFdFdAhR,              & 
+& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,             & 
+& cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,               & 
+& cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,             & 
+& IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,gTVZtemp,gTVZRtemp,gTAhtemp,gThhtemp,           & 
+& deltaM,epsI,check,gFeFecFdFdi)
 
 gFeFecFdFd(i_run,:,:,:) = gFeFecFdFdi 
 gT(i_run) = gT(i_run) + Sum(gFeFecFdFdi) 
  
 gFeFecFeFei = 0._dp 
-Call FeToFecFeFe(i_run,MFe,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6)     & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,     & 
-& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,IntegralSSss,IntegralSSst,            & 
-& IntegralVs,IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,              & 
-& NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZtemp,gTVZRtemp,gTAhtemp,gThhtemp,deltaM,         & 
-& epsI,check,gFeFecFeFei)
+Call FeToFecFeFe(i_run,MFe,MVZ,MVZR,MAh,Mhh,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,      & 
+& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,              & 
+& IntegralSSss,IntegralSSst,IntegralVs,IntegralVSss,IntegralVSst,IntegralVVss,           & 
+& IntegralVVst,NSs,NSSss,NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZtemp,gTVZRtemp,           & 
+& gTAhtemp,gThhtemp,deltaM,epsI,check,gFeFecFeFei)
 
 gFeFecFeFe(i_run,:,:,:) = gFeFecFeFei 
 gT(i_run) = gT(i_run) + Sum(gFeFecFeFei) 
  
 gFeFecFuFui = 0._dp 
-Call FeToFecFuFu(i_run,MFe,MFu,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,     & 
-& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,             & 
-& cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,IntegralSs,              & 
-& IntegralSSss,IntegralVs,IntegralVSss,IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,           & 
-& gTVZtemp,gTVZRtemp,gTAhtemp,gThhtemp,deltaM,epsI,check,gFeFecFuFui)
+Call FeToFecFuFu(i_run,MFe,MFu,MVZ,MVZR,MAh,Mhh,cplcFeFeAhL,cplcFeFeAhR,              & 
+& cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,             & 
+& cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,             & 
+& IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,gTVZtemp,gTVZRtemp,gTAhtemp,gThhtemp,           & 
+& deltaM,epsI,check,gFeFecFuFui)
 
 gFeFecFuFu(i_run,:,:,:) = gFeFecFuFui 
 gT(i_run) = gT(i_run) + Sum(gFeFecFuFui) 
  
 gFeFeFvFvi = 0._dp 
-Call FeToFeFvFv(i_run,MFe,MFv,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,           & 
-& cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplFvFecVWLmL,   & 
-& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
-& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,        & 
-& IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,IntegralVSss,IntegralVSst,             & 
-& IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZtemp,        & 
-& gTVZRtemp,gTVWLmtemp,gTVWRmtemp,gTHpmtemp,gTAhtemp,gThhtemp,deltaM,epsI,               & 
-& check,gFeFeFvFvi)
+Call FeToFeFvFv(i_run,MFe,MFv,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,Mhh,cplcFeFeAhL,          & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
+& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
+& cplcFeFvVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,     & 
+& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplFvFvVZRL,cplFvFvVZRR,IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,               & 
+& IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,               & 
+& NVSss,NVSst,NVVss,NVVst,gTVZtemp,gTVZRtemp,gTVWLmtemp,gTVWRmtemp,gTHpmtemp,            & 
+& gTAhtemp,gThhtemp,deltaM,epsI,check,gFeFeFvFvi)
 
 gFeFeFvFv(i_run,:,:,:) = gFeFeFvFvi 
 gT(i_run) = gT(i_run) + Sum(gFeFeFvFvi) 
@@ -296,26 +284,21 @@ Iname = Iname - 1
 End Subroutine FeThreeBodyDecay
  
  
-Subroutine FeToFecFdFd(iIN,MFe,MFd,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3)            & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,         & 
-& cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,             & 
-& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,IntegralVVss,             & 
-& NSs,NSSss,NVs,NVSss,NVVss,gTVZ,gTVZR,gTAh,gThh,deltaM,epsI,check,g,WriteContributions)
+Subroutine FeToFecFdFd(iIN,MFe,MFd,MVZ,MVZR,MAh,Mhh,cplcFdFdAhL,cplcFdFdAhR,          & 
+& cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,             & 
+& cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,               & 
+& cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,             & 
+& IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,gTVZ,gTVZR,gTAh,gThh,deltaM,epsI,               & 
+& check,g,WriteContributions)
 
 Implicit None 
  
-Real(dp),Intent(in) :: MFe(3),MFd(3),MVZ,MVZR,MAh(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MFe(3),MFd(3),MVZ,MVZR,MAh(4),Mhh(4)
 
-Complex(dp),Intent(in) :: k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)            & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),    & 
-& cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),               & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),             & 
-& cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3)
+Complex(dp),Intent(in) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),          & 
+& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),& 
+& cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),             & 
+& cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3)
 
 Real(dp),Intent(inout) :: IntegralSs(500000,10),IntegralVs(25000,9),IntegralVVss(500000,12)
 
@@ -485,21 +468,12 @@ Contribution(gt1,gt2,gt3,Isum)='Ah'
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
-Boson2(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson2(1) = Mhh(i1) 
 Boson2(2) =gThh(i1) 
  
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) =gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(3) = Mhh(i1) 
 Boson4(4) =gThh(i1) 
  
 resS=0._dp 
@@ -622,10 +596,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZ,Ah'
   Do i2=1,4
 Boson4(1) = MVZ 
 Boson4(2) = gTVZ 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -711,10 +682,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZR,Ah'
   Do i2=1,4
 Boson4(1) = MVZR 
 Boson4(2) = gTVZR 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -803,10 +771,7 @@ Do i1=1,4
   Do i2=1,4
 Boson4(1) = MAh(i1) 
 Boson4(2) = gTAh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -849,15 +814,9 @@ Contribution(gt1,gt2,gt3,Isum)='Ah,hh'
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) = gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -920,24 +879,18 @@ End If
 End Subroutine FeToFecFdFd 
  
  
-Subroutine FeToFecFeFe(iIN,MFe,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) & 
-&  + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1) - RHO2)*vR**2)          & 
-& /2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR),0,0,-((ALP1 + ALP3)       & 
-& *k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,     & 
-& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,IntegralSs,IntegralSSss,IntegralSSst,            & 
-& IntegralVs,IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,              & 
-& NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZ,gTVZR,gTAh,gThh,deltaM,epsI,check,              & 
-& g,WriteContributions)
+Subroutine FeToFecFeFe(iIN,MFe,MVZ,MVZR,MAh,Mhh,cplcFeFeAhL,cplcFeFeAhR,              & 
+& cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,             & 
+& IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,IntegralVSss,IntegralVSst,             & 
+& IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZ,            & 
+& gTVZR,gTAh,gThh,deltaM,epsI,check,g,WriteContributions)
 
 Implicit None 
  
-Real(dp),Intent(in) :: MFe(3),MVZ,MVZR,MAh(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MFe(3),MVZ,MVZR,MAh(4),Mhh(4)
 
-Complex(dp),Intent(in) :: k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)            & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),    & 
-& cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3)
+Complex(dp),Intent(in) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),          & 
+& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3)
 
 Real(dp),Intent(inout) :: IntegralSs(500000,10),IntegralVs(25000,9),IntegralVVss(500000,12)
 
@@ -1222,21 +1175,12 @@ Contribution(gt1,gt2,gt3,Isum)='Ah'
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
-Boson2(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson2(1) = Mhh(i1) 
 Boson2(2) =gThh(i1) 
  
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) =gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(3) = Mhh(i1) 
 Boson4(4) =gThh(i1) 
  
 resS=0._dp 
@@ -1528,10 +1472,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZ,Ah'
   Do i2=1,4
 Boson4(1) = MVZ 
 Boson4(2) = gTVZ 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -1755,10 +1696,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZR,Ah'
   Do i2=1,4
 Boson4(1) = MVZR 
 Boson4(2) = gTVZR 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -1979,10 +1917,7 @@ Do i1=1,4
   Do i2=1,4
 Boson4(1) = MAh(i1) 
 Boson4(2) = gTAh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2088,15 +2023,9 @@ Contribution(gt1,gt2,gt3,Isum)='Ah,hh'
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) = gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2222,26 +2151,21 @@ End If
 End Subroutine FeToFecFeFe 
  
  
-Subroutine FeToFecFuFu(iIN,MFe,MFu,MVZ,MVZR,MAh,k1**2*(LAM2 - 4._dp*(LAM3)            & 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuAhL,             & 
-& cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,              & 
-& cplcFuFuVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,IntegralVVss,             & 
-& NSs,NSSss,NVs,NVSss,NVVss,gTVZ,gTVZR,gTAh,gThh,deltaM,epsI,check,g,WriteContributions)
+Subroutine FeToFecFuFu(iIN,MFe,MFu,MVZ,MVZR,MAh,Mhh,cplcFeFeAhL,cplcFeFeAhR,          & 
+& cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,             & 
+& cplcFuFuAhL,cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,               & 
+& cplcFuFuVZRL,cplcFuFuVZRR,IntegralSs,IntegralSSss,IntegralVs,IntegralVSss,             & 
+& IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,gTVZ,gTVZR,gTAh,gThh,deltaM,epsI,               & 
+& check,g,WriteContributions)
 
 Implicit None 
  
-Real(dp),Intent(in) :: MFe(3),MFu(3),MVZ,MVZR,MAh(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MFe(3),MFu(3),MVZ,MVZR,MAh(4),Mhh(4)
 
-Complex(dp),Intent(in) :: k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)            & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),    & 
-& cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),             & 
-& cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3)
+Complex(dp),Intent(in) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),          & 
+& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),& 
+& cplcFuFuAhR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),             & 
+& cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3)
 
 Real(dp),Intent(inout) :: IntegralSs(500000,10),IntegralVs(25000,9),IntegralVVss(500000,12)
 
@@ -2411,21 +2335,12 @@ Contribution(gt1,gt2,gt3,Isum)='Ah'
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
-Boson2(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson2(1) = Mhh(i1) 
 Boson2(2) =gThh(i1) 
  
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) =gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(3) = Mhh(i1) 
 Boson4(4) =gThh(i1) 
  
 resS=0._dp 
@@ -2548,10 +2463,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZ,Ah'
   Do i2=1,4
 Boson4(1) = MVZ 
 Boson4(2) = gTVZ 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2637,10 +2549,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZR,Ah'
   Do i2=1,4
 Boson4(1) = MVZR 
 Boson4(2) = gTVZR 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2729,10 +2638,7 @@ Do i1=1,4
   Do i2=1,4
 Boson4(1) = MAh(i1) 
 Boson4(2) = gTAh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2775,15 +2681,9 @@ Contribution(gt1,gt2,gt3,Isum)='Ah,hh'
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) = gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -2846,33 +2746,27 @@ End If
 End Subroutine FeToFecFuFu 
  
  
-Subroutine FeToFeFvFv(iIN,MFe,MFv,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,k1**2*(LAM2 - 4._dp*(LAM3)& 
-&  - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)/2._dp,0,0,0,0,((2._dp*(RHO1)          & 
-&  - RHO2)*vR**2)/2._dp,0,0,0,0,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)*k1*vR)            & 
-& ,0,0,-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,           & 
-& cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplFvFecVWLmL,   & 
-& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
-& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,        & 
-& IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,IntegralVSss,IntegralVSst,             & 
-& IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,NVSss,NVSst,NVVss,NVVst,gTVZ,            & 
-& gTVZR,gTVWLm,gTVWRm,gTHpm,gTAh,gThh,deltaM,epsI,check,g,WriteContributions)
+Subroutine FeToFeFvFv(iIN,MFe,MFv,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,Mhh,cplcFeFeAhL,      & 
+& cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
+& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
+& cplcFeFvVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,     & 
+& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplFvFvVZRL,cplFvFvVZRR,IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,               & 
+& IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,               & 
+& NVSss,NVSst,NVVss,NVVst,gTVZ,gTVZR,gTVWLm,gTVWRm,gTHpm,gTAh,gThh,deltaM,               & 
+& epsI,check,g,WriteContributions)
 
 Implicit None 
  
-Real(dp),Intent(in) :: MFe(3),MFv(9),MVZ,MVZR,MVWLm,MVWRm,MHpm(4),MAh(4),0(4),0(4),0(4),0(4),0(4),           & 
-& 0(4),0(4),0(4),0(4),0(4)
+Real(dp),Intent(in) :: MFe(3),MFv(9),MVZ,MVZR,MVWLm,MVWRm,MHpm(4),MAh(4),Mhh(4)
 
-Complex(dp),Intent(in) :: k1**2*(LAM2 - 4._dp*(LAM3) - LAM5 - LAM6) + ((-1._dp*(ALP2) + ALP3)*vR**2)            & 
-& /2._dp,((2._dp*(RHO1) - RHO2)*vR**2)/2._dp,-2*k1**2*(LAM1 + LAM2),-((ALP1 + ALP3)      & 
-& *k1*vR),-((ALP1 + ALP3)*k1*vR),-2*RHO1*vR**2,cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),    & 
-& cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),         & 
-& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),           & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),  & 
-& cplFvFvVZRR(9,9)
+Complex(dp),Intent(in) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),          & 
+& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvcHpmL(3,9,4),& 
+& cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
+& cplcFeFvVWRmR(3,9),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),           & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9), & 
+& cplFvFvVZRL(9,9),cplFvFvVZRR(9,9)
 
 Real(dp),Intent(inout) :: IntegralSs(500000,10),IntegralVs(25000,9),IntegralVVss(500000,12)
 
@@ -3397,21 +3291,12 @@ Contribution(gt1,gt2,gt3,Isum)='Ah'
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
-Boson2(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson2(1) = Mhh(i1) 
 Boson2(2) =gThh(i1) 
  
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) =gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(3) = Mhh(i1) 
 Boson4(4) =gThh(i1) 
  
 resS=0._dp 
@@ -3778,10 +3663,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZ,Ah'
   Do i2=1,4
 Boson4(1) = MVZ 
 Boson4(2) = gTVZ 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -4073,10 +3955,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZR,Ah'
   Do i2=1,4
 Boson4(1) = MVZR 
 Boson4(2) = gTVZR 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -4408,10 +4287,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWLm,Ah'
   Do i2=1,4
 Boson4(1) = MVWLm 
 Boson4(2) = gTVWLm 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -4667,10 +4543,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWRm,Ah'
   Do i2=1,4
 Boson4(1) = MVWRm 
 Boson4(2) = gTVWRm 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -4919,10 +4792,7 @@ Do i1=1,4
   Do i2=1,4
 Boson4(1) = MHpm(i1) 
 Boson4(2) = gTHpm(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -5038,10 +4908,7 @@ Do i1=1,4
   Do i2=1,4
 Boson4(1) = MAh(i1) 
 Boson4(2) = gTAh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
@@ -5087,15 +4954,9 @@ Contribution(gt1,gt2,gt3,Isum)='Ah,hh'
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
-Boson4(1) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i1) 
+Boson4(1) = Mhh(i1) 
 Boson4(2) = gThh(i1) 
-Boson4(3) =                                                        2                                  2
-    2                                 (-alp2 + alp3) vR                 (2 rho1 - rho2) vR                      2                                                                                  2
-{{k1  (lam2 - 4 lam3 - lam5 - lam6) + ------------------, 0, 0, 0}, {0, -------------------, 0, 0}, {0, 0, -2 k1  (lam1 + lam2), -((alp1 + alp3) k1 vR)}, {0, 0, -((alp1 + alp3) k1 vR), -2 rho1 vR }}
-                                              2                                  2(i2) 
+Boson4(3) = Mhh(i2) 
 Boson4(4) = gThh(i2) 
 Isum = Isum + 1 
  
