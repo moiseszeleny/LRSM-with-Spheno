@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 16:50 on 7.6.2025   
+! File created at 11:43 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1215,7 +1215,8 @@ Complex(dp) :: ratioPGG(4),ratioPPP(4)
 Real(dp) :: gForTadpoles(144)
 Complex(dp) :: tForTadpoles(2)
 Real(dp) :: gBL_saveEP 
-Real(dp) :: g2_saveEP
+Real(dp) :: g2_saveEP 
+Real(dp) :: g2_saveEP 
 Complex(dp) :: Y_saveEP(3,3) 
 Complex(dp) :: YQ1_saveEP(3,3) 
 Complex(dp) :: YQ2_saveEP(3,3) 
