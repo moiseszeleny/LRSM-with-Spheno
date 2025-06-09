@@ -16,8 +16,8 @@ MINPAR={{1, vRinput},
         {8, rho1input},
         {9, rho2input},
         {10, alp1input},
-        {11, alp2input},
-        {12, alp3input},
+        {11, alp2input}
+        (*{12, alp3input},
         {111, MD11},
         {112, MD12},
         {113, MD13},
@@ -26,7 +26,7 @@ MINPAR={{1, vRinput},
         {123, MD23},
         {131, MD31},
         {132, MD32},
-        {133, MD33}
+        {133, MD33}*)
         };
 
 RealParameters = {
@@ -44,7 +44,7 @@ BoundaryLowScaleInput={
     {g2, g2SM},
     {gR, g2},
     {gBL, (g1SM*gR)/Sqrt[-g1SM^2 + gR^2]},
-    {MD[1,1], MD11},
+    (*{MD[1,1], MD11},
     {MD[1,2], MD12},
     {MD[1,3], MD13},
     {MD[2,1], MD21},
@@ -52,7 +52,7 @@ BoundaryLowScaleInput={
     {MD[2,3], MD23},
     {MD[3,1], MD31},
     {MD[3,2], MD32},
-    {MD[3,3], MD33},
+    {MD[3,3], MD33},*)
     {vR, vRinput},
     (*{vL, vLinput},*)
     {vL, 0},
