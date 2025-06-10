@@ -31,9 +31,7 @@ BoundaryLowScaleInput={
     {gR, g2},
     {gBL, (g1SM*gR)/Sqrt[-g1SM^2 + gR^2]},
     {vR, vRinput},
-    {vL, 0},
-    {k1, vSM}, 
-    {k2, 0}
+    {k1, vSM}
 };
 
 DEFINITION[MatchingConditions]={
