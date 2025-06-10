@@ -17,8 +17,8 @@ MINPAR={{1, vRinput},
         {9, rho2input},
         {10, alp1input},
         {11, alp2input}
-        (*{12, alp3input},
-        {111, MD11},
+        {12, alp3input},
+        (*{111, MD11},
         {112, MD12},
         {113, MD13},
         {121, MD21},
@@ -57,13 +57,13 @@ BoundaryLowScaleInput={
     (*{vL, vLinput},*)
     {vL, 0},
     {k1, vSM}, 
-    {k2, 0}, 
+    {k2, 0}
     (*{k1, Sqrt[vSM^2- 2 vL^2]*Cos[ArcTan[TanBeta]]}, *)  
     (*{k2, Sqrt[vSM^2-2 vL^2]*Sin[ArcTan[TanBeta]]},*)
-    {YQ2, -Conjg[(Transpose[YdSM]*k1*vSM - (MatMul[Transpose[YuSM],Conjg[CKM]])*vSM*k2)/(k2^2-k1^2)]},
+    (*{YQ2, -Conjg[(Transpose[YdSM]*k1*vSM - (MatMul[Transpose[YuSM],Conjg[CKM]])*vSM*k2)/(k2^2-k1^2)]},
     {YQ1, Conjg[(-(MatMul[Transpose[YuSM],Conjg[CKM]])*vSM*k1 + Transpose[YdSM]*k2*vSM)/(k2^2-k1^2)]}, 
     {Yt, Conjg[(Sqrt[2]*k2*MD - vSM*k1*Transpose[YeSM])/(k2^2-k1^2)]},  
-    {Y, Conjg[(-Sqrt[2]*k1*MD + vSM*k2*Transpose[YeSM])/(k2^2-k1^2)]}
+    {Y, Conjg[(-Sqrt[2]*k1*MD + vSM*k2*Transpose[YeSM])/(k2^2-k1^2)]}*)
 };
 
 QuadruplePrecision = {Fv};
