@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 11:43 on 9.6.2025   
+! File created at 18:29 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1289,15 +1289,6 @@ Complex(dp) :: temporaryValue
 Complex(dp) :: gR
 Complex(dp) :: k2
 Complex(dp) :: vL
-Complex(dp) :: MD(1,1)
-Complex(dp) :: MD(1,2)
-Complex(dp) :: MD(1,3)
-Complex(dp) :: MD(2,1)
-Complex(dp) :: MD(2,2)
-Complex(dp) :: MD(2,3)
-Complex(dp) :: MD(3,1)
-Complex(dp) :: MD(3,2)
-Complex(dp) :: MD(3,3)
 Real(dp) :: vRinput
 Real(dp) :: lam1input
 Real(dp) :: lam2input
@@ -1309,16 +1300,6 @@ Real(dp) :: rho1input
 Real(dp) :: rho2input
 Real(dp) :: alp1input
 Real(dp) :: alp2input
-Real(dp) :: alp3input
-Complex(dp) :: MD11
-Complex(dp) :: MD12
-Complex(dp) :: MD13
-Complex(dp) :: MD21
-Complex(dp) :: MD22
-Complex(dp) :: MD23
-Complex(dp) :: MD31
-Complex(dp) :: MD32
-Complex(dp) :: MD33
 Real(dp) :: k1MZ 
 Real(dp) :: k1SUSY 
 Real(dp) :: vRMZ 
@@ -2121,16 +2102,6 @@ rho1input= 0._dp
 rho2input= 0._dp 
 alp1input= 0._dp 
 alp2input= 0._dp 
-alp3input= 0._dp 
-MD11=(0._dp,0._dp) 
-MD12=(0._dp,0._dp) 
-MD13=(0._dp,0._dp) 
-MD21=(0._dp,0._dp) 
-MD22=(0._dp,0._dp) 
-MD23=(0._dp,0._dp) 
-MD31=(0._dp,0._dp) 
-MD32=(0._dp,0._dp) 
-MD33=(0._dp,0._dp) 
 End Subroutine Set_All_Parameters_0 
  
 

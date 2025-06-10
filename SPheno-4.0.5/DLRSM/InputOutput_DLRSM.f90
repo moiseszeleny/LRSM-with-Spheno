@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 11:51 on 9.6.2025   
+! File created at 18:38 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -358,35 +358,6 @@ Else If (i_par.Eq.10) Then
 alp1input= wert 
 Else If (i_par.Eq.11) Then 
 alp2input= wert 
-Else If (i_par.Eq.12) Then 
-alp3input= wert 
-Else If (i_par.Eq.111) Then 
-If (i_c.Eq.0) MD11= Cmplx(wert,Aimag(MD11),dp) 
-If (i_c.Eq.1) MD11= Cmplx(Real(MD11,dp),wert,dp) 
-Else If (i_par.Eq.112) Then 
-If (i_c.Eq.0) MD12= Cmplx(wert,Aimag(MD12),dp) 
-If (i_c.Eq.1) MD12= Cmplx(Real(MD12,dp),wert,dp) 
-Else If (i_par.Eq.113) Then 
-If (i_c.Eq.0) MD13= Cmplx(wert,Aimag(MD13),dp) 
-If (i_c.Eq.1) MD13= Cmplx(Real(MD13,dp),wert,dp) 
-Else If (i_par.Eq.121) Then 
-If (i_c.Eq.0) MD21= Cmplx(wert,Aimag(MD21),dp) 
-If (i_c.Eq.1) MD21= Cmplx(Real(MD21,dp),wert,dp) 
-Else If (i_par.Eq.122) Then 
-If (i_c.Eq.0) MD22= Cmplx(wert,Aimag(MD22),dp) 
-If (i_c.Eq.1) MD22= Cmplx(Real(MD22,dp),wert,dp) 
-Else If (i_par.Eq.123) Then 
-If (i_c.Eq.0) MD23= Cmplx(wert,Aimag(MD23),dp) 
-If (i_c.Eq.1) MD23= Cmplx(Real(MD23,dp),wert,dp) 
-Else If (i_par.Eq.131) Then 
-If (i_c.Eq.0) MD31= Cmplx(wert,Aimag(MD31),dp) 
-If (i_c.Eq.1) MD31= Cmplx(Real(MD31,dp),wert,dp) 
-Else If (i_par.Eq.132) Then 
-If (i_c.Eq.0) MD32= Cmplx(wert,Aimag(MD32),dp) 
-If (i_c.Eq.1) MD32= Cmplx(Real(MD32,dp),wert,dp) 
-Else If (i_par.Eq.133) Then 
-If (i_c.Eq.0) MD33= Cmplx(wert,Aimag(MD33),dp) 
-If (i_c.Eq.1) MD33= Cmplx(Real(MD33,dp),wert,dp) 
 Else
 Write(ErrCan,*) "Error in routine "//NameOfUnit(Iname)
 If (i_c.Eq.0) Write(ErrCan,*) "Unknown entry for Block MINPAR ",i_par
@@ -1597,55 +1568,9 @@ Write(io_L,101) 8, Real(rho1input,dp) ,"# rho1input"
 Write(io_L,101) 9, Real(rho2input,dp) ,"# rho2input"
 Write(io_L,101) 10, Real(alp1input,dp) ,"# alp1input"
 Write(io_L,101) 11, Real(alp2input,dp) ,"# alp2input"
-Write(io_L,101) 12, Real(alp3input,dp) ,"# alp3input"
-Write(io_L,101) 111, Real(MD11,dp) ,"# MD11"
-Write(io_L,101) 112, Real(MD12,dp) ,"# MD12"
-Write(io_L,101) 113, Real(MD13,dp) ,"# MD13"
-Write(io_L,101) 121, Real(MD21,dp) ,"# MD21"
-Write(io_L,101) 122, Real(MD22,dp) ,"# MD22"
-Write(io_L,101) 123, Real(MD23,dp) ,"# MD23"
-Write(io_L,101) 131, Real(MD31,dp) ,"# MD31"
-Write(io_L,101) 132, Real(MD32,dp) ,"# MD32"
-Write(io_L,101) 133, Real(MD33,dp) ,"# MD33"
 WriteNextBlock = .False. 
-If (Abs(Aimag(MD11)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD12)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD13)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD21)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD22)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD23)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD31)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD32)).gt.0._dp) WriteNextBlock = .True. 
-If (Abs(Aimag(MD33)).gt.0._dp) WriteNextBlock = .True. 
 If(WriteNextBlock) Then 
 Write(io_L,100) "Block IMMINPAR  # Input parameters"
-If (Abs(Aimag(MD11)).gt.0._dp) Then 
-Write(io_L,101) 111, Aimag(MD11) ,"# MD11"
-End if 
-If (Abs(Aimag(MD12)).gt.0._dp) Then 
-Write(io_L,101) 112, Aimag(MD12) ,"# MD12"
-End if 
-If (Abs(Aimag(MD13)).gt.0._dp) Then 
-Write(io_L,101) 113, Aimag(MD13) ,"# MD13"
-End if 
-If (Abs(Aimag(MD21)).gt.0._dp) Then 
-Write(io_L,101) 121, Aimag(MD21) ,"# MD21"
-End if 
-If (Abs(Aimag(MD22)).gt.0._dp) Then 
-Write(io_L,101) 122, Aimag(MD22) ,"# MD22"
-End if 
-If (Abs(Aimag(MD23)).gt.0._dp) Then 
-Write(io_L,101) 123, Aimag(MD23) ,"# MD23"
-End if 
-If (Abs(Aimag(MD31)).gt.0._dp) Then 
-Write(io_L,101) 131, Aimag(MD31) ,"# MD31"
-End if 
-If (Abs(Aimag(MD32)).gt.0._dp) Then 
-Write(io_L,101) 132, Aimag(MD32) ,"# MD32"
-End if 
-If (Abs(Aimag(MD33)).gt.0._dp) Then 
-Write(io_L,101) 133, Aimag(MD33) ,"# MD33"
-End if 
 End if 
 Write(io_L,106) "Block gaugeGUT Q=",m_GUT,"# (GUT scale)" 
 Write(io_L,104) 1,gBLGUT, "# gBL(Q)" 
@@ -2072,123 +1997,6 @@ Write(io_L,106) "Block AddPars Q=1.0000E00 # Additional parameters not appearing
 Write(io_L,104) 1, Abs(gR), "# gR "  
 Write(io_L,104) 2, Abs(k2), "# k2 "  
 Write(io_L,104) 3, Abs(vL), "# vL "  
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-Write(io_L,107)1,3,Real(MD(1,3),dp), "# Real(MD(1,3),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-Write(io_L,107)1,3,Aimag(MD(1,3)), "# Aimag(MD(1,3))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-Write(io_L,107)1,3,Real(MD(1,3),dp), "# Real(MD(1,3),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
-Write(io_L,107)2,3,Real(MD(2,3),dp), "# Real(MD(2,3),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-Write(io_L,107)1,3,Aimag(MD(1,3)), "# Aimag(MD(1,3))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
-Write(io_L,107)2,3,Aimag(MD(2,3)), "# Aimag(MD(2,3))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-Write(io_L,107)3,1,Real(MD(3,1),dp), "# Real(MD(3,1),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-Write(io_L,107)3,1,Aimag(MD(3,1)), "# Aimag(MD(3,1))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
-Write(io_L,107)3,1,Real(MD(3,1),dp), "# Real(MD(3,1),dp)" 
-Write(io_L,107)3,2,Real(MD(3,2),dp), "# Real(MD(3,2),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
-Write(io_L,107)3,1,Aimag(MD(3,1)), "# Aimag(MD(3,1))" 
-Write(io_L,107)3,2,Aimag(MD(3,2)), "# Aimag(MD(3,2))" 
-End If 
-
-Write(io_L,106) "Block MD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Real(MD(1,1),dp), "# Real(MD(1,1),dp)" 
-Write(io_L,107)1,2,Real(MD(1,2),dp), "# Real(MD(1,2),dp)" 
-Write(io_L,107)1,3,Real(MD(1,3),dp), "# Real(MD(1,3),dp)" 
-Write(io_L,107)2,1,Real(MD(2,1),dp), "# Real(MD(2,1),dp)" 
-Write(io_L,107)2,2,Real(MD(2,2),dp), "# Real(MD(2,2),dp)" 
-Write(io_L,107)2,3,Real(MD(2,3),dp), "# Real(MD(2,3),dp)" 
-Write(io_L,107)3,1,Real(MD(3,1),dp), "# Real(MD(3,1),dp)" 
-Write(io_L,107)3,2,Real(MD(3,2),dp), "# Real(MD(3,2),dp)" 
-Write(io_L,107)3,3,Real(MD(3,3),dp), "# Real(MD(3,3),dp)" 
-If ((MaxVal(Abs(AImag(MD))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMMD Q=",Q,"# (  )" 
-Write(io_L,107)1,1,Aimag(MD(1,1)), "# Aimag(MD(1,1))" 
-Write(io_L,107)1,2,Aimag(MD(1,2)), "# Aimag(MD(1,2))" 
-Write(io_L,107)1,3,Aimag(MD(1,3)), "# Aimag(MD(1,3))" 
-Write(io_L,107)2,1,Aimag(MD(2,1)), "# Aimag(MD(2,1))" 
-Write(io_L,107)2,2,Aimag(MD(2,2)), "# Aimag(MD(2,2))" 
-Write(io_L,107)2,3,Aimag(MD(2,3)), "# Aimag(MD(2,3))" 
-Write(io_L,107)3,1,Aimag(MD(3,1)), "# Aimag(MD(3,1))" 
-Write(io_L,107)3,2,Aimag(MD(3,2)), "# Aimag(MD(3,2))" 
-Write(io_L,107)3,3,Aimag(MD(3,3)), "# Aimag(MD(3,3))" 
-End If 
-
 MassLSP = 100000._dp 
 Write(io_L,100) "Block MASS  # Mass spectrum"
 Write(io_L,100) "#   PDG code      mass          particle" 

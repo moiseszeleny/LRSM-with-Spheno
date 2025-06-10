@@ -12,15 +12,6 @@ Block SMINPUTS    # Standard Model inputs
  7 1.776690E+00    # m_tau(pole) 
 Block MINPAR      # Input parameters 
  1   0.000000E+00    # vRinput
- 111   0.000000E+00    # MD11
- 112   0.000000E+00    # MD12
- 113   0.000000E+00    # MD13
- 121   0.000000E+00    # MD21
- 122   0.000000E+00    # MD22
- 123   0.000000E+00    # MD23
- 131   0.000000E+00    # MD31
- 132   0.000000E+00    # MD32
- 133   0.000000E+00    # MD33
 Block SPhenoInput   # SPheno specific input 
   1 -1              # error level 
   2  0              # SPA conventions 

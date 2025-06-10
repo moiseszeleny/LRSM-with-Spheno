@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 11:43 on 9.6.2025   
+! File created at 18:29 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1694,15 +1694,6 @@ If (HighScaleModel.ne."LOW") Then
 g2 = g2SM
 gR = g2
 gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
-MD(1,1) = MD11
-MD(1,2) = MD12
-MD(1,3) = MD13
-MD(2,1) = MD21
-MD(2,2) = MD22
-MD(2,3) = MD23
-MD(3,1) = MD31
-MD(3,2) = MD32
-MD(3,3) = MD33
 vR = vRinput
 vL = 0
 k1 = vSM
@@ -1966,15 +1957,6 @@ If (HighScaleModel.ne."LOW") Then
 g2 = g2SM
 gR = g2
 gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
-MD(1,1) = MD11
-MD(1,2) = MD12
-MD(1,3) = MD13
-MD(2,1) = MD21
-MD(2,2) = MD22
-MD(2,3) = MD23
-MD(3,1) = MD31
-MD(3,2) = MD32
-MD(3,3) = MD33
 vR = vRinput
 vL = 0
 k1 = vSM

@@ -81,17 +81,7 @@ DEFINITION[a_][MINPAR]={
 {{8},{Value->0}} (*rho1input*), 
 {{9},{Value->0}} (*rho2input*), 
 {{10},{Value->0}} (*alp1input*), 
-{{11},{Value->0}} (*alp2input*), 
-{{12},{Value->0}} (*alp3input*), 
-{{111},{Value->0}} (*MD11*), 
-{{112},{Value->0}} (*MD12*), 
-{{113},{Value->0}} (*MD13*), 
-{{121},{Value->0}} (*MD21*), 
-{{122},{Value->0}} (*MD22*), 
-{{123},{Value->0}} (*MD23*), 
-{{131},{Value->0}} (*MD31*), 
-{{132},{Value->0}} (*MD32*), 
-{{133},{Value->0}} (*MD33*)}; 
+{{11},{Value->0}} (*alp2input*)}; 
  
 DEFINITION[a_][SPhenoInput]={ 
 {{1},{Value->-1}}, (* error level *)
