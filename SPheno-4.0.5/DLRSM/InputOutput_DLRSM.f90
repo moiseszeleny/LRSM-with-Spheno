@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 10:51 on 10.6.2025   
+! File created at 14:03 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1996,8 +1996,6 @@ End If
 
 End if 
  
-Write(io_L,106) "Block AddPars Q=1.0000E00 # Additional parameters not appearing elsewhere; scale Q just a dummy" 
-Write(io_L,104) 1, Abs(gR), "# gR "  
 MassLSP = 100000._dp 
 Write(io_L,100) "Block MASS  # Mass spectrum"
 Write(io_L,100) "#   PDG code      mass          particle" 

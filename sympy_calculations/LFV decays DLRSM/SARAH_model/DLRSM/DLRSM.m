@@ -105,11 +105,11 @@ DEFINITION[EWSB][GaugeSector] =
 DEFINITION[EWSB][VEVs]={
 {H0,       {k1, 1/Sqrt[2]}, 
                     {sigmaH10, I/Sqrt[2]},{phiH10, 1/Sqrt[2]}},
-{HPrime0, {0, 1/Sqrt[2]}, 
+{HPrime0, {0, 0}, 
                     {sigmaH20, I/Sqrt[2]},{phiH20,1/Sqrt[2]}},
 {chiR0, {vR, 1/Sqrt[2]}, 
                     {sigmaR0, I/Sqrt[2]},{phiR0,1/Sqrt[2]}},
-{chiL0, {0, 1/Sqrt[2]}, 
+{chiL0, {0, 0}, 
                     {sigmaL0, I/Sqrt[2]},{phiL0,1/Sqrt[2]}} };
 
 DEFINITION[EWSB][MatterSector]=   

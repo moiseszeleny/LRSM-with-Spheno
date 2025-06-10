@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 10:42 on 10.6.2025   
+! File created at 13:48 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1669,8 +1669,7 @@ If (HighScaleModel.ne."LOW") Then
  MU22 = MU22IN 
  g3 = g3SM
 g2 = g2SM
-gR = g2
-gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
+gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW)))
 vR = vRinput
 k1 = vSM
 End if
@@ -1926,8 +1925,7 @@ If (HighScaleModel.ne."LOW") Then
  MU22 = MU22IN 
  g3 = g3SM
 g2 = g2SM
-gR = g2
-gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
+gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW)))
 vR = vRinput
 k1 = vSM
 End if

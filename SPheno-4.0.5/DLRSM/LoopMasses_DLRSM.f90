@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 10:40 on 10.6.2025   
+! File created at 13:45 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -327,7 +327,7 @@ Call CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,       
 & cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
 & cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
-Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
+Call OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhUhh,     & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,               & 
@@ -567,7 +567,7 @@ End if
 Iname = Iname -1 
 End Subroutine OneLoopMasses 
  
-Subroutine OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
+Subroutine OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & cplAhAhUhh,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,           & 
 & cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,  & 
@@ -584,7 +584,7 @@ Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,
 & cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
 & cplUhhcVWLmVWLm(4),cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZRVZR(4)
 
-Real(dp), Intent(in) :: k1,vR
+Real(dp), Intent(in) :: 0,k1,vR
 
 Integer :: i1,i2, gO1, gO2 
 Complex(dp) :: coupL, coupR, coup, temp, res, A0m, sumI(4)  
