@@ -55,7 +55,7 @@ RunScans = {Scan1, Scan2,...};
 (*    PARAMETER RANGES                          *)
 (*----------------------------------------------*)
 
-DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,LRINPUTIN,MUXMIXIN,YLIN,YRIN}; 
+DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,LRINPUTIN,MUXMIXIN,YIN,YLIN,YQ1IN,YQ2IN,YRIN,YTIN}; 
  
 DEFINITION[a_][MODSEL]={ 
 {{1},{Value->0}}, 
@@ -81,7 +81,7 @@ DEFINITION[a_][MINPAR]={
 {{8},{Value->0}} (*rho1input*), 
 {{9},{Value->0}} (*rho2input*), 
 {{10},{Value->0}} (*alp1input*), 
-{{11},{Value->0}} (*alp2input*)}; 
+{{132},{Value->0}} (*alp2input alp3input*)}; 
  
 DEFINITION[a_][SPhenoInput]={ 
 {{1},{Value->-1}}, (* error level *)
@@ -126,6 +126,17 @@ DEFINITION[a_][MUXMIXIN]={
 {{3,2},{Value->0}} , 
 {{3,3},{Value->0}} }; 
  
+DEFINITION[a_][YIN]={ 
+{{1,1},{Value->0}} , 
+{{1,2},{Value->0}} , 
+{{1,3},{Value->0}} , 
+{{2,1},{Value->0}} , 
+{{2,2},{Value->0}} , 
+{{2,3},{Value->0}} , 
+{{3,1},{Value->0}} , 
+{{3,2},{Value->0}} , 
+{{3,3},{Value->0}} }; 
+ 
 DEFINITION[a_][YLIN]={ 
 {{1,1},{Value->0}} , 
 {{1,2},{Value->0}} , 
@@ -137,7 +148,40 @@ DEFINITION[a_][YLIN]={
 {{3,2},{Value->0}} , 
 {{3,3},{Value->0}} }; 
  
+DEFINITION[a_][YQ1IN]={ 
+{{1,1},{Value->0}} , 
+{{1,2},{Value->0}} , 
+{{1,3},{Value->0}} , 
+{{2,1},{Value->0}} , 
+{{2,2},{Value->0}} , 
+{{2,3},{Value->0}} , 
+{{3,1},{Value->0}} , 
+{{3,2},{Value->0}} , 
+{{3,3},{Value->0}} }; 
+ 
+DEFINITION[a_][YQ2IN]={ 
+{{1,1},{Value->0}} , 
+{{1,2},{Value->0}} , 
+{{1,3},{Value->0}} , 
+{{2,1},{Value->0}} , 
+{{2,2},{Value->0}} , 
+{{2,3},{Value->0}} , 
+{{3,1},{Value->0}} , 
+{{3,2},{Value->0}} , 
+{{3,3},{Value->0}} }; 
+ 
 DEFINITION[a_][YRIN]={ 
+{{1,1},{Value->0}} , 
+{{1,2},{Value->0}} , 
+{{1,3},{Value->0}} , 
+{{2,1},{Value->0}} , 
+{{2,2},{Value->0}} , 
+{{2,3},{Value->0}} , 
+{{3,1},{Value->0}} , 
+{{3,2},{Value->0}} , 
+{{3,3},{Value->0}} }; 
+ 
+DEFINITION[a_][YTIN]={ 
 {{1,1},{Value->0}} , 
 {{1,2},{Value->0}} , 
 {{1,3},{Value->0}} , 

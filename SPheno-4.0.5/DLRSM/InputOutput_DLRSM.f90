@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 18:38 on 9.6.2025   
+! File created at 19:30 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -356,8 +356,9 @@ Else If (i_par.Eq.9) Then
 rho2input= wert 
 Else If (i_par.Eq.10) Then 
 alp1input= wert 
-Else If (i_par.Eq.11) Then 
-alp2input= wert 
+Else If (i_par.Eq.132) Then 
+If (i_c.Eq.0) alp2input*alp3input= Cmplx(wert,Aimag(alp2input*alp3input),dp) 
+If (i_c.Eq.1) alp2input*alp3input= Cmplx(Real(alp2input*alp3input,dp),wert,dp) 
 Else
 Write(ErrCan,*) "Error in routine "//NameOfUnit(Iname)
 If (i_c.Eq.0) Write(ErrCan,*) "Unknown entry for Block MINPAR ",i_par
@@ -1567,10 +1568,14 @@ Write(io_L,101) 7, Real(lam6input,dp) ,"# lam6input"
 Write(io_L,101) 8, Real(rho1input,dp) ,"# rho1input"
 Write(io_L,101) 9, Real(rho2input,dp) ,"# rho2input"
 Write(io_L,101) 10, Real(alp1input,dp) ,"# alp1input"
-Write(io_L,101) 11, Real(alp2input,dp) ,"# alp2input"
+Write(io_L,101) 132, Real(alp2input*alp3input,dp) ,"# alp2input*alp3input"
 WriteNextBlock = .False. 
+If (Abs(Aimag(alp2input*alp3input)).gt.0._dp) WriteNextBlock = .True. 
 If(WriteNextBlock) Then 
 Write(io_L,100) "Block IMMINPAR  # Input parameters"
+If (Abs(Aimag(alp2input*alp3input)).gt.0._dp) Then 
+Write(io_L,101) 132, Aimag(alp2input*alp3input) ,"# alp2input*alp3input"
+End if 
 End if 
 Write(io_L,106) "Block gaugeGUT Q=",m_GUT,"# (GUT scale)" 
 Write(io_L,104) 1,gBLGUT, "# gBL(Q)" 

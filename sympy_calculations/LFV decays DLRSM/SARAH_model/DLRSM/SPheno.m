@@ -17,7 +17,7 @@ MINPAR={{1, vRinput},
         {9, rho2input},
         {10, alp1input},
         {11, alp2input}
-        {12, alp3input},
+        {12, alp3input}
         (*{111, MD11},
         {112, MD12},
         {113, MD13},

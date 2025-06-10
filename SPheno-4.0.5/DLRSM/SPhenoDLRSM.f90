@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 18:38 on 9.6.2025   
+! File created at 19:30 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -233,10 +233,6 @@ vR = vRinput
 vL = 0
 k1 = vSM
 k2 = 0
-YQ2 = -Conjg((-(k2*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
-YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
-Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
-Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 
  
  ! Setting VEVs used for low energy constraints 
@@ -273,10 +269,6 @@ vR = vRinput
 vL = 0
 k1 = vSM
 k2 = 0
-YQ2 = -Conjg((-(k2*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k1*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
-YQ1 = Conjg((-(k1*vSM*MatMul(Transpose(YuSM),Conjg(CKM))) + k2*vSM*Transpose(YdSM))/(-k1**2 + k2**2))
-Yt = Conjg((sqrt(2._dp)*k2*MD - k1*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
-Y = Conjg((-(sqrt(2._dp)*k1*MD) + k2*vSM*Transpose(YeSM))/(-k1**2 + k2**2))
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 

@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 18:29 on 9.6.2025   
+! File created at 19:21 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1299,7 +1299,7 @@ Real(dp) :: lam6input
 Real(dp) :: rho1input
 Real(dp) :: rho2input
 Real(dp) :: alp1input
-Real(dp) :: alp2input
+Complex(dp) :: alp2input*alp3input
 Real(dp) :: k1MZ 
 Real(dp) :: k1SUSY 
 Real(dp) :: vRMZ 
@@ -2101,7 +2101,7 @@ lam6input= 0._dp
 rho1input= 0._dp 
 rho2input= 0._dp 
 alp1input= 0._dp 
-alp2input= 0._dp 
+alp2input*alp3input=(0._dp,0._dp) 
 End Subroutine Set_All_Parameters_0 
  
 
