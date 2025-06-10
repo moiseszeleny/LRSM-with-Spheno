@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:18 on 9.6.2025   
+! File created at 23:32 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -34,9 +34,9 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 
 Real(dp),Intent(out) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
-& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
 
-Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
+Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Real(dp),Intent(in) :: k1,vR
 
@@ -47,7 +47,7 @@ Iname = Iname + 1
 NameOfUnit(Iname) = 'TreeMassesDLRSM'
  
 kont = 0 
-Call CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
+Call CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,TW,kont)
 
 Call CalculateVWLmVWRm(g2,k1,vR,ZW,MVWLm,MVWRm,MVWLm2,MVWRm2,PhiW,kont)
 
@@ -56,7 +56,7 @@ Call CalculateMhh(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,       
 
 kontSave = kont 
 Call CalculateMAh(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,           & 
-& LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
+& LAM6,LAM4,k1,vR,TW,UP,MAh,MAh2,kont)
 
 kont = kontSave 
 kontSave = kont 
@@ -114,7 +114,7 @@ MHpm2(1)=MVWLm2*RXiWLm
 MHpm(2)=MVWRm*sqrt(RXiWRm)
 MHpm2(2)=MVWRm2*RXiWRm
 PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-TW = ASin(Abs(ZZ(2,1)))
+TW = ASin(Abs(ZZ(1,1)))
 Iname = Iname - 1 
  
 End Subroutine  TreeMasses 
@@ -168,9 +168,9 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 
 Real(dp),Intent(out) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
-& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
 
-Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
+Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Real(dp),Intent(in) :: k1,vR
 
@@ -181,7 +181,7 @@ Iname = Iname + 1
 NameOfUnit(Iname) = 'TreeMassesDLRSM'
  
 kont = 0 
-Call CalculateVPVZVZREffPot(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
+Call CalculateVPVZVZREffPot(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,TW,kont)
 
 Call CalculateVWLmVWRmEffPot(g2,k1,vR,ZW,MVWLm,MVWRm,MVWLm2,MVWRm2,PhiW,kont)
 
@@ -190,7 +190,7 @@ Call CalculateMhhEffPot(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,      
 
 kontSave = kont 
 Call CalculateMAhEffPot(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,               & 
-& ALP3,LAM5,LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
+& ALP3,LAM5,LAM6,LAM4,k1,vR,TW,UP,MAh,MAh2,kont)
 
 kont = kontSave 
 kontSave = kont 
@@ -347,11 +347,9 @@ Iname = Iname - 1
 End Subroutine CalculateMhh 
 
 Subroutine CalculateMAh(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,               & 
-& ALP3,LAM5,LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
+& ALP3,LAM5,LAM6,LAM4,k1,vR,TW,UP,MAh,MAh2,kont)
 
-Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,TW
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr 
@@ -390,42 +388,25 @@ mat(3,3) = mat(3,3)-(k1**2*LAM2)
 mat(3,3) = mat(3,3)+MU12
 mat(3,3) = mat(3,3)-1._dp/2._dp*(ALP1*vR**2)
 mat(3,3) = mat(3,3)-1._dp/2._dp*(ALP3*vR**2)
-mat(3,3) = mat(3,3)+(g2**2*k1**2*Conjg(ZZ(1,1))*RXiZ*ZZ(1,1))/4._dp
-mat(3,3) = mat(3,3)-1._dp/4._dp*(g2**2*k1**2*Conjg(ZZ(2,1))*RXiZ*ZZ(1,1))
-mat(3,3) = mat(3,3)+(g2**2*k1**2*Conjg(ZZ(1,2))*RXiZR*ZZ(1,2))/4._dp
-mat(3,3) = mat(3,3)-1._dp/4._dp*(g2**2*k1**2*Conjg(ZZ(2,2))*RXiZR*ZZ(1,2))
-mat(3,3) = mat(3,3)-1._dp/4._dp*(g2**2*k1**2*Conjg(ZZ(1,1))*RXiZ*ZZ(2,1))
-mat(3,3) = mat(3,3)+(g2**2*k1**2*Conjg(ZZ(2,1))*RXiZ*ZZ(2,1))/4._dp
-mat(3,3) = mat(3,3)-1._dp/4._dp*(g2**2*k1**2*Conjg(ZZ(1,2))*RXiZR*ZZ(2,2))
-mat(3,3) = mat(3,3)+(g2**2*k1**2*Conjg(ZZ(2,2))*RXiZR*ZZ(2,2))/4._dp
+mat(3,3) = mat(3,3)+(g2**2*k1**2*Cos(TW)**2*RXiZR)/4._dp
+mat(3,3) = mat(3,3)+(g2**2*k1**2*RXiZR*Sin(TW)**2)/2._dp
+mat(3,3) = mat(3,3)+(g2**2*k1**2*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
 mat(3,4) = 0._dp 
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2**2*k1*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(1,1))
-mat(3,4) = mat(3,4)+(g2*gBL*k1*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(1,1))/8._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2**2*k1*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(1,2))
-mat(3,4) = mat(3,4)+(g2*gBL*k1*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(1,2))/8._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2**2*k1*vR*Conjg(ZZ(1,1))*RXiZ*ZZ(2,1))
-mat(3,4) = mat(3,4)+(g2**2*k1*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(2,1))/4._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2*gBL*k1*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(2,1))
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2**2*k1*vR*Conjg(ZZ(1,2))*RXiZR*ZZ(2,2))
-mat(3,4) = mat(3,4)+(g2**2*k1*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(2,2))/4._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2*gBL*k1*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(2,2))
-mat(3,4) = mat(3,4)+(g2*gBL*k1*vR*Conjg(ZZ(1,1))*RXiZ*ZZ(3,1))/8._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2*gBL*k1*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(3,1))
-mat(3,4) = mat(3,4)+(g2*gBL*k1*vR*Conjg(ZZ(1,2))*RXiZR*ZZ(3,2))/8._dp
-mat(3,4) = mat(3,4)-1._dp/8._dp*(g2*gBL*k1*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(3,2))
+mat(3,4) = mat(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW))
+mat(3,4) = mat(3,4)+(g2**2*k1*vR*RXiZR*Sin(TW)**2)/4._dp
+mat(3,4) = mat(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2)
+mat(3,4) = mat(3,4)+(g2**2*k1*vR*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
 mat(4,4) = 0._dp 
 mat(4,4) = mat(4,4)-1._dp/2._dp*(ALP1*k1**2)
 mat(4,4) = mat(4,4)-1._dp/2._dp*(ALP3*k1**2)
 mat(4,4) = mat(4,4)+MU22
 mat(4,4) = mat(4,4)-(RHO1*vR**2)
-mat(4,4) = mat(4,4)+(g2**2*vR**2*Conjg(ZZ(2,1))*RXiZ*ZZ(2,1))/4._dp
-mat(4,4) = mat(4,4)-1._dp/4._dp*(g2*gBL*vR**2*Conjg(ZZ(3,1))*RXiZ*ZZ(2,1))
-mat(4,4) = mat(4,4)+(g2**2*vR**2*Conjg(ZZ(2,2))*RXiZR*ZZ(2,2))/4._dp
-mat(4,4) = mat(4,4)-1._dp/4._dp*(g2*gBL*vR**2*Conjg(ZZ(3,2))*RXiZR*ZZ(2,2))
-mat(4,4) = mat(4,4)-1._dp/4._dp*(g2*gBL*vR**2*Conjg(ZZ(2,1))*RXiZ*ZZ(3,1))
-mat(4,4) = mat(4,4)+(gBL**2*vR**2*Conjg(ZZ(3,1))*RXiZ*ZZ(3,1))/4._dp
-mat(4,4) = mat(4,4)-1._dp/4._dp*(g2*gBL*vR**2*Conjg(ZZ(2,2))*RXiZR*ZZ(3,2))
-mat(4,4) = mat(4,4)+(gBL**2*vR**2*Conjg(ZZ(3,2))*RXiZR*ZZ(3,2))/4._dp
+mat(4,4) = mat(4,4)+(gBL**2*vR**2*Cos(2._dp*(TW))*RXiZ)/4._dp
+mat(4,4) = mat(4,4)-1._dp/2._dp*(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW))
+mat(4,4) = mat(4,4)+(g2**2*vR**2*RXiZ*Sin(TW)**2)/4._dp
+mat(4,4) = mat(4,4)+(gBL**2*vR**2*Cos(2._dp*(TW))*RXiZR*Tan(TW)**2)/4._dp
+mat(4,4) = mat(4,4)-1._dp/2._dp*(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2)
+mat(4,4) = mat(4,4)+(g2**2*vR**2*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
 
  
  Do i1=2,4
@@ -1260,9 +1241,11 @@ Iname = Iname - 1
  
 End Subroutine CalculateMFv 
 
-Subroutine CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
+Subroutine CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,TW,kont)
 
 Real(dp), Intent(in) :: gBL,g2,k1,vR
+
+Real(dp), Intent(out) :: TW
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr 
@@ -1271,9 +1254,9 @@ Real(dp), Intent(out) :: MVZ, MVZ2
 Real(dp), Intent(out) :: MVZR, MVZR2
 Real(dp) :: VPVZVZR2(3),VPVZVZR(3)  
 
-Complex(dp), Intent(out) :: ZZ(3,3) 
+Real(dp), Intent(out) :: ZZ(3,3) 
  
-Complex(dp) :: mat(3,3)  
+Real(dp) :: mat(3,3)  
 
 Real(dp) ::  test(2) 
 
@@ -1296,7 +1279,7 @@ mat(3,3) = mat(3,3)+(gBL**2*vR**2)/4._dp
  
  Do i1=2,3
   Do i2 = 1, i1-1 
-  mat(i1,i2) = Conjg(mat(i2,i1)) 
+  mat(i1,i2) = mat(i2,i1) 
   End do 
 End do 
 
@@ -1357,6 +1340,7 @@ MVZ = VPVZVZR(1)
 MVZ2 = VPVZVZR2(1) 
 MVZR = VPVZVZR(2) 
 MVZR2 = VPVZVZR2(2) 
+TW = ASin(Abs(ZZ(1,1)))
 
  Iname = Iname - 1 
  
@@ -1578,11 +1562,9 @@ Iname = Iname - 1
 End Subroutine CalculateMhhEffPot 
 
 Subroutine CalculateMAhEffPot(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,              & 
-& ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,ZZ,UP,MAh,MAh2,kont)
+& ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,TW,UP,MAh,MAh2,kont)
 
-Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,TW
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr, pos 
@@ -2365,9 +2347,11 @@ Iname = Iname - 1
  
 End Subroutine CalculateMFvEffPot 
 
-Subroutine CalculateVPVZVZREffPot(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
+Subroutine CalculateVPVZVZREffPot(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,TW,kont)
 
 Real(dp), Intent(in) :: gBL,g2,k1,vR
+
+Real(dp), Intent(out) :: TW
 
 Integer, Intent(inout) :: kont 
 Integer :: i1,i2,i3,i4, ierr 
@@ -2376,9 +2360,9 @@ Real(dp), Intent(out) :: MVZ, MVZ2
 Real(dp), Intent(out) :: MVZR, MVZR2
 Real(dp) :: VPVZVZR2(3),VPVZVZR(3)  
 
-Complex(dp), Intent(out) :: ZZ(3,3) 
+Real(dp), Intent(out) :: ZZ(3,3) 
  
-Complex(dp) :: mat(3,3)  
+Real(dp) :: mat(3,3)  
 
 Real(dp) ::  test(2) 
 
@@ -2401,7 +2385,7 @@ mat(3,3) = mat(3,3)+(gBL**2*vRFix**2)/4._dp
  
  Do i1=2,3
   Do i2 = 1, i1-1 
-  mat(i1,i2) = Conjg(mat(i2,i1)) 
+  mat(i1,i2) = mat(i2,i1) 
   End do 
 End do 
 
@@ -2547,9 +2531,9 @@ MVWRm2 = VWLmVWRm2(3)
 End Subroutine CalculateVWLmVWRmEffPot 
 
 Subroutine TreeMassesSM(MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MVWLm,MVWLm2,             & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,ZDR,ZER,ZUR,ZDL,ZEL,ZUL,ZM,ZW,ZZ,k1,             & 
-& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
-& YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
+& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,ZDR,ZER,ZUR,ZDL,ZEL,ZUL,ZM,ZW,ZZ,             & 
+& k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,              & 
+& YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 Implicit None 
  
@@ -2558,9 +2542,9 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
 Real(dp),Intent(out) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),MVWLm,MVWLm2,             & 
-& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW
+& MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,ZZ(3,3)
 
-Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
+Complex(dp),Intent(out) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Real(dp),Intent(in) :: k1,vR
 
@@ -2585,7 +2569,7 @@ Call CalculateMFv(Mux,Y,YR,k1,vR,ZM,MFv,kont)
 MFv2 = MFv**2 
 
  
- Call CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,kont)
+ Call CalculateVPVZVZR(gBL,g2,k1,vR,ZZ,MVZ,MVZR,MVZ2,MVZR2,TW,kont)
 
 Call CalculateVWLmVWRm(g2,k1,vR,ZW,MVWLm,MVWRm,MVWLm2,MVWRm2,PhiW,kont)
 
@@ -2600,9 +2584,9 @@ Subroutine SortGoldstones(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,         
 
 Real(dp),Intent(inout) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
-& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
 
-Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
+Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Integer, Intent(inout) :: kont 
 Integer :: i1, i2, pos 

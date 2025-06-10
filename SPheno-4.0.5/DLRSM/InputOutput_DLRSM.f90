@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:30 on 9.6.2025   
+! File created at 23:46 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -356,9 +356,10 @@ Else If (i_par.Eq.9) Then
 rho2input= wert 
 Else If (i_par.Eq.10) Then 
 alp1input= wert 
-Else If (i_par.Eq.132) Then 
-If (i_c.Eq.0) alp2input*alp3input= Cmplx(wert,Aimag(alp2input*alp3input),dp) 
-If (i_c.Eq.1) alp2input*alp3input= Cmplx(Real(alp2input*alp3input,dp),wert,dp) 
+Else If (i_par.Eq.11) Then 
+alp2input= wert 
+Else If (i_par.Eq.12) Then 
+alp3input= wert 
 Else
 Write(ErrCan,*) "Error in routine "//NameOfUnit(Iname)
 If (i_c.Eq.0) Write(ErrCan,*) "Unknown entry for Block MINPAR ",i_par
@@ -1568,14 +1569,11 @@ Write(io_L,101) 7, Real(lam6input,dp) ,"# lam6input"
 Write(io_L,101) 8, Real(rho1input,dp) ,"# rho1input"
 Write(io_L,101) 9, Real(rho2input,dp) ,"# rho2input"
 Write(io_L,101) 10, Real(alp1input,dp) ,"# alp1input"
-Write(io_L,101) 132, Real(alp2input*alp3input,dp) ,"# alp2input*alp3input"
+Write(io_L,101) 11, Real(alp2input,dp) ,"# alp2input"
+Write(io_L,101) 12, Real(alp3input,dp) ,"# alp3input"
 WriteNextBlock = .False. 
-If (Abs(Aimag(alp2input*alp3input)).gt.0._dp) WriteNextBlock = .True. 
 If(WriteNextBlock) Then 
 Write(io_L,100) "Block IMMINPAR  # Input parameters"
-If (Abs(Aimag(alp2input*alp3input)).gt.0._dp) Then 
-Write(io_L,101) 132, Aimag(alp2input*alp3input) ,"# alp2input*alp3input"
-End if 
 End if 
 Write(io_L,106) "Block gaugeGUT Q=",m_GUT,"# (GUT scale)" 
 Write(io_L,104) 1,gBLGUT, "# gBL(Q)" 
@@ -1629,7 +1627,7 @@ Write(io_L,104) 1,Real(ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2)),dp), "# Phi
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block THETAW Q=",Q,"# (Renormalization Scale)" 
-Write(io_L,104) 1,Real(ASin(Abs(ZZ(2,1))),dp), "# TW" 
+Write(io_L,104) 1,Real(ASin(Abs(ZZ(1,1))),dp), "# TW" 
 If (WriteTreeLevelTadpoleParameters) Then 
 If (HighScaleModel.Eq."LOW") Then 
 WriteNextBlock = .false. 
@@ -2422,29 +2420,6 @@ Write(io_L,107)9,6,Aimag(ZM(9,6)), "# Aimag(ZM(9,6))"
 Write(io_L,107)9,7,Aimag(ZM(9,7)), "# Aimag(ZM(9,7))" 
 Write(io_L,107)9,8,Aimag(ZM(9,8)), "# Aimag(ZM(9,8))" 
 Write(io_L,107)9,9,Aimag(ZM(9,9)), "# Aimag(ZM(9,9))" 
-End If 
-
-Write(io_L,106) "Block ZZMIX Q=",Q,"# ()" 
-Write(io_L,107)1,1,Real(ZZ(1,1),dp), "# Real(ZZ(1,1),dp)" 
-Write(io_L,107)1,2,Real(ZZ(1,2),dp), "# Real(ZZ(1,2),dp)" 
-Write(io_L,107)1,3,Real(ZZ(1,3),dp), "# Real(ZZ(1,3),dp)" 
-Write(io_L,107)2,1,Real(ZZ(2,1),dp), "# Real(ZZ(2,1),dp)" 
-Write(io_L,107)2,2,Real(ZZ(2,2),dp), "# Real(ZZ(2,2),dp)" 
-Write(io_L,107)2,3,Real(ZZ(2,3),dp), "# Real(ZZ(2,3),dp)" 
-Write(io_L,107)3,1,Real(ZZ(3,1),dp), "# Real(ZZ(3,1),dp)" 
-Write(io_L,107)3,2,Real(ZZ(3,2),dp), "# Real(ZZ(3,2),dp)" 
-Write(io_L,107)3,3,Real(ZZ(3,3),dp), "# Real(ZZ(3,3),dp)" 
-If ((MaxVal(Abs(AImag(ZZ))).gt.0._dp).OR.(OutputForMG)) Then 
-Write(io_L,106) "Block IMZZMIX Q=",Q,"# ()" 
-Write(io_L,107)1,1,Aimag(ZZ(1,1)), "# Aimag(ZZ(1,1))" 
-Write(io_L,107)1,2,Aimag(ZZ(1,2)), "# Aimag(ZZ(1,2))" 
-Write(io_L,107)1,3,Aimag(ZZ(1,3)), "# Aimag(ZZ(1,3))" 
-Write(io_L,107)2,1,Aimag(ZZ(2,1)), "# Aimag(ZZ(2,1))" 
-Write(io_L,107)2,2,Aimag(ZZ(2,2)), "# Aimag(ZZ(2,2))" 
-Write(io_L,107)2,3,Aimag(ZZ(2,3)), "# Aimag(ZZ(2,3))" 
-Write(io_L,107)3,1,Aimag(ZZ(3,1)), "# Aimag(ZZ(3,1))" 
-Write(io_L,107)3,2,Aimag(ZZ(3,2)), "# Aimag(ZZ(3,2))" 
-Write(io_L,107)3,3,Aimag(ZZ(3,3)), "# Aimag(ZZ(3,3))" 
 End If 
 
 Write(io_L,100) "Block SPheno # SPheno internal parameters " 
@@ -7221,15 +7196,6 @@ Write(io_L,201) BRVZ(1,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
 If (BRVZ(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVWLm 
-CurrentPDG2(2) = -PDGVWRm 
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleVWLm)//" "//Trim(NameParticleVWRm)//"^* "//")"
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVWRm)//" "//")"
-End if 
-icount = icount +1 
-If (BRVZ(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWRm 
 CurrentPDG2(2) = -PDGVWRm 
 Write(io_L,201) BRVZ(1,icount),2,CurrentPDG2, & 
@@ -8230,13 +8196,6 @@ End if
 icount = icount +1 
 If (BRVWLm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGVWRm 
-CurrentPDG2(2) = PDGVZ 
-Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZ)//" "//")"
-End if 
-icount = icount +1 
-If (BRVWLm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGVWRm 
 CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
  & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZR)//" "//")"
@@ -8346,13 +8305,6 @@ icount = icount +1
   End Do 
 End Do 
  
-If (BRVWRm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVWLm 
-CurrentPDG2(2) = PDGVZ 
-Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleVWLm)//" "//Trim(NameParticleVZ)//" "//")"
-End if 
-icount = icount +1 
 If (BRVWRm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = PDGVZR 
@@ -8551,7 +8503,7 @@ Write(123,*) ""
  
 Write(123,*) "" 
 Write(123,*) "PhiW= ",ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-Write(123,*) "TW= ",ASin(Abs(ZZ(2,1)))
+Write(123,*) "TW= ",ASin(Abs(ZZ(1,1)))
 Write(123,*) "" 
 Write(123,*) "" 
 
@@ -9142,24 +9094,6 @@ Write(123,*) "ZER32_r = ", Real(ZER(3,2),dp)
 Write(123,*) "ZER32_i = ", AImag(ZER(3,2))
 Write(123,*) "ZER33_r = ", Real(ZER(3,3),dp)
 Write(123,*) "ZER33_i = ", AImag(ZER(3,3))
-Write(123,*) "ZZ11_r = ", Real(ZZ(1,1),dp)
-Write(123,*) "ZZ11_i = ", AImag(ZZ(1,1))
-Write(123,*) "ZZ12_r = ", Real(ZZ(1,2),dp)
-Write(123,*) "ZZ12_i = ", AImag(ZZ(1,2))
-Write(123,*) "ZZ13_r = ", Real(ZZ(1,3),dp)
-Write(123,*) "ZZ13_i = ", AImag(ZZ(1,3))
-Write(123,*) "ZZ21_r = ", Real(ZZ(2,1),dp)
-Write(123,*) "ZZ21_i = ", AImag(ZZ(2,1))
-Write(123,*) "ZZ22_r = ", Real(ZZ(2,2),dp)
-Write(123,*) "ZZ22_i = ", AImag(ZZ(2,2))
-Write(123,*) "ZZ23_r = ", Real(ZZ(2,3),dp)
-Write(123,*) "ZZ23_i = ", AImag(ZZ(2,3))
-Write(123,*) "ZZ31_r = ", Real(ZZ(3,1),dp)
-Write(123,*) "ZZ31_i = ", AImag(ZZ(3,1))
-Write(123,*) "ZZ32_r = ", Real(ZZ(3,2),dp)
-Write(123,*) "ZZ32_i = ", AImag(ZZ(3,2))
-Write(123,*) "ZZ33_r = ", Real(ZZ(3,3),dp)
-Write(123,*) "ZZ33_i = ", AImag(ZZ(3,3))
     Close(123) 
 End Subroutine WriteWHIZARD 
 

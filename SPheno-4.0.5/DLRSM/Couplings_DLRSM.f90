@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:18 on 9.6.2025   
+! File created at 23:32 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -18,7 +18,7 @@ Use Mathematics, Only: CompareMatrices, Adjungate
 Contains 
  
  Subroutine AllCouplingsReallyAll(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,             & 
-& LAM6,LAM3,LAM4,k1,vR,ZH,UP,UC,gBL,g2,ZZ,PhiW,g3,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,              & 
+& LAM6,LAM3,LAM4,k1,vR,ZH,UP,UC,gBL,g2,TW,PhiW,g3,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,              & 
 & ZER,ZUL,ZUR,YR,ZM,cplAhAhhh,cplAhAhHpm,cplAhAhcHpm,cplAhhhHpm,cplAhhhcHpm,             & 
 & cplAhHpmcHpm,cplhhhhhh,cplhhhhHpm,cplhhhhcHpm,cplhhHpmcHpm,cplHpmHpmcHpm,              & 
 & cplHpmcHpmcHpm,cplAhAhAhAh,cplAhAhAhHpm,cplAhAhAhcHpm,cplAhAhhhhh,cplAhAhhhHpm,        & 
@@ -44,74 +44,69 @@ Contains
 & cplHpmcHpmcVWRmVWLm,cplHpmcHpmcVWLmVWRm,cplHpmcHpmcVWRmVWRm,cplHpmcHpmVZVZ,            & 
 & cplHpmcHpmVZVZR,cplHpmcHpmVZRVZR,cplcHpmcHpmcVWLmcVWLm,cplcHpmcHpmcVWLmcVWRm,          & 
 & cplcHpmcHpmcVWRmcVWRm,cplVGVGVG,cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWLmVPVWRm,          & 
-& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWRmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL,             & 
-& cplcFdFdAhR,cplcFeFeAhL,cplcFeFeAhR,cplcFuFuAhL,cplcFuFuAhR,cplFvFvAhL,cplFvFvAhR,     & 
-& cplcFdFdhhL,cplcFdFdhhR,cplcFuFdHpmL,cplcFuFdHpmR,cplFvFeHpmL,cplFvFeHpmR,             & 
-& cplcFeFehhL,cplcFeFehhR,cplcFuFuhhL,cplcFuFuhhR,cplcFdFucHpmL,cplcFdFucHpmR,           & 
-& cplFvFvhhL,cplFvFvhhR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFdFdVGL,cplcFdFdVGR,             & 
-& cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,             & 
-& cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWLmL,             & 
-& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,         & 
-& cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,             & 
-& cplcFuFuVPR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFuVZL,       & 
-& cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,     & 
-& cplFvFvVZRL,cplFvFvVZRR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,       & 
-& cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,            & 
-& cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,               & 
-& cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,cplcVWLmVPVPVWRm3,cplcVWRmVPVPVWRm1,               & 
-& cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,               & 
-& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,cplcVWRmVPVWLmVZ3,               & 
-& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWLmVZR1,           & 
-& cplcVWRmVPVWLmVZR2,cplcVWRmVPVWLmVZR3,cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,             & 
-& cplcVWLmVPVWRmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
-& cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,cplcVWLmVPVWRmVZR3,cplcVWRmVPVWRmVZR1,           & 
-& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,   & 
-& cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
-& cplcVWRmcVWRmVWLmVWLm1,cplcVWRmcVWRmVWLmVWLm2,cplcVWRmcVWRmVWLmVWLm3,cplcVWLmcVWLmVWLmVWRm1,& 
-& cplcVWLmcVWLmVWLmVWRm2,cplcVWLmcVWLmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
-& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWLmVZVZ1,               & 
-& cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,             & 
-& cplcVWLmVWLmVZVZR3,cplcVWRmVWLmVZVZR1,cplcVWRmVWLmVZVZR2,cplcVWRmVWLmVZVZR3,           & 
-& cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWRmVWLmVZRVZR1,       & 
-& cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,cplcVWLmcVWLmVWRmVWRm1,cplcVWLmcVWLmVWRmVWRm2, & 
-& cplcVWLmcVWLmVWRmVWRm3,cplcVWLmcVWRmVWRmVWRm1,cplcVWLmcVWRmVWRmVWRm2,cplcVWLmcVWRmVWRmVWRm3,& 
-& cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWLmVWRmVZVZ1,& 
-& cplcVWLmVWRmVZVZ2,cplcVWLmVWRmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3,cplcVWLmVWRmVZVZR1,cplcVWLmVWRmVZVZR2,cplcVWLmVWRmVZVZR3,            & 
-& cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplcVWLmVWRmVZRVZR1,          & 
-& cplcVWLmVWRmVZRVZR2,cplcVWLmVWRmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,       & 
-& cplcVWRmVWRmVZRVZR3,cplcgGgGVG,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgWLmgPVWRm,           & 
-& cplcgWRmgPVWRm,cplcgWLpgPcVWLm,cplcgWLpgPcVWRm,cplcgWRpgPcVWLm,cplcgWRpgPcVWRm,        & 
-& cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLmgWLmVZR,           & 
-& cplcgWRmgWLmVZR,cplcgPgWLmcVWLm,cplcgPgWLmcVWRm,cplcgZgWLmcVWLm,cplcgZgWLmcVWRm,       & 
-& cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgPgWLpVWLm,        & 
-& cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWLpVWRm,cplcgZgWLpVWRm,cplcgZpgWLpVWRm,          & 
-& cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWLmgWRmVP,          & 
-& cplcgWRmgWRmVP,cplcgWLmgWRmVZ,cplcgWRmgWRmVZ,cplcgWLmgWRmVZR,cplcgWRmgWRmVZR,          & 
-& cplcgPgWRmcVWLm,cplcgPgWRmcVWRm,cplcgZgWRmcVWLm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWLm,      & 
-& cplcgZpgWRmcVWRm,cplcgWLpgWRpVP,cplcgWRpgWRpVP,cplcgPgWRpVWLm,cplcgZgWRpVWLm,          & 
-& cplcgZpgWRpVWLm,cplcgPgWRpVWRm,cplcgZgWRpVWRm,cplcgZpgWRpVWRm,cplcgWLpgWRpVZ,          & 
-& cplcgWRpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRpgWRpVZR,cplcgWLmgZVWLm,cplcgWRmgZVWLm,          & 
-& cplcgWLmgZVWRm,cplcgWRmgZVWRm,cplcgWLpgZcVWLm,cplcgWLpgZcVWRm,cplcgWRpgZcVWLm,         & 
-& cplcgWRpgZcVWRm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplcgWLmgZpVWRm,cplcgWRmgZpVWRm,       & 
-& cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWLm,cplcgWRpgZpcVWRm,cplcgWLmgWLmAh,    & 
-& cplcgWRmgWLmAh,cplcgWLpgWLpAh,cplcgWRpgWLpAh,cplcgWLmgWRmAh,cplcgWRmgWRmAh,            & 
-& cplcgWLpgWRpAh,cplcgWRpgWRpAh,cplcgZgPhh,cplcgZpgPhh,cplcgWLpgPHpm,cplcgWRpgPHpm,      & 
-& cplcgWLmgPcHpm,cplcgWRmgPcHpm,cplcgWLmgWLmhh,cplcgWRmgWLmhh,cplcgZgWLmHpm,             & 
-& cplcgZpgWLmHpm,cplcgWLpgWLphh,cplcgWRpgWLphh,cplcgZgWLpcHpm,cplcgZpgWLpcHpm,           & 
-& cplcgWLmgWRmhh,cplcgWRmgWRmhh,cplcgZgWRmHpm,cplcgZpgWRmHpm,cplcgWLpgWRphh,             & 
-& cplcgWRpgWRphh,cplcgZgWRpcHpm,cplcgZpgWRpcHpm,cplcgZgZhh,cplcgZpgZhh,cplcgWLpgZHpm,    & 
-& cplcgWRpgZHpm,cplcgWLmgZcHpm,cplcgWRmgZcHpm,cplcgZgZphh,cplcgZpgZphh,cplcgWLpgZpHpm,   & 
-& cplcgWRpgZpHpm,cplcgWLmgZpcHpm,cplcgWRmgZpcHpm)
+& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL,cplcFdFdAhR,cplcFeFeAhL,cplcFeFeAhR,       & 
+& cplcFuFuAhL,cplcFuFuAhR,cplFvFvAhL,cplFvFvAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFuFdHpmL,    & 
+& cplcFuFdHpmR,cplFvFeHpmL,cplFvFeHpmR,cplcFeFehhL,cplcFeFehhR,cplcFuFuhhL,              & 
+& cplcFuFuhhR,cplcFdFucHpmL,cplcFdFucHpmR,cplFvFvhhL,cplFvFvhhR,cplcFeFvcHpmL,           & 
+& cplcFeFvcHpmR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,             & 
+& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,    & 
+& cplcFuFdcVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplcFeFeVPL,    & 
+& cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVGL,             & 
+& cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,         & 
+& cplcFdFuVWRmR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVPL,            & 
+& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplcFeFvVWLmL,cplcFeFvVWLmR,  & 
+& cplcFeFvVWRmL,cplcFeFvVWRmR,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplcVWLmVPVPVWLm1,  & 
+& cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,               & 
+& cplcVWRmVPVPVWLm3,cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,cplcVWLmVPVPVWRm3,               & 
+& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,cplcVWLmVPVWLmVZ1,               & 
+& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,               & 
+& cplcVWRmVPVWLmVZ3,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,            & 
+& cplcVWRmVPVWLmVZR1,cplcVWRmVPVWLmVZR2,cplcVWRmVPVWLmVZR3,cplcVWLmVPVWRmVZ1,            & 
+& cplcVWLmVPVWRmVZ2,cplcVWLmVPVWRmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,               & 
+& cplcVWRmVPVWRmVZ3,cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,cplcVWLmVPVWRmVZR3,            & 
+& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWLmcVWLmVWLmVWLm1,       & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,& 
+& cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWLm1,cplcVWRmcVWRmVWLmVWLm2,cplcVWRmcVWRmVWLmVWLm3,& 
+& cplcVWLmcVWLmVWLmVWRm1,cplcVWLmcVWLmVWLmVWRm2,cplcVWLmcVWLmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
+& cplcVWRmcVWRmVWLmVWRm3,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,          & 
+& cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWLmVZVZR1,           & 
+& cplcVWRmVWLmVZVZR2,cplcVWRmVWLmVZVZR3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,         & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,       & 
+& cplcVWLmcVWLmVWRmVWRm1,cplcVWLmcVWLmVWRmVWRm2,cplcVWLmcVWLmVWRmVWRm3,cplcVWLmcVWRmVWRmVWRm1,& 
+& cplcVWLmcVWRmVWRmVWRm2,cplcVWLmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,          & 
+& cplcVWLmVWRmVZVZR1,cplcVWLmVWRmVZVZR2,cplcVWLmVWRmVZVZR3,cplcVWRmVWRmVZVZR1,           & 
+& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2,         & 
+& cplcVWLmVWRmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
+& cplcgGgGVG,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgWLmgPVWRm,cplcgWRmgPVWRm,cplcgWLpgPcVWLm,& 
+& cplcgWLpgPcVWRm,cplcgWRpgPcVWLm,cplcgWRpgPcVWRm,cplcgWLmgWLmVP,cplcgWRmgWLmVP,         & 
+& cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgPgWLmcVWLm,cplcgPgWLmcVWRm,        & 
+& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgWLpgWLpVP,cplcgWRpgWLpVP,       & 
+& cplcgPgWLpVWLm,cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWLpVWRm,cplcgZpgWLpVWRm,          & 
+& cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWLmgWRmVP,cplcgWRmgWRmVP,          & 
+& cplcgWRmgWRmVZ,cplcgWLmgWRmVZR,cplcgWRmgWRmVZR,cplcgPgWRmcVWLm,cplcgPgWRmcVWRm,        & 
+& cplcgZgWRmcVWRm,cplcgZpgWRmcVWLm,cplcgZpgWRmcVWRm,cplcgWLpgWRpVP,cplcgWRpgWRpVP,       & 
+& cplcgPgWRpVWLm,cplcgZpgWRpVWLm,cplcgPgWRpVWRm,cplcgZgWRpVWRm,cplcgZpgWRpVWRm,          & 
+& cplcgWRpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRpgWRpVZR,cplcgWLmgZVWLm,cplcgWRmgZVWRm,          & 
+& cplcgWLpgZcVWLm,cplcgWRpgZcVWRm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplcgWLmgZpVWRm,       & 
+& cplcgWRmgZpVWRm,cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWLm,cplcgWRpgZpcVWRm,   & 
+& cplcgWLmgWLmAh,cplcgWRmgWLmAh,cplcgWLpgWLpAh,cplcgWRpgWLpAh,cplcgWLmgWRmAh,            & 
+& cplcgWRmgWRmAh,cplcgWLpgWRpAh,cplcgWRpgWRpAh,cplcgZgPhh,cplcgZpgPhh,cplcgWLpgPHpm,     & 
+& cplcgWRpgPHpm,cplcgWLmgPcHpm,cplcgWRmgPcHpm,cplcgWLmgWLmhh,cplcgWRmgWLmhh,             & 
+& cplcgZgWLmHpm,cplcgZpgWLmHpm,cplcgWLpgWLphh,cplcgWRpgWLphh,cplcgZgWLpcHpm,             & 
+& cplcgZpgWLpcHpm,cplcgWLmgWRmhh,cplcgWRmgWRmhh,cplcgZgWRmHpm,cplcgZpgWRmHpm,            & 
+& cplcgWLpgWRphh,cplcgWRpgWRphh,cplcgZgWRpcHpm,cplcgZpgWRpcHpm,cplcgZgZhh,               & 
+& cplcgZpgZhh,cplcgWLpgZHpm,cplcgWRpgZHpm,cplcgWLmgZcHpm,cplcgWRmgZcHpm,cplcgZgZphh,     & 
+& cplcgZpgZphh,cplcgWLpgZpHpm,cplcgWRpgZpHpm,cplcgWLmgZpcHpm,cplcgWRmgZpcHpm)
 
 Implicit None 
 Real(dp), Intent(in) :: LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,k1,vR,ZH(4,4),UP(4,4),         & 
-& UC(4,4),gBL,g2,PhiW,g3
+& UC(4,4),gBL,g2,TW,PhiW,g3
 
-Complex(dp), Intent(in) :: ZZ(3,3),YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),         & 
-& ZUL(3,3),ZUR(3,3),YR(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),ZUL(3,3),        & 
+& ZUR(3,3),YR(3,3),ZM(9,9)
 
 Complex(dp), Intent(out) :: cplAhAhhh(4,4,4),cplAhAhHpm(4,4,4),cplAhAhcHpm(4,4,4),cplAhhhHpm(4,4,4),              & 
 & cplAhhhcHpm(4,4,4),cplAhHpmcHpm(4,4,4),cplhhhhhh(4,4,4),cplhhhhHpm(4,4,4),             & 
@@ -146,74 +141,70 @@ Complex(dp), Intent(out) :: cplAhAhhh(4,4,4),cplAhAhHpm(4,4,4),cplAhAhcHpm(4,4,4
 & cplHpmcHpmcVWLmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplHpmcHpmVZVZ(4,4),cplHpmcHpmVZVZR(4,4),& 
 & cplHpmcHpmVZRVZR(4,4),cplcHpmcHpmcVWLmcVWLm(4,4),cplcHpmcHpmcVWLmcVWRm(4,4),           & 
 & cplcHpmcHpmcVWRmcVWRm(4,4),cplVGVGVG,cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWLmVPVWRm,     & 
-& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWRmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL(3,3,4),      & 
-& cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFuFuAhL(3,3,4),           & 
-& cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplcFdFdhhL(3,3,4)
+& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),& 
+& cplcFeFeAhR(3,3,4),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFuFdHpmL(3,3,4)
 
-Complex(dp), Intent(out) :: cplcFdFdhhR(3,3,4),cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),cplFvFeHpmL(9,3,4),         & 
-& cplFvFeHpmR(9,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),           & 
-& cplcFuFuhhR(3,3,4),cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplFvFvhhL(9,9,4),        & 
-& cplFvFvhhR(9,9,4),cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),cplcFdFdVGL(3,3),          & 
-& cplcFdFdVGR(3,3),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),  & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),           & 
-& cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),         & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),               & 
-& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuVGL(3,3),& 
-& cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),& 
-& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),& 
-& cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,          & 
-& cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWLm1,               & 
-& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,               & 
-& cplcVWLmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,               & 
-& cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWLmVZ1,               & 
-& cplcVWRmVPVWLmVZ2,cplcVWRmVPVWLmVZ3,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,             & 
-& cplcVWLmVPVWLmVZR3,cplcVWRmVPVWLmVZR1,cplcVWRmVPVWLmVZR2,cplcVWRmVPVWLmVZR3,           & 
-& cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,cplcVWLmVPVWRmVZ3,cplcVWRmVPVWRmVZ1,               & 
-& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,             & 
-& cplcVWLmVPVWRmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,           & 
-& cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWLm1,& 
-& cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWLm1,cplcVWRmcVWRmVWLmVWLm2,& 
-& cplcVWRmcVWRmVWLmVWLm3,cplcVWLmcVWLmVWLmVWRm1,cplcVWLmcVWLmVWLmVWRm2,cplcVWLmcVWLmVWLmVWRm3,& 
-& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWRmcVWRmVWLmVWRm1,& 
-& cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,               & 
-& cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWLmVZVZR1,           & 
-& cplcVWRmVWLmVZVZR2,cplcVWRmVWLmVZVZR3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,         & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,       & 
-& cplcVWLmcVWLmVWRmVWRm1,cplcVWLmcVWLmVWRmVWRm2,cplcVWLmcVWLmVWRmVWRm3,cplcVWLmcVWRmVWRmVWRm1,& 
-& cplcVWLmcVWRmVWRmVWRm2,cplcVWLmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
-& cplcVWRmcVWRmVWRmVWRm3,cplcVWLmVWRmVZVZ1,cplcVWLmVWRmVZVZ2,cplcVWLmVWRmVZVZ3,          & 
+Complex(dp), Intent(out) :: cplcFuFdHpmR(3,3,4),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplcFeFehhL(3,3,4),          & 
+& cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFdFucHpmL(3,3,4),         & 
+& cplcFdFucHpmR(3,3,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplcFeFvcHpmL(3,9,4),         & 
+& cplcFeFvcHpmR(3,9,4),cplcFdFdVGL(3,3),cplcFdFdVGR(3,3),cplcFdFdVPL(3,3),               & 
+& cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),& 
+& cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),       & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
+& cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3), & 
+& cplcFeFeVZRR(3,3),cplcFuFuVGL(3,3),cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3), & 
+& cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),           & 
+& cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVPL(9,9), & 
+& cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),     & 
+& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),           & 
+& cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,            & 
+& cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,               & 
+& cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,cplcVWLmVPVPVWRm3,cplcVWRmVPVPVWRm1,               & 
+& cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,               & 
+& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,cplcVWRmVPVWLmVZ3,               & 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWLmVZR1,           & 
+& cplcVWRmVPVWLmVZR2,cplcVWRmVPVWLmVZR3,cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,             & 
+& cplcVWLmVPVWRmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
+& cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,cplcVWLmVPVWRmVZR3,cplcVWRmVPVWRmVZR1,           & 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,   & 
+& cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
+& cplcVWRmcVWRmVWLmVWLm1,cplcVWRmcVWRmVWLmVWLm2,cplcVWRmcVWRmVWLmVWLm3,cplcVWLmcVWLmVWLmVWRm1,& 
+& cplcVWLmcVWLmVWLmVWRm2,cplcVWLmcVWLmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
+& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZVZR1,              & 
+& cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWLmVZVZR1,cplcVWRmVWLmVZVZR2,           & 
+& cplcVWRmVWLmVZVZR3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,        & 
+& cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,cplcVWLmcVWLmVWRmVWRm1,    & 
+& cplcVWLmcVWLmVWRmVWRm2,cplcVWLmcVWLmVWRmVWRm3,cplcVWLmcVWRmVWRmVWRm1,cplcVWLmcVWRmVWRmVWRm2,& 
+& cplcVWLmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWLmVWRmVZVZR1,              & 
-& cplcVWLmVWRmVZVZR2,cplcVWLmVWRmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2
+& cplcVWLmVWRmVZVZR2,cplcVWLmVWRmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,           & 
+& cplcVWRmVWRmVZVZR3,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2,cplcVWLmVWRmVZRVZR3,        & 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,cplcgGgGVG,cplcgWLmgPVWLm
 
-Complex(dp), Intent(out) :: cplcVWRmVWRmVZVZR3,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2,cplcVWLmVWRmVZRVZR3,        & 
-& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,cplcgGgGVG,cplcgWLmgPVWLm, & 
-& cplcgWRmgPVWLm,cplcgWLmgPVWRm,cplcgWRmgPVWRm,cplcgWLpgPcVWLm,cplcgWLpgPcVWRm,          & 
+Complex(dp), Intent(out) :: cplcgWRmgPVWLm,cplcgWLmgPVWRm,cplcgWRmgPVWRm,cplcgWLpgPcVWLm,cplcgWLpgPcVWRm,          & 
 & cplcgWRpgPcVWLm,cplcgWRpgPcVWRm,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLmgWLmVZ,          & 
-& cplcgWRmgWLmVZ,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgPgWLmcVWLm,cplcgPgWLmcVWRm,        & 
-& cplcgZgWLmcVWLm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgWLpgWLpVP,      & 
-& cplcgWRpgWLpVP,cplcgPgWLpVWLm,cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWLpVWRm,           & 
-& cplcgZgWLpVWRm,cplcgZpgWLpVWRm,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWLpgWLpVZR,          & 
-& cplcgWRpgWLpVZR,cplcgWLmgWRmVP,cplcgWRmgWRmVP,cplcgWLmgWRmVZ,cplcgWRmgWRmVZ,           & 
-& cplcgWLmgWRmVZR,cplcgWRmgWRmVZR,cplcgPgWRmcVWLm,cplcgPgWRmcVWRm,cplcgZgWRmcVWLm,       & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWLm,cplcgZpgWRmcVWRm,cplcgWLpgWRpVP,cplcgWRpgWRpVP,       & 
-& cplcgPgWRpVWLm,cplcgZgWRpVWLm,cplcgZpgWRpVWLm,cplcgPgWRpVWRm,cplcgZgWRpVWRm,           & 
-& cplcgZpgWRpVWRm,cplcgWLpgWRpVZ,cplcgWRpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRpgWRpVZR,         & 
-& cplcgWLmgZVWLm,cplcgWRmgZVWLm,cplcgWLmgZVWRm,cplcgWRmgZVWRm,cplcgWLpgZcVWLm,           & 
-& cplcgWLpgZcVWRm,cplcgWRpgZcVWLm,cplcgWRpgZcVWRm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,       & 
-& cplcgWLmgZpVWRm,cplcgWRmgZpVWRm,cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWLm,    & 
-& cplcgWRpgZpcVWRm,cplcgWLmgWLmAh(4),cplcgWRmgWLmAh(4),cplcgWLpgWLpAh(4),cplcgWRpgWLpAh(4),& 
-& cplcgWLmgWRmAh(4),cplcgWRmgWRmAh(4),cplcgWLpgWRpAh(4),cplcgWRpgWRpAh(4),               & 
-& cplcgZgPhh(4),cplcgZpgPhh(4),cplcgWLpgPHpm(4),cplcgWRpgPHpm(4),cplcgWLmgPcHpm(4),      & 
-& cplcgWRmgPcHpm(4),cplcgWLmgWLmhh(4),cplcgWRmgWLmhh(4),cplcgZgWLmHpm(4),cplcgZpgWLmHpm(4),& 
-& cplcgWLpgWLphh(4),cplcgWRpgWLphh(4),cplcgZgWLpcHpm(4),cplcgZpgWLpcHpm(4),              & 
-& cplcgWLmgWRmhh(4),cplcgWRmgWRmhh(4),cplcgZgWRmHpm(4),cplcgZpgWRmHpm(4),cplcgWLpgWRphh(4),& 
-& cplcgWRpgWRphh(4),cplcgZgWRpcHpm(4),cplcgZpgWRpcHpm(4),cplcgZgZhh(4),cplcgZpgZhh(4),   & 
-& cplcgWLpgZHpm(4),cplcgWRpgZHpm(4),cplcgWLmgZcHpm(4),cplcgWRmgZcHpm(4),cplcgZgZphh(4),  & 
-& cplcgZpgZphh(4),cplcgWLpgZpHpm(4),cplcgWRpgZpHpm(4),cplcgWLmgZpcHpm(4),cplcgWRmgZpcHpm(4)
+& cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgPgWLmcVWLm,cplcgPgWLmcVWRm,cplcgZgWLmcVWLm,       & 
+& cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgPgWLpVWLm,        & 
+& cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWLpVWRm,cplcgZpgWLpVWRm,cplcgWLpgWLpVZ,          & 
+& cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWLmgWRmVP,cplcgWRmgWRmVP,cplcgWRmgWRmVZ,          & 
+& cplcgWLmgWRmVZR,cplcgWRmgWRmVZR,cplcgPgWRmcVWLm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,       & 
+& cplcgZpgWRmcVWLm,cplcgZpgWRmcVWRm,cplcgWLpgWRpVP,cplcgWRpgWRpVP,cplcgPgWRpVWLm,        & 
+& cplcgZpgWRpVWLm,cplcgPgWRpVWRm,cplcgZgWRpVWRm,cplcgZpgWRpVWRm,cplcgWRpgWRpVZ,          & 
+& cplcgWLpgWRpVZR,cplcgWRpgWRpVZR,cplcgWLmgZVWLm,cplcgWRmgZVWRm,cplcgWLpgZcVWLm,         & 
+& cplcgWRpgZcVWRm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplcgWLmgZpVWRm,cplcgWRmgZpVWRm,       & 
+& cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWLm,cplcgWRpgZpcVWRm,cplcgWLmgWLmAh(4), & 
+& cplcgWRmgWLmAh(4),cplcgWLpgWLpAh(4),cplcgWRpgWLpAh(4),cplcgWLmgWRmAh(4),               & 
+& cplcgWRmgWRmAh(4),cplcgWLpgWRpAh(4),cplcgWRpgWRpAh(4),cplcgZgPhh(4),cplcgZpgPhh(4),    & 
+& cplcgWLpgPHpm(4),cplcgWRpgPHpm(4),cplcgWLmgPcHpm(4),cplcgWRmgPcHpm(4),cplcgWLmgWLmhh(4),& 
+& cplcgWRmgWLmhh(4),cplcgZgWLmHpm(4),cplcgZpgWLmHpm(4),cplcgWLpgWLphh(4),cplcgWRpgWLphh(4),& 
+& cplcgZgWLpcHpm(4),cplcgZpgWLpcHpm(4),cplcgWLmgWRmhh(4),cplcgWRmgWRmhh(4),              & 
+& cplcgZgWRmHpm(4),cplcgZpgWRmHpm(4),cplcgWLpgWRphh(4),cplcgWRpgWRphh(4),cplcgZgWRpcHpm(4),& 
+& cplcgZpgWRpcHpm(4),cplcgZgZhh(4),cplcgZpgZhh(4),cplcgWLpgZHpm(4),cplcgWRpgZHpm(4),     & 
+& cplcgWLmgZcHpm(4),cplcgWRmgZcHpm(4),cplcgZgZphh(4),cplcgZpgZphh(4),cplcgWLpgZpHpm(4),  & 
+& cplcgWRpgZpHpm(4),cplcgWLmgZpcHpm(4),cplcgWRmgZpcHpm(4)
 
 Integer :: gt1, gt2, gt3, gt4, ct1, ct2, ct3, ct4
 
@@ -613,7 +604,7 @@ End Do
 cplAhhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVPT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVP(gt1,gt2))
+Call CouplingAhhhVPT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -622,7 +613,7 @@ End Do
 cplAhhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZ(gt1,gt2))
+Call CouplingAhhhVZT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -631,7 +622,7 @@ End Do
 cplAhhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZR(gt1,gt2))
+Call CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -712,7 +703,7 @@ End Do
 cplHpmcHpmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVP(gt1,gt2))
+Call CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -721,7 +712,7 @@ End Do
 cplHpmcHpmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZ(gt1,gt2))
+Call CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -730,7 +721,7 @@ End Do
 cplHpmcHpmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZR(gt1,gt2))
+Call CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -752,14 +743,14 @@ End Do
 
 cplhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZ(gt1))
+Call CouplinghhVPVZT(gt1,gBL,g2,vR,ZH,TW,cplhhVPVZ(gt1))
 
 End Do 
 
 
 cplhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZR(gt1))
+Call CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVPVZR(gt1))
 
 End Do 
 
@@ -794,105 +785,105 @@ End Do
 
 cplhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZ(gt1))
+Call CouplinghhVZVZT(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZR(gt1))
+Call CouplinghhVZVZRT(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZR(gt1))
 
 End Do 
 
 
 cplhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZRVZR(gt1))
+Call CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVZRVZR(gt1))
 
 End Do 
 
 
 cplHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWLm(gt1))
+Call CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWLm(gt1))
 
 End Do 
 
 
 cplHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWRm(gt1))
+Call CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWRm(gt1))
 
 End Do 
 
 
 cplHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZ(gt1))
+Call CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZ(gt1))
+Call CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZR(gt1))
+Call CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZR(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVP(gt1))
+Call CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVP(gt1))
+Call CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZ(gt1))
+Call CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZ(gt1))
+Call CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZR(gt1))
+Call CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZR(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZR(gt1))
+Call CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZR(gt1))
 
 End Do 
 
@@ -900,7 +891,7 @@ End Do
 cplAhAhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVPT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVP(gt1,gt2))
+Call CouplingAhAhVPVPT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -909,7 +900,7 @@ End Do
 cplAhAhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZ(gt1,gt2))
+Call CouplingAhAhVPVZT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -918,7 +909,7 @@ End Do
 cplAhAhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZRT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZR(gt1,gt2))
+Call CouplingAhAhVPVZRT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -963,7 +954,7 @@ End Do
 cplAhAhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZ(gt1,gt2))
+Call CouplingAhAhVZVZT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -972,7 +963,7 @@ End Do
 cplAhAhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZRT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZR(gt1,gt2))
+Call CouplingAhAhVZVZRT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -981,7 +972,7 @@ End Do
 cplAhAhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZRVZRT(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZRVZR(gt1,gt2))
+Call CouplingAhAhVZRVZRT(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1008,7 +999,7 @@ End Do
 cplAhHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVPVWLmT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVPVWLm(gt1,gt2))
+Call CouplingAhHpmVPVWLmT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVPVWLm(gt1,gt2))
 
  End Do 
 End Do 
@@ -1017,7 +1008,7 @@ End Do
 cplAhHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVPVWRmT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVPVWRm(gt1,gt2))
+Call CouplingAhHpmVPVWRmT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVPVWRm(gt1,gt2))
 
  End Do 
 End Do 
@@ -1026,7 +1017,7 @@ End Do
 cplAhHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVWLmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVWLmVZ(gt1,gt2))
+Call CouplingAhHpmVWLmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVWLmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1035,7 +1026,7 @@ End Do
 cplAhHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVWLmVZR(gt1,gt2))
+Call CouplingAhHpmVWLmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVWLmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1044,7 +1035,7 @@ End Do
 cplAhHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVWRmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVWRmVZ(gt1,gt2))
+Call CouplingAhHpmVWRmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVWRmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1053,7 +1044,7 @@ End Do
 cplAhHpmVWRmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhHpmVWRmVZR(gt1,gt2))
+Call CouplingAhHpmVWRmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhHpmVWRmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1062,7 +1053,7 @@ End Do
 cplAhcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWLmVP(gt1,gt2))
+Call CouplingAhcHpmcVWLmVPT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWLmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1071,7 +1062,7 @@ End Do
 cplAhcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWRmVP(gt1,gt2))
+Call CouplingAhcHpmcVWRmVPT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWRmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1080,7 +1071,7 @@ End Do
 cplAhcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWLmVZ(gt1,gt2))
+Call CouplingAhcHpmcVWLmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWLmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1089,7 +1080,7 @@ End Do
 cplAhcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWRmVZ(gt1,gt2))
+Call CouplingAhcHpmcVWRmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWRmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1098,7 +1089,7 @@ End Do
 cplAhcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWLmVZR(gt1,gt2))
+Call CouplingAhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWLmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1107,7 +1098,7 @@ End Do
 cplAhcHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,cplAhcHpmcVWRmVZR(gt1,gt2))
+Call CouplingAhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,cplAhcHpmcVWRmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1116,7 +1107,7 @@ End Do
 cplhhhhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVPT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVP(gt1,gt2))
+Call CouplinghhhhVPVPT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1125,7 +1116,7 @@ End Do
 cplhhhhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZ(gt1,gt2))
+Call CouplinghhhhVPVZT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1134,7 +1125,7 @@ End Do
 cplhhhhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZRT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZR(gt1,gt2))
+Call CouplinghhhhVPVZRT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1179,7 +1170,7 @@ End Do
 cplhhhhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZ(gt1,gt2))
+Call CouplinghhhhVZVZT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1188,7 +1179,7 @@ End Do
 cplhhhhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZRT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZR(gt1,gt2))
+Call CouplinghhhhVZVZRT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1197,7 +1188,7 @@ End Do
 cplhhhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZRVZRT(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZRVZR(gt1,gt2))
+Call CouplinghhhhVZRVZRT(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1206,7 +1197,7 @@ End Do
 cplhhHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVPVWLmT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVPVWLm(gt1,gt2))
+Call CouplinghhHpmVPVWLmT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVPVWLm(gt1,gt2))
 
  End Do 
 End Do 
@@ -1215,7 +1206,7 @@ End Do
 cplhhHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVPVWRmT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVPVWRm(gt1,gt2))
+Call CouplinghhHpmVPVWRmT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVPVWRm(gt1,gt2))
 
  End Do 
 End Do 
@@ -1224,7 +1215,7 @@ End Do
 cplhhHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVWLmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVWLmVZ(gt1,gt2))
+Call CouplinghhHpmVWLmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVWLmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1233,7 +1224,7 @@ End Do
 cplhhHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVWLmVZR(gt1,gt2))
+Call CouplinghhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVWLmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1242,7 +1233,7 @@ End Do
 cplhhHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVWRmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVWRmVZ(gt1,gt2))
+Call CouplinghhHpmVWRmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVWRmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1251,7 +1242,7 @@ End Do
 cplhhHpmVWRmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhHpmVWRmVZR(gt1,gt2))
+Call CouplinghhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhHpmVWRmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1260,7 +1251,7 @@ End Do
 cplhhcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWLmVP(gt1,gt2))
+Call CouplinghhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWLmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1269,7 +1260,7 @@ End Do
 cplhhcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWRmVP(gt1,gt2))
+Call CouplinghhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWRmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1278,7 +1269,7 @@ End Do
 cplhhcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWLmVZ(gt1,gt2))
+Call CouplinghhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWLmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1287,7 +1278,7 @@ End Do
 cplhhcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWRmVZ(gt1,gt2))
+Call CouplinghhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWRmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1296,7 +1287,7 @@ End Do
 cplhhcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWLmVZR(gt1,gt2))
+Call CouplinghhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWLmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1305,7 +1296,7 @@ End Do
 cplhhcHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,cplhhcHpmcVWRmVZR(gt1,gt2))
+Call CouplinghhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,cplhhcHpmcVWRmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1341,7 +1332,7 @@ End Do
 cplHpmcHpmVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVPT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVP(gt1,gt2))
+Call CouplingHpmcHpmVPVPT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -1350,7 +1341,7 @@ End Do
 cplHpmcHpmVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZ(gt1,gt2))
+Call CouplingHpmcHpmVPVZT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1359,7 +1350,7 @@ End Do
 cplHpmcHpmVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZRT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZR(gt1,gt2))
+Call CouplingHpmcHpmVPVZRT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1404,7 +1395,7 @@ End Do
 cplHpmcHpmVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZ(gt1,gt2))
+Call CouplingHpmcHpmVZVZT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -1413,7 +1404,7 @@ End Do
 cplHpmcHpmVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZRT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZR(gt1,gt2))
+Call CouplingHpmcHpmVZVZRT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1422,7 +1413,7 @@ End Do
 cplHpmcHpmVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZRVZRT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZRVZR(gt1,gt2))
+Call CouplingHpmcHpmVZRVZRT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1461,62 +1452,52 @@ Call CouplingVGVGVGT(g3,cplVGVGVG)
 
 
 cplcVWLmVPVWLm = 0._dp 
-Call CouplingcVWLmVPVWLmT(g2,ZZ,PhiW,cplcVWLmVPVWLm)
+Call CouplingcVWLmVPVWLmT(g2,TW,PhiW,cplcVWLmVPVWLm)
 
 
 
 cplcVWRmVPVWLm = 0._dp 
-Call CouplingcVWRmVPVWLmT(g2,ZZ,PhiW,cplcVWRmVPVWLm)
+Call CouplingcVWRmVPVWLmT(g2,TW,PhiW,cplcVWRmVPVWLm)
 
 
 
 cplcVWLmVPVWRm = 0._dp 
-Call CouplingcVWLmVPVWRmT(g2,ZZ,PhiW,cplcVWLmVPVWRm)
+Call CouplingcVWLmVPVWRmT(g2,TW,PhiW,cplcVWLmVPVWRm)
 
 
 
 cplcVWRmVPVWRm = 0._dp 
-Call CouplingcVWRmVPVWRmT(g2,ZZ,PhiW,cplcVWRmVPVWRm)
+Call CouplingcVWRmVPVWRmT(g2,TW,PhiW,cplcVWRmVPVWRm)
 
 
 
 cplcVWLmVWLmVZ = 0._dp 
-Call CouplingcVWLmVWLmVZT(g2,ZZ,PhiW,cplcVWLmVWLmVZ)
-
-
-
-cplcVWRmVWLmVZ = 0._dp 
-Call CouplingcVWRmVWLmVZT(g2,ZZ,PhiW,cplcVWRmVWLmVZ)
+Call CouplingcVWLmVWLmVZT(g2,TW,cplcVWLmVWLmVZ)
 
 
 
 cplcVWLmVWLmVZR = 0._dp 
-Call CouplingcVWLmVWLmVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZR)
+Call CouplingcVWLmVWLmVZRT(g2,TW,PhiW,cplcVWLmVWLmVZR)
 
 
 
 cplcVWRmVWLmVZR = 0._dp 
-Call CouplingcVWRmVWLmVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZR)
-
-
-
-cplcVWLmVWRmVZ = 0._dp 
-Call CouplingcVWLmVWRmVZT(g2,ZZ,PhiW,cplcVWLmVWRmVZ)
+Call CouplingcVWRmVWLmVZRT(g2,TW,PhiW,cplcVWRmVWLmVZR)
 
 
 
 cplcVWRmVWRmVZ = 0._dp 
-Call CouplingcVWRmVWRmVZT(g2,ZZ,PhiW,cplcVWRmVWRmVZ)
+Call CouplingcVWRmVWRmVZT(g2,TW,cplcVWRmVWRmVZ)
 
 
 
 cplcVWLmVWRmVZR = 0._dp 
-Call CouplingcVWLmVWRmVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZR)
+Call CouplingcVWLmVWRmVZRT(g2,TW,PhiW,cplcVWLmVWRmVZR)
 
 
 
 cplcVWRmVWRmVZR = 0._dp 
-Call CouplingcVWRmVWRmVZRT(g2,ZZ,PhiW,cplcVWRmVWRmVZR)
+Call CouplingcVWRmVWRmVZRT(g2,TW,PhiW,cplcVWRmVWRmVZR)
 
 
 
@@ -1690,7 +1671,7 @@ cplcFdFdVPL = 0._dp
 cplcFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVPT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
+Call CouplingcFdFdVPT(gt1,gt2,gBL,g2,TW,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1700,7 +1681,7 @@ cplcFdFdVZL = 0._dp
 cplcFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
+Call CouplingcFdFdVZT(gt1,gt2,gBL,g2,TW,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1710,7 +1691,7 @@ cplcFdFdVZRL = 0._dp
 cplcFdFdVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZRT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
+Call CouplingcFdFdVZRT(gt1,gt2,gBL,g2,TW,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1764,7 +1745,7 @@ cplcFeFeVPL = 0._dp
 cplcFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVPT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
+Call CouplingcFeFeVPT(gt1,gt2,gBL,g2,TW,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1774,7 +1755,7 @@ cplcFeFeVZL = 0._dp
 cplcFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
+Call CouplingcFeFeVZT(gt1,gt2,gBL,g2,TW,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1784,7 +1765,7 @@ cplcFeFeVZRL = 0._dp
 cplcFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
+Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,TW,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1804,7 +1785,7 @@ cplcFuFuVPL = 0._dp
 cplcFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVPT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
+Call CouplingcFuFuVPT(gt1,gt2,gBL,g2,TW,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1836,7 +1817,7 @@ cplcFuFuVZL = 0._dp
 cplcFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
+Call CouplingcFuFuVZT(gt1,gt2,gBL,g2,TW,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1846,7 +1827,7 @@ cplcFuFuVZRL = 0._dp
 cplcFuFuVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZRT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
+Call CouplingcFuFuVZRT(gt1,gt2,gBL,g2,TW,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1856,7 +1837,7 @@ cplFvFvVPL = 0._dp
 cplFvFvVPR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVPT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
+Call CouplingFvFvVPT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1866,7 +1847,7 @@ cplFvFvVZL = 0._dp
 cplFvFvVZR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
+Call CouplingFvFvVZT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1876,7 +1857,7 @@ cplFvFvVZRL = 0._dp
 cplFvFvVZRR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
+Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -1914,7 +1895,7 @@ Call CouplingVGVGVGVGT(g3,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3)
 cplcVWLmVPVPVWLm1 = 0._dp 
 cplcVWLmVPVPVWLm2 = 0._dp 
 cplcVWLmVPVPVWLm3 = 0._dp 
-Call CouplingcVWLmVPVPVWLmT(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
+Call CouplingcVWLmVPVPVWLmT(g2,TW,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
 & cplcVWLmVPVPVWLm3)
 
 
@@ -1922,7 +1903,7 @@ Call CouplingcVWLmVPVPVWLmT(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,     
 cplcVWRmVPVPVWLm1 = 0._dp 
 cplcVWRmVPVPVWLm2 = 0._dp 
 cplcVWRmVPVPVWLm3 = 0._dp 
-Call CouplingcVWRmVPVPVWLmT(g2,ZZ,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
+Call CouplingcVWRmVPVPVWLmT(g2,TW,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
 & cplcVWRmVPVPVWLm3)
 
 
@@ -1930,7 +1911,7 @@ Call CouplingcVWRmVPVPVWLmT(g2,ZZ,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,     
 cplcVWLmVPVPVWRm1 = 0._dp 
 cplcVWLmVPVPVWRm2 = 0._dp 
 cplcVWLmVPVPVWRm3 = 0._dp 
-Call CouplingcVWLmVPVPVWRmT(g2,ZZ,PhiW,cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,           & 
+Call CouplingcVWLmVPVPVWRmT(g2,TW,PhiW,cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,           & 
 & cplcVWLmVPVPVWRm3)
 
 
@@ -1938,7 +1919,7 @@ Call CouplingcVWLmVPVPVWRmT(g2,ZZ,PhiW,cplcVWLmVPVPVWRm1,cplcVWLmVPVPVWRm2,     
 cplcVWRmVPVPVWRm1 = 0._dp 
 cplcVWRmVPVPVWRm2 = 0._dp 
 cplcVWRmVPVPVWRm3 = 0._dp 
-Call CouplingcVWRmVPVPVWRmT(g2,ZZ,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
+Call CouplingcVWRmVPVPVWRmT(g2,TW,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
 & cplcVWRmVPVPVWRm3)
 
 
@@ -1946,7 +1927,7 @@ Call CouplingcVWRmVPVPVWRmT(g2,ZZ,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,     
 cplcVWLmVPVWLmVZ1 = 0._dp 
 cplcVWLmVPVWLmVZ2 = 0._dp 
 cplcVWLmVPVWLmVZ3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZT(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
+Call CouplingcVWLmVPVWLmVZT(g2,TW,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
 & cplcVWLmVPVWLmVZ3)
 
 
@@ -1954,7 +1935,7 @@ Call CouplingcVWLmVPVWLmVZT(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,     
 cplcVWRmVPVWLmVZ1 = 0._dp 
 cplcVWRmVPVWLmVZ2 = 0._dp 
 cplcVWRmVPVWLmVZ3 = 0._dp 
-Call CouplingcVWRmVPVWLmVZT(g2,ZZ,PhiW,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,           & 
+Call CouplingcVWRmVPVWLmVZT(g2,TW,PhiW,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,           & 
 & cplcVWRmVPVWLmVZ3)
 
 
@@ -1962,7 +1943,7 @@ Call CouplingcVWRmVPVWLmVZT(g2,ZZ,PhiW,cplcVWRmVPVWLmVZ1,cplcVWRmVPVWLmVZ2,     
 cplcVWLmVPVWLmVZR1 = 0._dp 
 cplcVWLmVPVWLmVZR2 = 0._dp 
 cplcVWLmVPVWLmVZR3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZRT(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
+Call CouplingcVWLmVPVWLmVZRT(g2,TW,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
 & cplcVWLmVPVWLmVZR3)
 
 
@@ -1970,7 +1951,7 @@ Call CouplingcVWLmVPVWLmVZRT(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,  
 cplcVWRmVPVWLmVZR1 = 0._dp 
 cplcVWRmVPVWLmVZR2 = 0._dp 
 cplcVWRmVPVWLmVZR3 = 0._dp 
-Call CouplingcVWRmVPVWLmVZRT(g2,ZZ,PhiW,cplcVWRmVPVWLmVZR1,cplcVWRmVPVWLmVZR2,        & 
+Call CouplingcVWRmVPVWLmVZRT(g2,TW,PhiW,cplcVWRmVPVWLmVZR1,cplcVWRmVPVWLmVZR2,        & 
 & cplcVWRmVPVWLmVZR3)
 
 
@@ -1978,7 +1959,7 @@ Call CouplingcVWRmVPVWLmVZRT(g2,ZZ,PhiW,cplcVWRmVPVWLmVZR1,cplcVWRmVPVWLmVZR2,  
 cplcVWLmVPVWRmVZ1 = 0._dp 
 cplcVWLmVPVWRmVZ2 = 0._dp 
 cplcVWLmVPVWRmVZ3 = 0._dp 
-Call CouplingcVWLmVPVWRmVZT(g2,ZZ,PhiW,cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,           & 
+Call CouplingcVWLmVPVWRmVZT(g2,TW,PhiW,cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,           & 
 & cplcVWLmVPVWRmVZ3)
 
 
@@ -1986,7 +1967,7 @@ Call CouplingcVWLmVPVWRmVZT(g2,ZZ,PhiW,cplcVWLmVPVWRmVZ1,cplcVWLmVPVWRmVZ2,     
 cplcVWRmVPVWRmVZ1 = 0._dp 
 cplcVWRmVPVWRmVZ2 = 0._dp 
 cplcVWRmVPVWRmVZ3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZT(g2,ZZ,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
+Call CouplingcVWRmVPVWRmVZT(g2,TW,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
 & cplcVWRmVPVWRmVZ3)
 
 
@@ -1994,7 +1975,7 @@ Call CouplingcVWRmVPVWRmVZT(g2,ZZ,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,     
 cplcVWLmVPVWRmVZR1 = 0._dp 
 cplcVWLmVPVWRmVZR2 = 0._dp 
 cplcVWLmVPVWRmVZR3 = 0._dp 
-Call CouplingcVWLmVPVWRmVZRT(g2,ZZ,PhiW,cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,        & 
+Call CouplingcVWLmVPVWRmVZRT(g2,TW,PhiW,cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,        & 
 & cplcVWLmVPVWRmVZR3)
 
 
@@ -2002,7 +1983,7 @@ Call CouplingcVWLmVPVWRmVZRT(g2,ZZ,PhiW,cplcVWLmVPVWRmVZR1,cplcVWLmVPVWRmVZR2,  
 cplcVWRmVPVWRmVZR1 = 0._dp 
 cplcVWRmVPVWRmVZR2 = 0._dp 
 cplcVWRmVPVWRmVZR3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZRT(g2,ZZ,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
+Call CouplingcVWRmVPVWRmVZRT(g2,TW,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
 & cplcVWRmVPVWRmVZR3)
 
 
@@ -2058,23 +2039,14 @@ Call CouplingcVWRmcVWRmVWLmVWRmT(g2,PhiW,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWL
 cplcVWLmVWLmVZVZ1 = 0._dp 
 cplcVWLmVWLmVZVZ2 = 0._dp 
 cplcVWLmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZT(g2,ZZ,PhiW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,           & 
-& cplcVWLmVWLmVZVZ3)
-
-
-
-cplcVWRmVWLmVZVZ1 = 0._dp 
-cplcVWRmVWLmVZVZ2 = 0._dp 
-cplcVWRmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWLmVZVZT(g2,ZZ,PhiW,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
-& cplcVWRmVWLmVZVZ3)
+Call CouplingcVWLmVWLmVZVZT(g2,TW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3)
 
 
 
 cplcVWLmVWLmVZVZR1 = 0._dp 
 cplcVWLmVWLmVZVZR2 = 0._dp 
 cplcVWLmVWLmVZVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
+Call CouplingcVWLmVWLmVZVZRT(g2,TW,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
 & cplcVWLmVWLmVZVZR3)
 
 
@@ -2082,7 +2054,7 @@ Call CouplingcVWLmVWLmVZVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,  
 cplcVWRmVWLmVZVZR1 = 0._dp 
 cplcVWRmVWLmVZVZR2 = 0._dp 
 cplcVWRmVWLmVZVZR3 = 0._dp 
-Call CouplingcVWRmVWLmVZVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZVZR1,cplcVWRmVWLmVZVZR2,        & 
+Call CouplingcVWRmVWLmVZVZRT(g2,TW,PhiW,cplcVWRmVWLmVZVZR1,cplcVWRmVWLmVZVZR2,        & 
 & cplcVWRmVWLmVZVZR3)
 
 
@@ -2090,7 +2062,7 @@ Call CouplingcVWRmVWLmVZVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZVZR1,cplcVWRmVWLmVZVZR2,  
 cplcVWLmVWLmVZRVZR1 = 0._dp 
 cplcVWLmVWLmVZRVZR2 = 0._dp 
 cplcVWLmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZRVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
+Call CouplingcVWLmVWLmVZRVZRT(g2,TW,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
 & cplcVWLmVWLmVZRVZR3)
 
 
@@ -2098,7 +2070,7 @@ Call CouplingcVWLmVWLmVZRVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2
 cplcVWRmVWLmVZRVZR1 = 0._dp 
 cplcVWRmVWLmVZRVZR2 = 0._dp 
 cplcVWRmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWRmVWLmVZRVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
+Call CouplingcVWRmVWLmVZRVZRT(g2,TW,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
 & cplcVWRmVWLmVZRVZR3)
 
 
@@ -2127,26 +2099,17 @@ Call CouplingcVWRmcVWRmVWRmVWRmT(g2,PhiW,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWR
 
 
 
-cplcVWLmVWRmVZVZ1 = 0._dp 
-cplcVWLmVWRmVZVZ2 = 0._dp 
-cplcVWLmVWRmVZVZ3 = 0._dp 
-Call CouplingcVWLmVWRmVZVZT(g2,ZZ,PhiW,cplcVWLmVWRmVZVZ1,cplcVWLmVWRmVZVZ2,           & 
-& cplcVWLmVWRmVZVZ3)
-
-
-
 cplcVWRmVWRmVZVZ1 = 0._dp 
 cplcVWRmVWRmVZVZ2 = 0._dp 
 cplcVWRmVWRmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZT(g2,ZZ,PhiW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,           & 
-& cplcVWRmVWRmVZVZ3)
+Call CouplingcVWRmVWRmVZVZT(g2,TW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3)
 
 
 
 cplcVWLmVWRmVZVZR1 = 0._dp 
 cplcVWLmVWRmVZVZR2 = 0._dp 
 cplcVWLmVWRmVZVZR3 = 0._dp 
-Call CouplingcVWLmVWRmVZVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZVZR1,cplcVWLmVWRmVZVZR2,        & 
+Call CouplingcVWLmVWRmVZVZRT(g2,TW,PhiW,cplcVWLmVWRmVZVZR1,cplcVWLmVWRmVZVZR2,        & 
 & cplcVWLmVWRmVZVZR3)
 
 
@@ -2154,7 +2117,7 @@ Call CouplingcVWLmVWRmVZVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZVZR1,cplcVWLmVWRmVZVZR2,  
 cplcVWRmVWRmVZVZR1 = 0._dp 
 cplcVWRmVWRmVZVZR2 = 0._dp 
 cplcVWRmVWRmVZVZR3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZRT(g2,ZZ,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
+Call CouplingcVWRmVWRmVZVZRT(g2,TW,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
 & cplcVWRmVWRmVZVZR3)
 
 
@@ -2162,7 +2125,7 @@ Call CouplingcVWRmVWRmVZVZRT(g2,ZZ,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,  
 cplcVWLmVWRmVZRVZR1 = 0._dp 
 cplcVWLmVWRmVZRVZR2 = 0._dp 
 cplcVWLmVWRmVZRVZR3 = 0._dp 
-Call CouplingcVWLmVWRmVZRVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2,     & 
+Call CouplingcVWLmVWRmVZRVZRT(g2,TW,PhiW,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2,     & 
 & cplcVWLmVWRmVZRVZR3)
 
 
@@ -2170,7 +2133,7 @@ Call CouplingcVWLmVWRmVZRVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZRVZR1,cplcVWLmVWRmVZRVZR2
 cplcVWRmVWRmVZRVZR1 = 0._dp 
 cplcVWRmVWRmVZRVZR2 = 0._dp 
 cplcVWRmVWRmVZRVZR3 = 0._dp 
-Call CouplingcVWRmVWRmVZRVZRT(g2,ZZ,PhiW,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,     & 
+Call CouplingcVWRmVWRmVZRVZRT(g2,TW,PhiW,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,     & 
 & cplcVWRmVWRmVZRVZR3)
 
 
@@ -2181,362 +2144,302 @@ Call CouplingcgGgGVGT(g3,cplcgGgGVG)
 
 
 cplcgWLmgPVWLm = 0._dp 
-Call CouplingcgWLmgPVWLmT(g2,ZZ,PhiW,cplcgWLmgPVWLm)
+Call CouplingcgWLmgPVWLmT(g2,TW,PhiW,cplcgWLmgPVWLm)
 
 
 
 cplcgWRmgPVWLm = 0._dp 
-Call CouplingcgWRmgPVWLmT(g2,ZZ,PhiW,cplcgWRmgPVWLm)
+Call CouplingcgWRmgPVWLmT(g2,TW,PhiW,cplcgWRmgPVWLm)
 
 
 
 cplcgWLmgPVWRm = 0._dp 
-Call CouplingcgWLmgPVWRmT(g2,ZZ,PhiW,cplcgWLmgPVWRm)
+Call CouplingcgWLmgPVWRmT(g2,TW,PhiW,cplcgWLmgPVWRm)
 
 
 
 cplcgWRmgPVWRm = 0._dp 
-Call CouplingcgWRmgPVWRmT(g2,ZZ,PhiW,cplcgWRmgPVWRm)
+Call CouplingcgWRmgPVWRmT(g2,TW,PhiW,cplcgWRmgPVWRm)
 
 
 
 cplcgWLpgPcVWLm = 0._dp 
-Call CouplingcgWLpgPcVWLmT(g2,ZZ,PhiW,cplcgWLpgPcVWLm)
+Call CouplingcgWLpgPcVWLmT(g2,TW,PhiW,cplcgWLpgPcVWLm)
 
 
 
 cplcgWLpgPcVWRm = 0._dp 
-Call CouplingcgWLpgPcVWRmT(g2,ZZ,PhiW,cplcgWLpgPcVWRm)
+Call CouplingcgWLpgPcVWRmT(g2,TW,PhiW,cplcgWLpgPcVWRm)
 
 
 
 cplcgWRpgPcVWLm = 0._dp 
-Call CouplingcgWRpgPcVWLmT(g2,ZZ,PhiW,cplcgWRpgPcVWLm)
+Call CouplingcgWRpgPcVWLmT(g2,TW,PhiW,cplcgWRpgPcVWLm)
 
 
 
 cplcgWRpgPcVWRm = 0._dp 
-Call CouplingcgWRpgPcVWRmT(g2,ZZ,PhiW,cplcgWRpgPcVWRm)
+Call CouplingcgWRpgPcVWRmT(g2,TW,PhiW,cplcgWRpgPcVWRm)
 
 
 
 cplcgWLmgWLmVP = 0._dp 
-Call CouplingcgWLmgWLmVPT(g2,ZZ,PhiW,cplcgWLmgWLmVP)
+Call CouplingcgWLmgWLmVPT(g2,TW,PhiW,cplcgWLmgWLmVP)
 
 
 
 cplcgWRmgWLmVP = 0._dp 
-Call CouplingcgWRmgWLmVPT(g2,ZZ,PhiW,cplcgWRmgWLmVP)
+Call CouplingcgWRmgWLmVPT(g2,TW,PhiW,cplcgWRmgWLmVP)
 
 
 
 cplcgWLmgWLmVZ = 0._dp 
-Call CouplingcgWLmgWLmVZT(g2,ZZ,PhiW,cplcgWLmgWLmVZ)
-
-
-
-cplcgWRmgWLmVZ = 0._dp 
-Call CouplingcgWRmgWLmVZT(g2,ZZ,PhiW,cplcgWRmgWLmVZ)
+Call CouplingcgWLmgWLmVZT(g2,TW,cplcgWLmgWLmVZ)
 
 
 
 cplcgWLmgWLmVZR = 0._dp 
-Call CouplingcgWLmgWLmVZRT(g2,ZZ,PhiW,cplcgWLmgWLmVZR)
+Call CouplingcgWLmgWLmVZRT(g2,TW,PhiW,cplcgWLmgWLmVZR)
 
 
 
 cplcgWRmgWLmVZR = 0._dp 
-Call CouplingcgWRmgWLmVZRT(g2,ZZ,PhiW,cplcgWRmgWLmVZR)
+Call CouplingcgWRmgWLmVZRT(g2,TW,PhiW,cplcgWRmgWLmVZR)
 
 
 
 cplcgPgWLmcVWLm = 0._dp 
-Call CouplingcgPgWLmcVWLmT(g2,ZZ,PhiW,cplcgPgWLmcVWLm)
+Call CouplingcgPgWLmcVWLmT(g2,TW,PhiW,cplcgPgWLmcVWLm)
 
 
 
 cplcgPgWLmcVWRm = 0._dp 
-Call CouplingcgPgWLmcVWRmT(g2,ZZ,PhiW,cplcgPgWLmcVWRm)
+Call CouplingcgPgWLmcVWRmT(g2,TW,PhiW,cplcgPgWLmcVWRm)
 
 
 
 cplcgZgWLmcVWLm = 0._dp 
-Call CouplingcgZgWLmcVWLmT(g2,ZZ,PhiW,cplcgZgWLmcVWLm)
-
-
-
-cplcgZgWLmcVWRm = 0._dp 
-Call CouplingcgZgWLmcVWRmT(g2,ZZ,PhiW,cplcgZgWLmcVWRm)
+Call CouplingcgZgWLmcVWLmT(g2,TW,cplcgZgWLmcVWLm)
 
 
 
 cplcgZpgWLmcVWLm = 0._dp 
-Call CouplingcgZpgWLmcVWLmT(g2,ZZ,PhiW,cplcgZpgWLmcVWLm)
+Call CouplingcgZpgWLmcVWLmT(g2,TW,PhiW,cplcgZpgWLmcVWLm)
 
 
 
 cplcgZpgWLmcVWRm = 0._dp 
-Call CouplingcgZpgWLmcVWRmT(g2,ZZ,PhiW,cplcgZpgWLmcVWRm)
+Call CouplingcgZpgWLmcVWRmT(g2,TW,PhiW,cplcgZpgWLmcVWRm)
 
 
 
 cplcgWLpgWLpVP = 0._dp 
-Call CouplingcgWLpgWLpVPT(g2,ZZ,PhiW,cplcgWLpgWLpVP)
+Call CouplingcgWLpgWLpVPT(g2,TW,PhiW,cplcgWLpgWLpVP)
 
 
 
 cplcgWRpgWLpVP = 0._dp 
-Call CouplingcgWRpgWLpVPT(g2,ZZ,PhiW,cplcgWRpgWLpVP)
+Call CouplingcgWRpgWLpVPT(g2,TW,PhiW,cplcgWRpgWLpVP)
 
 
 
 cplcgPgWLpVWLm = 0._dp 
-Call CouplingcgPgWLpVWLmT(g2,ZZ,PhiW,cplcgPgWLpVWLm)
+Call CouplingcgPgWLpVWLmT(g2,TW,PhiW,cplcgPgWLpVWLm)
 
 
 
 cplcgZgWLpVWLm = 0._dp 
-Call CouplingcgZgWLpVWLmT(g2,ZZ,PhiW,cplcgZgWLpVWLm)
+Call CouplingcgZgWLpVWLmT(g2,TW,cplcgZgWLpVWLm)
 
 
 
 cplcgZpgWLpVWLm = 0._dp 
-Call CouplingcgZpgWLpVWLmT(g2,ZZ,PhiW,cplcgZpgWLpVWLm)
+Call CouplingcgZpgWLpVWLmT(g2,TW,PhiW,cplcgZpgWLpVWLm)
 
 
 
 cplcgPgWLpVWRm = 0._dp 
-Call CouplingcgPgWLpVWRmT(g2,ZZ,PhiW,cplcgPgWLpVWRm)
-
-
-
-cplcgZgWLpVWRm = 0._dp 
-Call CouplingcgZgWLpVWRmT(g2,ZZ,PhiW,cplcgZgWLpVWRm)
+Call CouplingcgPgWLpVWRmT(g2,TW,PhiW,cplcgPgWLpVWRm)
 
 
 
 cplcgZpgWLpVWRm = 0._dp 
-Call CouplingcgZpgWLpVWRmT(g2,ZZ,PhiW,cplcgZpgWLpVWRm)
+Call CouplingcgZpgWLpVWRmT(g2,TW,PhiW,cplcgZpgWLpVWRm)
 
 
 
 cplcgWLpgWLpVZ = 0._dp 
-Call CouplingcgWLpgWLpVZT(g2,ZZ,PhiW,cplcgWLpgWLpVZ)
-
-
-
-cplcgWRpgWLpVZ = 0._dp 
-Call CouplingcgWRpgWLpVZT(g2,ZZ,PhiW,cplcgWRpgWLpVZ)
+Call CouplingcgWLpgWLpVZT(g2,TW,cplcgWLpgWLpVZ)
 
 
 
 cplcgWLpgWLpVZR = 0._dp 
-Call CouplingcgWLpgWLpVZRT(g2,ZZ,PhiW,cplcgWLpgWLpVZR)
+Call CouplingcgWLpgWLpVZRT(g2,TW,PhiW,cplcgWLpgWLpVZR)
 
 
 
 cplcgWRpgWLpVZR = 0._dp 
-Call CouplingcgWRpgWLpVZRT(g2,ZZ,PhiW,cplcgWRpgWLpVZR)
+Call CouplingcgWRpgWLpVZRT(g2,TW,PhiW,cplcgWRpgWLpVZR)
 
 
 
 cplcgWLmgWRmVP = 0._dp 
-Call CouplingcgWLmgWRmVPT(g2,ZZ,PhiW,cplcgWLmgWRmVP)
+Call CouplingcgWLmgWRmVPT(g2,TW,PhiW,cplcgWLmgWRmVP)
 
 
 
 cplcgWRmgWRmVP = 0._dp 
-Call CouplingcgWRmgWRmVPT(g2,ZZ,PhiW,cplcgWRmgWRmVP)
-
-
-
-cplcgWLmgWRmVZ = 0._dp 
-Call CouplingcgWLmgWRmVZT(g2,ZZ,PhiW,cplcgWLmgWRmVZ)
+Call CouplingcgWRmgWRmVPT(g2,TW,PhiW,cplcgWRmgWRmVP)
 
 
 
 cplcgWRmgWRmVZ = 0._dp 
-Call CouplingcgWRmgWRmVZT(g2,ZZ,PhiW,cplcgWRmgWRmVZ)
+Call CouplingcgWRmgWRmVZT(g2,TW,cplcgWRmgWRmVZ)
 
 
 
 cplcgWLmgWRmVZR = 0._dp 
-Call CouplingcgWLmgWRmVZRT(g2,ZZ,PhiW,cplcgWLmgWRmVZR)
+Call CouplingcgWLmgWRmVZRT(g2,TW,PhiW,cplcgWLmgWRmVZR)
 
 
 
 cplcgWRmgWRmVZR = 0._dp 
-Call CouplingcgWRmgWRmVZRT(g2,ZZ,PhiW,cplcgWRmgWRmVZR)
+Call CouplingcgWRmgWRmVZRT(g2,TW,PhiW,cplcgWRmgWRmVZR)
 
 
 
 cplcgPgWRmcVWLm = 0._dp 
-Call CouplingcgPgWRmcVWLmT(g2,ZZ,PhiW,cplcgPgWRmcVWLm)
+Call CouplingcgPgWRmcVWLmT(g2,TW,PhiW,cplcgPgWRmcVWLm)
 
 
 
 cplcgPgWRmcVWRm = 0._dp 
-Call CouplingcgPgWRmcVWRmT(g2,ZZ,PhiW,cplcgPgWRmcVWRm)
-
-
-
-cplcgZgWRmcVWLm = 0._dp 
-Call CouplingcgZgWRmcVWLmT(g2,ZZ,PhiW,cplcgZgWRmcVWLm)
+Call CouplingcgPgWRmcVWRmT(g2,TW,PhiW,cplcgPgWRmcVWRm)
 
 
 
 cplcgZgWRmcVWRm = 0._dp 
-Call CouplingcgZgWRmcVWRmT(g2,ZZ,PhiW,cplcgZgWRmcVWRm)
+Call CouplingcgZgWRmcVWRmT(g2,TW,cplcgZgWRmcVWRm)
 
 
 
 cplcgZpgWRmcVWLm = 0._dp 
-Call CouplingcgZpgWRmcVWLmT(g2,ZZ,PhiW,cplcgZpgWRmcVWLm)
+Call CouplingcgZpgWRmcVWLmT(g2,TW,PhiW,cplcgZpgWRmcVWLm)
 
 
 
 cplcgZpgWRmcVWRm = 0._dp 
-Call CouplingcgZpgWRmcVWRmT(g2,ZZ,PhiW,cplcgZpgWRmcVWRm)
+Call CouplingcgZpgWRmcVWRmT(g2,TW,PhiW,cplcgZpgWRmcVWRm)
 
 
 
 cplcgWLpgWRpVP = 0._dp 
-Call CouplingcgWLpgWRpVPT(g2,ZZ,PhiW,cplcgWLpgWRpVP)
+Call CouplingcgWLpgWRpVPT(g2,TW,PhiW,cplcgWLpgWRpVP)
 
 
 
 cplcgWRpgWRpVP = 0._dp 
-Call CouplingcgWRpgWRpVPT(g2,ZZ,PhiW,cplcgWRpgWRpVP)
+Call CouplingcgWRpgWRpVPT(g2,TW,PhiW,cplcgWRpgWRpVP)
 
 
 
 cplcgPgWRpVWLm = 0._dp 
-Call CouplingcgPgWRpVWLmT(g2,ZZ,PhiW,cplcgPgWRpVWLm)
-
-
-
-cplcgZgWRpVWLm = 0._dp 
-Call CouplingcgZgWRpVWLmT(g2,ZZ,PhiW,cplcgZgWRpVWLm)
+Call CouplingcgPgWRpVWLmT(g2,TW,PhiW,cplcgPgWRpVWLm)
 
 
 
 cplcgZpgWRpVWLm = 0._dp 
-Call CouplingcgZpgWRpVWLmT(g2,ZZ,PhiW,cplcgZpgWRpVWLm)
+Call CouplingcgZpgWRpVWLmT(g2,TW,PhiW,cplcgZpgWRpVWLm)
 
 
 
 cplcgPgWRpVWRm = 0._dp 
-Call CouplingcgPgWRpVWRmT(g2,ZZ,PhiW,cplcgPgWRpVWRm)
+Call CouplingcgPgWRpVWRmT(g2,TW,PhiW,cplcgPgWRpVWRm)
 
 
 
 cplcgZgWRpVWRm = 0._dp 
-Call CouplingcgZgWRpVWRmT(g2,ZZ,PhiW,cplcgZgWRpVWRm)
+Call CouplingcgZgWRpVWRmT(g2,TW,cplcgZgWRpVWRm)
 
 
 
 cplcgZpgWRpVWRm = 0._dp 
-Call CouplingcgZpgWRpVWRmT(g2,ZZ,PhiW,cplcgZpgWRpVWRm)
-
-
-
-cplcgWLpgWRpVZ = 0._dp 
-Call CouplingcgWLpgWRpVZT(g2,ZZ,PhiW,cplcgWLpgWRpVZ)
+Call CouplingcgZpgWRpVWRmT(g2,TW,PhiW,cplcgZpgWRpVWRm)
 
 
 
 cplcgWRpgWRpVZ = 0._dp 
-Call CouplingcgWRpgWRpVZT(g2,ZZ,PhiW,cplcgWRpgWRpVZ)
+Call CouplingcgWRpgWRpVZT(g2,TW,cplcgWRpgWRpVZ)
 
 
 
 cplcgWLpgWRpVZR = 0._dp 
-Call CouplingcgWLpgWRpVZRT(g2,ZZ,PhiW,cplcgWLpgWRpVZR)
+Call CouplingcgWLpgWRpVZRT(g2,TW,PhiW,cplcgWLpgWRpVZR)
 
 
 
 cplcgWRpgWRpVZR = 0._dp 
-Call CouplingcgWRpgWRpVZRT(g2,ZZ,PhiW,cplcgWRpgWRpVZR)
+Call CouplingcgWRpgWRpVZRT(g2,TW,PhiW,cplcgWRpgWRpVZR)
 
 
 
 cplcgWLmgZVWLm = 0._dp 
-Call CouplingcgWLmgZVWLmT(g2,ZZ,PhiW,cplcgWLmgZVWLm)
-
-
-
-cplcgWRmgZVWLm = 0._dp 
-Call CouplingcgWRmgZVWLmT(g2,ZZ,PhiW,cplcgWRmgZVWLm)
-
-
-
-cplcgWLmgZVWRm = 0._dp 
-Call CouplingcgWLmgZVWRmT(g2,ZZ,PhiW,cplcgWLmgZVWRm)
+Call CouplingcgWLmgZVWLmT(g2,TW,cplcgWLmgZVWLm)
 
 
 
 cplcgWRmgZVWRm = 0._dp 
-Call CouplingcgWRmgZVWRmT(g2,ZZ,PhiW,cplcgWRmgZVWRm)
+Call CouplingcgWRmgZVWRmT(g2,TW,cplcgWRmgZVWRm)
 
 
 
 cplcgWLpgZcVWLm = 0._dp 
-Call CouplingcgWLpgZcVWLmT(g2,ZZ,PhiW,cplcgWLpgZcVWLm)
-
-
-
-cplcgWLpgZcVWRm = 0._dp 
-Call CouplingcgWLpgZcVWRmT(g2,ZZ,PhiW,cplcgWLpgZcVWRm)
-
-
-
-cplcgWRpgZcVWLm = 0._dp 
-Call CouplingcgWRpgZcVWLmT(g2,ZZ,PhiW,cplcgWRpgZcVWLm)
+Call CouplingcgWLpgZcVWLmT(g2,TW,cplcgWLpgZcVWLm)
 
 
 
 cplcgWRpgZcVWRm = 0._dp 
-Call CouplingcgWRpgZcVWRmT(g2,ZZ,PhiW,cplcgWRpgZcVWRm)
+Call CouplingcgWRpgZcVWRmT(g2,TW,cplcgWRpgZcVWRm)
 
 
 
 cplcgWLmgZpVWLm = 0._dp 
-Call CouplingcgWLmgZpVWLmT(g2,ZZ,PhiW,cplcgWLmgZpVWLm)
+Call CouplingcgWLmgZpVWLmT(g2,TW,PhiW,cplcgWLmgZpVWLm)
 
 
 
 cplcgWRmgZpVWLm = 0._dp 
-Call CouplingcgWRmgZpVWLmT(g2,ZZ,PhiW,cplcgWRmgZpVWLm)
+Call CouplingcgWRmgZpVWLmT(g2,TW,PhiW,cplcgWRmgZpVWLm)
 
 
 
 cplcgWLmgZpVWRm = 0._dp 
-Call CouplingcgWLmgZpVWRmT(g2,ZZ,PhiW,cplcgWLmgZpVWRm)
+Call CouplingcgWLmgZpVWRmT(g2,TW,PhiW,cplcgWLmgZpVWRm)
 
 
 
 cplcgWRmgZpVWRm = 0._dp 
-Call CouplingcgWRmgZpVWRmT(g2,ZZ,PhiW,cplcgWRmgZpVWRm)
+Call CouplingcgWRmgZpVWRmT(g2,TW,PhiW,cplcgWRmgZpVWRm)
 
 
 
 cplcgWLpgZpcVWLm = 0._dp 
-Call CouplingcgWLpgZpcVWLmT(g2,ZZ,PhiW,cplcgWLpgZpcVWLm)
+Call CouplingcgWLpgZpcVWLmT(g2,TW,PhiW,cplcgWLpgZpcVWLm)
 
 
 
 cplcgWLpgZpcVWRm = 0._dp 
-Call CouplingcgWLpgZpcVWRmT(g2,ZZ,PhiW,cplcgWLpgZpcVWRm)
+Call CouplingcgWLpgZpcVWRmT(g2,TW,PhiW,cplcgWLpgZpcVWRm)
 
 
 
 cplcgWRpgZpcVWLm = 0._dp 
-Call CouplingcgWRpgZpcVWLmT(g2,ZZ,PhiW,cplcgWRpgZpcVWLm)
+Call CouplingcgWRpgZpcVWLmT(g2,TW,PhiW,cplcgWRpgZpcVWLm)
 
 
 
 cplcgWRpgZpcVWRm = 0._dp 
-Call CouplingcgWRpgZpcVWRmT(g2,ZZ,PhiW,cplcgWRpgZpcVWRm)
+Call CouplingcgWRpgZpcVWRmT(g2,TW,PhiW,cplcgWRpgZpcVWRm)
 
 
 
@@ -2598,42 +2501,42 @@ End Do
 
 cplcgZgPhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgPhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZgPhh(gt3))
+Call CouplingcgZgPhhT(gt3,gBL,g2,vR,ZH,TW,cplcgZgPhh(gt3))
 
 End Do 
 
 
 cplcgZpgPhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgPhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZpgPhh(gt3))
+Call CouplingcgZpgPhhT(gt3,gBL,g2,k1,vR,ZH,TW,cplcgZpgPhh(gt3))
 
 End Do 
 
 
 cplcgWLpgPHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLpgPHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLpgPHpm(gt3))
+Call CouplingcgWLpgPHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLpgPHpm(gt3))
 
 End Do 
 
 
 cplcgWRpgPHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRpgPHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRpgPHpm(gt3))
+Call CouplingcgWRpgPHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRpgPHpm(gt3))
 
 End Do 
 
 
 cplcgWLmgPcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLmgPcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLmgPcHpm(gt3))
+Call CouplingcgWLmgPcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLmgPcHpm(gt3))
 
 End Do 
 
 
 cplcgWRmgPcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRmgPcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRmgPcHpm(gt3))
+Call CouplingcgWRmgPcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRmgPcHpm(gt3))
 
 End Do 
 
@@ -2654,14 +2557,14 @@ End Do
 
 cplcgZgWLmHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWLmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZgWLmHpm(gt3))
+Call CouplingcgZgWLmHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,cplcgZgWLmHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWLmHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWLmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZpgWLmHpm(gt3))
+Call CouplingcgZpgWLmHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgZpgWLmHpm(gt3))
 
 End Do 
 
@@ -2682,14 +2585,14 @@ End Do
 
 cplcgZgWLpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWLpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZgWLpcHpm(gt3))
+Call CouplingcgZgWLpcHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,cplcgZgWLpcHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWLpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWLpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZpgWLpcHpm(gt3))
+Call CouplingcgZpgWLpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgZpgWLpcHpm(gt3))
 
 End Do 
 
@@ -2710,14 +2613,14 @@ End Do
 
 cplcgZgWRmHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWRmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZgWRmHpm(gt3))
+Call CouplingcgZgWRmHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,cplcgZgWRmHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWRmHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWRmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZpgWRmHpm(gt3))
+Call CouplingcgZpgWRmHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgZpgWRmHpm(gt3))
 
 End Do 
 
@@ -2738,98 +2641,98 @@ End Do
 
 cplcgZgWRpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWRpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZgWRpcHpm(gt3))
+Call CouplingcgZgWRpcHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,cplcgZgWRpcHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWRpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWRpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgZpgWRpcHpm(gt3))
+Call CouplingcgZpgWRpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgZpgWRpcHpm(gt3))
 
 End Do 
 
 
 cplcgZgZhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZgZhh(gt3))
+Call CouplingcgZgZhhT(gt3,gBL,g2,vR,ZH,TW,cplcgZgZhh(gt3))
 
 End Do 
 
 
 cplcgZpgZhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZpgZhh(gt3))
+Call CouplingcgZpgZhhT(gt3,gBL,g2,vR,ZH,TW,cplcgZpgZhh(gt3))
 
 End Do 
 
 
 cplcgWLpgZHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLpgZHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLpgZHpm(gt3))
+Call CouplingcgWLpgZHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLpgZHpm(gt3))
 
 End Do 
 
 
 cplcgWRpgZHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRpgZHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRpgZHpm(gt3))
+Call CouplingcgWRpgZHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRpgZHpm(gt3))
 
 End Do 
 
 
 cplcgWLmgZcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLmgZcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLmgZcHpm(gt3))
+Call CouplingcgWLmgZcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLmgZcHpm(gt3))
 
 End Do 
 
 
 cplcgWRmgZcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRmgZcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRmgZcHpm(gt3))
+Call CouplingcgWRmgZcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRmgZcHpm(gt3))
 
 End Do 
 
 
 cplcgZgZphh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZphhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZgZphh(gt3))
+Call CouplingcgZgZphhT(gt3,gBL,g2,vR,ZH,TW,cplcgZgZphh(gt3))
 
 End Do 
 
 
 cplcgZpgZphh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZphhT(gt3,gBL,g2,k1,vR,ZZ,ZH,cplcgZpgZphh(gt3))
+Call CouplingcgZpgZphhT(gt3,gBL,g2,k1,vR,ZH,TW,cplcgZpgZphh(gt3))
 
 End Do 
 
 
 cplcgWLpgZpHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLpgZpHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLpgZpHpm(gt3))
+Call CouplingcgWLpgZpHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLpgZpHpm(gt3))
 
 End Do 
 
 
 cplcgWRpgZpHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRpgZpHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRpgZpHpm(gt3))
+Call CouplingcgWRpgZpHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRpgZpHpm(gt3))
 
 End Do 
 
 
 cplcgWLmgZpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLmgZpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWLmgZpcHpm(gt3))
+Call CouplingcgWLmgZpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWLmgZpcHpm(gt3))
 
 End Do 
 
 
 cplcgWRmgZpcHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRmgZpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcgWRmgZpcHpm(gt3))
+Call CouplingcgWRmgZpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,cplcgWRmgZpcHpm(gt3))
 
 End Do 
 
@@ -2838,7 +2741,7 @@ Iname = Iname - 1
 End Subroutine AllCouplingsReallyAll
 
 Subroutine AllCouplings(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,            & 
-& LAM4,k1,vR,ZH,UP,UC,gBL,g2,ZZ,PhiW,g3,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,            & 
+& LAM4,k1,vR,ZH,UP,UC,gBL,g2,TW,PhiW,g3,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,            & 
 & YR,ZM,cplAhAhhh,cplAhAhHpm,cplAhAhcHpm,cplAhhhHpm,cplAhhhcHpm,cplAhHpmcHpm,            & 
 & cplhhhhhh,cplhhhhHpm,cplhhhhcHpm,cplhhHpmcHpm,cplHpmHpmcHpm,cplHpmcHpmcHpm,            & 
 & cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmVWLm,cplAhHpmVWRm,cplAhcHpmcVWLm,               & 
@@ -2848,27 +2751,26 @@ Subroutine AllCouplings(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,      
 & cplhhVZRVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,         & 
 & cplHpmVWRmVZR,cplcHpmcVWLmVP,cplcHpmcVWRmVP,cplcHpmcVWLmVZ,cplcHpmcVWRmVZ,             & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVZR,cplVGVGVG,cplcVWLmVPVWLm,cplcVWRmVPVWLm,               & 
-& cplcVWLmVPVWRm,cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWLmVWLmVZR,           & 
-& cplcVWRmVWLmVZR,cplcVWLmVWRmVZ,cplcVWRmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,         & 
-& cplcFdFdAhL,cplcFdFdAhR,cplcFeFeAhL,cplcFeFeAhR,cplcFuFuAhL,cplcFuFuAhR,               & 
-& cplFvFvAhL,cplFvFvAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFuFdHpmL,cplcFuFdHpmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplcFeFehhL,cplcFeFehhR,cplcFuFuhhL,cplcFuFuhhR,               & 
-& cplcFdFucHpmL,cplcFdFucHpmR,cplFvFvhhL,cplFvFvhhR,cplcFeFvcHpmL,cplcFeFvcHpmR,         & 
-& cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,               & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR, & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplcFeFeVPL,cplcFeFeVPR,       & 
-& cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVGL,cplcFuFuVGR,             & 
-& cplcFuFuVPL,cplcFuFuVPR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,       & 
-& cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVPL,cplFvFvVPR,               & 
-& cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplcFeFvVWLmL,cplcFeFvVWLmR,             & 
-& cplcFeFvVWRmL,cplcFeFvVWRmR)
+& cplcVWLmVPVWRm,cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,          & 
+& cplcVWRmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL,cplcFdFdAhR,cplcFeFeAhL,    & 
+& cplcFeFeAhR,cplcFuFuAhL,cplcFuFuAhR,cplFvFvAhL,cplFvFvAhR,cplcFdFdhhL,cplcFdFdhhR,     & 
+& cplcFuFdHpmL,cplcFuFdHpmR,cplFvFeHpmL,cplFvFeHpmR,cplcFeFehhL,cplcFeFehhR,             & 
+& cplcFuFuhhL,cplcFuFuhhR,cplcFdFucHpmL,cplcFdFucHpmR,cplFvFvhhL,cplFvFvhhR,             & 
+& cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFdFdVGL,cplcFdFdVGR,cplcFdFdVPL,cplcFdFdVPR,           & 
+& cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFuFdcVWLmL,cplcFuFdcVWLmR,       & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,               & 
+& cplFvFecVWRmR,cplcFeFeVPL,cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,            & 
+& cplcFeFeVZRR,cplcFuFuVGL,cplcFuFuVGR,cplcFuFuVPL,cplcFuFuVPR,cplcFdFuVWLmL,            & 
+& cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,        & 
+& cplcFuFuVZRR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,      & 
+& cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR)
 
 Implicit None 
 Real(dp), Intent(in) :: LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,k1,vR,ZH(4,4),UP(4,4),         & 
-& UC(4,4),gBL,g2,PhiW,g3
+& UC(4,4),gBL,g2,TW,PhiW,g3
 
-Complex(dp), Intent(in) :: ZZ(3,3),YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),         & 
-& ZUL(3,3),ZUR(3,3),YR(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),ZUL(3,3),        & 
+& ZUR(3,3),YR(3,3),ZM(9,9)
 
 Complex(dp), Intent(out) :: cplAhAhhh(4,4,4),cplAhAhHpm(4,4,4),cplAhAhcHpm(4,4,4),cplAhhhHpm(4,4,4),              & 
 & cplAhhhcHpm(4,4,4),cplAhHpmcHpm(4,4,4),cplhhhhhh(4,4,4),cplhhhhHpm(4,4,4),             & 
@@ -2882,24 +2784,23 @@ Complex(dp), Intent(out) :: cplAhAhhh(4,4,4),cplAhAhHpm(4,4,4),cplAhAhcHpm(4,4,4
 & cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),cplcHpmcVWLmVP(4),   & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),cplcHpmcVWLmVZR(4),              & 
 & cplcHpmcVWRmVZR(4),cplVGVGVG,cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWLmVPVWRm,             & 
-& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWRmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL(3,3,4),      & 
-& cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFuFuAhL(3,3,4),           & 
-& cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplcFdFdhhL(3,3,4),             & 
-& cplcFdFdhhR(3,3,4),cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),cplFvFeHpmL(9,3,4),         & 
-& cplFvFeHpmR(9,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),           & 
-& cplcFuFuhhR(3,3,4),cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplFvFvhhL(9,9,4),        & 
-& cplFvFvhhR(9,9,4),cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),cplcFdFdVGL(3,3),          & 
-& cplcFdFdVGR(3,3),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),  & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),           & 
-& cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),         & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),               & 
-& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuVGL(3,3),& 
-& cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),& 
-& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),& 
-& cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9)
+& cplcVWRmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWLmVWRmVZR,cplcVWRmVWRmVZR,cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),& 
+& cplcFeFeAhR(3,3,4),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFuFdHpmL(3,3,4),           & 
+& cplcFuFdHpmR(3,3,4),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplcFeFehhL(3,3,4),          & 
+& cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFdFucHpmL(3,3,4),         & 
+& cplcFdFucHpmR(3,3,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplcFeFvcHpmL(3,9,4),         & 
+& cplcFeFvcHpmR(3,9,4),cplcFdFdVGL(3,3),cplcFdFdVGR(3,3),cplcFdFdVPL(3,3),               & 
+& cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),& 
+& cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),       & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
+& cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3), & 
+& cplcFeFeVZRR(3,3),cplcFuFuVGL(3,3),cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3), & 
+& cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),           & 
+& cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVPL(9,9), & 
+& cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),     & 
+& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9)
 
 Integer :: gt1, gt2, gt3, gt4, ct1, ct2, ct3, ct4
 
@@ -3045,7 +2946,7 @@ End Do
 cplAhhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVPT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVP(gt1,gt2))
+Call CouplingAhhhVPT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -3054,7 +2955,7 @@ End Do
 cplAhhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZ(gt1,gt2))
+Call CouplingAhhhVZT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -3063,7 +2964,7 @@ End Do
 cplAhhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZR(gt1,gt2))
+Call CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3144,7 +3045,7 @@ End Do
 cplHpmcHpmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVP(gt1,gt2))
+Call CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -3153,7 +3054,7 @@ End Do
 cplHpmcHpmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZ(gt1,gt2))
+Call CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -3162,7 +3063,7 @@ End Do
 cplHpmcHpmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZR(gt1,gt2))
+Call CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3184,14 +3085,14 @@ End Do
 
 cplhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZ(gt1))
+Call CouplinghhVPVZT(gt1,gBL,g2,vR,ZH,TW,cplhhVPVZ(gt1))
 
 End Do 
 
 
 cplhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZR(gt1))
+Call CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVPVZR(gt1))
 
 End Do 
 
@@ -3226,105 +3127,105 @@ End Do
 
 cplhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZ(gt1))
+Call CouplinghhVZVZT(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZR(gt1))
+Call CouplinghhVZVZRT(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZR(gt1))
 
 End Do 
 
 
 cplhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZRVZR(gt1))
+Call CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVZRVZR(gt1))
 
 End Do 
 
 
 cplHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWLm(gt1))
+Call CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWLm(gt1))
 
 End Do 
 
 
 cplHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWRm(gt1))
+Call CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWRm(gt1))
 
 End Do 
 
 
 cplHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZ(gt1))
+Call CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZ(gt1))
+Call CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZR(gt1))
+Call CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZR(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVP(gt1))
+Call CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVP(gt1))
+Call CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZ(gt1))
+Call CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZ(gt1))
+Call CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZR(gt1))
+Call CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZR(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZR(gt1))
+Call CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZR(gt1))
 
 End Do 
 
@@ -3335,62 +3236,52 @@ Call CouplingVGVGVGT(g3,cplVGVGVG)
 
 
 cplcVWLmVPVWLm = 0._dp 
-Call CouplingcVWLmVPVWLmT(g2,ZZ,PhiW,cplcVWLmVPVWLm)
+Call CouplingcVWLmVPVWLmT(g2,TW,PhiW,cplcVWLmVPVWLm)
 
 
 
 cplcVWRmVPVWLm = 0._dp 
-Call CouplingcVWRmVPVWLmT(g2,ZZ,PhiW,cplcVWRmVPVWLm)
+Call CouplingcVWRmVPVWLmT(g2,TW,PhiW,cplcVWRmVPVWLm)
 
 
 
 cplcVWLmVPVWRm = 0._dp 
-Call CouplingcVWLmVPVWRmT(g2,ZZ,PhiW,cplcVWLmVPVWRm)
+Call CouplingcVWLmVPVWRmT(g2,TW,PhiW,cplcVWLmVPVWRm)
 
 
 
 cplcVWRmVPVWRm = 0._dp 
-Call CouplingcVWRmVPVWRmT(g2,ZZ,PhiW,cplcVWRmVPVWRm)
+Call CouplingcVWRmVPVWRmT(g2,TW,PhiW,cplcVWRmVPVWRm)
 
 
 
 cplcVWLmVWLmVZ = 0._dp 
-Call CouplingcVWLmVWLmVZT(g2,ZZ,PhiW,cplcVWLmVWLmVZ)
-
-
-
-cplcVWRmVWLmVZ = 0._dp 
-Call CouplingcVWRmVWLmVZT(g2,ZZ,PhiW,cplcVWRmVWLmVZ)
+Call CouplingcVWLmVWLmVZT(g2,TW,cplcVWLmVWLmVZ)
 
 
 
 cplcVWLmVWLmVZR = 0._dp 
-Call CouplingcVWLmVWLmVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZR)
+Call CouplingcVWLmVWLmVZRT(g2,TW,PhiW,cplcVWLmVWLmVZR)
 
 
 
 cplcVWRmVWLmVZR = 0._dp 
-Call CouplingcVWRmVWLmVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZR)
-
-
-
-cplcVWLmVWRmVZ = 0._dp 
-Call CouplingcVWLmVWRmVZT(g2,ZZ,PhiW,cplcVWLmVWRmVZ)
+Call CouplingcVWRmVWLmVZRT(g2,TW,PhiW,cplcVWRmVWLmVZR)
 
 
 
 cplcVWRmVWRmVZ = 0._dp 
-Call CouplingcVWRmVWRmVZT(g2,ZZ,PhiW,cplcVWRmVWRmVZ)
+Call CouplingcVWRmVWRmVZT(g2,TW,cplcVWRmVWRmVZ)
 
 
 
 cplcVWLmVWRmVZR = 0._dp 
-Call CouplingcVWLmVWRmVZRT(g2,ZZ,PhiW,cplcVWLmVWRmVZR)
+Call CouplingcVWLmVWRmVZRT(g2,TW,PhiW,cplcVWLmVWRmVZR)
 
 
 
 cplcVWRmVWRmVZR = 0._dp 
-Call CouplingcVWRmVWRmVZRT(g2,ZZ,PhiW,cplcVWRmVWRmVZR)
+Call CouplingcVWRmVWRmVZRT(g2,TW,PhiW,cplcVWRmVWRmVZR)
 
 
 
@@ -3564,7 +3455,7 @@ cplcFdFdVPL = 0._dp
 cplcFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVPT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
+Call CouplingcFdFdVPT(gt1,gt2,gBL,g2,TW,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3574,7 +3465,7 @@ cplcFdFdVZL = 0._dp
 cplcFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
+Call CouplingcFdFdVZT(gt1,gt2,gBL,g2,TW,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3584,7 +3475,7 @@ cplcFdFdVZRL = 0._dp
 cplcFdFdVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZRT(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
+Call CouplingcFdFdVZRT(gt1,gt2,gBL,g2,TW,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3638,7 +3529,7 @@ cplcFeFeVPL = 0._dp
 cplcFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVPT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
+Call CouplingcFeFeVPT(gt1,gt2,gBL,g2,TW,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3648,7 +3539,7 @@ cplcFeFeVZL = 0._dp
 cplcFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
+Call CouplingcFeFeVZT(gt1,gt2,gBL,g2,TW,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3658,7 +3549,7 @@ cplcFeFeVZRL = 0._dp
 cplcFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
+Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,TW,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3678,7 +3569,7 @@ cplcFuFuVPL = 0._dp
 cplcFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVPT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
+Call CouplingcFuFuVPT(gt1,gt2,gBL,g2,TW,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3710,7 +3601,7 @@ cplcFuFuVZL = 0._dp
 cplcFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
+Call CouplingcFuFuVZT(gt1,gt2,gBL,g2,TW,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3720,7 +3611,7 @@ cplcFuFuVZRL = 0._dp
 cplcFuFuVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZRT(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
+Call CouplingcFuFuVZRT(gt1,gt2,gBL,g2,TW,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3730,7 +3621,7 @@ cplFvFvVPL = 0._dp
 cplFvFvVPR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVPT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
+Call CouplingFvFvVPT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3740,7 +3631,7 @@ cplFvFvVZL = 0._dp
 cplFvFvVZR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
+Call CouplingFvFvVZT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -3750,7 +3641,7 @@ cplFvFvVZRL = 0._dp
 cplFvFvVZRR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
+Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -6209,14 +6100,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmHpmcHpmcHpmT  
  
  
-Subroutine CouplingAhhhVPT(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVPT(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6241,14 +6130,11 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,3))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,3))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,3))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,3))
+res = res+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,1)*ZH(gt2,1))/2._dp
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,3)*ZH(gt2,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,4)*ZH(gt2,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -6262,14 +6148,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhVPT  
  
  
-Subroutine CouplingAhhhVZT(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVZT(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6294,14 +6178,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,1))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,1))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,1))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,1))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,2)*ZH(gt2,2))
+res = res+(g2*Sin(TW)*UP(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,4)*ZH(gt2,4))
+res = res+(g2*Sin(TW)*UP(gt1,4)*ZH(gt2,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -6315,14 +6195,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhVZT  
  
  
-Subroutine CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVZRT(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6347,14 +6225,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,2))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,2))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,2))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,2))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,2))
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*UP(gt1,1)*ZH(gt2,1))
+res = res-1._dp/4._dp*(g2*1/Cos(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res+(g2*1/Cos(TW)*UP(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(g2*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*ZH(gt2,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -6752,14 +6630,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWRmT  
  
  
-Subroutine CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6784,14 +6660,11 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,3))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,3))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,3))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,3))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1)*UC(gt2,1))
+res = res+(gBL*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,3)*UC(gt2,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -6803,14 +6676,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPT  
  
  
-Subroutine CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6835,14 +6706,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,1))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,1))/2._dp
+res = res+g2*Sin(TW)*UC(gt1,1)*UC(gt2,1)
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2*Sin(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+g2*Sin(TW)*UC(gt1,3)*UC(gt2,3)
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+(g2*Sin(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -6854,14 +6723,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZT  
  
  
-Subroutine CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZRT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -6886,14 +6753,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,2))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,1)*UC(gt2,1))
+res = res-1._dp/2._dp*(g2*Cos(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+(g2*Sin(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -6977,14 +6842,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcVWLmVWRmT  
  
  
-Subroutine CouplinghhVPVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVPVZT(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7001,14 +6864,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*1/Cos(TW)*ZH(gt1,4))
+res = res+(3*g2*gBL*vR*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt1,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4))
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7020,14 +6879,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVPVZT  
  
  
-Subroutine CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVPVZRT(gt1,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7044,14 +6901,13 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,3))
+res = res-1._dp/4._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4))
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4))/4._dp
+res = res+(g2**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4))
+res = res+(3*g2*gBL*vR*1/Cos(TW)**2*Sin(3._dp*(TW))*ZH(gt1,4))/8._dp
+res = res+(-5*g2*gBL*vR*1/Cos(TW)*Tan(TW)*ZH(gt1,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7205,14 +7061,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcVWRmVWRmT  
  
  
-Subroutine CouplinghhVZVZT(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZVZT(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7229,12 +7083,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*vR*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW))*ZH(gt1,4))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7246,14 +7098,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZVZT  
  
  
-Subroutine CouplinghhVZVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZVZRT(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7270,14 +7120,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2**2*vR*Tan(TW)*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7289,14 +7135,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZVZRT  
  
  
-Subroutine CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZRVZRT(gt1,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7313,12 +7157,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*k1*1/Cos(TW)**2*ZH(gt1,3))/2._dp
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*ZH(gt1,4))
+res = res+(g2**2*vR*Sin(TW)**2*Tan(TW)**2*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7330,14 +7172,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZRVZRT  
  
  
-Subroutine CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVPVWLmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7354,9 +7194,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,3))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1))/2._dp
+res = res+(g2*gBL*vR*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7368,14 +7207,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVPVWLmT  
  
  
-Subroutine CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVPVWRmT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7392,9 +7229,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt1,1))
+res = res+(g2*gBL*vR*Cos(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7406,14 +7242,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVPVWRmT  
  
  
-Subroutine CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7430,9 +7264,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,1))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,1))
+res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7444,14 +7278,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWLmVZT  
  
  
-Subroutine CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7468,9 +7300,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))
+res = res+(g2**2*k1*Cos(TW)*Sin(PhiW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7482,14 +7314,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWLmVZRT  
  
  
-Subroutine CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7506,9 +7336,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7520,14 +7350,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWRmVZT  
  
  
-Subroutine CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7544,9 +7372,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Cos(TW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7558,14 +7386,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWRmVZRT  
  
  
-Subroutine CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7582,9 +7408,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,3))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1))/2._dp
+res = res+(g2*gBL*vR*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7596,14 +7421,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWLmVPT  
  
  
-Subroutine CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVPT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7620,9 +7443,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt1,1))
+res = res+(g2*gBL*vR*Cos(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7634,14 +7456,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWRmVPT  
  
  
-Subroutine CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7658,9 +7478,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,1))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,1))
+res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7672,14 +7492,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWLmVZT  
  
  
-Subroutine CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVZT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7696,9 +7514,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7710,14 +7528,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWRmVZT  
  
  
-Subroutine CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7734,9 +7550,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))
+res = res+(g2**2*k1*Cos(TW)*Sin(PhiW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7748,14 +7564,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWLmVZRT  
  
  
-Subroutine CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7772,9 +7586,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Cos(TW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7786,14 +7600,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWRmVZRT  
  
  
-Subroutine CouplingAhAhVPVPT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVPVPT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7818,18 +7630,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,3))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,3))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4)
+res = res+(gBL**2*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7841,14 +7647,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVPVPT  
  
  
-Subroutine CouplingAhAhVPVZT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVPVZT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7873,22 +7677,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*Tan(TW)*UP(gt1,2)*UP(gt2,2))
+res = res-1._dp/4._dp*(g2*gBL*1/Cos(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -7900,14 +7694,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVPVZT  
  
  
-Subroutine CouplingAhAhVPVZRT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVPVZRT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -7932,22 +7724,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,2)*UP(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,2)*UP(gt2,2))
+res = res+(g2*gBL*Sin(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,3)*UP(gt2,3))
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*UP(gt1,4)*UP(gt2,4))/8._dp
+res = res+(-5*g2*gBL*1/Cos(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -8147,14 +7934,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhcVWRmVWRmT  
  
  
-Subroutine CouplingAhAhVZVZT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZVZT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8179,18 +7964,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,1))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,1))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*UP(gt1,2)*UP(gt2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(g2**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,4)*UP(gt2,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -8202,14 +7983,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVZVZT  
  
  
-Subroutine CouplingAhAhVZVZRT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZVZRT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8234,22 +8013,13 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*Cos(TW)*Sqrt(Cos(2._dp*(TW)))*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -8261,14 +8031,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVZVZRT  
  
  
-Subroutine CouplingAhAhVZRVZRT(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZRVZRT(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8293,18 +8061,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,2))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,2))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,2)*UP(gt2,2)
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+g2**2*Sin(TW)**2*UP(gt1,3)*UP(gt2,3)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -8406,14 +8172,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhcVWLmVWRmT  
  
  
-Subroutine CouplingAhHpmVPVWLmT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVPVWLmT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8438,12 +8202,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,3))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,3)*UP(gt1,1))
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,1)*UP(gt1,3))
+res = res+(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8457,14 +8219,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVPVWLmT  
  
  
-Subroutine CouplingAhHpmVPVWRmT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVPVWRmT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8489,12 +8249,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,3))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))
+res = res+(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8508,14 +8266,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVPVWRmT  
  
  
-Subroutine CouplingAhHpmVWLmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVWLmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8540,12 +8296,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,1))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,1))
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,3))
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8559,14 +8315,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVWLmVZT  
  
  
-Subroutine CouplingAhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVWLmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8591,12 +8345,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,2))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,1)*UP(gt1,1))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res+(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,3)*UP(gt1,3))/2._dp
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8610,14 +8364,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVWLmVZRT  
  
  
-Subroutine CouplingAhHpmVWRmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVWRmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8642,12 +8394,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,1))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,2)*UP(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,3))
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,3))
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8661,14 +8413,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVWRmVZT  
  
  
-Subroutine CouplingAhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhHpmVWRmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8693,12 +8443,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,2))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,1)*UP(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*UP(gt1,3))
+res = res+(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,3)*UP(gt1,3))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,4)*UP(gt1,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8712,14 +8462,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhHpmVWRmVZRT  
  
  
-Subroutine CouplingAhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWLmVPT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8744,12 +8492,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,3))
+res = res+(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))
+res = res+(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8763,14 +8509,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWLmVPT  
  
  
-Subroutine CouplingAhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWRmVPT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8795,12 +8539,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,3))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,3))
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,3)*UP(gt1,1))
+res = res+(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,1)*UP(gt1,3))
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8814,14 +8556,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWRmVPT  
  
  
-Subroutine CouplingAhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWLmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8846,12 +8586,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,1))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,1))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,2)*UP(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,3))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8865,14 +8605,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWLmVZT  
  
  
-Subroutine CouplingAhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWRmVZT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8897,12 +8635,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,1))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,1))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,1))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,1))
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,1))/2._dp
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*UP(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8916,14 +8654,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWRmVZT  
  
  
-Subroutine CouplingAhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8948,12 +8684,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,2))
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,1)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*UP(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,2)*UP(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*UP(gt1,3))
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,3)*UP(gt1,3))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -8967,14 +8703,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWLmVZRT  
  
  
-Subroutine CouplingAhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZZ,UP,UC,PhiW,res)
+Subroutine CouplingAhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,UP,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -8999,12 +8733,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*UP(gt1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*UP(gt1,3)*ZZ(1,2))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,3)*UP(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*UP(gt1,3)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,2)*UP(gt1,2)*ZZ(3,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*UC(gt2,4)*UP(gt1,4)*ZZ(3,2))
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,1)*UP(gt1,1))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*UP(gt1,1))/2._dp
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,2)*UP(gt1,2))/2._dp
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*UP(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,3)*UP(gt1,3))
+res = res-1._dp/2._dp*(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,4)*UP(gt1,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -9018,14 +8752,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhcHpmcVWRmVZRT  
  
  
-Subroutine CouplinghhhhVPVPT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVPT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9050,18 +8782,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,3))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,3))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4)
+res = res+(gBL**2*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9073,14 +8799,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVPVPT  
  
  
-Subroutine CouplinghhhhVPVZT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVZT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9105,22 +8829,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res-1._dp/4._dp*(g2*gBL*1/Cos(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9132,14 +8846,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVPVZT  
  
  
-Subroutine CouplinghhhhVPVZRT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVZRT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9164,22 +8876,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))
+res = res+(g2*gBL*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))/8._dp
+res = res+(-5*g2*gBL*1/Cos(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9379,14 +9086,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhcVWRmVWRmT  
  
  
-Subroutine CouplinghhhhVZVZT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZVZT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9411,18 +9116,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,1))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,1))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,4)*ZH(gt2,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9434,14 +9135,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZVZT  
  
  
-Subroutine CouplinghhhhVZVZRT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZVZRT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9466,22 +9165,13 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*Cos(TW)*Sqrt(Cos(2._dp*(TW)))*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9493,14 +9183,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZVZRT  
  
  
-Subroutine CouplinghhhhVZRVZRT(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZRVZRT(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9525,18 +9213,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,2))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,2))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,2)*ZH(gt2,2)
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+g2**2*Sin(TW)**2*ZH(gt1,3)*ZH(gt2,3)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9548,14 +9234,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZRVZRT  
  
  
-Subroutine CouplinghhHpmVPVWLmT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVPVWLmT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9580,12 +9264,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,3))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,3))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9597,14 +9279,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVPVWLmT  
  
  
-Subroutine CouplinghhHpmVPVWRmT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVPVWRmT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9629,12 +9309,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,3))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,3))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3))
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9646,14 +9324,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVPVWRmT  
  
  
-Subroutine CouplinghhHpmVWLmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVWLmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9678,12 +9354,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,1))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,1))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,1))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,3))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,3))
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9695,14 +9371,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVWLmVZT  
  
  
-Subroutine CouplinghhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVWLmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9727,12 +9401,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,2))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,2))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1))
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*ZH(gt1,3))
+res = res+(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9744,14 +9418,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVWLmVZRT  
  
  
-Subroutine CouplinghhHpmVWRmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVWRmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9776,12 +9448,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,1))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,1))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,3))
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9793,14 +9465,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVWRmVZT  
  
  
-Subroutine CouplinghhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhHpmVWRmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9825,12 +9495,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,2))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,2))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,1)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res+(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,3)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9842,14 +9512,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhHpmVWRmVZRT  
  
  
-Subroutine CouplinghhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWLmVPT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9874,12 +9542,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,3))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,3))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9891,14 +9557,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWLmVPT  
  
  
-Subroutine CouplinghhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWRmVPT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9923,12 +9587,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,3))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,3))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3))
+res = res+(g2*gBL*Cos(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9940,14 +9602,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWRmVPT  
  
  
-Subroutine CouplinghhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWLmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -9972,12 +9632,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,1))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,1))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,1))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,3))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,3))
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -9989,14 +9649,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWLmVZT  
  
  
-Subroutine CouplinghhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWRmVZT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10021,12 +9679,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,1))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,1))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*UC(gt2,3)*ZH(gt1,3))
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10038,14 +9696,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWRmVZT  
  
  
-Subroutine CouplinghhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWLmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10070,12 +9726,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,2))
-res = res+(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,2))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*Sin(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,1)*ZH(gt1,1))
+res = res+(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*ZH(gt1,1))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,2)*ZH(gt1,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*ZH(gt1,3))
+res = res+(g2**2*Cos(TW)*Sin(PhiW)*UC(gt2,3)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10087,14 +9743,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcHpmcVWLmVZRT  
  
  
-Subroutine CouplinghhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZZ,ZH,UC,PhiW,res)
+Subroutine CouplinghhcHpmcVWRmVZRT(gt1,gt2,gBL,g2,ZH,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10119,12 +9773,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*Cos(PhiW)*UC(gt2,1)*ZH(gt1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*UC(gt2,3)*ZH(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*UC(gt2,3)*ZH(gt1,1)*ZZ(2,2))
-res = res+(g2**2*Sin(PhiW)*UC(gt2,1)*ZH(gt1,3)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*Sin(PhiW)*UC(gt2,2)*ZH(gt1,2)*ZZ(3,2))
-res = res+(g2*gBL*Cos(PhiW)*UC(gt2,4)*ZH(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,1)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,3)*ZH(gt1,1))
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt2,2)*ZH(gt1,2))
+res = res+(g2**2*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt2,1)*ZH(gt1,3))/2._dp
+res = res+(g2**2*Cos(PhiW)*Cos(TW)*UC(gt2,3)*ZH(gt1,3))/2._dp
+res = res+(g2*gBL*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt2,4)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10265,14 +9919,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmHpmVWRmVWRmT  
  
  
-Subroutine CouplingHpmcHpmVPVPT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVPT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10297,18 +9949,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,3)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,3)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,3)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,3)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10320,14 +9966,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPVPT  
  
  
-Subroutine CouplingHpmcHpmVPVZT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVZT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10352,22 +9996,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res-(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,1)*UC(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2*gBL*Sin(TW)*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(g2*gBL*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res+(-3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10379,14 +10015,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPVZT  
  
  
-Subroutine CouplingHpmcHpmVPVZRT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVZRT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10411,22 +10045,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,2)*UC(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))
+res = res+(-3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*UC(gt1,4)*UC(gt2,4))/8._dp
+res = res+(5*g2*gBL*1/Cos(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10616,14 +10245,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmcVWRmVWRmT  
  
  
-Subroutine CouplingHpmcHpmVZVZT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZVZT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10648,18 +10275,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,1)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,1)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,1)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,1)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+2*g2**2*Sin(TW)**2*UC(gt1,1)*UC(gt2,1)
+res = res+(gBL**2*Cos(2._dp*(TW))*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,2)*UC(gt2,2)
+res = res+(g2**2*Sin(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+2*g2**2*Sin(TW)**2*UC(gt1,3)*UC(gt2,3)
+res = res+(gBL**2*Cos(2._dp*(TW))*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,4)*UC(gt2,4)
+res = res+(g2**2*Sin(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10671,14 +10294,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZVZT  
  
  
-Subroutine CouplingHpmcHpmVZVZRT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZVZRT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10703,22 +10324,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*1/Cos(TW)*Sin(3._dp*(TW))*UC(gt1,1)*UC(gt2,1))
+res = res+(g2**2*Tan(TW)*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/4._dp*(g2**2*Tan(TW)*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(g2**2*Tan(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10730,14 +10346,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZVZRT  
  
  
-Subroutine CouplingHpmcHpmVZRVZRT(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZRVZRT(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10762,18 +10376,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,2)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,2)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,2)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,2)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))**2*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res-(g2**2*Sin(TW)**2*UC(gt1,3)*UC(gt2,3))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*UC(gt1,4)*UC(gt2,4)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10941,13 +10553,11 @@ Iname = Iname - 1
 End Subroutine CouplingVGVGVGT  
  
  
-Subroutine CouplingcVWLmVPVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVPVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10956,10 +10566,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLm' 
  
 res = 0._dp 
-res = res+(g2*ZZ(1,3))/2._dp
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,3))/2._dp
-res = res+(g2*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,3))
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10971,13 +10578,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmT  
  
  
-Subroutine CouplingcVWRmVPVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVPVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -10986,8 +10591,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWLm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -10999,13 +10603,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWLmT  
  
  
-Subroutine CouplingcVWLmVPVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVPVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11014,8 +10616,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWRm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11027,13 +10628,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWRmT  
  
  
-Subroutine CouplingcVWRmVPVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVPVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11042,10 +10641,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRm' 
  
 res = 0._dp 
-res = res+(g2*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,3))
-res = res+(g2*ZZ(2,3))/2._dp
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,3))/2._dp
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11057,13 +10653,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWRmT  
  
  
-Subroutine CouplingcVWLmVWLmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWLmVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11072,10 +10666,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZ' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*ZZ(2,1))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,1))/2._dp
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11087,41 +10678,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZT  
  
  
-Subroutine CouplingcVWRmVWLmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWLmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWRmVWLmVZT  
- 
- 
-Subroutine CouplingcVWLmVWLmVZRT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11130,10 +10691,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZR' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*ZZ(2,2))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,2))/2._dp
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11145,13 +10704,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZRT  
  
  
-Subroutine CouplingcVWRmVWLmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWLmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11160,8 +10717,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZR' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11173,41 +10729,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWLmVZRT  
  
  
-Subroutine CouplingcVWLmVWRmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWRmVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWLmVWRmVZT  
- 
- 
-Subroutine CouplingcVWRmVWRmVZT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11216,10 +10742,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZ' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,1))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*ZZ(2,1))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11231,13 +10754,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZT  
  
  
-Subroutine CouplingcVWLmVWRmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWRmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11246,8 +10767,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZR' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -11259,13 +10779,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWRmVZRT  
  
  
-Subroutine CouplingcVWRmVWRmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWRmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -11274,10 +10792,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZR' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,2))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*ZZ(2,2))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -12307,14 +11823,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVGT  
  
  
-Subroutine CouplingcFdFdVPT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVPT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12340,17 +11854,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,3))/2._dp
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12363,14 +11874,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVPT  
  
  
-Subroutine CouplingcFdFdVZT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVZT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12396,17 +11905,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,1))/2._dp
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,1))
+resL = resL+(g2*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,1))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,1))
+resR = resR+(g2*Sin(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12419,14 +11928,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVZT  
  
  
-Subroutine CouplingcFdFdVZRT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVZRT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12452,17 +11959,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,2))
+resL = resL-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,2))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,2))
+resR = resR+(g2*Sin(TW)*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12675,14 +12185,12 @@ Iname = Iname - 1
 End Subroutine CouplingFvFecVWRmT  
  
  
-Subroutine CouplingcFeFeVPT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVPT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12708,17 +12216,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,3))/2._dp
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,3))/2._dp
+resL = resL+(gBL*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,3))/2._dp
+resR = resR+(gBL*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12731,14 +12236,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFeVPT  
  
  
-Subroutine CouplingcFeFeVZT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVZT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12764,17 +12267,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,1))/2._dp
+resL = resL+(gBL*Sqrt(Cos(2._dp*(TW))))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,1))/2._dp
+resL = resL+(g2*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,1))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW))))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,1))/2._dp
+resR = resR+(g2*Sin(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12787,14 +12290,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFeVZT  
  
  
-Subroutine CouplingcFeFeVZRT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVZRT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12820,17 +12321,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,2))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,2))/2._dp
+resR = resR+(g2*Sin(TW)*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -12891,14 +12395,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVGT  
  
  
-Subroutine CouplingcFuFuVPT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVPT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -12924,17 +12426,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,3))
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,3))
+resR = resR+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13047,14 +12546,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFuVWRmT  
  
  
-Subroutine CouplingcFuFuVZT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVZT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -13080,17 +12577,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,1))
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,1))
+resL = resL-1._dp/2._dp*(g2*Sin(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,1))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,1))
+resR = resR-1._dp/2._dp*(g2*Sin(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13103,14 +12600,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVZT  
  
  
-Subroutine CouplingcFuFuVZRT(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVZRT(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -13136,17 +12631,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,2))
+resL = resL+(g2*1/Cos(TW))/4._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,2))
+resL = resL+(g2*Cos(2._dp*(TW))*1/Cos(TW))/4._dp
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,2))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,2))
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13159,14 +12657,14 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVZRT  
  
  
-Subroutine CouplingFvFvVPT(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVPT(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -13192,29 +12690,23 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,3))
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Tan(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,3))/2._dp
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,3))/2._dp
-End Do 
-Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,3))
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Tan(TW)*ZM(gt1,3 + j1))
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,3))/2._dp
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Tan(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,3))
+resR = resR+(g2*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,3))
-End Do 
-Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,3))/2._dp
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Tan(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13227,14 +12719,14 @@ Iname = Iname - 1
 End Subroutine CouplingFvFvVPT  
  
  
-Subroutine CouplingFvFvVZT(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVZT(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -13260,29 +12752,29 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,1))
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,1))/2._dp
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*Sin(TW)*ZM(gt1,j1))
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,1))/2._dp
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,1))
+resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*Sin(TW)*ZM(gt1,3 + j1))/2._dp
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,1))/2._dp
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,1))
+resR = resR+(g2*Conjg(ZM(gt1,j1))*Sin(TW)*ZM(gt2,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,1))
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,1))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*Sin(TW)*ZM(gt2,3 + j1))
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13295,14 +12787,14 @@ Iname = Iname - 1
 End Subroutine CouplingFvFvVZT  
  
  
-Subroutine CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -13328,29 +12820,29 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,2))
+resL = resL+(g2*Conjg(ZM(gt2,j1))*Cos(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,2))/2._dp
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,2))/2._dp
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,2))
+resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*Sin(TW)*Tan(TW)*ZM(gt1,3 + j1))/2._dp
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,2))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,j1))*Cos(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,2))
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,2))
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,2))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*Sin(TW)*Tan(TW)*ZM(gt2,3 + j1))
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -13491,13 +12983,11 @@ Iname = Iname - 1
 End Subroutine CouplingVGVGVGVGT  
  
  
-Subroutine CouplingcVWLmVPVPVWLmT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVPVWLmT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13506,20 +12996,12 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVPVWLm' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,3)**2)/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)/2._dp
-res1 = res1+(g2**2*ZZ(2,3)**2)/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res1 = res1+g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*Sin(PhiW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,3)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,3)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res2 = res2+g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*Sin(PhiW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*ZZ(1,3)**2)
-res3 = res3-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res3 = res3-(g2**2*ZZ(2,3)**2)
-res3 = res3+g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2
+res3 = res3-2*g2**2*Sin(PhiW)**2
+res3 = res3+2*g2**2*Sin(PhiW)**2*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13531,13 +13013,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVPVWLmT  
  
  
-Subroutine CouplingcVWRmVPVPVWLmT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVPVWLmT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13546,14 +13026,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVPVWLm' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)**2)
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)**2
+res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)
+res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)**2
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res3 = 0._dp 
-res3 = res3+g2**2*Sin(2._dp*(PhiW))*ZZ(1,3)**2
-res3 = res3-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,3)**2)
+res3 = res3-2*g2**2*Cos(PhiW)*Sin(PhiW)
+res3 = res3+2*g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13565,13 +13045,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVPVWLmT  
  
  
-Subroutine CouplingcVWLmVPVPVWRmT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVPVWRmT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13580,14 +13058,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVPVWRm' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)**2)
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)**2
+res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)
+res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)**2
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res3 = 0._dp 
-res3 = res3+g2**2*Sin(2._dp*(PhiW))*ZZ(1,3)**2
-res3 = res3-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,3)**2)
+res3 = res3-2*g2**2*Cos(PhiW)*Sin(PhiW)
+res3 = res3+2*g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13599,13 +13077,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVPVWRmT  
  
  
-Subroutine CouplingcVWRmVPVPVWRmT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVPVWRmT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13614,20 +13090,12 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVPVWRm' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,3)**2)/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res1 = res1+(g2**2*ZZ(2,3)**2)/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res1 = res1+g2**2*Cos(PhiW)**2*Cos(2._dp*(TW))*1/Cos(TW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,3)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res2 = res2+(g2**2*ZZ(2,3)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res2 = res2+g2**2*Cos(PhiW)**2*Cos(2._dp*(TW))*1/Cos(TW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*ZZ(1,3)**2)
-res3 = res3+g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2
-res3 = res3-(g2**2*ZZ(2,3)**2)
-res3 = res3-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res3 = res3-2*g2**2*Cos(PhiW)**2
+res3 = res3+2*g2**2*Cos(PhiW)**2*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13639,13 +13107,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVPVWRmT  
  
  
-Subroutine CouplingcVWLmVPVWLmVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWLmVZT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13654,20 +13120,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLmVZ' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res1 = res1-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,1)*ZZ(1,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res2 = res2-(g2**2*ZZ(2,1)*ZZ(2,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3)
+res2 = res2+2*g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res3 = res3-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13679,13 +13136,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmVZT  
  
  
-Subroutine CouplingcVWRmVPVWLmVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWLmVZT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13694,14 +13149,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWLmVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,3))
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,3)
+res1 = res1-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW))
 res2 = 0._dp 
-res2 = res2+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3)
-res2 = res2-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res2 = res2+g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(2._dp*(PhiW))*Tan(TW)
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,3))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,3)
+res3 = res3-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13713,13 +13165,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWLmVZT  
  
  
-Subroutine CouplingcVWLmVPVWLmVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWLmVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13728,20 +13178,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLmVZR' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res1 = res1-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,2)*ZZ(1,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res2 = res2-(g2**2*ZZ(2,2)*ZZ(2,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3)
+res2 = res2+2*g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res3 = res3-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13753,13 +13194,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmVZRT  
  
  
-Subroutine CouplingcVWRmVPVWLmVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWLmVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13768,14 +13207,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWLmVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)*ZZ(1,3))
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)*ZZ(2,3)
+res1 = res1-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2+g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3)
-res2 = res2-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res2 = res2+g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(2._dp*(PhiW))*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)*ZZ(1,3))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)*ZZ(2,3)
+res3 = res3-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13787,13 +13223,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWLmVZRT  
  
  
-Subroutine CouplingcVWLmVPVWRmVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWRmVZT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13802,14 +13236,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWRmVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,3))
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,3)
+res1 = res1-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW))
 res2 = 0._dp 
-res2 = res2+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3)
-res2 = res2-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res2 = res2+g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(2._dp*(PhiW))*Tan(TW)
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,3))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,3)
+res3 = res3-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13821,13 +13252,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWRmVZT  
  
  
-Subroutine CouplingcVWRmVPVWRmVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWRmVZT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13836,20 +13265,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRmVZ' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res1 = res1+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))/2._dp
+res1 = res1-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,1)*ZZ(1,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3)
-res2 = res2-(g2**2*ZZ(2,1)*ZZ(2,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res2 = res2+2*g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))/2._dp
+res3 = res3-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13861,13 +13281,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWRmVZT  
  
  
-Subroutine CouplingcVWLmVPVWRmVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWRmVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13876,14 +13294,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWRmVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)*ZZ(1,3))
-res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)*ZZ(2,3)
+res1 = res1-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2+g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3)
-res2 = res2-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res2 = res2+g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(2._dp*(PhiW))*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)*ZZ(1,3))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)*ZZ(2,3)
+res3 = res3-(g2**2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -13895,13 +13310,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWRmVZRT  
  
  
-Subroutine CouplingcVWRmVPVWRmVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWRmVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -13910,20 +13323,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRmVZR' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res1 = res1+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))/2._dp
+res1 = res1-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,2)*ZZ(1,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3)
-res2 = res2-(g2**2*ZZ(2,2)*ZZ(2,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res2 = res2+2*g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res3 = res3+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))/2._dp
+res3 = res3-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14112,13 +13516,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmcVWRmVWLmVWRmT  
  
  
-Subroutine CouplingcVWLmVWLmVZVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZVZT(g2,TW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14127,20 +13529,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res1 = res1-(g2**2*ZZ(2,1)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2
+res1 = res1-2*g2**2*Sin(TW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,1)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res2 = res2+g2**2*Sin(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)/2._dp
-res3 = res3+(g2**2*ZZ(2,1)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res3 = res3+g2**2*Sin(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14152,47 +13545,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZVZT  
  
  
-Subroutine CouplingcVWRmVWLmVZVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res1, res2, res3 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZVZ' 
- 
-res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)**2)
-res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)**2
-res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)**2)
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)**2
-If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWRmVWLmVZVZT  
- 
- 
-Subroutine CouplingcVWLmVWLmVZVZRT(g2,ZZ,PhiW,res1,res2,res3)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14201,20 +13558,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)*ZZ(1,2))
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res1 = res1-(g2**2*ZZ(2,1)*ZZ(2,2))
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2)
+res1 = res1+g2**2*Cos(2._dp*(PhiW))*Tan(TW)
+res1 = res1+g2**2*Cos(2._dp*(TW))*Tan(TW)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14226,13 +13577,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZVZRT  
  
  
-Subroutine CouplingcVWRmVWLmVZVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWLmVZVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14241,14 +13590,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2)
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res1 = res1-(g2**2*Sin(2._dp*(PhiW))*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,2))
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,2)
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,2))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,2)
+res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14260,13 +13606,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWLmVZVZRT  
  
  
-Subroutine CouplingcVWLmVWLmVZRVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZRVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14275,20 +13619,20 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,2)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res1 = res1-(g2**2*ZZ(2,2)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2
+res1 = res1+(-3*g2**2*1/Cos(TW)**2)/4._dp
+res1 = res1-1._dp/2._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res1 = res1-1._dp/4._dp*(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)
+res1 = res1-1._dp/2._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,2)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,2)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res2 = res2+(3*g2**2*1/Cos(TW)**2)/8._dp
+res2 = res2+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/4._dp
+res2 = res2+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res2 = res2+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/4._dp
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)/2._dp
-res3 = res3+(g2**2*ZZ(2,2)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res3 = res3+(3*g2**2*1/Cos(TW)**2)/8._dp
+res3 = res3+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/4._dp
+res3 = res3+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res3 = res3+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/4._dp
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14300,13 +13644,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZRVZRT  
  
  
-Subroutine CouplingcVWRmVWLmVZRVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWLmVZRVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14315,14 +13657,13 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)**2)
+res1 = res1+g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*Sin(2._dp*(PhiW))
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)**2
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW))
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)**2)
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)**2
+res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW))
+res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14424,47 +13765,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmcVWRmVWRmVWRmT  
  
  
-Subroutine CouplingcVWLmVWRmVZVZT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZVZT(g2,TW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res1, res2, res3 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZVZ' 
- 
-res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)**2)
-res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)**2
-res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)**2)
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)**2
-If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWLmVWRmVZVZT  
- 
- 
-Subroutine CouplingcVWRmVWRmVZVZT(g2,ZZ,PhiW,res1,res2,res3)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14473,20 +13778,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2
-res1 = res1-(g2**2*ZZ(2,1)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res1 = res1-2*g2**2*Sin(TW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res2 = res2+(g2**2*ZZ(2,1)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
+res2 = res2+g2**2*Sin(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res3 = res3+(g2**2*ZZ(2,1)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
+res3 = res3+g2**2*Sin(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14498,13 +13794,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZVZT  
  
  
-Subroutine CouplingcVWLmVWRmVZVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWRmVZVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14513,14 +13807,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2)
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res1 = res1-(g2**2*Sin(2._dp*(PhiW))*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,2))
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,2)
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)*ZZ(1,2))
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)*ZZ(2,2)
+res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14532,13 +13823,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWRmVZVZRT  
  
  
-Subroutine CouplingcVWRmVWRmVZVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14547,20 +13836,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)*ZZ(1,2))
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2)
-res1 = res1-(g2**2*ZZ(2,1)*ZZ(2,2))
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res1 = res1-(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res1 = res1+g2**2*Cos(2._dp*(TW))*Tan(TW)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res2 = res2+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))/2._dp
+res2 = res2+(g2**2*Cos(2._dp*(PhiW))*Tan(TW))/2._dp
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))/2._dp
+res3 = res3+(g2**2*Cos(2._dp*(PhiW))*Tan(TW))/2._dp
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14572,13 +13855,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZVZRT  
  
  
-Subroutine CouplingcVWLmVWRmVZRVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWRmVZRVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14587,14 +13868,13 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)**2)
+res1 = res1+g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*Sin(2._dp*(PhiW))
 res2 = 0._dp 
-res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)**2)
-res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)**2
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW))
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)**2)
-res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)**2
+res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW))
+res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14606,13 +13886,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWRmVZRVZRT  
  
  
-Subroutine CouplingcVWRmVWRmVZRVZRT(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZRVZRT(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -14621,20 +13899,20 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,2)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2
-res1 = res1-(g2**2*ZZ(2,2)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res1 = res1+(-3*g2**2*1/Cos(TW)**2)/4._dp
+res1 = res1+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/2._dp
+res1 = res1-1._dp/4._dp*(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)
+res1 = res1+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/2._dp
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,2)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res2 = res2+(g2**2*ZZ(2,2)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res2 = res2+(3*g2**2*1/Cos(TW)**2)/8._dp
+res2 = res2-1._dp/4._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res2 = res2+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res2 = res2-1._dp/4._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res3 = res3+(g2**2*ZZ(2,2)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res3 = res3+(3*g2**2*1/Cos(TW)**2)/8._dp
+res3 = res3-1._dp/4._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res3 = res3+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res3 = res3-1._dp/4._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14673,13 +13951,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgGgGVGT  
  
  
-Subroutine CouplingcgWLmgPVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgPVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14688,8 +13964,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgPVWLm' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,3)
-res = res+g2*Sin(PhiW)**2*ZZ(2,3)
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14701,13 +13976,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgPVWLmT  
  
  
-Subroutine CouplingcgWRmgPVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgPVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14716,8 +13989,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgPVWLm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14729,13 +14001,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgPVWLmT  
  
  
-Subroutine CouplingcgWLmgPVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgPVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14744,8 +14014,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgPVWRm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14757,13 +14026,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgPVWRmT  
  
  
-Subroutine CouplingcgWRmgPVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgPVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14772,8 +14039,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgPVWRm' 
  
 res = 0._dp 
-res = res+g2*Sin(PhiW)**2*ZZ(1,3)
-res = res+g2*Cos(PhiW)**2*ZZ(2,3)
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14785,13 +14051,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgPVWRmT  
  
  
-Subroutine CouplingcgWLpgPcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgPcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14800,8 +14064,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgPcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,3))*Sin(PhiW)**2)
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14813,13 +14076,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgPcVWLmT  
  
  
-Subroutine CouplingcgWLpgPcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgPcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14828,8 +14089,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgPcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14841,13 +14101,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgPcVWRmT  
  
  
-Subroutine CouplingcgWRpgPcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgPcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14856,8 +14114,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgPcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14869,13 +14126,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgPcVWLmT  
  
  
-Subroutine CouplingcgWRpgPcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgPcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14884,8 +14139,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgPcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,3))*Sin(PhiW)**2)
+res = res+g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14897,13 +14151,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgPcVWRmT  
  
  
-Subroutine CouplingcgWLmgWLmVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14912,8 +14164,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVP' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,3))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,3))
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14925,13 +14176,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVPT  
  
  
-Subroutine CouplingcgWRmgWLmVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWLmVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14940,8 +14189,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWLmVP' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14953,13 +14201,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWLmVPT  
  
  
-Subroutine CouplingcgWLmgWLmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -14968,8 +14214,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVZ' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,1))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -14981,41 +14226,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVZT  
  
  
-Subroutine CouplingcgWRmgWLmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRmgWLmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRmgWLmVZT  
- 
- 
-Subroutine CouplingcgWLmgWLmVZRT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15024,8 +14239,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVZR' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,2))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,2))
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15037,13 +14252,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVZRT  
  
  
-Subroutine CouplingcgWRmgWLmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWLmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15052,8 +14265,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWLmVZR' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15065,13 +14277,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWLmVZRT  
  
  
-Subroutine CouplingcgPgWLmcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLmcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15080,8 +14290,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,3))*Sin(PhiW)**2
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15093,13 +14302,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLmcVWLmT  
  
  
-Subroutine CouplingcgPgWLmcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLmcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15108,8 +14315,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLmcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15121,13 +14327,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLmcVWRmT  
  
  
-Subroutine CouplingcgZgWLmcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWLmcVWLmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15136,8 +14340,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15149,41 +14352,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLmcVWLmT  
  
  
-Subroutine CouplingcgZgWLmcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLmcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWLmcVWRm' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWLmcVWRmT  
- 
- 
-Subroutine CouplingcgZpgWLmcVWLmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15192,8 +14365,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,2))*Sin(PhiW)**2
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15205,13 +14378,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLmcVWLmT  
  
  
-Subroutine CouplingcgZpgWLmcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLmcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15220,8 +14391,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLmcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15233,13 +14403,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLmcVWRmT  
  
  
-Subroutine CouplingcgWLpgWLpVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15248,8 +14416,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVP' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,3))*Sin(PhiW)**2
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15261,13 +14428,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVPT  
  
  
-Subroutine CouplingcgWRpgWLpVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWLpVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15276,8 +14441,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWLpVP' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15289,13 +14453,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWLpVPT  
  
  
-Subroutine CouplingcgPgWLpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15304,8 +14466,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,3))*Sin(PhiW)**2)
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15317,13 +14478,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLpVWLmT  
  
  
-Subroutine CouplingcgZgWLpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWLpVWLmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15332,8 +14491,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWLpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15345,13 +14503,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLpVWLmT  
  
  
-Subroutine CouplingcgZpgWLpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15360,8 +14516,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,2))*Sin(PhiW)**2)
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15373,13 +14529,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLpVWLmT  
  
  
-Subroutine CouplingcgPgWLpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15388,8 +14542,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLpVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15401,41 +14554,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLpVWRmT  
  
  
-Subroutine CouplingcgZgWLpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWLpVWRm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWLpVWRmT  
- 
- 
-Subroutine CouplingcgZpgWLpVWRmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15444,8 +14567,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLpVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15457,13 +14579,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLpVWRmT  
  
  
-Subroutine CouplingcgWLpgWLpVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15472,8 +14592,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVZ' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15485,41 +14604,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVZT  
  
  
-Subroutine CouplingcgWRpgWLpVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRpgWLpVZ' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRpgWLpVZT  
- 
- 
-Subroutine CouplingcgWLpgWLpVZRT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15528,8 +14617,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVZR' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,2))*Sin(PhiW)**2
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15541,13 +14630,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVZRT  
  
  
-Subroutine CouplingcgWRpgWLpVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWLpVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15556,8 +14643,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWLpVZR' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15569,13 +14655,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWLpVZRT  
  
  
-Subroutine CouplingcgWLmgWRmVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWRmVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15584,8 +14668,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWRmVP' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15597,13 +14680,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWRmVPT  
  
  
-Subroutine CouplingcgWRmgWRmVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15612,8 +14693,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVP' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,3))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,3))
+res = res+g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15625,41 +14705,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVPT  
  
  
-Subroutine CouplingcgWLmgWRmVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgWRmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgWRmVZT  
- 
- 
-Subroutine CouplingcgWRmgWRmVZT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15668,8 +14718,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVZ' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,1))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15681,13 +14730,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVZT  
  
  
-Subroutine CouplingcgWLmgWRmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWRmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15696,8 +14743,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWRmVZR' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15709,13 +14755,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWRmVZRT  
  
  
-Subroutine CouplingcgWRmgWRmVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15724,8 +14768,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVZR' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,2))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15737,13 +14781,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVZRT  
  
  
-Subroutine CouplingcgPgWRmcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRmcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15752,8 +14794,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRmcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15765,13 +14806,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRmcVWLmT  
  
  
-Subroutine CouplingcgPgWRmcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRmcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15780,8 +14819,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,3))*Sin(PhiW)**2
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15793,41 +14831,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRmcVWRmT  
  
  
-Subroutine CouplingcgZgWRmcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWRmcVWRmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWRmcVWLm' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWRmcVWLmT  
- 
- 
-Subroutine CouplingcgZgWRmcVWRmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15836,8 +14844,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15849,13 +14856,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRmcVWRmT  
  
  
-Subroutine CouplingcgZpgWRmcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRmcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15864,8 +14869,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRmcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15877,13 +14881,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRmcVWLmT  
  
  
-Subroutine CouplingcgZpgWRmcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRmcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15892,8 +14894,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,2))*Sin(PhiW)**2
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15905,13 +14907,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRmcVWRmT  
  
  
-Subroutine CouplingcgWLpgWRpVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWRpVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15920,8 +14920,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWRpVP' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15933,13 +14932,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWRpVPT  
  
  
-Subroutine CouplingcgWRpgWRpVPT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVPT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15948,8 +14945,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVP' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,3))*Sin(PhiW)**2
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15961,13 +14957,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVPT  
  
  
-Subroutine CouplingcgPgWRpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -15976,8 +14970,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRpVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -15989,41 +14982,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRpVWLmT  
  
  
-Subroutine CouplingcgZgWRpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWRpVWLm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWRpVWLmT  
- 
- 
-Subroutine CouplingcgZpgWRpVWLmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16032,8 +14995,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRpVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16045,13 +15007,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRpVWLmT  
  
  
-Subroutine CouplingcgPgWRpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16060,8 +15020,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRpVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,3))*Sin(PhiW)**2)
+res = res+g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16073,13 +15032,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRpVWRmT  
  
  
-Subroutine CouplingcgZgWRpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWRpVWRmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16088,8 +15045,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWRpVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16101,13 +15057,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRpVWRmT  
  
  
-Subroutine CouplingcgZpgWRpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16116,8 +15070,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRpVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,2))*Sin(PhiW)**2)
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16129,41 +15083,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRpVWRmT  
  
  
-Subroutine CouplingcgWLpgWRpVZT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVZT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgWRpVZ' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgWRpVZT  
- 
- 
-Subroutine CouplingcgWRpgWRpVZT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16172,8 +15096,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVZ' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16185,13 +15108,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVZT  
  
  
-Subroutine CouplingcgWLpgWRpVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWRpVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16200,8 +15121,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWRpVZR' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16213,13 +15133,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWRpVZRT  
  
  
-Subroutine CouplingcgWRpgWRpVZRT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVZRT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16228,8 +15146,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVZR' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,2))*Sin(PhiW)**2
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16241,13 +15159,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVZRT  
  
  
-Subroutine CouplingcgWLmgZVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZVWLmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16256,8 +15172,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgZVWLm' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,1)
-res = res+g2*Sin(PhiW)**2*ZZ(2,1)
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16269,69 +15184,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZVWLmT  
  
  
-Subroutine CouplingcgWRmgZVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZVWRmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRmgZVWLm' 
- 
-res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRmgZVWLmT  
- 
- 
-Subroutine CouplingcgWLmgZVWRmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgZVWRm' 
- 
-res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgZVWRmT  
- 
- 
-Subroutine CouplingcgWRmgZVWRmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16340,8 +15197,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgZVWRm' 
  
 res = 0._dp 
-res = res+g2*Sin(PhiW)**2*ZZ(1,1)
-res = res+g2*Cos(PhiW)**2*ZZ(2,1)
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16353,13 +15209,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZVWRmT  
  
  
-Subroutine CouplingcgWLpgZcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZcVWLmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16368,8 +15222,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16381,69 +15234,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZcVWLmT  
  
  
-Subroutine CouplingcgWLpgZcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZcVWRmT(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgZcVWRm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgZcVWRmT  
- 
- 
-Subroutine CouplingcgWRpgZcVWLmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRpgZcVWLm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRpgZcVWLmT  
- 
- 
-Subroutine CouplingcgWRpgZcVWRmT(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16452,8 +15247,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16465,13 +15259,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZcVWRmT  
  
  
-Subroutine CouplingcgWLmgZpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16480,8 +15272,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgZpVWLm' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,2)
-res = res+g2*Sin(PhiW)**2*ZZ(2,2)
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16493,13 +15285,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZpVWLmT  
  
  
-Subroutine CouplingcgWRmgZpVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZpVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16508,8 +15298,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgZpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16521,13 +15310,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZpVWLmT  
  
  
-Subroutine CouplingcgWLmgZpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16536,8 +15323,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgZpVWRm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16549,13 +15335,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZpVWRmT  
  
  
-Subroutine CouplingcgWRmgZpVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZpVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16564,8 +15348,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgZpVWRm' 
  
 res = 0._dp 
-res = res+g2*Sin(PhiW)**2*ZZ(1,2)
-res = res+g2*Cos(PhiW)**2*ZZ(2,2)
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16577,13 +15361,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZpVWRmT  
  
  
-Subroutine CouplingcgWLpgZpcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZpcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16592,8 +15374,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZpcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,2))*Sin(PhiW)**2)
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16605,13 +15387,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpcVWLmT  
  
  
-Subroutine CouplingcgWLpgZpcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZpcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16620,8 +15400,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZpcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16633,13 +15412,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpcVWRmT  
  
  
-Subroutine CouplingcgWRpgZpcVWLmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZpcVWLmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16648,8 +15425,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZpcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16661,13 +15437,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZpcVWLmT  
  
  
-Subroutine CouplingcgWRpgZpcVWRmT(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZpcVWRmT(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -16676,8 +15450,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZpcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,2))*Sin(PhiW)**2)
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -16989,14 +15763,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpAhT  
  
  
-Subroutine CouplingcgZgPhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZgPhhT(gt3,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17013,22 +15785,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(1,3))
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(1,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)*ZZ(1,3))
-res = res+(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,3)*ZZ(2,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(2,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(2,3))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(2,3))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(2,3))/8._dp
-res = res+(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)*ZZ(2,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(2,1)*ZZ(2,3))
-res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)*ZZ(2,3))
-res = res+(g2*gBL*vR*RXiZ*ZH(gt3,4)*ZZ(2,3)*ZZ(3,1))/8._dp
-res = res+(g2*gBL*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(3,3))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(3,3))
-res = res+(g2*gBL*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)*ZZ(3,3))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZ*ZH(gt3,4)*ZZ(3,1)*ZZ(3,3))
+res = res+(g2*gBL*vR*RXiZ*1/Cos(TW)*ZH(gt3,4))/8._dp
+res = res+(-3*g2*gBL*vR*Cos(2._dp*(TW))*RXiZ*1/Cos(TW)*ZH(gt3,4))/8._dp
+res = res+(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Tan(TW)*ZH(gt3,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Tan(TW)*ZH(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17040,14 +15800,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgPhhT  
  
  
-Subroutine CouplingcgZpgPhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZpgPhhT(gt3,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17064,22 +15822,13 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(1,3))
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(1,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,2)*ZZ(1,3))
-res = res+(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,3)*ZZ(2,2))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(2,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(2,3))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(2,3))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(2,3))/8._dp
-res = res+(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,2)*ZZ(2,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(2,2)*ZZ(2,3))
-res = res-1._dp/8._dp*(g2**2*vR*RXiZR*ZH(gt3,4)*ZZ(2,2)*ZZ(2,3))
-res = res+(g2*gBL*vR*RXiZR*ZH(gt3,4)*ZZ(2,3)*ZZ(3,2))/8._dp
-res = res+(g2*gBL*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(3,3))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(3,3))
-res = res+(g2*gBL*vR*RXiZR*ZH(gt3,4)*ZZ(2,2)*ZZ(3,3))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZR*ZH(gt3,4)*ZZ(3,2)*ZZ(3,3))
+res = res+(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*RXiZR*1/Cos(TW)**2*ZH(gt3,3))/4._dp
+res = res+(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*1/Cos(TW)**2*ZH(gt3,4))/8._dp
+res = res-1._dp/8._dp*(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*1/Cos(TW)**2*ZH(gt3,4))
+res = res-1._dp/8._dp*(g2**2*vR*Cos(2._dp*(TW))**1.5_dp*RXiZR*1/Cos(TW)**2*ZH(gt3,4))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))**1.5_dp*RXiZR*1/Cos(TW)**2*ZH(gt3,4))/8._dp
+res = res+(-3*g2*gBL*vR*RXiZR*1/Cos(TW)**2*Sin(3._dp*(TW))*ZH(gt3,4))/16._dp
+res = res+(5*g2*gBL*vR*RXiZR*1/Cos(TW)*Tan(TW)*ZH(gt3,4))/16._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17091,14 +15840,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgPhhT  
  
  
-Subroutine CouplingcgWLpgPHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLpgPHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17115,12 +15862,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,3))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,3))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(1,3))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(2,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(2,3))
-res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(3,3))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res+(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,4))/4._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17132,14 +15877,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgPHpmT  
  
  
-Subroutine CouplingcgWRpgPHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRpgPHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17156,12 +15899,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(1,3))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(2,3))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(1,3))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(2,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(2,3))
-res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(3,3))
+res = res+(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*UC(gt3,3))
+res = res+(g2**2*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*UC(gt3,4))/4._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17173,14 +15914,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgPHpmT  
  
  
-Subroutine CouplingcgWLmgPcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLmgPcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17197,12 +15936,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,3))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,3))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,3))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,3))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(1,3))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(2,3))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res+(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,4))/4._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17214,14 +15951,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgPcHpmT  
  
  
-Subroutine CouplingcgWRmgPcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRmgPcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17238,12 +15973,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,3))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,3))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,3))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,3))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(1,3))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(2,3))
+res = res+(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*UC(gt3,3))
+res = res+(g2**2*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*1/Cos(TW)*UC(gt3,4))/4._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17326,14 +16059,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWLmhhT  
  
  
-Subroutine CouplingcgZgWLmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZgWLmHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17350,18 +16081,8 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW)*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,1)*ZZ(1,1))
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,3)*ZZ(1,1))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,1)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,3)*ZZ(2,1))
-res = res+(g2**2*vR*RXiZ*Sin(PhiW)*UC(gt3,4)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZ*Sin(PhiW)*UC(gt3,4)*ZZ(3,1))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(PhiW)*UC(gt3,4))
+res = res+(g2**2*vR*RXiZ*Sin(PhiW)*Sin(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17373,14 +16094,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLmHpmT  
  
  
-Subroutine CouplingcgZpgWLmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZpgWLmHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17397,18 +16116,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW)*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,1)*ZZ(1,2))
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,3)*ZZ(1,2))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,1)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,3)*ZZ(2,2))
-res = res+(g2**2*vR*RXiZR*Sin(PhiW)*UC(gt3,4)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZR*Sin(PhiW)*UC(gt3,4)*ZZ(3,2))
+res = res+(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(PhiW)*Tan(TW)*UC(gt3,4))
+res = res+(g2**2*vR*RXiZR*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17491,14 +16202,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWLphhT  
  
  
-Subroutine CouplingcgZgWLpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZgWLpcHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17515,18 +16224,8 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW)*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,1)*ZZ(1,1))
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,3)*ZZ(1,1))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,1)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,3)*ZZ(2,1))
-res = res+(g2**2*vR*RXiZ*Sin(PhiW)*UC(gt3,4)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZ*Sin(PhiW)*UC(gt3,4)*ZZ(3,1))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(PhiW)*UC(gt3,4))
+res = res+(g2**2*vR*RXiZ*Sin(PhiW)*Sin(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17538,14 +16237,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLpcHpmT  
  
  
-Subroutine CouplingcgZpgWLpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZpgWLpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17562,18 +16259,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW)*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,1)*ZZ(1,2))
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,3)*ZZ(1,2))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,1)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,3)*ZZ(2,2))
-res = res+(g2**2*vR*RXiZR*Sin(PhiW)*UC(gt3,4)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZR*Sin(PhiW)*UC(gt3,4)*ZZ(3,2))
+res = res+(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(PhiW)*Tan(TW)*UC(gt3,4))
+res = res+(g2**2*vR*RXiZR*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17656,14 +16345,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmhhT  
  
  
-Subroutine CouplingcgZgWRmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZgWRmHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17680,18 +16367,8 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW)*UC(gt3,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiZ*UC(gt3,4))
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,1)*ZZ(1,1))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,3)*ZZ(1,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,1)*ZZ(2,1))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,3)*ZZ(2,1))
-res = res+(g2**2*vR*Cos(PhiW)*RXiZ*UC(gt3,4)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZ*UC(gt3,4)*ZZ(3,1))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZ*UC(gt3,4))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZ*Sin(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17703,14 +16380,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRmHpmT  
  
  
-Subroutine CouplingcgZpgWRmHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZpgWRmHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17727,18 +16402,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW)*UC(gt3,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiZR*UC(gt3,4))
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,1)*ZZ(1,2))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,3)*ZZ(1,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,1)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,3)*ZZ(2,2))
-res = res+(g2**2*vR*Cos(PhiW)*RXiZR*UC(gt3,4)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZR*UC(gt3,4)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZR*Tan(TW)*UC(gt3,4))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZR*Sin(TW)*Tan(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17821,14 +16488,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRphhT  
  
  
-Subroutine CouplingcgZgWRpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZgWRpcHpmT(gt3,gBL,g2,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17845,18 +16510,8 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW)*UC(gt3,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiZ*UC(gt3,4))
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,1)*ZZ(1,1))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,3)*ZZ(1,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*UC(gt3,1)*ZZ(2,1))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*UC(gt3,3)*ZZ(2,1))
-res = res+(g2**2*vR*Cos(PhiW)*RXiZ*UC(gt3,4)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZ*UC(gt3,4)*ZZ(3,1))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZ*UC(gt3,4))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZ*Sin(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17868,14 +16523,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRpcHpmT  
  
  
-Subroutine CouplingcgZpgWRpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgZpgWRpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17892,18 +16545,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW)*UC(gt3,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR*UC(gt3,3))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,3))
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR*UC(gt3,4))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiZR*UC(gt3,4))
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,1)*ZZ(1,2))/8._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,3)*ZZ(1,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*UC(gt3,1)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*UC(gt3,3)*ZZ(2,2))
-res = res+(g2**2*vR*Cos(PhiW)*RXiZR*UC(gt3,4)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZR*UC(gt3,4)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZR*Tan(TW)*UC(gt3,4))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZR*Sin(TW)*Tan(TW)*UC(gt3,4))/4._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17915,14 +16560,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRpcHpmT  
  
  
-Subroutine CouplingcgZgZhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZgZhhT(gt3,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17939,20 +16582,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(1,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(1,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)**2)
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(2,1))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(2,1))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(2,1))/8._dp
-res = res+(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)*ZZ(2,1))/4._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(2,1)**2)
-res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)**2)
-res = res+(g2*gBL*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(3,1))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(3,1))
-res = res+(g2*gBL*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)*ZZ(3,1))/4._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZ*ZH(gt3,4)*ZZ(3,1)**2)
+res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZH(gt3,4))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZ*ZH(gt3,4))/8._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZ*ZH(gt3,4))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW)*ZH(gt3,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -17964,14 +16597,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgZhhT  
  
  
-Subroutine CouplingcgZpgZhhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZpgZhhT(gt3,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -17988,22 +16619,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(1,1))
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(1,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,1)*ZZ(1,2))
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(2,1))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(2,1))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(2,1))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(2,1))/8._dp
-res = res+(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,2)*ZZ(2,1))/8._dp
-res = res+(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,1)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(2,1)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*vR*RXiZR*ZH(gt3,4)*ZZ(2,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(3,1))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(3,1))
-res = res+(g2*gBL*vR*RXiZR*ZH(gt3,4)*ZZ(2,2)*ZZ(3,1))/8._dp
-res = res+(g2*gBL*vR*RXiZR*ZH(gt3,4)*ZZ(2,1)*ZZ(3,2))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZR*ZH(gt3,4)*ZZ(3,1)*ZZ(3,2))
+res = res-1._dp/8._dp*(g2**2*vR*RXiZR*Tan(TW)*ZH(gt3,4))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW)*ZH(gt3,4))/8._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW)*ZH(gt3,4))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)*ZH(gt3,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18015,14 +16634,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgZhhT  
  
  
-Subroutine CouplingcgWLpgZHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLpgZHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18039,12 +16656,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(1,1))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(2,1))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(2,1))
-res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(3,1))
+res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*Sin(TW)*UC(gt3,1))/2._dp
+res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*Sin(TW)*UC(gt3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18056,14 +16671,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZHpmT  
  
  
-Subroutine CouplingcgWRpgZHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRpgZHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18080,12 +16693,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(1,1))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(2,1))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(2,1))
-res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(3,1))
+res = res-1._dp/2._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*Sin(TW)*UC(gt3,1))
+res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*Sin(TW)*UC(gt3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18097,14 +16708,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZHpmT  
  
  
-Subroutine CouplingcgWLmgZcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLmgZcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18121,12 +16730,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(1,1))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(2,1))/4._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*Sin(TW)*UC(gt3,1))/2._dp
+res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*Sin(TW)*UC(gt3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18138,14 +16745,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZcHpmT  
  
  
-Subroutine CouplingcgWRmgZcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRmgZcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18162,12 +16767,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(1,1))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(2,1))
+res = res-1._dp/2._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*Sin(TW)*UC(gt3,1))
+res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*Sin(TW)*UC(gt3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18179,14 +16782,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZcHpmT  
  
  
-Subroutine CouplingcgZgZphhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZgZphhT(gt3,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18203,22 +16804,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(1,2))
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(1,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)*ZZ(1,2))
-res = res+(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,2)*ZZ(2,1))/8._dp
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZH(gt3,3)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,3)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(2,2))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(2,2))/8._dp
-res = res+(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(1,1)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZH(gt3,3)*ZZ(2,1)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*RXiZ*ZH(gt3,4)*ZZ(2,2)*ZZ(3,1))/8._dp
-res = res+(g2*gBL*vR*Conjg(ZZ(2,1))*RXiZ*ZH(gt3,4)*ZZ(3,2))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,1))*RXiZ*ZH(gt3,4)*ZZ(3,2))
-res = res+(g2*gBL*vR*RXiZ*ZH(gt3,4)*ZZ(2,1)*ZZ(3,2))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZ*ZH(gt3,4)*ZZ(3,1)*ZZ(3,2))
+res = res-1._dp/8._dp*(g2**2*vR*RXiZ*Tan(TW)*ZH(gt3,4))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZ*Tan(TW)*ZH(gt3,4))/8._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZ*Tan(TW)*ZH(gt3,4))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW)*Tan(TW)*ZH(gt3,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18230,14 +16819,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgZphhT  
  
  
-Subroutine CouplingcgZpgZphhT(gt3,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplingcgZpgZphhT(gt3,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18254,20 +16841,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(1,2))
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(1,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,2)**2)
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZH(gt3,3)*ZZ(2,2))/8._dp
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,3)*ZZ(2,2))
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(2,2))
-res = res+(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(2,2))/8._dp
-res = res+(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(1,2)*ZZ(2,2))/4._dp
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZH(gt3,3)*ZZ(2,2)**2)
-res = res-1._dp/8._dp*(g2**2*vR*RXiZR*ZH(gt3,4)*ZZ(2,2)**2)
-res = res+(g2*gBL*vR*Conjg(ZZ(2,2))*RXiZR*ZH(gt3,4)*ZZ(3,2))/8._dp
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,2))*RXiZR*ZH(gt3,4)*ZZ(3,2))
-res = res+(g2*gBL*vR*RXiZR*ZH(gt3,4)*ZZ(2,2)*ZZ(3,2))/4._dp
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZR*ZH(gt3,4)*ZZ(3,2)**2)
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)**2*ZH(gt3,3))
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW)**2*ZH(gt3,4))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2*ZH(gt3,4))/2._dp
+res = res-1._dp/4._dp*(g2**2*vR*RXiZR*Sin(TW)**2*Tan(TW)**2*ZH(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18279,14 +16856,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgZphhT  
  
  
-Subroutine CouplingcgWLpgZpHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLpgZpHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18303,12 +16878,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWLm*UC(gt3,1))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(1,2))/4._dp
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*UC(gt3,3)*ZZ(2,2))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(2,2))
-res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*UC(gt3,4)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*Tan(TW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18320,14 +16893,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpHpmT  
  
  
-Subroutine CouplingcgWRpgZpHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRpgZpHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18344,12 +16915,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiWRm*Sin(PhiW)*UC(gt3,1))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(1,2))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*UC(gt3,3)*ZZ(2,2))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(2,2))
-res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*UC(gt3,4)*ZZ(3,2))
+res = res+(g2**2*k1*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*Tan(TW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18361,14 +16930,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZpHpmT  
  
  
-Subroutine CouplingcgWLmgZpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWLmgZpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18385,12 +16952,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiWLm*Sin(PhiW)*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiWLm*Sin(PhiW)*UC(gt3,4))
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(1,2))/4._dp
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*UC(gt3,1)*ZZ(2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*UC(gt3,1))
+res = res-1._dp/4._dp*(g2**2*k1*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*Sin(PhiW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*Tan(TW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -18402,14 +16967,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZpcHpmT  
  
  
-Subroutine CouplingcgWRmgZpcHpmT(gt3,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcgWRmgZpcHpmT(gt3,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -18426,12 +16989,10 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWRm*UC(gt3,3))/4._dp
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiWRm*UC(gt3,4))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(1,2))
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*UC(gt3,1)*ZZ(2,2))
+res = res+(g2**2*k1*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*Sin(PhiW)*UC(gt3,1))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*UC(gt3,3))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*Tan(TW)*UC(gt3,4))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*Tan(TW)*UC(gt3,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -26529,7 +25090,7 @@ End Subroutine CouplingHpmHpmcHpmcHpm2LP
  
  
 Subroutine CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,            & 
-& LAM6,LAM3,LAM4,k1,vR,UP,UC,gBL,g2,ZZ,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,             & 
+& LAM6,LAM3,LAM4,k1,vR,UP,UC,gBL,g2,TW,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,             & 
 & YR,ZM,PhiW,ZH,g3,cplAhAhUhh,cplAhUhhcHpm,cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,            & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,               & 
@@ -26570,59 +25131,54 @@ Subroutine CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,      
 & cplcFeUFvcHpmL,cplcFeUFvcHpmR,cplcFdFdVGL,cplcFdFdVGR,cplcFuFuVGL,cplcFuFuVGR,         & 
 & cplcgGgGVG,cplVGVGVG,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplAhhhVZ,cplcFdFdVZL,     & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
-& cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
-& cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,               & 
-& cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,     & 
-& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
-& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,              & 
-& cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,           & 
-& cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,       & 
-& cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZRVZR,cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,      & 
-& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,           & 
-& cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,          & 
-& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,cplAhhhVP,cplcFdFdVPL,     & 
-& cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,cplFvFvVPL,cplFvFvVPR,     & 
-& cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,            & 
-& cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,cplcVWRmVPVWLm,   & 
-& cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,               & 
+& cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,       & 
+& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
+& cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,            & 
+& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
+& cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,           & 
+& cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,  & 
+& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
+& cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,           & 
+& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
+& cplAhhhVP,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,     & 
+& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
+& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,   & 
+& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,& 
 & cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
 & cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,         & 
 & cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,           & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,     & 
-& cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,      & 
-& cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZ,            & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,      & 
-& cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
-& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcHpmcVWRm,   & 
-& cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,      & 
-& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
+& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
+& cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,          & 
+& cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,          & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplAhcHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,    & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,           & 
+& cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,     & 
 & cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,        & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,       & 
 & cplHpmcHpmcVWRmVWRm,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,& 
-& cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,cplAhAhVZVZR,            & 
-& cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3, & 
-& cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplcgWLmgWRmVP,               & 
-& cplcgWLpgWRpVP,cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,               & 
-& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,               & 
-& cplcVWRmVPVWRmVZ3,cplAhAhVPVZR,cplhhhhVPVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1,        & 
-& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,           & 
-& cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,             & 
-& cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,cplcgZgWLpVWLm,             & 
-& cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZVWLm,          & 
-& cplcgWRmgZVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm,cplAhAhcVWRmVWLm,          & 
-& cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,              & 
-& cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
-& cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZVZ1,& 
-& cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
-& cplcVWRmVWLmVZRVZR3)
+& cplAhAhVZVZR,cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,       & 
+& cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,           & 
+& cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,            & 
+& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
+& cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,cplAhAhVPVZR,            & 
+& cplhhhhVPVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3, & 
+& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,   & 
+& cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,               & 
+& cplcgPgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZpVWLm,         & 
+& cplcgWRmgZpVWLm,cplhhHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,    & 
+& cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,          & 
+& cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
+& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
 Implicit None 
 Real(dp), Intent(in) :: LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,k1,vR,UP(4,4),UC(4,4),         & 
-& gBL,g2,PhiW,ZH(4,4),g3
+& gBL,g2,TW,PhiW,ZH(4,4),g3
 
-Complex(dp), Intent(in) :: ZZ(3,3),YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),         & 
-& ZUL(3,3),ZUR(3,3),YR(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),ZUL(3,3),        & 
+& ZUR(3,3),YR(3,3),ZM(9,9)
 
 Complex(dp), Intent(out) :: cplAhAhUhh(4,4,4),cplAhUhhcHpm(4,4,4),cplAhUhhVP(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),& 
 & cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),       & 
@@ -26678,56 +25234,52 @@ Complex(dp), Intent(out) :: cplcUFuFdHpmL(3,3,4),cplcUFuFdHpmR(3,3,4),cplcUFuFuh
 & cplcFuFuVGR(3,3),cplcgGgGVG,cplVGVGVG,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,          & 
 & cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),    & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplcgWLmgWLmVZ,      & 
-& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
-& cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),             & 
-& cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ(4,4),         & 
-& cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,              & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
-& cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcgWLmgWLmVZR, & 
-& cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,       & 
-& cplhhVPVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),cplHpmVWRmVZR(4),     & 
-& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),cplhhhhVZRVZR(4,4), & 
-& cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,     & 
-& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,cplAhhhVP(4,4),            & 
-& cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFuFuVPL(3,3),  & 
-& cplcFuFuVPR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,cplcgWRmgWLmVP,        & 
-& cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP(4,4),         & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
-& cplAhAhVPVP(4,4),cplhhhhVPVP(4,4),cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm1,               & 
+& cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),  & 
+& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
+& cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,               & 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
+& cplcVWRmVWRmVZVZ3,cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),& 
+& cplcFeFeVZRR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),& 
+& cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,       & 
+& cplcgWRpgWRpVZR,cplhhVPVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),      & 
+& cplHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),   & 
+& cplhhhhVZRVZR(4,4),cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,      & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
+& cplAhhhVP(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),    & 
+& cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,      & 
+& cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,            & 
+& cplHpmcHpmVP(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplcVWLmVPVWLm,cplcVWRmVPVWLm,       & 
+& cplcVWRmVPVWRm,cplAhAhVPVP(4,4),cplhhhhVPVP(4,4),cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm1,& 
 & cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
 & cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),           & 
 & cplcFuFdcVWLmR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,             & 
-& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm
+& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4)
 
-Complex(dp), Intent(out) :: cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,     & 
-& cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),              & 
-& cplcHpmcVWLmVP(4),cplcVWLmVPVWRm,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),     & 
-& cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),cplHpmcHpmcVWLmVWLm(4,4),& 
-& cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,& 
-& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcHpmcVWRm(4,4),cplAhcVWRmVWLm(4),   & 
-& cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),         & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,      & 
-& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
-& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm(4,4),cplhhcVWRmVWLm(4),               & 
-& cplhhcVWRmVWRm(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),              & 
-& cplAhAhcVWRmVWRm(4,4),cplhhhhcVWRmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmcVWRmVWRmVWRm1,& 
-& cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,         & 
-& cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,cplAhAhVZVZR(4,4),cplhhhhVZVZR(4,4),cplHpmcHpmVZVZR(4,4),& 
+Complex(dp), Intent(out) :: cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWRm,cplcVWLmVWRmVZR,  & 
+& cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),      & 
+& cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
+& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcHpmcVWRm(4,4),& 
+& cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplFvFecVWRmL(9,3),          & 
+& cplFvFecVWRmR(9,3),cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,   & 
+& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,     & 
+& cplcgWRpgZpcVWRm,cplhhcHpmcVWRm(4,4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),              & 
+& cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplAhAhcVWRmVWRm(4,4),          & 
+& cplhhhhcVWRmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplAhAhVZVZR(4,4),cplhhhhVZVZR(4,4),cplHpmcHpmVZVZR(4,4),       & 
 & cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,           & 
-& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZ(4,4),  & 
-& cplhhhhVPVZ(4,4),cplHpmcHpmVPVZ(4,4),cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,              & 
-& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
-& cplAhAhVPVZR(4,4),cplhhhhVPVZR(4,4),cplHpmcHpmVPVZR(4,4),cplcVWLmVPVWLmVZR1,           & 
-& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,           & 
-& cplcVWRmVPVWRmVZR3,cplAhHpmVWLm(4,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),            & 
-& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,    & 
-& cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZgWRpVWLm,cplcgZpgWRpVWLm,          & 
-& cplcgWLmgZVWLm,cplcgWRmgZVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm(4,4),       & 
-& cplAhAhcVWRmVWLm(4,4),cplhhhhcVWRmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplcVWRmVPVPVWLm1,& 
-& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,     & 
-& cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
-& cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,             & 
+& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplAhAhVPVZ(4,4),cplhhhhVPVZ(4,4),               & 
+& cplHpmcHpmVPVZ(4,4),cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,             & 
+& cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcgWLmgWRmVP,cplcgWLpgWRpVP,   & 
+& cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,cplAhAhVPVZR(4,4),cplhhhhVPVZR(4,4),cplHpmcHpmVPVZR(4,4),& 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,           & 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm(4,4),cplcFdFuVWLmL(3,3),            & 
+& cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcgWLmgPVWLm,               & 
+& cplcgWRmgPVWLm,cplcgPgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZpgWRpVWLm,          & 
+& cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm(4,4),cplAhAhcVWRmVWLm(4,4),               & 
+& cplhhhhcVWRmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,    & 
+& cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
+& cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,& 
 & cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3
 
 Integer :: gt1, gt2, gt3, gt4, ct1, ct2, ct3, ct4
@@ -26761,7 +25313,7 @@ End Do
 cplAhUhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVPL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVP(gt1,gt2))
+Call CouplingAhUhhVPL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -26770,7 +25322,7 @@ End Do
 cplAhUhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVZ(gt1,gt2))
+Call CouplingAhUhhVZL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -26779,7 +25331,7 @@ End Do
 cplAhUhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVZR(gt1,gt2))
+Call CouplingAhUhhVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -26894,28 +25446,28 @@ End Do
 
 cplcgZgZUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZgZUhh(gt3))
+Call CouplingcgZgZUhhL(gt3,gBL,g2,vR,TW,cplcgZgZUhh(gt3))
 
 End Do 
 
 
 cplcgZpgZUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZpgZUhh(gt3))
+Call CouplingcgZpgZUhhL(gt3,gBL,g2,vR,TW,cplcgZpgZUhh(gt3))
 
 End Do 
 
 
 cplcgZgZpUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZgZpUhh(gt3))
+Call CouplingcgZgZpUhhL(gt3,gBL,g2,vR,TW,cplcgZgZpUhh(gt3))
 
 End Do 
 
 
 cplcgZpgZpUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZpgZpUhh(gt3))
+Call CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,TW,cplcgZpgZpUhh(gt3))
 
 End Do 
 
@@ -26975,14 +25527,14 @@ End Do
 
 cplUhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVPVZL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVPVZ(gt1))
+Call CouplingUhhVPVZL(gt1,gBL,g2,vR,TW,cplUhhVPVZ(gt1))
 
 End Do 
 
 
 cplUhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVPVZR(gt1))
+Call CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,TW,cplUhhVPVZR(gt1))
 
 End Do 
 
@@ -27010,21 +25562,21 @@ End Do
 
 cplUhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZVZL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZVZ(gt1))
+Call CouplingUhhVZVZL(gt1,gBL,g2,vR,TW,cplUhhVZVZ(gt1))
 
 End Do 
 
 
 cplUhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZVZR(gt1))
+Call CouplingUhhVZVZRL(gt1,gBL,g2,vR,TW,cplUhhVZVZR(gt1))
 
 End Do 
 
 
 cplUhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZRVZR(gt1))
+Call CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,TW,cplUhhVZRVZR(gt1))
 
 End Do 
 
@@ -27074,7 +25626,7 @@ End Do
 cplUhhUhhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVPVP(gt1,gt2))
+Call CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,TW,cplUhhUhhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -27101,7 +25653,7 @@ End Do
 cplUhhUhhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVZVZ(gt1,gt2))
+Call CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,TW,cplUhhUhhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -27110,7 +25662,7 @@ End Do
 cplUhhUhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVZRVZR(gt1,gt2))
+Call CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,TW,cplUhhUhhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -27260,7 +25812,7 @@ End Do
 cplUAhhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhhhVPL(gt1,gt2,gBL,g2,ZZ,ZH,cplUAhhhVP(gt1,gt2))
+Call CouplingUAhhhVPL(gt1,gt2,gBL,g2,ZH,TW,cplUAhhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -27269,7 +25821,7 @@ End Do
 cplUAhhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhhhVZL(gt1,gt2,gBL,g2,ZZ,ZH,cplUAhhhVZ(gt1,gt2))
+Call CouplingUAhhhVZL(gt1,gt2,gBL,g2,ZH,TW,cplUAhhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -27278,7 +25830,7 @@ End Do
 cplUAhhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhhhVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplUAhhhVZR(gt1,gt2))
+Call CouplingUAhhhVZRL(gt1,gt2,gBL,g2,ZH,TW,cplUAhhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -27366,7 +25918,7 @@ End Do
 cplUAhUAhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhUAhVPVPL(gt1,gt2,gBL,g2,ZZ,cplUAhUAhVPVP(gt1,gt2))
+Call CouplingUAhUAhVPVPL(gt1,gt2,gBL,g2,TW,cplUAhUAhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -27393,7 +25945,7 @@ End Do
 cplUAhUAhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhUAhVZVZL(gt1,gt2,gBL,g2,ZZ,cplUAhUAhVZVZ(gt1,gt2))
+Call CouplingUAhUAhVZVZL(gt1,gt2,gBL,g2,TW,cplUAhUAhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -27402,7 +25954,7 @@ End Do
 cplUAhUAhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUAhUAhVZRVZRL(gt1,gt2,gBL,g2,ZZ,cplUAhUAhVZRVZR(gt1,gt2))
+Call CouplingUAhUAhVZRVZRL(gt1,gt2,gBL,g2,TW,cplUAhUAhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -27488,112 +26040,112 @@ End Do
 
 cplcgZgWLpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWLpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZgWLpcUHpm(gt3))
+Call CouplingcgZgWLpcUHpmL(gt3,gBL,g2,vR,TW,PhiW,cplcgZgWLpcUHpm(gt3))
 
 End Do 
 
 
 cplcgWLpgZUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLpgZUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWLpgZUHpm(gt3))
+Call CouplingcgWLpgZUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWLpgZUHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWLpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWLpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZpgWLpcUHpm(gt3))
+Call CouplingcgZpgWLpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgZpgWLpcUHpm(gt3))
 
 End Do 
 
 
 cplcgWLpgZpUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLpgZpUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWLpgZpUHpm(gt3))
+Call CouplingcgWLpgZpUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWLpgZpUHpm(gt3))
 
 End Do 
 
 
 cplcgZgWRpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWRpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZgWRpcUHpm(gt3))
+Call CouplingcgZgWRpcUHpmL(gt3,gBL,g2,vR,TW,PhiW,cplcgZgWRpcUHpm(gt3))
 
 End Do 
 
 
 cplcgWRpgZUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRpgZUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWRpgZUHpm(gt3))
+Call CouplingcgWRpgZUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWRpgZUHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWRpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWRpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZpgWRpcUHpm(gt3))
+Call CouplingcgZpgWRpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgZpgWRpcUHpm(gt3))
 
 End Do 
 
 
 cplcgWRpgZpUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRpgZpUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWRpgZpUHpm(gt3))
+Call CouplingcgWRpgZpUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWRpgZpUHpm(gt3))
 
 End Do 
 
 
 cplcgWLmgZcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLmgZcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWLmgZcUHpm(gt3))
+Call CouplingcgWLmgZcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWLmgZcUHpm(gt3))
 
 End Do 
 
 
 cplcgZgWLmUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWLmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZgWLmUHpm(gt3))
+Call CouplingcgZgWLmUHpmL(gt3,gBL,g2,vR,TW,PhiW,cplcgZgWLmUHpm(gt3))
 
 End Do 
 
 
 cplcgWRmgZcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRmgZcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWRmgZcUHpm(gt3))
+Call CouplingcgWRmgZcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWRmgZcUHpm(gt3))
 
 End Do 
 
 
 cplcgZgWRmUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgWRmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZgWRmUHpm(gt3))
+Call CouplingcgZgWRmUHpmL(gt3,gBL,g2,vR,TW,PhiW,cplcgZgWRmUHpm(gt3))
 
 End Do 
 
 
 cplcgWLmgZpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWLmgZpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWLmgZpcUHpm(gt3))
+Call CouplingcgWLmgZpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWLmgZpcUHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWLmUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWLmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZpgWLmUHpm(gt3))
+Call CouplingcgZpgWLmUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgZpgWLmUHpm(gt3))
 
 End Do 
 
 
 cplcgWRmgZpcUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgWRmgZpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgWRmgZpcUHpm(gt3))
+Call CouplingcgWRmgZpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgWRmgZpcUHpm(gt3))
 
 End Do 
 
 
 cplcgZpgWRmUHpm = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgWRmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,cplcgZpgWRmUHpm(gt3))
+Call CouplingcgZpgWRmUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,cplcgZpgWRmUHpm(gt3))
 
 End Do 
 
@@ -27653,7 +26205,7 @@ End Do
 cplHpmcUHpmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcUHpmVPL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcUHpmVP(gt1,gt2))
+Call CouplingHpmcUHpmVPL(gt1,gt2,gBL,g2,UC,TW,cplHpmcUHpmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -27662,7 +26214,7 @@ End Do
 cplHpmcUHpmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcUHpmVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcUHpmVZ(gt1,gt2))
+Call CouplingHpmcUHpmVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcUHpmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -27671,7 +26223,7 @@ End Do
 cplHpmcUHpmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcUHpmVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcUHpmVZR(gt1,gt2))
+Call CouplingHpmcUHpmVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcUHpmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -27679,42 +26231,42 @@ End Do
 
 cplcUHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWLmVPL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWLmVP(gt1))
+Call CouplingcUHpmcVWLmVPL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWLmVP(gt1))
 
 End Do 
 
 
 cplcUHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWRmVPL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWRmVP(gt1))
+Call CouplingcUHpmcVWRmVPL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWRmVP(gt1))
 
 End Do 
 
 
 cplcUHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWLmVZ(gt1))
+Call CouplingcUHpmcVWLmVZL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWLmVZ(gt1))
 
 End Do 
 
 
 cplcUHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWRmVZ(gt1))
+Call CouplingcUHpmcVWRmVZL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWRmVZ(gt1))
 
 End Do 
 
 
 cplcUHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWLmVZR(gt1))
+Call CouplingcUHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWLmVZR(gt1))
 
 End Do 
 
 
 cplcUHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcUHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,PhiW,cplcUHpmcVWRmVZR(gt1))
+Call CouplingcUHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,TW,PhiW,cplcUHpmcVWRmVZR(gt1))
 
 End Do 
 
@@ -27764,7 +26316,7 @@ End Do
 cplUHpmcUHpmVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUHpmcUHpmVPVPL(gt1,gt2,gBL,g2,ZZ,cplUHpmcUHpmVPVP(gt1,gt2))
+Call CouplingUHpmcUHpmVPVPL(gt1,gt2,gBL,g2,TW,cplUHpmcUHpmVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -27791,7 +26343,7 @@ End Do
 cplUHpmcUHpmVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUHpmcUHpmVZVZL(gt1,gt2,gBL,g2,ZZ,cplUHpmcUHpmVZVZ(gt1,gt2))
+Call CouplingUHpmcUHpmVZVZL(gt1,gt2,gBL,g2,TW,cplUHpmcUHpmVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -27800,7 +26352,7 @@ End Do
 cplUHpmcUHpmVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUHpmcUHpmVZRVZRL(gt1,gt2,gBL,g2,ZZ,cplUHpmcUHpmVZRVZR(gt1,gt2))
+Call CouplingUHpmcUHpmVZRVZRL(gt1,gt2,gBL,g2,TW,cplUHpmcUHpmVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -27846,7 +26398,7 @@ cplcUFdFdVPL = 0._dp
 cplcUFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVPL(gt1,gt2),               & 
+Call CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVPL(gt1,gt2),               & 
 & cplcUFdFdVPR(gt1,gt2))
 
  End Do 
@@ -27857,7 +26409,7 @@ cplcUFdFdVZL = 0._dp
 cplcUFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVZL(gt1,gt2),               & 
+Call CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVZL(gt1,gt2),               & 
 & cplcUFdFdVZR(gt1,gt2))
 
  End Do 
@@ -27868,7 +26420,7 @@ cplcUFdFdVZRL = 0._dp
 cplcUFdFdVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVZRL(gt1,gt2)              & 
+Call CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVZRL(gt1,gt2)              & 
 & ,cplcUFdFdVZRR(gt1,gt2))
 
  End Do 
@@ -27985,7 +26537,7 @@ cplcUFuFuVPL = 0._dp
 cplcUFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVPL(gt1,gt2),               & 
+Call CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVPL(gt1,gt2),               & 
 & cplcUFuFuVPR(gt1,gt2))
 
  End Do 
@@ -27996,7 +26548,7 @@ cplcUFuFuVZL = 0._dp
 cplcUFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVZL(gt1,gt2),               & 
+Call CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVZL(gt1,gt2),               & 
 & cplcUFuFuVZR(gt1,gt2))
 
  End Do 
@@ -28007,7 +26559,7 @@ cplcUFuFuVZRL = 0._dp
 cplcUFuFuVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVZRL(gt1,gt2)              & 
+Call CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVZRL(gt1,gt2)              & 
 & ,cplcUFuFuVZRR(gt1,gt2))
 
  End Do 
@@ -28044,7 +26596,7 @@ cplcUFeFeVPL = 0._dp
 cplcUFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVPL(gt1,gt2),               & 
+Call CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVPL(gt1,gt2),               & 
 & cplcUFeFeVPR(gt1,gt2))
 
  End Do 
@@ -28055,7 +26607,7 @@ cplcUFeFeVZL = 0._dp
 cplcUFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVZL(gt1,gt2),               & 
+Call CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVZL(gt1,gt2),               & 
 & cplcUFeFeVZR(gt1,gt2))
 
  End Do 
@@ -28066,7 +26618,7 @@ cplcUFeFeVZRL = 0._dp
 cplcUFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVZRL(gt1,gt2)              & 
+Call CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVZRL(gt1,gt2)              & 
 & ,cplcUFeFeVZRR(gt1,gt2))
 
  End Do 
@@ -28171,7 +26723,7 @@ cplUFvFvVPL = 0._dp
 cplUFvFvVPR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingUFvFvVPL(gt1,gt2,gBL,g2,ZZ,ZM,cplUFvFvVPL(gt1,gt2),cplUFvFvVPR(gt1,gt2))
+Call CouplingUFvFvVPL(gt1,gt2,gBL,g2,ZM,TW,cplUFvFvVPL(gt1,gt2),cplUFvFvVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28181,7 +26733,7 @@ cplUFvFvVZL = 0._dp
 cplUFvFvVZR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingUFvFvVZL(gt1,gt2,gBL,g2,ZZ,ZM,cplUFvFvVZL(gt1,gt2),cplUFvFvVZR(gt1,gt2))
+Call CouplingUFvFvVZL(gt1,gt2,gBL,g2,ZM,TW,cplUFvFvVZL(gt1,gt2),cplUFvFvVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28191,7 +26743,7 @@ cplUFvFvVZRL = 0._dp
 cplUFvFvVZRR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingUFvFvVZRL(gt1,gt2,gBL,g2,ZZ,ZM,cplUFvFvVZRL(gt1,gt2),cplUFvFvVZRR(gt1,gt2))
+Call CouplingUFvFvVZRL(gt1,gt2,gBL,g2,ZM,TW,cplUFvFvVZRL(gt1,gt2),cplUFvFvVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28272,7 +26824,7 @@ Call CouplingVGVGVGVGL(g3,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3)
 cplAhhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZL(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZ(gt1,gt2))
+Call CouplingAhhhVZL(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -28282,7 +26834,7 @@ cplcFdFdVZL = 0._dp
 cplcFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZL(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
+Call CouplingcFdFdVZL(gt1,gt2,gBL,g2,TW,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28292,7 +26844,7 @@ cplcFeFeVZL = 0._dp
 cplcFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZL(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
+Call CouplingcFeFeVZL(gt1,gt2,gBL,g2,TW,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28302,7 +26854,7 @@ cplcFuFuVZL = 0._dp
 cplcFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZL(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
+Call CouplingcFuFuVZL(gt1,gt2,gBL,g2,TW,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28312,59 +26864,49 @@ cplFvFvVZL = 0._dp
 cplFvFvVZR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZL(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
+Call CouplingFvFvVZL(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
 
  End Do 
 End Do 
 
 
 cplcgWLmgWLmVZ = 0._dp 
-Call CouplingcgWLmgWLmVZL(g2,ZZ,PhiW,cplcgWLmgWLmVZ)
-
-
-
-cplcgWRmgWLmVZ = 0._dp 
-Call CouplingcgWRmgWLmVZL(g2,ZZ,PhiW,cplcgWRmgWLmVZ)
+Call CouplingcgWLmgWLmVZL(g2,TW,cplcgWLmgWLmVZ)
 
 
 
 cplcgWLpgWLpVZ = 0._dp 
-Call CouplingcgWLpgWLpVZL(g2,ZZ,PhiW,cplcgWLpgWLpVZ)
-
-
-
-cplcgWRpgWLpVZ = 0._dp 
-Call CouplingcgWRpgWLpVZL(g2,ZZ,PhiW,cplcgWRpgWLpVZ)
+Call CouplingcgWLpgWLpVZL(g2,TW,cplcgWLpgWLpVZ)
 
 
 
 cplcgWRmgWRmVZ = 0._dp 
-Call CouplingcgWRmgWRmVZL(g2,ZZ,PhiW,cplcgWRmgWRmVZ)
+Call CouplingcgWRmgWRmVZL(g2,TW,cplcgWRmgWRmVZ)
 
 
 
 cplcgWRpgWRpVZ = 0._dp 
-Call CouplingcgWRpgWRpVZL(g2,ZZ,PhiW,cplcgWRpgWRpVZ)
+Call CouplingcgWRpgWRpVZL(g2,TW,cplcgWRpgWRpVZ)
 
 
 
 cplhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZ(gt1))
+Call CouplinghhVPVZL(gt1,gBL,g2,vR,ZH,TW,cplhhVPVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZ(gt1))
+Call CouplinghhVZVZL(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZR(gt1))
+Call CouplinghhVZVZRL(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZR(gt1))
 
 End Do 
 
@@ -28372,7 +26914,7 @@ End Do
 cplHpmcHpmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZ(gt1,gt2))
+Call CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -28380,37 +26922,32 @@ End Do
 
 cplHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZ(gt1))
+Call CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZ(gt1))
+Call CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZ(gt1))
 
 End Do 
 
 
 cplcVWLmVWLmVZ = 0._dp 
-Call CouplingcVWLmVWLmVZL(g2,ZZ,PhiW,cplcVWLmVWLmVZ)
-
-
-
-cplcVWRmVWLmVZ = 0._dp 
-Call CouplingcVWRmVWLmVZL(g2,ZZ,PhiW,cplcVWRmVWLmVZ)
+Call CouplingcVWLmVWLmVZL(g2,TW,cplcVWLmVWLmVZ)
 
 
 
 cplcVWRmVWRmVZ = 0._dp 
-Call CouplingcVWRmVWRmVZL(g2,ZZ,PhiW,cplcVWRmVWRmVZ)
+Call CouplingcVWRmVWRmVZL(g2,TW,cplcVWRmVWRmVZ)
 
 
 
 cplAhAhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZ(gt1,gt2))
+Call CouplingAhAhVZVZL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -28419,7 +26956,7 @@ End Do
 cplhhhhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZ(gt1,gt2))
+Call CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -28428,7 +26965,7 @@ End Do
 cplHpmcHpmVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZ(gt1,gt2))
+Call CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -28437,23 +26974,21 @@ End Do
 cplcVWLmVWLmVZVZ1 = 0._dp 
 cplcVWLmVWLmVZVZ2 = 0._dp 
 cplcVWLmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,           & 
-& cplcVWLmVWLmVZVZ3)
+Call CouplingcVWLmVWLmVZVZL(g2,TW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3)
 
 
 
 cplcVWRmVWRmVZVZ1 = 0._dp 
 cplcVWRmVWRmVZVZ2 = 0._dp 
 cplcVWRmVWRmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZL(g2,ZZ,PhiW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,           & 
-& cplcVWRmVWRmVZVZ3)
+Call CouplingcVWRmVWRmVZVZL(g2,TW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3)
 
 
 
 cplAhhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZRL(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZR(gt1,gt2))
+Call CouplingAhhhVZRL(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28463,7 +26998,7 @@ cplcFdFdVZRL = 0._dp
 cplcFdFdVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZRL(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
+Call CouplingcFdFdVZRL(gt1,gt2,gBL,g2,TW,cplcFdFdVZRL(gt1,gt2),cplcFdFdVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28473,7 +27008,7 @@ cplcFeFeVZRL = 0._dp
 cplcFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZRL(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
+Call CouplingcFeFeVZRL(gt1,gt2,gBL,g2,TW,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28483,7 +27018,7 @@ cplcFuFuVZRL = 0._dp
 cplcFuFuVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZRL(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
+Call CouplingcFuFuVZRL(gt1,gt2,gBL,g2,TW,cplcFuFuVZRL(gt1,gt2),cplcFuFuVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28493,52 +27028,52 @@ cplFvFvVZRL = 0._dp
 cplFvFvVZRR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZRL(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
+Call CouplingFvFvVZRL(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
 
  End Do 
 End Do 
 
 
 cplcgWLmgWLmVZR = 0._dp 
-Call CouplingcgWLmgWLmVZRL(g2,ZZ,PhiW,cplcgWLmgWLmVZR)
+Call CouplingcgWLmgWLmVZRL(g2,TW,PhiW,cplcgWLmgWLmVZR)
 
 
 
 cplcgWRmgWLmVZR = 0._dp 
-Call CouplingcgWRmgWLmVZRL(g2,ZZ,PhiW,cplcgWRmgWLmVZR)
+Call CouplingcgWRmgWLmVZRL(g2,TW,PhiW,cplcgWRmgWLmVZR)
 
 
 
 cplcgWLpgWLpVZR = 0._dp 
-Call CouplingcgWLpgWLpVZRL(g2,ZZ,PhiW,cplcgWLpgWLpVZR)
+Call CouplingcgWLpgWLpVZRL(g2,TW,PhiW,cplcgWLpgWLpVZR)
 
 
 
 cplcgWRpgWLpVZR = 0._dp 
-Call CouplingcgWRpgWLpVZRL(g2,ZZ,PhiW,cplcgWRpgWLpVZR)
+Call CouplingcgWRpgWLpVZRL(g2,TW,PhiW,cplcgWRpgWLpVZR)
 
 
 
 cplcgWRmgWRmVZR = 0._dp 
-Call CouplingcgWRmgWRmVZRL(g2,ZZ,PhiW,cplcgWRmgWRmVZR)
+Call CouplingcgWRmgWRmVZRL(g2,TW,PhiW,cplcgWRmgWRmVZR)
 
 
 
 cplcgWRpgWRpVZR = 0._dp 
-Call CouplingcgWRpgWRpVZRL(g2,ZZ,PhiW,cplcgWRpgWRpVZR)
+Call CouplingcgWRpgWRpVZRL(g2,TW,PhiW,cplcgWRpgWRpVZR)
 
 
 
 cplhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZR(gt1))
+Call CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVPVZR(gt1))
 
 End Do 
 
 
 cplhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZRVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZRVZR(gt1))
+Call CouplinghhVZRVZRL(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVZRVZR(gt1))
 
 End Do 
 
@@ -28546,7 +27081,7 @@ End Do
 cplHpmcHpmVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZR(gt1,gt2))
+Call CouplingHpmcHpmVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28554,37 +27089,37 @@ End Do
 
 cplHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZR(gt1))
+Call CouplingHpmVWRmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZR(gt1))
 
 End Do 
 
 
 cplcVWLmVWLmVZR = 0._dp 
-Call CouplingcVWLmVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZR)
+Call CouplingcVWLmVWLmVZRL(g2,TW,PhiW,cplcVWLmVWLmVZR)
 
 
 
 cplcVWRmVWLmVZR = 0._dp 
-Call CouplingcVWRmVWLmVZRL(g2,ZZ,PhiW,cplcVWRmVWLmVZR)
+Call CouplingcVWRmVWLmVZRL(g2,TW,PhiW,cplcVWRmVWLmVZR)
 
 
 
 cplcVWRmVWRmVZR = 0._dp 
-Call CouplingcVWRmVWRmVZRL(g2,ZZ,PhiW,cplcVWRmVWRmVZR)
+Call CouplingcVWRmVWRmVZRL(g2,TW,PhiW,cplcVWRmVWRmVZR)
 
 
 
 cplAhAhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZRVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZRVZR(gt1,gt2))
+Call CouplingAhAhVZRVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28593,7 +27128,7 @@ End Do
 cplhhhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZRVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZRVZR(gt1,gt2))
+Call CouplinghhhhVZRVZRL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28602,7 +27137,7 @@ End Do
 cplHpmcHpmVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZRVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZRVZR(gt1,gt2))
+Call CouplingHpmcHpmVZRVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZRVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28611,7 +27146,7 @@ End Do
 cplcVWLmVWLmVZRVZR1 = 0._dp 
 cplcVWLmVWLmVZRVZR2 = 0._dp 
 cplcVWLmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
+Call CouplingcVWLmVWLmVZRVZRL(g2,TW,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
 & cplcVWLmVWLmVZRVZR3)
 
 
@@ -28619,7 +27154,7 @@ Call CouplingcVWLmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2
 cplcVWRmVWRmVZRVZR1 = 0._dp 
 cplcVWRmVWRmVZRVZR2 = 0._dp 
 cplcVWRmVWRmVZRVZR3 = 0._dp 
-Call CouplingcVWRmVWRmVZRVZRL(g2,ZZ,PhiW,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,     & 
+Call CouplingcVWRmVWRmVZRVZRL(g2,TW,PhiW,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,     & 
 & cplcVWRmVWRmVZRVZR3)
 
 
@@ -28627,7 +27162,7 @@ Call CouplingcVWRmVWRmVZRVZRL(g2,ZZ,PhiW,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2
 cplAhhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVPL(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVP(gt1,gt2))
+Call CouplingAhhhVPL(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -28637,7 +27172,7 @@ cplcFdFdVPL = 0._dp
 cplcFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVPL(gt1,gt2,gBL,g2,ZZ,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
+Call CouplingcFdFdVPL(gt1,gt2,gBL,g2,TW,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28647,7 +27182,7 @@ cplcFeFeVPL = 0._dp
 cplcFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVPL(gt1,gt2,gBL,g2,ZZ,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
+Call CouplingcFeFeVPL(gt1,gt2,gBL,g2,TW,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28657,7 +27192,7 @@ cplcFuFuVPL = 0._dp
 cplcFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVPL(gt1,gt2,gBL,g2,ZZ,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
+Call CouplingcFuFuVPL(gt1,gt2,gBL,g2,TW,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -28667,46 +27202,46 @@ cplFvFvVPL = 0._dp
 cplFvFvVPR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVPL(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
+Call CouplingFvFvVPL(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
 
  End Do 
 End Do 
 
 
 cplcgWLmgWLmVP = 0._dp 
-Call CouplingcgWLmgWLmVPL(g2,ZZ,PhiW,cplcgWLmgWLmVP)
+Call CouplingcgWLmgWLmVPL(g2,TW,PhiW,cplcgWLmgWLmVP)
 
 
 
 cplcgWRmgWLmVP = 0._dp 
-Call CouplingcgWRmgWLmVPL(g2,ZZ,PhiW,cplcgWRmgWLmVP)
+Call CouplingcgWRmgWLmVPL(g2,TW,PhiW,cplcgWRmgWLmVP)
 
 
 
 cplcgWLpgWLpVP = 0._dp 
-Call CouplingcgWLpgWLpVPL(g2,ZZ,PhiW,cplcgWLpgWLpVP)
+Call CouplingcgWLpgWLpVPL(g2,TW,PhiW,cplcgWLpgWLpVP)
 
 
 
 cplcgWRpgWLpVP = 0._dp 
-Call CouplingcgWRpgWLpVPL(g2,ZZ,PhiW,cplcgWRpgWLpVP)
+Call CouplingcgWRpgWLpVPL(g2,TW,PhiW,cplcgWRpgWLpVP)
 
 
 
 cplcgWRmgWRmVP = 0._dp 
-Call CouplingcgWRmgWRmVPL(g2,ZZ,PhiW,cplcgWRmgWRmVP)
+Call CouplingcgWRmgWRmVPL(g2,TW,PhiW,cplcgWRmgWRmVP)
 
 
 
 cplcgWRpgWRpVP = 0._dp 
-Call CouplingcgWRpgWRpVPL(g2,ZZ,PhiW,cplcgWRpgWRpVP)
+Call CouplingcgWRpgWRpVPL(g2,TW,PhiW,cplcgWRpgWRpVP)
 
 
 
 cplHpmcHpmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVP(gt1,gt2))
+Call CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -28714,37 +27249,37 @@ End Do
 
 cplHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWLm(gt1))
+Call CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWLm(gt1))
 
 End Do 
 
 
 cplHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWRm(gt1))
+Call CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWRm(gt1))
 
 End Do 
 
 
 cplcVWLmVPVWLm = 0._dp 
-Call CouplingcVWLmVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVWLm)
+Call CouplingcVWLmVPVWLmL(g2,TW,PhiW,cplcVWLmVPVWLm)
 
 
 
 cplcVWRmVPVWLm = 0._dp 
-Call CouplingcVWRmVPVWLmL(g2,ZZ,PhiW,cplcVWRmVPVWLm)
+Call CouplingcVWRmVPVWLmL(g2,TW,PhiW,cplcVWRmVPVWLm)
 
 
 
 cplcVWRmVPVWRm = 0._dp 
-Call CouplingcVWRmVPVWRmL(g2,ZZ,PhiW,cplcVWRmVPVWRm)
+Call CouplingcVWRmVPVWRmL(g2,TW,PhiW,cplcVWRmVPVWRm)
 
 
 
 cplAhAhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVPL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVP(gt1,gt2))
+Call CouplingAhAhVPVPL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -28753,7 +27288,7 @@ End Do
 cplhhhhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVP(gt1,gt2))
+Call CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -28762,7 +27297,7 @@ End Do
 cplHpmcHpmVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVP(gt1,gt2))
+Call CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -28771,7 +27306,7 @@ End Do
 cplcVWLmVPVPVWLm1 = 0._dp 
 cplcVWLmVPVPVWLm2 = 0._dp 
 cplcVWLmVPVPVWLm3 = 0._dp 
-Call CouplingcVWLmVPVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
+Call CouplingcVWLmVPVPVWLmL(g2,TW,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
 & cplcVWLmVPVPVWLm3)
 
 
@@ -28779,7 +27314,7 @@ Call CouplingcVWLmVPVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,     
 cplcVWRmVPVPVWRm1 = 0._dp 
 cplcVWRmVPVPVWRm2 = 0._dp 
 cplcVWRmVPVPVWRm3 = 0._dp 
-Call CouplingcVWRmVPVPVWRmL(g2,ZZ,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
+Call CouplingcVWRmVPVPVWRmL(g2,TW,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
 & cplcVWRmVPVPVWRm3)
 
 
@@ -28823,62 +27358,52 @@ End Do
 
 
 cplcgWLpgPcVWLm = 0._dp 
-Call CouplingcgWLpgPcVWLmL(g2,ZZ,PhiW,cplcgWLpgPcVWLm)
+Call CouplingcgWLpgPcVWLmL(g2,TW,PhiW,cplcgWLpgPcVWLm)
 
 
 
 cplcgWRpgPcVWLm = 0._dp 
-Call CouplingcgWRpgPcVWLmL(g2,ZZ,PhiW,cplcgWRpgPcVWLm)
+Call CouplingcgWRpgPcVWLmL(g2,TW,PhiW,cplcgWRpgPcVWLm)
 
 
 
 cplcgPgWLmcVWLm = 0._dp 
-Call CouplingcgPgWLmcVWLmL(g2,ZZ,PhiW,cplcgPgWLmcVWLm)
+Call CouplingcgPgWLmcVWLmL(g2,TW,PhiW,cplcgPgWLmcVWLm)
 
 
 
 cplcgZgWLmcVWLm = 0._dp 
-Call CouplingcgZgWLmcVWLmL(g2,ZZ,PhiW,cplcgZgWLmcVWLm)
+Call CouplingcgZgWLmcVWLmL(g2,TW,cplcgZgWLmcVWLm)
 
 
 
 cplcgZpgWLmcVWLm = 0._dp 
-Call CouplingcgZpgWLmcVWLmL(g2,ZZ,PhiW,cplcgZpgWLmcVWLm)
+Call CouplingcgZpgWLmcVWLmL(g2,TW,PhiW,cplcgZpgWLmcVWLm)
 
 
 
 cplcgPgWRmcVWLm = 0._dp 
-Call CouplingcgPgWRmcVWLmL(g2,ZZ,PhiW,cplcgPgWRmcVWLm)
-
-
-
-cplcgZgWRmcVWLm = 0._dp 
-Call CouplingcgZgWRmcVWLmL(g2,ZZ,PhiW,cplcgZgWRmcVWLm)
+Call CouplingcgPgWRmcVWLmL(g2,TW,PhiW,cplcgPgWRmcVWLm)
 
 
 
 cplcgZpgWRmcVWLm = 0._dp 
-Call CouplingcgZpgWRmcVWLmL(g2,ZZ,PhiW,cplcgZpgWRmcVWLm)
+Call CouplingcgZpgWRmcVWLmL(g2,TW,PhiW,cplcgZpgWRmcVWLm)
 
 
 
 cplcgWLpgZcVWLm = 0._dp 
-Call CouplingcgWLpgZcVWLmL(g2,ZZ,PhiW,cplcgWLpgZcVWLm)
-
-
-
-cplcgWRpgZcVWLm = 0._dp 
-Call CouplingcgWRpgZcVWLmL(g2,ZZ,PhiW,cplcgWRpgZcVWLm)
+Call CouplingcgWLpgZcVWLmL(g2,TW,cplcgWLpgZcVWLm)
 
 
 
 cplcgWLpgZpcVWLm = 0._dp 
-Call CouplingcgWLpgZpcVWLmL(g2,ZZ,PhiW,cplcgWLpgZpcVWLm)
+Call CouplingcgWLpgZpcVWLmL(g2,TW,PhiW,cplcgWLpgZpcVWLm)
 
 
 
 cplcgWRpgZpcVWLm = 0._dp 
-Call CouplingcgWRpgZpcVWLmL(g2,ZZ,PhiW,cplcgWRpgZpcVWLm)
+Call CouplingcgWRpgZpcVWLmL(g2,TW,PhiW,cplcgWRpgZpcVWLm)
 
 
 
@@ -28907,36 +27432,31 @@ End Do
 
 cplcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVP(gt1))
+Call CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVP(gt1))
 
 End Do 
 
 
 cplcVWLmVPVWRm = 0._dp 
-Call CouplingcVWLmVPVWRmL(g2,ZZ,PhiW,cplcVWLmVPVWRm)
-
-
-
-cplcVWLmVWRmVZ = 0._dp 
-Call CouplingcVWLmVWRmVZL(g2,ZZ,PhiW,cplcVWLmVWRmVZ)
+Call CouplingcVWLmVPVWRmL(g2,TW,PhiW,cplcVWLmVPVWRm)
 
 
 
 cplcVWLmVWRmVZR = 0._dp 
-Call CouplingcVWLmVWRmVZRL(g2,ZZ,PhiW,cplcVWLmVWRmVZR)
+Call CouplingcVWLmVWRmVZRL(g2,TW,PhiW,cplcVWLmVWRmVZR)
 
 
 
 cplcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZ(gt1))
+Call CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZR(gt1))
+Call CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZR(gt1))
 
 End Do 
 
@@ -29023,62 +27543,52 @@ End Do
 
 
 cplcgWLpgPcVWRm = 0._dp 
-Call CouplingcgWLpgPcVWRmL(g2,ZZ,PhiW,cplcgWLpgPcVWRm)
+Call CouplingcgWLpgPcVWRmL(g2,TW,PhiW,cplcgWLpgPcVWRm)
 
 
 
 cplcgWRpgPcVWRm = 0._dp 
-Call CouplingcgWRpgPcVWRmL(g2,ZZ,PhiW,cplcgWRpgPcVWRm)
+Call CouplingcgWRpgPcVWRmL(g2,TW,PhiW,cplcgWRpgPcVWRm)
 
 
 
 cplcgPgWLmcVWRm = 0._dp 
-Call CouplingcgPgWLmcVWRmL(g2,ZZ,PhiW,cplcgPgWLmcVWRm)
-
-
-
-cplcgZgWLmcVWRm = 0._dp 
-Call CouplingcgZgWLmcVWRmL(g2,ZZ,PhiW,cplcgZgWLmcVWRm)
+Call CouplingcgPgWLmcVWRmL(g2,TW,PhiW,cplcgPgWLmcVWRm)
 
 
 
 cplcgZpgWLmcVWRm = 0._dp 
-Call CouplingcgZpgWLmcVWRmL(g2,ZZ,PhiW,cplcgZpgWLmcVWRm)
+Call CouplingcgZpgWLmcVWRmL(g2,TW,PhiW,cplcgZpgWLmcVWRm)
 
 
 
 cplcgPgWRmcVWRm = 0._dp 
-Call CouplingcgPgWRmcVWRmL(g2,ZZ,PhiW,cplcgPgWRmcVWRm)
+Call CouplingcgPgWRmcVWRmL(g2,TW,PhiW,cplcgPgWRmcVWRm)
 
 
 
 cplcgZgWRmcVWRm = 0._dp 
-Call CouplingcgZgWRmcVWRmL(g2,ZZ,PhiW,cplcgZgWRmcVWRm)
+Call CouplingcgZgWRmcVWRmL(g2,TW,cplcgZgWRmcVWRm)
 
 
 
 cplcgZpgWRmcVWRm = 0._dp 
-Call CouplingcgZpgWRmcVWRmL(g2,ZZ,PhiW,cplcgZpgWRmcVWRm)
-
-
-
-cplcgWLpgZcVWRm = 0._dp 
-Call CouplingcgWLpgZcVWRmL(g2,ZZ,PhiW,cplcgWLpgZcVWRm)
+Call CouplingcgZpgWRmcVWRmL(g2,TW,PhiW,cplcgZpgWRmcVWRm)
 
 
 
 cplcgWRpgZcVWRm = 0._dp 
-Call CouplingcgWRpgZcVWRmL(g2,ZZ,PhiW,cplcgWRpgZcVWRm)
+Call CouplingcgWRpgZcVWRmL(g2,TW,cplcgWRpgZcVWRm)
 
 
 
 cplcgWLpgZpcVWRm = 0._dp 
-Call CouplingcgWLpgZpcVWRmL(g2,ZZ,PhiW,cplcgWLpgZpcVWRm)
+Call CouplingcgWLpgZpcVWRmL(g2,TW,PhiW,cplcgWLpgZpcVWRm)
 
 
 
 cplcgWRpgZpcVWRm = 0._dp 
-Call CouplingcgWRpgZpcVWRmL(g2,ZZ,PhiW,cplcgWRpgZpcVWRm)
+Call CouplingcgWRpgZpcVWRmL(g2,TW,PhiW,cplcgWRpgZpcVWRm)
 
 
 
@@ -29107,21 +27617,21 @@ End Do
 
 cplcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVP(gt1))
+Call CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZ(gt1))
+Call CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZR(gt1))
+Call CouplingcHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZR(gt1))
 
 End Do 
 
@@ -29161,30 +27671,10 @@ Call CouplingcVWRmcVWRmVWRmVWRmL(g2,PhiW,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWR
 
 
 
-cplcgWLmgWRmVZR = 0._dp 
-Call CouplingcgWLmgWRmVZRL(g2,ZZ,PhiW,cplcgWLmgWRmVZR)
-
-
-
-cplcgWLpgWRpVZR = 0._dp 
-Call CouplingcgWLpgWRpVZRL(g2,ZZ,PhiW,cplcgWLpgWRpVZR)
-
-
-
-cplcgWLmgWRmVZ = 0._dp 
-Call CouplingcgWLmgWRmVZL(g2,ZZ,PhiW,cplcgWLmgWRmVZ)
-
-
-
-cplcgWLpgWRpVZ = 0._dp 
-Call CouplingcgWLpgWRpVZL(g2,ZZ,PhiW,cplcgWLpgWRpVZ)
-
-
-
 cplAhAhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZR(gt1,gt2))
+Call CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29193,7 +27683,7 @@ End Do
 cplhhhhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZR(gt1,gt2))
+Call CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29202,7 +27692,7 @@ End Do
 cplHpmcHpmVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZR(gt1,gt2))
+Call CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29211,7 +27701,7 @@ End Do
 cplcVWLmVWLmVZVZR1 = 0._dp 
 cplcVWLmVWLmVZVZR2 = 0._dp 
 cplcVWLmVWLmVZVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
+Call CouplingcVWLmVWLmVZVZRL(g2,TW,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
 & cplcVWLmVWLmVZVZR3)
 
 
@@ -29219,25 +27709,15 @@ Call CouplingcVWLmVWLmVZVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,  
 cplcVWRmVWRmVZVZR1 = 0._dp 
 cplcVWRmVWRmVZVZR2 = 0._dp 
 cplcVWRmVWRmVZVZR3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZRL(g2,ZZ,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
+Call CouplingcVWRmVWRmVZVZRL(g2,TW,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
 & cplcVWRmVWRmVZVZR3)
-
-
-
-cplcgWLmgWRmVP = 0._dp 
-Call CouplingcgWLmgWRmVPL(g2,ZZ,PhiW,cplcgWLmgWRmVP)
-
-
-
-cplcgWLpgWRpVP = 0._dp 
-Call CouplingcgWLpgWRpVPL(g2,ZZ,PhiW,cplcgWLpgWRpVP)
 
 
 
 cplAhAhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZ(gt1,gt2))
+Call CouplingAhAhVPVZL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -29246,7 +27726,7 @@ End Do
 cplhhhhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZ(gt1,gt2))
+Call CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -29255,7 +27735,7 @@ End Do
 cplHpmcHpmVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZ(gt1,gt2))
+Call CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -29264,7 +27744,7 @@ End Do
 cplcVWLmVPVWLmVZ1 = 0._dp 
 cplcVWLmVPVWLmVZ2 = 0._dp 
 cplcVWLmVPVWLmVZ3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
+Call CouplingcVWLmVPVWLmVZL(g2,TW,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
 & cplcVWLmVPVWLmVZ3)
 
 
@@ -29272,15 +27752,35 @@ Call CouplingcVWLmVPVWLmVZL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,     
 cplcVWRmVPVWRmVZ1 = 0._dp 
 cplcVWRmVPVWRmVZ2 = 0._dp 
 cplcVWRmVPVWRmVZ3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZL(g2,ZZ,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
+Call CouplingcVWRmVPVWRmVZL(g2,TW,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
 & cplcVWRmVPVWRmVZ3)
+
+
+
+cplcgWLmgWRmVP = 0._dp 
+Call CouplingcgWLmgWRmVPL(g2,TW,PhiW,cplcgWLmgWRmVP)
+
+
+
+cplcgWLpgWRpVP = 0._dp 
+Call CouplingcgWLpgWRpVPL(g2,TW,PhiW,cplcgWLpgWRpVP)
+
+
+
+cplcgWLmgWRmVZR = 0._dp 
+Call CouplingcgWLmgWRmVZRL(g2,TW,PhiW,cplcgWLmgWRmVZR)
+
+
+
+cplcgWLpgWRpVZR = 0._dp 
+Call CouplingcgWLpgWRpVZRL(g2,TW,PhiW,cplcgWLpgWRpVZR)
 
 
 
 cplAhAhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZR(gt1,gt2))
+Call CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29289,7 +27789,7 @@ End Do
 cplhhhhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZR(gt1,gt2))
+Call CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29298,7 +27798,7 @@ End Do
 cplHpmcHpmVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZR(gt1,gt2))
+Call CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -29307,7 +27807,7 @@ End Do
 cplcVWLmVPVWLmVZR1 = 0._dp 
 cplcVWLmVPVWLmVZR2 = 0._dp 
 cplcVWLmVPVWLmVZR3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
+Call CouplingcVWLmVPVWLmVZRL(g2,TW,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
 & cplcVWLmVPVWLmVZR3)
 
 
@@ -29315,7 +27815,7 @@ Call CouplingcVWLmVPVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,  
 cplcVWRmVPVWRmVZR1 = 0._dp 
 cplcVWRmVPVWRmVZR2 = 0._dp 
 cplcVWRmVPVWRmVZR3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZRL(g2,ZZ,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
+Call CouplingcVWRmVPVWRmVZRL(g2,TW,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
 & cplcVWRmVPVWRmVZR3)
 
 
@@ -29352,62 +27852,42 @@ End Do
 
 
 cplcgWLmgPVWLm = 0._dp 
-Call CouplingcgWLmgPVWLmL(g2,ZZ,PhiW,cplcgWLmgPVWLm)
+Call CouplingcgWLmgPVWLmL(g2,TW,PhiW,cplcgWLmgPVWLm)
 
 
 
 cplcgWRmgPVWLm = 0._dp 
-Call CouplingcgWRmgPVWLmL(g2,ZZ,PhiW,cplcgWRmgPVWLm)
+Call CouplingcgWRmgPVWLmL(g2,TW,PhiW,cplcgWRmgPVWLm)
 
 
 
 cplcgPgWLpVWLm = 0._dp 
-Call CouplingcgPgWLpVWLmL(g2,ZZ,PhiW,cplcgPgWLpVWLm)
-
-
-
-cplcgZgWLpVWLm = 0._dp 
-Call CouplingcgZgWLpVWLmL(g2,ZZ,PhiW,cplcgZgWLpVWLm)
+Call CouplingcgPgWLpVWLmL(g2,TW,PhiW,cplcgPgWLpVWLm)
 
 
 
 cplcgZpgWLpVWLm = 0._dp 
-Call CouplingcgZpgWLpVWLmL(g2,ZZ,PhiW,cplcgZpgWLpVWLm)
+Call CouplingcgZpgWLpVWLmL(g2,TW,PhiW,cplcgZpgWLpVWLm)
 
 
 
 cplcgPgWRpVWLm = 0._dp 
-Call CouplingcgPgWRpVWLmL(g2,ZZ,PhiW,cplcgPgWRpVWLm)
-
-
-
-cplcgZgWRpVWLm = 0._dp 
-Call CouplingcgZgWRpVWLmL(g2,ZZ,PhiW,cplcgZgWRpVWLm)
+Call CouplingcgPgWRpVWLmL(g2,TW,PhiW,cplcgPgWRpVWLm)
 
 
 
 cplcgZpgWRpVWLm = 0._dp 
-Call CouplingcgZpgWRpVWLmL(g2,ZZ,PhiW,cplcgZpgWRpVWLm)
-
-
-
-cplcgWLmgZVWLm = 0._dp 
-Call CouplingcgWLmgZVWLmL(g2,ZZ,PhiW,cplcgWLmgZVWLm)
-
-
-
-cplcgWRmgZVWLm = 0._dp 
-Call CouplingcgWRmgZVWLmL(g2,ZZ,PhiW,cplcgWRmgZVWLm)
+Call CouplingcgZpgWRpVWLmL(g2,TW,PhiW,cplcgZpgWRpVWLm)
 
 
 
 cplcgWLmgZpVWLm = 0._dp 
-Call CouplingcgWLmgZpVWLmL(g2,ZZ,PhiW,cplcgWLmgZpVWLm)
+Call CouplingcgWLmgZpVWLmL(g2,TW,PhiW,cplcgWLmgZpVWLm)
 
 
 
 cplcgWRmgZpVWLm = 0._dp 
-Call CouplingcgWRmgZpVWLmL(g2,ZZ,PhiW,cplcgWRmgZpVWLm)
+Call CouplingcgWRmgZpVWLmL(g2,TW,PhiW,cplcgWRmgZpVWLm)
 
 
 
@@ -29450,7 +27930,7 @@ End Do
 cplcVWRmVPVPVWLm1 = 0._dp 
 cplcVWRmVPVPVWLm2 = 0._dp 
 cplcVWRmVPVPVWLm3 = 0._dp 
-Call CouplingcVWRmVPVPVWLmL(g2,ZZ,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
+Call CouplingcVWRmVPVPVWLmL(g2,TW,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
 & cplcVWRmVPVPVWLm3)
 
 
@@ -29471,18 +27951,10 @@ Call CouplingcVWRmcVWRmVWLmVWRmL(g2,PhiW,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWL
 
 
 
-cplcVWRmVWLmVZVZ1 = 0._dp 
-cplcVWRmVWLmVZVZ2 = 0._dp 
-cplcVWRmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWLmVZVZL(g2,ZZ,PhiW,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
-& cplcVWRmVWLmVZVZ3)
-
-
-
 cplcVWRmVWLmVZRVZR1 = 0._dp 
 cplcVWRmVWLmVZRVZR2 = 0._dp 
 cplcVWRmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWRmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
+Call CouplingcVWRmVWLmVZRVZRL(g2,TW,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
 & cplcVWRmVWLmVZRVZR3)
 
 
@@ -29663,14 +28135,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhUhhcHpmL  
  
  
-Subroutine CouplingAhUhhVPL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhUhhVPL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -29696,28 +28166,19 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt2)) Then 
-res = res+(g2*UP(gt1,1)*ZZ(1,3))/2._dp
+res = res+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,1))/2._dp
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UP(gt1,2)*ZZ(1,3))/2._dp
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,2))
 End If 
 If ((3.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZZ(1,3))
-End If 
-If ((1.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZZ(2,3))
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UP(gt1,3)*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,3))
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(g2*UP(gt1,4)*ZZ(2,3))/2._dp
-End If 
-If ((2.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZZ(3,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,4))
 End If 
 If ((4.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZZ(3,3))
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,4))
 End If 
 res = -(0.,1.)*res 
  
@@ -29732,14 +28193,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhUhhVPL  
  
  
-Subroutine CouplingAhUhhVZL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhUhhVZL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -29764,29 +28223,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt2)) Then 
-res = res+(g2*UP(gt1,1)*ZZ(1,1))/2._dp
+If ((2.eq.gt2)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,2))
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UP(gt1,2)*ZZ(1,1))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZZ(1,1))
-End If 
-If ((1.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZZ(2,1))
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UP(gt1,3)*ZZ(2,1))/2._dp
+res = res+(g2*Sin(TW)*UP(gt1,2))/2._dp
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(g2*UP(gt1,4)*ZZ(2,1))/2._dp
-End If 
-If ((2.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZZ(3,1))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,4))
 End If 
 If ((4.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZZ(3,1))
+res = res+(g2*Sin(TW)*UP(gt1,4))/2._dp
 End If 
 res = -(0.,1.)*res 
  
@@ -29801,14 +28248,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhUhhVZL  
  
  
-Subroutine CouplingAhUhhVZRL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhUhhVZRL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -29834,28 +28279,28 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt2)) Then 
-res = res+(g2*UP(gt1,1)*ZZ(1,2))/2._dp
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*UP(gt1,1))
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UP(gt1,2)*ZZ(1,2))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZZ(1,2))
-End If 
-If ((1.eq.gt2)) Then 
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZZ(2,2))
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UP(gt1,3)*ZZ(2,2))/2._dp
-End If 
-If ((4.eq.gt2)) Then 
-res = res+(g2*UP(gt1,4)*ZZ(2,2))/2._dp
+res = res-1._dp/4._dp*(g2*1/Cos(TW)*UP(gt1,2))
 End If 
 If ((2.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,2))
+End If 
+If ((2.eq.gt2)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,2))
+End If 
+If ((3.eq.gt2)) Then 
+res = res+(g2*1/Cos(TW)*UP(gt1,3))/2._dp
 End If 
 If ((4.eq.gt2)) Then 
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZZ(3,2))
+res = res+(g2*1/Cos(TW)*UP(gt1,4))/4._dp
+End If 
+If ((4.eq.gt2)) Then 
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,4))
+End If 
+If ((4.eq.gt2)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4))
 End If 
 res = -(0.,1.)*res 
  
@@ -30562,14 +29007,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpUhhL  
  
  
-Subroutine CouplingcgZgZUhhL(gt3,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingcgZgZUhhL(gt3,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -30586,47 +29029,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZZ(1,1))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZZ(1,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZZ(1,1)**2)
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZZ(2,1))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/8._dp*(g2**2*vR*RXiZ)
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(2,1))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZ)/8._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*ZZ(1,1)*ZZ(2,1))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZZ(2,1)**2)
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZ)
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZZ(2,1)**2)
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(3,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(3,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZ*ZZ(2,1)*ZZ(3,1))/4._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZ*ZZ(3,1)**2)
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -30639,14 +29052,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgZUhhL  
  
  
-Subroutine CouplingcgZpgZUhhL(gt3,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingcgZpgZUhhL(gt3,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -30663,53 +29074,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZZ(1,1))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZZ(1,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZZ(1,1)*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZZ(2,1))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/8._dp*(g2**2*vR*RXiZR*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(2,1))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW))/8._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*ZZ(1,2)*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*ZZ(1,1)*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZZ(2,1)*ZZ(2,2))
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*RXiZR*ZZ(2,1)*ZZ(2,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(3,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(3,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZR*ZZ(2,2)*ZZ(3,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZR*ZZ(2,1)*ZZ(3,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZR*ZZ(3,1)*ZZ(3,2))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -30722,14 +29097,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgZUhhL  
  
  
-Subroutine CouplingcgZgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingcgZgZpUhhL(gt3,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -30746,53 +29119,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZZ(1,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZZ(1,1)*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*ZZ(1,2)*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*ZZ(2,2))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/8._dp*(g2**2*vR*RXiZ*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(2,2))
+res = res+(g2**2*vR*Cos(2._dp*(TW))*RXiZ*Tan(TW))/8._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*ZZ(1,1)*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*ZZ(2,1)*ZZ(2,2))
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZ*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*RXiZ*ZZ(2,1)*ZZ(2,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZ*ZZ(2,2)*ZZ(3,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(2,1))*RXiZ*ZZ(3,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,1))*RXiZ*ZZ(3,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZ*ZZ(2,1)*ZZ(3,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZ*ZZ(3,1)*ZZ(3,2))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW)*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -30805,14 +29142,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgZpUhhL  
  
  
-Subroutine CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -30830,46 +29165,16 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZZ(1,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZZ(1,2)**2)
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*ZZ(2,2))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)**2)
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(2,2))
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))*RXiZR*Tan(TW)**2)
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*ZZ(1,2)*ZZ(2,2))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*ZZ(2,2)**2)
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*vR*RXiZR*ZZ(2,2)**2)
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*Conjg(ZZ(2,2))*RXiZR*ZZ(3,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*Conjg(ZZ(3,2))*RXiZR*ZZ(3,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2*gBL*vR*RXiZR*ZZ(2,2)*ZZ(3,2))/4._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(gBL**2*vR*RXiZR*ZZ(3,2)**2)
+res = res-1._dp/4._dp*(g2**2*vR*RXiZR*Sin(TW)**2*Tan(TW)**2)
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -31407,14 +29712,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhHpmVWRmL  
  
  
-Subroutine CouplingUhhVPVZL(gt1,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingUhhVPVZL(gt1,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -31431,29 +29734,17 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(1,1)*ZZ(1,3))/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,3)*ZZ(2,1))
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,1)*ZZ(2,3))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(2,1)*ZZ(2,3))/2._dp
+If ((4.eq.gt1)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*1/Cos(TW))
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2**2*vR*ZZ(2,1)*ZZ(2,3))/2._dp
+res = res+(3*g2*gBL*vR*Cos(2._dp*(TW))*1/Cos(TW))/4._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,3)*ZZ(3,1))
+res = res-1._dp/2._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,1)*ZZ(3,3))
-End If 
-If ((4.eq.gt1)) Then 
-res = res+(gBL**2*vR*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -31466,14 +29757,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhVPVZL  
  
  
-Subroutine CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -31491,28 +29780,25 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(1,2)*ZZ(1,3))/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,3)*ZZ(2,2))
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,2)*ZZ(2,3))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(2,2)*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2)
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2**2*vR*ZZ(2,2)*ZZ(2,3))/2._dp
+res = res-1._dp/4._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2)
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,3)*ZZ(3,2))
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2)/4._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,2)*ZZ(3,3))
+res = res+(g2**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2)/4._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(gBL**2*vR*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2)
+End If 
+If ((4.eq.gt1)) Then 
+res = res+(3*g2*gBL*vR*1/Cos(TW)**2*Sin(3._dp*(TW)))/8._dp
+End If 
+If ((4.eq.gt1)) Then 
+res = res+(-5*g2*gBL*vR*1/Cos(TW)*Tan(TW))/8._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -31648,14 +29934,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhcVWRmVWRmL  
  
  
-Subroutine CouplingUhhVZVZL(gt1,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingUhhVZVZL(gt1,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -31672,23 +29956,17 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(1,1)**2)/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-(g2**2*k1*ZZ(1,1)*ZZ(2,1))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(2,1)**2)/2._dp
+If ((4.eq.gt1)) Then 
+res = res+(g2**2*vR)/4._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2**2*vR*ZZ(2,1)**2)/2._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW)))
 End If 
 If ((4.eq.gt1)) Then 
-res = res-(g2*gBL*vR*ZZ(2,1)*ZZ(3,1))
+res = res+(gBL**2*vR*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(gBL**2*vR*ZZ(3,1)**2)/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -31701,14 +29979,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhVZVZL  
  
  
-Subroutine CouplingUhhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingUhhVZVZRL(gt1,gBL,g2,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -31725,29 +30001,17 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(1,1)*ZZ(1,2))/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,2)*ZZ(2,1))
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*ZZ(1,1)*ZZ(2,2))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(2,1)*ZZ(2,2))/2._dp
+If ((4.eq.gt1)) Then 
+res = res+(g2**2*vR*Tan(TW))/4._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2**2*vR*ZZ(2,1)*ZZ(2,2))/2._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW))*Tan(TW))
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,2)*ZZ(3,1))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*gBL*vR*ZZ(2,1)*ZZ(3,2))
-End If 
-If ((4.eq.gt1)) Then 
-res = res+(gBL**2*vR*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -31760,14 +30024,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhVZVZRL  
  
  
-Subroutine CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,ZZ,res)
+Subroutine CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -31785,22 +30047,16 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(1,2)**2)/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-(g2**2*k1*ZZ(1,2)*ZZ(2,2))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2**2*k1*ZZ(2,2)**2)/2._dp
+res = res+(g2**2*k1*1/Cos(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2**2*vR*ZZ(2,2)**2)/2._dp
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res-(g2*gBL*vR*ZZ(2,2)*ZZ(3,2))
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2)
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(gBL**2*vR*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*vR*Sin(TW)**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -32599,14 +30855,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhUhhHpmcHpmL  
  
  
-Subroutine CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -32632,40 +30886,22 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,3)*ZZ(2,3))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,3)*ZZ(2,3))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,3)*ZZ(3,3))
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,3)*ZZ(3,3))
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -32808,14 +31044,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhUhhcVWRmVWRmL  
  
  
-Subroutine CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -32840,41 +31074,29 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
+If ((2.eq.gt1).And.(2.eq.gt2)) Then 
+res = res+g2**2/4._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,1)*ZZ(2,1))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,1)*ZZ(2,1))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW)))
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,1)*ZZ(3,1))
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,1)*ZZ(3,1))
+res = res+g2**2/4._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW)))
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -32887,14 +31109,12 @@ Iname = Iname - 1
 End Subroutine CouplingUhhUhhVZVZL  
  
  
-Subroutine CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -32919,41 +31139,35 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
-End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,2)*ZZ(2,2))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,2)*ZZ(2,2))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2)/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,2)*ZZ(3,2))
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)
 End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,2)*ZZ(3,2))
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+g2**2*Sin(TW)**2
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2)
+End If 
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -33918,14 +32132,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhhhcHpmL  
  
  
-Subroutine CouplingUAhhhVPL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplingUAhhhVPL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -33951,28 +32163,19 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,1)*ZZ(1,3))/2._dp
+res = res+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZH(gt2,1))/2._dp
 End If 
 If ((2.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,2)*ZZ(1,3))/2._dp
+res = res-1._dp/2._dp*(gBL*Tan(TW)*ZH(gt2,2))
 End If 
 If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,3)*ZZ(1,3))
-End If 
-If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,1)*ZZ(2,3))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,3)*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZH(gt2,3))
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,4)*ZZ(2,3))/2._dp
-End If 
-If ((2.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,2)*ZZ(3,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZH(gt2,4))
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,4)*ZZ(3,3))
+res = res-1._dp/2._dp*(gBL*Tan(TW)*ZH(gt2,4))
 End If 
 res = -(0.,1.)*res 
  
@@ -33987,14 +32190,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhhhVPL  
  
  
-Subroutine CouplingUAhhhVZL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplingUAhhhVZL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -34019,29 +32220,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,1)*ZZ(1,1))/2._dp
+If ((2.eq.gt1)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*ZH(gt2,2))
 End If 
 If ((2.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,2)*ZZ(1,1))/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,3)*ZZ(1,1))
-End If 
-If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,1)*ZZ(2,1))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,3)*ZZ(2,1))/2._dp
+res = res+(g2*Sin(TW)*ZH(gt2,2))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,4)*ZZ(2,1))/2._dp
-End If 
-If ((2.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,2)*ZZ(3,1))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*ZH(gt2,4))
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,4)*ZZ(3,1))
+res = res+(g2*Sin(TW)*ZH(gt2,4))/2._dp
 End If 
 res = -(0.,1.)*res 
  
@@ -34056,14 +32245,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhhhVZL  
  
  
-Subroutine CouplingUAhhhVZRL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplingUAhhhVZRL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -34089,28 +32276,28 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,1)*ZZ(1,2))/2._dp
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*ZH(gt2,1))
 End If 
 If ((2.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,2)*ZZ(1,2))/2._dp
-End If 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,3)*ZZ(1,2))
-End If 
-If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2*ZH(gt2,1)*ZZ(2,2))
-End If 
-If ((3.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,3)*ZZ(2,2))/2._dp
-End If 
-If ((4.eq.gt1)) Then 
-res = res+(g2*ZH(gt2,4)*ZZ(2,2))/2._dp
+res = res-1._dp/4._dp*(g2*1/Cos(TW)*ZH(gt2,2))
 End If 
 If ((2.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,2)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt2,2))
+End If 
+If ((2.eq.gt1)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt2,2))
+End If 
+If ((3.eq.gt1)) Then 
+res = res+(g2*1/Cos(TW)*ZH(gt2,3))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res-1._dp/2._dp*(gBL*ZH(gt2,4)*ZZ(3,2))
+res = res+(g2*1/Cos(TW)*ZH(gt2,4))/4._dp
+End If 
+If ((4.eq.gt1)) Then 
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt2,4))
+End If 
+If ((4.eq.gt1)) Then 
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt2,4))
 End If 
 res = -(0.,1.)*res 
  
@@ -35195,14 +33382,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhUAhHpmcHpmL  
  
  
-Subroutine CouplingUAhUAhVPVPL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUAhUAhVPVPL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -35228,40 +33413,22 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,3)*ZZ(2,3))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,3)*ZZ(2,3))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,3)*ZZ(3,3))
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,3)*ZZ(3,3))
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -35404,14 +33571,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhUAhcVWRmVWRmL  
  
  
-Subroutine CouplingUAhUAhVZVZL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUAhUAhVZVZL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -35436,41 +33601,29 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
+If ((2.eq.gt1).And.(2.eq.gt2)) Then 
+res = res+g2**2/4._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,1)*ZZ(2,1))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,1)*ZZ(2,1))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW)))
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,1)*ZZ(3,1))
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,1)*ZZ(3,1))
+res = res+g2**2/4._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW)))
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -35483,14 +33636,12 @@ Iname = Iname - 1
 End Subroutine CouplingUAhUAhVZVZL  
  
  
-Subroutine CouplingUAhUAhVZRVZRL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUAhUAhVZRVZRL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -35515,41 +33666,35 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
-End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,2)*ZZ(2,2))
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res-(g2**2*ZZ(1,2)*ZZ(2,2))
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2)/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(1,2)*ZZ(3,2))
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)
 End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res-(g2*gBL*ZZ(2,2)*ZZ(3,2))
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+g2**2*Sin(TW)**2
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2)
+End If 
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36083,14 +34228,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFvcUHpmL  
  
  
-Subroutine CouplingcgZgWLpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZgWLpcUHpmL(gt3,gBL,g2,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36107,41 +34250,11 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(1,1))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(1,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*RXiZ*Sin(PhiW)*ZZ(2,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZ*Sin(PhiW)*ZZ(3,1))
+res = res+(g2**2*vR*RXiZ*Sin(PhiW)*Sin(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36154,14 +34267,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLpcUHpmL  
  
  
-Subroutine CouplingcgWLpgZUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36178,23 +34289,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiWLm)/4._dp
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWLm)/4._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*Sin(TW))/2._dp
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*ZZ(1,1))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*ZZ(2,1))/4._dp
+res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*Sin(TW))/2._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*ZZ(3,1))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36207,14 +34312,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZUHpmL  
  
  
-Subroutine CouplingcgZpgWLpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36232,40 +34335,16 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)/8._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW))/4._dp
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))/8._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(PhiW)*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(1,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(2,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*RXiZR*Sin(PhiW)*ZZ(2,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZR*Sin(PhiW)*ZZ(3,2))
+res = res+(g2**2*vR*RXiZR*Sin(PhiW)*Sin(TW)*Tan(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36278,14 +34357,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLpcUHpmL  
  
  
-Subroutine CouplingcgWLpgZpUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZpUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36303,22 +34380,16 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiWLm)/4._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWLm)/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW))
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*ZZ(1,2))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*ZZ(2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*ZZ(2,2))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*RXiWLm*Sin(PhiW)*ZZ(3,2))
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36331,14 +34402,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpUHpmL  
  
  
-Subroutine CouplingcgZgWRpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZgWRpcUHpmL(gt3,gBL,g2,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36355,41 +34424,11 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZ)
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiZ)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(1,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(1,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Cos(PhiW)*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZ*ZZ(3,1))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZ*Sin(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36402,14 +34441,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRpcUHpmL  
  
  
-Subroutine CouplingcgWRpgZUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36426,23 +34463,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(1,1))*RXiWRm*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiWRm*Sin(PhiW))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm)
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*ZZ(1,1))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*ZZ(2,1))/4._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*Sin(TW))/2._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*ZZ(2,1))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW))
 End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*ZZ(3,1))
+If ((1.eq.gt3)) Then 
+res = res-1._dp/2._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36455,14 +34486,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZUHpmL  
  
  
-Subroutine CouplingcgZpgWRpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36480,40 +34509,16 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiZR)
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(1,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(1,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(2,2))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Cos(PhiW)*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(2,2))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZR*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZR*ZZ(3,2))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZR*Sin(TW)*Tan(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36526,14 +34531,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRpcUHpmL  
  
  
-Subroutine CouplingcgWRpgZpUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZpUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36550,23 +34553,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(1,2))*RXiWRm*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiWRm*Sin(PhiW))
-End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*ZZ(1,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW))
 End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*ZZ(2,2))/4._dp
+If ((1.eq.gt3)) Then 
+res = res+(g2**2*k1*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*Sin(PhiW))/4._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*ZZ(2,2))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*RXiWRm*ZZ(3,2))
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36579,14 +34576,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZpUHpmL  
  
  
-Subroutine CouplingcgWLmgZcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36603,23 +34598,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiWLm*Sin(PhiW))/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*RXiWLm*Sin(PhiW))/4._dp
-End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,1))*RXiWLm*Sin(PhiW))
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiWLm*Sin(PhiW))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*ZZ(1,1))/4._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*Sin(TW))/2._dp
 End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*ZZ(2,1))/4._dp
+If ((3.eq.gt3)) Then 
+res = res+(g2**2*k1*RXiWLm*Sin(PhiW)*Sin(TW))/2._dp
+End If 
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36632,14 +34621,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZcUHpmL  
  
  
-Subroutine CouplingcgZgWLmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZgWLmUHpmL(gt3,gBL,g2,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36656,41 +34643,11 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*RXiZ*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(1,1))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(1,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*RXiZ*Sin(PhiW)*ZZ(2,1))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZ*Sin(PhiW)*ZZ(3,1))
+res = res+(g2**2*vR*RXiZ*Sin(PhiW)*Sin(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36703,14 +34660,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLmUHpmL  
  
  
-Subroutine CouplingcgWRmgZcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36727,23 +34682,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiWRm)/4._dp
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm)
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWRm)/4._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiWRm*Sin(TW))/2._dp
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiWRm)
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiWRm)
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*ZZ(1,1))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*ZZ(2,1))
+res = res-1._dp/2._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36756,14 +34705,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZcUHpmL  
  
  
-Subroutine CouplingcgZgWRmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZgWRmUHpmL(gt3,gBL,g2,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36780,41 +34727,11 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZ)
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,1))*Cos(PhiW)*RXiZ)/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,1))*Cos(PhiW)*RXiZ)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,1))*RXiZ*Sin(PhiW))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,1))*RXiZ*Sin(PhiW))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(1,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(1,1))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZ*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Cos(PhiW)*RXiZ*ZZ(2,1))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZ*Sin(PhiW)*ZZ(2,1))
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZ*ZZ(3,1))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZ*Sin(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36827,14 +34744,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRmUHpmL  
  
  
-Subroutine CouplingcgWLmgZpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36851,23 +34766,17 @@ If ((gt3.Lt.1).Or.(gt3.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiWLm*Sin(PhiW))/4._dp
+If ((1.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW))
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*RXiWLm*Sin(PhiW))/4._dp
+res = res-1._dp/4._dp*(g2**2*k1*Cos(2._dp*(TW))*RXiWLm*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,2))*RXiWLm*Sin(PhiW))
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiWLm*Sin(PhiW)*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiWLm*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*ZZ(1,2))/4._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiWLm*ZZ(2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*vR*RXiWLm*Sin(PhiW)*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36880,14 +34789,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZpcUHpmL  
  
  
-Subroutine CouplingcgZpgWLmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLmUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36905,40 +34812,16 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR)
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)/8._dp
+res = res+(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW))/4._dp
 End If 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))/8._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(PhiW)*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*RXiZR*Sin(PhiW))
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(1,2))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(1,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(2,2))
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*RXiZR*Sin(PhiW)*ZZ(2,2))/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*RXiZR*Sin(PhiW)*ZZ(3,2))
+res = res+(g2**2*vR*RXiZR*Sin(PhiW)*Sin(TW)*Tan(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -36951,14 +34834,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLmUHpmL  
  
  
-Subroutine CouplingcgWRmgZpcUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZpcUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -36976,22 +34857,16 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiWRm)/4._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWRm)/4._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiWRm)
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiWRm)
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*ZZ(1,2))
+res = res+(g2**2*k1*Cos(2._dp*(TW))*RXiWRm*1/Cos(TW)*Sin(PhiW))/4._dp
 End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/4._dp*(g2**2*k1*RXiWRm*Sin(PhiW)*ZZ(2,2))
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiWRm*Tan(TW))
+End If 
+If ((4.eq.gt3)) Then 
+res = res-1._dp/4._dp*(g2**2*vR*Cos(PhiW)*RXiWRm*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37004,14 +34879,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgZpcUHpmL  
  
  
-Subroutine CouplingcgZpgWRmUHpmL(gt3,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRmUHpmL(gt3,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt3
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37029,40 +34902,16 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*Cos(PhiW)*RXiZR)/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)
-End If 
-If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Conjg(ZZ(2,2))*Cos(PhiW)*RXiZR)/8._dp
-End If 
-If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Conjg(ZZ(3,2))*Cos(PhiW)*RXiZR)
+res = res-1._dp/4._dp*(g2**2*k1*Cos(PhiW)*RXiZR*1/Cos(TW))
 End If 
 If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*Conjg(ZZ(1,2))*RXiZR*Sin(PhiW))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Conjg(ZZ(2,2))*RXiZR*Sin(PhiW))
-End If 
-If ((3.eq.gt3)) Then 
-res = res+(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(1,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res+(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(1,2))/8._dp
-End If 
-If ((3.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*Cos(PhiW)*RXiZR*ZZ(2,2))
+res = res-1._dp/4._dp*(g2**2*k1*RXiZR*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res+(g2**2*vR*Cos(PhiW)*RXiZR*ZZ(2,2))/8._dp
-End If 
-If ((1.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2**2*k1*RXiZR*Sin(PhiW)*ZZ(2,2))
+res = res-1._dp/4._dp*(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*RXiZR*Tan(TW))
 End If 
 If ((4.eq.gt3)) Then 
-res = res-1._dp/8._dp*(g2*gBL*vR*Cos(PhiW)*RXiZR*ZZ(3,2))
+res = res+(g2**2*vR*Cos(PhiW)*RXiZR*Sin(TW)*Tan(TW))/4._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37485,14 +35334,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcUHpmcHpmL  
  
  
-Subroutine CouplingHpmcUHpmVPL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcUHpmVPL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37518,28 +35365,19 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(1,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1))
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UC(gt1,2)*ZZ(1,3))/2._dp
+res = res+(gBL*Tan(TW)*UC(gt1,2))/2._dp
 End If 
 If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(1,3))/2._dp
-End If 
-If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(2,3))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,3))
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(g2*UC(gt1,4)*ZZ(2,3))/2._dp
-End If 
-If ((2.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,4))
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res+(gBL*Tan(TW)*UC(gt1,4))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37552,14 +35390,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcUHpmVPL  
  
  
-Subroutine CouplingHpmcUHpmVZL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcUHpmVZL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37585,28 +35421,22 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(1,1))/2._dp
+res = res+g2*Sin(TW)*UC(gt1,1)
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UC(gt1,2)*ZZ(1,1))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(1,1))/2._dp
-End If 
-If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(2,1))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(2,1))/2._dp
-End If 
-If ((4.eq.gt2)) Then 
-res = res+(g2*UC(gt1,4)*ZZ(2,1))/2._dp
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,2))/2._dp
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,2)*ZZ(3,1))/2._dp
+res = res+(g2*Sin(TW)*UC(gt1,2))/2._dp
+End If 
+If ((3.eq.gt2)) Then 
+res = res+g2*Sin(TW)*UC(gt1,3)
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4))/2._dp
+End If 
+If ((4.eq.gt2)) Then 
+res = res+(g2*Sin(TW)*UC(gt1,4))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37619,14 +35449,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcUHpmVZL  
  
  
-Subroutine CouplingHpmcUHpmVZRL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcUHpmVZRL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37652,28 +35480,22 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(1,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,1))
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(g2*UC(gt1,2)*ZZ(1,2))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(1,2))/2._dp
-End If 
-If ((1.eq.gt2)) Then 
-res = res+(g2*UC(gt1,1)*ZZ(2,2))/2._dp
-End If 
-If ((3.eq.gt2)) Then 
-res = res+(g2*UC(gt1,3)*ZZ(2,2))/2._dp
-End If 
-If ((4.eq.gt2)) Then 
-res = res+(g2*UC(gt1,4)*ZZ(2,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(TW)*UC(gt1,2))
 End If 
 If ((2.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,2)*ZZ(3,2))/2._dp
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,2))/2._dp
+End If 
+If ((3.eq.gt2)) Then 
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,3))
 End If 
 If ((4.eq.gt2)) Then 
-res = res+(gBL*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4))/2._dp
+End If 
+If ((4.eq.gt2)) Then 
+res = res+(g2*Sin(TW)*Tan(TW)*UC(gt1,4))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37686,14 +35508,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcUHpmVZRL  
  
  
-Subroutine CouplingcUHpmcVWLmVPL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWLmVPL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37710,14 +35530,11 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*ZZ(1,3))
-End If 
 If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(2,3))
+res = res+(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Sin(PhiW)*ZZ(3,3))/2._dp
+res = res+(g2*gBL*vR*Sin(PhiW)*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37730,14 +35547,12 @@ Iname = Iname - 1
 End Subroutine CouplingcUHpmcVWLmVPL  
  
  
-Subroutine CouplingcUHpmcVWRmVPL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWRmVPL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37754,14 +35569,11 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(1,3))
-End If 
 If ((1.eq.gt1)) Then 
-res = res+(g2**2*k1*Sin(PhiW)*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Cos(PhiW)*ZZ(3,3))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37774,14 +35586,12 @@ Iname = Iname - 1
 End Subroutine CouplingcUHpmcVWRmVPL  
  
  
-Subroutine CouplingcUHpmcVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWLmVZL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37798,14 +35608,14 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*ZZ(1,1))
+If ((4.eq.gt1)) Then 
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW))/2._dp
 End If 
 If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(2,1))
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW))
 End If 
-If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Sin(PhiW)*ZZ(3,1))/2._dp
+If ((3.eq.gt1)) Then 
+res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*Sin(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37818,14 +35628,12 @@ Iname = Iname - 1
 End Subroutine CouplingcUHpmcVWLmVZL  
  
  
-Subroutine CouplingcUHpmcVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWRmVZL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37842,14 +35650,14 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
+If ((4.eq.gt1)) Then 
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW))))/2._dp
+End If 
 If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(1,1))
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW))
 End If 
 If ((1.eq.gt1)) Then 
-res = res+(g2**2*k1*Sin(PhiW)*ZZ(2,1))/2._dp
-End If 
-If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Cos(PhiW)*ZZ(3,1))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37862,14 +35670,12 @@ Iname = Iname - 1
 End Subroutine CouplingcUHpmcVWRmVZL  
  
  
-Subroutine CouplingcUHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37887,13 +35693,13 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*ZZ(1,2))
-End If 
-If ((1.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(2,2))
+res = res+(g2**2*k1*Cos(TW)*Sin(PhiW))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Sin(PhiW)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW))/2._dp
+End If 
+If ((1.eq.gt1)) Then 
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*Tan(TW))
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -37906,14 +35712,12 @@ Iname = Iname - 1
 End Subroutine CouplingcUHpmcVWLmVZRL  
  
  
-Subroutine CouplingcUHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,PhiW,res)
+Subroutine CouplingcUHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -37931,13 +35735,13 @@ End If
 
 res = 0._dp 
 If ((3.eq.gt1)) Then 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*ZZ(1,2))
-End If 
-If ((1.eq.gt1)) Then 
-res = res+(g2**2*k1*Sin(PhiW)*ZZ(2,2))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Cos(TW))/2._dp
 End If 
 If ((4.eq.gt1)) Then 
-res = res+(g2*gBL*vR*Cos(PhiW)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
+End If 
+If ((1.eq.gt1)) Then 
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*Tan(TW))/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -38772,14 +36576,12 @@ Iname = Iname - 1
 End Subroutine CouplingUHpmHpmcUHpmcHpmL  
  
  
-Subroutine CouplingUHpmcUHpmVPVPL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUHpmcUHpmVPVPL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -38805,40 +36607,22 @@ End If
 
 res = 0._dp 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,3)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,3)*ZZ(2,3)
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,3)*ZZ(2,3)
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW))
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(1,3)*ZZ(3,3)
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(2,3)*ZZ(3,3)
-End If 
-If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,3)**2)/2._dp
+res = res+(gBL**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -38963,14 +36747,12 @@ Iname = Iname - 1
 End Subroutine CouplingUHpmcUHpmcVWRmVWRmL  
  
  
-Subroutine CouplingUHpmcUHpmVZVZL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUHpmcUHpmVZVZL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -38995,41 +36777,29 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,1)**2)/2._dp
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,1)*ZZ(2,1)
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,1)*ZZ(2,1)
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,1)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW)))/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(1,1)*ZZ(3,1)
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(2,1)*ZZ(3,1)
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)
+End If 
+If ((1.eq.gt1).And.(1.eq.gt2)) Then 
+res = res+2*g2**2*Sin(TW)**2
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*Sin(TW)**2)/2._dp
+End If 
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+2*g2**2*Sin(TW)**2
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*Sin(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -39042,14 +36812,12 @@ Iname = Iname - 1
 End Subroutine CouplingUHpmcUHpmVZVZL  
  
  
-Subroutine CouplingUHpmcUHpmVZRVZRL(gt1,gt2,gBL,g2,ZZ,res)
+Subroutine CouplingUHpmcUHpmVZRVZRL(gt1,gt2,gBL,g2,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -39074,41 +36842,35 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
-End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(1,2)**2)/2._dp
+res = res+(g2**2*Cos(TW)**2)/2._dp
 End If 
 If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,2)*ZZ(2,2)
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+g2**2*ZZ(1,2)*ZZ(2,2)
-End If 
-If ((1.eq.gt1).And.(1.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((3.eq.gt1).And.(3.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
-End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(g2**2*ZZ(2,2)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))**2*1/Cos(TW)**2)/2._dp
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(1,2)*ZZ(3,2)
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW))
 End If 
-If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+g2*gBL*ZZ(2,2)*ZZ(3,2)
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res-(g2**2*Sin(TW)**2)
 End If 
 If ((2.eq.gt1).And.(2.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
 End If 
 If ((4.eq.gt1).And.(4.eq.gt2)) Then 
-res = res+(gBL**2*ZZ(3,2)**2)/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2
+End If 
+If ((3.eq.gt1).And.(3.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
+End If 
+If ((4.eq.gt1).And.(4.eq.gt2)) Then 
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2)/2._dp
 End If 
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -39319,14 +37081,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFdFdVGL  
  
  
-Subroutine CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,resL,resR)
+Subroutine CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZDL(3,3),ZDR(3,3)
+Complex(dp), Intent(in) :: ZDL(3,3),ZDR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -39352,17 +37114,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZDL(gt2,gt1))*ZZ(1,3))/2._dp
-End If 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZDR(gt2,gt1)*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZDR(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZDR(gt2,gt1)*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW)*ZDR(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -39375,14 +37134,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFdFdVPL  
  
  
-Subroutine CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,resL,resR)
+Subroutine CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZDL(3,3),ZDR(3,3)
+Complex(dp), Intent(in) :: ZDL(3,3),ZDR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -39408,17 +37167,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZDL(gt2,gt1))*ZZ(1,1))/2._dp
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*ZZ(3,1))
+resL = resL+(g2*Conjg(ZDL(gt2,gt1))*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZDR(gt2,gt1)*ZZ(2,1))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*ZDR(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZDR(gt2,gt1)*ZZ(3,1))
+resR = resR+(g2*Sin(TW)*ZDR(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -39431,14 +37190,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFdFdVZL  
  
  
-Subroutine CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,resL,resR)
+Subroutine CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZDL(3,3),ZDR(3,3)
+Complex(dp), Intent(in) :: ZDL(3,3),ZDR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -39464,17 +37223,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZDL(gt2,gt1))*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*Conjg(ZDL(gt2,gt1))*1/Cos(TW))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*ZZ(3,2))
+resL = resL-1._dp/4._dp*(g2*Conjg(ZDL(gt2,gt1))*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZDL(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZDR(gt2,gt1)*ZZ(2,2))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZDR(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZDR(gt2,gt1)*ZZ(3,2))
+resR = resR+(g2*Sin(TW)*Tan(TW)*ZDR(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40029,14 +37791,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFuFuVGL  
  
  
-Subroutine CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,resL,resR)
+Subroutine CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZUL(3,3),ZUR(3,3)
+Complex(dp), Intent(in) :: ZUL(3,3),ZUR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40062,17 +37824,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZUL(gt2,gt1))*ZZ(1,3))
-End If 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZUR(gt2,gt1)*ZZ(2,3))
+resR = resR+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZUR(gt2,gt1))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZUR(gt2,gt1)*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW)*ZUR(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40085,14 +37844,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFuFuVPL  
  
  
-Subroutine CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,resL,resR)
+Subroutine CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZUL(3,3),ZUR(3,3)
+Complex(dp), Intent(in) :: ZUL(3,3),ZUR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40118,17 +37877,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZUL(gt2,gt1))*ZZ(1,1))
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*ZZ(3,1))
+resL = resL-1._dp/2._dp*(g2*Conjg(ZUL(gt2,gt1))*Sin(TW))
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZUR(gt2,gt1)*ZZ(2,1))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*ZUR(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZUR(gt2,gt1)*ZZ(3,1))
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*ZUR(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40141,14 +37900,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFuFuVZL  
  
  
-Subroutine CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,resL,resR)
+Subroutine CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZUL(3,3),ZUR(3,3)
+Complex(dp), Intent(in) :: ZUL(3,3),ZUR(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40174,17 +37933,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZUL(gt2,gt1))*ZZ(1,2))
+resL = resL+(g2*Conjg(ZUL(gt2,gt1))*1/Cos(TW))/4._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*ZZ(3,2))
+resL = resL+(g2*Conjg(ZUL(gt2,gt1))*Cos(2._dp*(TW))*1/Cos(TW))/4._dp
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resL = resL-1._dp/6._dp*(gBL*Conjg(ZUL(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZUR(gt2,gt1)*ZZ(2,2))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZUR(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZUR(gt2,gt1)*ZZ(3,2))
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*Tan(TW)*ZUR(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40345,14 +38107,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFeFehhL  
  
  
-Subroutine CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,resL,resR)
+Subroutine CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZEL,ZER,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZEL(3,3),ZER(3,3)
+Complex(dp), Intent(in) :: ZEL(3,3),ZER(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40378,17 +38140,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZEL(gt2,gt1))*ZZ(1,3))/2._dp
-End If 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*ZZ(3,3))/2._dp
+resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZER(gt2,gt1)*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZER(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(gBL*ZER(gt2,gt1)*ZZ(3,3))/2._dp
+resR = resR+(gBL*Tan(TW)*ZER(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40401,14 +38160,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFeFeVPL  
  
  
-Subroutine CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,resL,resR)
+Subroutine CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZEL,ZER,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZEL(3,3),ZER(3,3)
+Complex(dp), Intent(in) :: ZEL(3,3),ZER(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40434,17 +38193,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZEL(gt2,gt1))*ZZ(1,1))/2._dp
+resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*Sqrt(Cos(2._dp*(TW))))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*ZZ(3,1))/2._dp
+resL = resL+(g2*Conjg(ZEL(gt2,gt1))*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZER(gt2,gt1)*ZZ(2,1))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*ZER(gt2,gt1))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(gBL*ZER(gt2,gt1)*ZZ(3,1))/2._dp
+resR = resR+(g2*Sin(TW)*ZER(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -40457,14 +38216,14 @@ Iname = Iname - 1
 End Subroutine CouplingcUFeFeVZL  
  
  
-Subroutine CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,resL,resR)
+Subroutine CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZEL,ZER,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZEL(3,3),ZER(3,3)
+Complex(dp), Intent(in) :: ZEL(3,3),ZER(3,3)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -40490,17 +38249,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZEL(gt2,gt1))*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*Conjg(ZEL(gt2,gt1))*1/Cos(TW))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*ZZ(3,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*Conjg(ZEL(gt2,gt1))*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resL = resL+(gBL*Conjg(ZEL(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZER(gt2,gt1)*ZZ(2,2))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZER(gt2,gt1))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(gBL*ZER(gt2,gt1)*ZZ(3,2))/2._dp
+resR = resR+(g2*Sin(TW)*Tan(TW)*ZER(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41095,14 +38857,14 @@ Iname = Iname - 1
 End Subroutine CouplingUFvFvhhL  
  
  
-Subroutine CouplingUFvFvVPL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingUFvFvVPL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41127,30 +38889,24 @@ If ((gt2.Lt.1).Or.(gt2.Gt.9)) Then
 End If 
 
 resL = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,gt1))*ZZ(1,3))
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZM(gt2,gt1))*ZZ(2,3))/2._dp
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,3))
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*Tan(TW))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,3))/2._dp
+resL = resL+(gBL*Conjg(ZM(gt2,gt1))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZM(gt2,gt1)*ZZ(1,3))/2._dp
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resR = resR+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZM(gt2,gt1))/2._dp
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZM(gt2,gt1)*ZZ(2,3))
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR+(gBL*ZM(gt2,gt1)*ZZ(3,3))/2._dp
+resR = resR+(gBL*Tan(TW)*ZM(gt2,gt1))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(gBL*ZM(gt2,gt1)*ZZ(3,3))
+resR = resR-1._dp/2._dp*(gBL*Tan(TW)*ZM(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41163,14 +38919,14 @@ Iname = Iname - 1
 End Subroutine CouplingUFvFvVPL  
  
  
-Subroutine CouplingUFvFvVZL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingUFvFvVZL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41195,30 +38951,30 @@ If ((gt2.Lt.1).Or.(gt2.Gt.9)) Then
 End If 
 
 resL = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,gt1))*ZZ(1,1))
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZM(gt2,gt1))*ZZ(2,1))/2._dp
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,1))
+resL = resL+(g2*Conjg(ZM(gt2,gt1))*Sin(TW))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,1))/2._dp
+resL = resL+(gBL*Conjg(ZM(gt2,gt1))*Sqrt(Cos(2._dp*(TW))))/2._dp
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,gt1))*Sin(TW))
 End If 
 resR = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZM(gt2,gt1)*ZZ(1,1))/2._dp
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,gt1))/2._dp
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZM(gt2,gt1)*ZZ(2,1))
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR+(gBL*ZM(gt2,gt1)*ZZ(3,1))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*ZM(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(gBL*ZM(gt2,gt1)*ZZ(3,1))
+resR = resR-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,gt1))
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resR = resR+(g2*Sin(TW)*ZM(gt2,gt1))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41231,14 +38987,14 @@ Iname = Iname - 1
 End Subroutine CouplingUFvFvVZL  
  
  
-Subroutine CouplingUFvFvVZRL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingUFvFvVZRL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41263,30 +39019,30 @@ If ((gt2.Lt.1).Or.(gt2.Gt.9)) Then
 End If 
 
 resL = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,gt1))*ZZ(1,2))
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL+(g2*Conjg(ZM(gt2,gt1))*ZZ(2,2))/2._dp
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,2))
+resL = resL+(g2*Conjg(ZM(gt2,gt1))*Sin(TW)*Tan(TW))/2._dp
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resL = resL+(gBL*Conjg(ZM(gt2,gt1))*ZZ(3,2))/2._dp
+resL = resL+(g2*Conjg(ZM(gt2,gt1))*Cos(TW))/2._dp
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resL = resL+(gBL*Conjg(ZM(gt2,gt1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
-If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR+(g2*ZM(gt2,gt1)*ZZ(1,2))/2._dp
+If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,gt1))/2._dp
 End If 
 If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(g2*ZM(gt2,gt1)*ZZ(2,2))
-End If 
-If ((-3 + gt1.le.3).And.(-3 + gt1.ge.1)) Then 
-resR = resR+(gBL*ZM(gt2,gt1)*ZZ(3,2))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*Tan(TW)*ZM(gt2,gt1))
 End If 
 If ((gt1.le.3).And.(gt1.ge.1)) Then 
-resR = resR-1._dp/2._dp*(gBL*ZM(gt2,gt1)*ZZ(3,2))
+resR = resR-1._dp/2._dp*(g2*Cos(TW)*ZM(gt2,gt1))
+End If 
+If ((gt1.le.3).And.(gt1.ge.1)) Then 
+resR = resR-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,gt1))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41654,14 +39410,12 @@ Iname = Iname - 1
 End Subroutine CouplingVGVGVGVGL  
  
  
-Subroutine CouplingAhhhVZL(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVZL(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -41686,14 +39440,10 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,1))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,1))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,1))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,1))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,1))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,2)*ZH(gt2,2))
+res = res+(g2*Sin(TW)*UP(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*UP(gt1,4)*ZH(gt2,4))
+res = res+(g2*Sin(TW)*UP(gt1,4)*ZH(gt2,4))/2._dp
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -41707,14 +39457,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhVZL  
  
  
-Subroutine CouplingcFdFdVZL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVZL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41740,17 +39488,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,1))/2._dp
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,1))
+resL = resL+(g2*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,1))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,1))
+resR = resR+(g2*Sin(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41763,14 +39511,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVZL  
  
  
-Subroutine CouplingcFeFeVZL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVZL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41796,17 +39542,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,1))/2._dp
+resL = resL+(gBL*Sqrt(Cos(2._dp*(TW))))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,1))/2._dp
+resL = resL+(g2*Sin(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,1))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW))))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,1))/2._dp
+resR = resR+(g2*Sin(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41819,14 +39565,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFeVZL  
  
  
-Subroutine CouplingcFuFuVZL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVZL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41852,17 +39596,17 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,1))
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,1))
+resL = resL-1._dp/2._dp*(g2*Sin(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,1))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW))))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,1))
+resR = resR-1._dp/2._dp*(g2*Sin(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41875,14 +39619,14 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVZL  
  
  
-Subroutine CouplingFvFvVZL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVZL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -41908,29 +39652,29 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,1))
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,1))/2._dp
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*Sin(TW)*ZM(gt1,j1))
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,1))/2._dp
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,1))
+resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*Sin(TW)*ZM(gt1,3 + j1))/2._dp
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,1))/2._dp
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,1))
+resR = resR+(g2*Conjg(ZM(gt1,j1))*Sin(TW)*ZM(gt2,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,1))
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,1))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*Sin(TW)*ZM(gt2,3 + j1))
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -41943,13 +39687,11 @@ Iname = Iname - 1
 End Subroutine CouplingFvFvVZL  
  
  
-Subroutine CouplingcgWLmgWLmVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -41958,8 +39700,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVZ' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,1))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -41971,41 +39712,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVZL  
  
  
-Subroutine CouplingcgWRmgWLmVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRmgWLmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRmgWLmVZL  
- 
- 
-Subroutine CouplingcgWLpgWLpVZL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42014,8 +39725,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVZ' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42027,41 +39737,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVZL  
  
  
-Subroutine CouplingcgWRpgWLpVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRpgWLpVZ' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRpgWLpVZL  
- 
- 
-Subroutine CouplingcgWRmgWRmVZL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42070,8 +39750,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVZ' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,1))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42083,13 +39762,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVZL  
  
  
-Subroutine CouplingcgWRpgWRpVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42098,8 +39775,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVZ' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42111,14 +39787,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVZL  
  
  
-Subroutine CouplinghhVPVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVPVZL(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42135,14 +39809,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res-1._dp/4._dp*(g2*gBL*vR*1/Cos(TW)*ZH(gt1,4))
+res = res+(3*g2*gBL*vR*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt1,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4))
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42154,14 +39824,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVPVZL  
  
  
-Subroutine CouplinghhVZVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZVZL(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42178,12 +39846,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*vR*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW))*ZH(gt1,4))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42195,14 +39861,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZVZL  
  
  
-Subroutine CouplinghhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZVZRL(gt1,gBL,g2,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42219,14 +39883,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2**2*vR*Tan(TW)*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*vR*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4))
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42238,14 +39898,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZVZRL  
  
  
-Subroutine CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42270,14 +39928,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,1))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,1))/2._dp
+res = res+g2*Sin(TW)*UC(gt1,1)*UC(gt2,1)
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2*Sin(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+g2*Sin(TW)*UC(gt1,3)*UC(gt2,3)
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+(g2*Sin(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42289,14 +39945,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZL  
  
  
-Subroutine CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42313,9 +39967,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,1))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,1))
+res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42327,14 +39981,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWLmVZL  
  
  
-Subroutine CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42351,9 +40003,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42365,13 +40017,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWRmVZL  
  
  
-Subroutine CouplingcVWLmVWLmVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWLmVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42380,10 +40030,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZ' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,1))
-res = res-1._dp/2._dp*(g2*ZZ(2,1))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,1))/2._dp
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42395,41 +40042,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZL  
  
  
-Subroutine CouplingcVWRmVWLmVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWRmVZL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZ' 
- 
-res = 0._dp 
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWRmVWLmVZL  
- 
- 
-Subroutine CouplingcVWRmVWRmVZL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42438,10 +40055,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZ' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,1))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*ZZ(2,1))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,1))
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42453,14 +40067,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZL  
  
  
-Subroutine CouplingAhAhVZVZL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZVZL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42485,18 +40097,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,1))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,1))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*UP(gt1,2)*UP(gt2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(g2**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,4)*UP(gt2,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42508,14 +40116,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVZVZL  
  
  
-Subroutine CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42540,18 +40146,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,1))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,1))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,1))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,1))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,4)*ZH(gt2,4))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42563,14 +40165,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZVZL  
  
  
-Subroutine CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42595,18 +40195,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,1)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,1)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,1)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,1)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)**2)/2._dp
+res = res+2*g2**2*Sin(TW)**2*UC(gt1,1)*UC(gt2,1)
+res = res+(gBL**2*Cos(2._dp*(TW))*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,2)*UC(gt2,2)
+res = res+(g2**2*Sin(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+2*g2**2*Sin(TW)**2*UC(gt1,3)*UC(gt2,3)
+res = res+(gBL**2*Cos(2._dp*(TW))*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,4)*UC(gt2,4)
+res = res+(g2**2*Sin(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42618,13 +40214,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZVZL  
  
  
-Subroutine CouplingcVWLmVWLmVZVZL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZVZL(g2,TW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -42633,20 +40227,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res1 = res1-(g2**2*ZZ(2,1)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2
+res1 = res1-2*g2**2*Sin(TW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,1)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res2 = res2+g2**2*Sin(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)/2._dp
-res3 = res3+(g2**2*ZZ(2,1)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res3 = res3+g2**2*Sin(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42658,13 +40243,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZVZL  
  
  
-Subroutine CouplingcVWRmVWRmVZVZL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZVZL(g2,TW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -42673,20 +40256,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZVZ' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2
-res1 = res1-(g2**2*ZZ(2,1)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)
+res1 = res1-2*g2**2*Sin(TW)**2
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res2 = res2+(g2**2*ZZ(2,1)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
+res2 = res2+g2**2*Sin(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)**2)
-res3 = res3+(g2**2*ZZ(2,1)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
+res3 = res3+g2**2*Sin(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -42698,14 +40272,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZVZL  
  
  
-Subroutine CouplingAhhhVZRL(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVZRL(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -42730,14 +40302,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,2))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,2))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,2))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,2))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,2))
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*UP(gt1,1)*ZH(gt2,1))
+res = res-1._dp/4._dp*(g2*1/Cos(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res+(g2*1/Cos(TW)*UP(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(g2*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))
+res = res-1._dp/2._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*ZH(gt2,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -42751,14 +40323,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhVZRL  
  
  
-Subroutine CouplingcFdFdVZRL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVZRL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -42784,17 +40354,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,2))
+resL = resL-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,2))/2._dp
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,2))
+resR = resR+(g2*Sin(TW)*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -42807,14 +40380,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVZRL  
  
  
-Subroutine CouplingcFeFeVZRL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVZRL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -42840,17 +40411,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,2))/2._dp
+resL = resL-1._dp/4._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,2))/2._dp
+resR = resR+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,2))/2._dp
+resR = resR+(g2*Sin(TW)*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -42863,14 +40437,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFeVZRL  
  
  
-Subroutine CouplingcFuFuVZRL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVZRL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -42896,17 +40468,20 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,2))
+resL = resL+(g2*1/Cos(TW))/4._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,2))
+resL = resL+(g2*Cos(2._dp*(TW))*1/Cos(TW))/4._dp
+End If 
+If ((gt1.eq.gt2)) Then 
+resL = resL-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,2))
+resR = resR-1._dp/6._dp*(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,2))
+resR = resR-1._dp/2._dp*(g2*Sin(TW)*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -42919,14 +40494,14 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVZRL  
  
  
-Subroutine CouplingFvFvVZRL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVZRL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -42952,29 +40527,29 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,2))
+resL = resL+(g2*Conjg(ZM(gt2,j1))*Cos(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,2))/2._dp
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,2))/2._dp
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,2))
+resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*Sin(TW)*Tan(TW)*ZM(gt1,3 + j1))/2._dp
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,2))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,j1))*Cos(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,2))
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,2))
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,2))/2._dp
+resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*Sin(TW)*Tan(TW)*ZM(gt2,3 + j1))
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -42987,13 +40562,11 @@ Iname = Iname - 1
 End Subroutine CouplingFvFvVZRL  
  
  
-Subroutine CouplingcgWLmgWLmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43002,8 +40575,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVZR' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,2))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,2))
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43015,13 +40588,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVZRL  
  
  
-Subroutine CouplingcgWRmgWLmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWLmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43030,8 +40601,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWLmVZR' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43043,13 +40613,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWLmVZRL  
  
  
-Subroutine CouplingcgWLpgWLpVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43058,8 +40626,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVZR' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,2))*Sin(PhiW)**2
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43071,13 +40639,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVZRL  
  
  
-Subroutine CouplingcgWRpgWLpVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWLpVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43086,8 +40652,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWLpVZR' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43099,13 +40664,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWLpVZRL  
  
  
-Subroutine CouplingcgWRmgWRmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43114,8 +40677,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVZR' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,2))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43127,13 +40690,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVZRL  
  
  
-Subroutine CouplingcgWRpgWRpVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43142,8 +40703,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVZR' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,2))*Sin(PhiW)**2
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43155,14 +40716,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVZRL  
  
  
-Subroutine CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43179,14 +40738,13 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,3))
+res = res-1._dp/4._dp*(g2**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4))
+res = res+(gBL**2*vR*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4))/4._dp
+res = res+(g2**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*vR*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4))
+res = res+(3*g2*gBL*vR*1/Cos(TW)**2*Sin(3._dp*(TW))*ZH(gt1,4))/8._dp
+res = res+(-5*g2*gBL*vR*1/Cos(TW)*Tan(TW)*ZH(gt1,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43198,14 +40756,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVPVZRL  
  
  
-Subroutine CouplinghhVZRVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,res)
+Subroutine CouplinghhVZRVZRL(gt1,gBL,g2,k1,vR,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43222,12 +40778,10 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*k1*ZH(gt1,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*k1*ZH(gt1,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*vR*ZH(gt1,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*vR*ZH(gt1,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*vR*ZH(gt1,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*k1*1/Cos(TW)**2*ZH(gt1,3))/2._dp
+res = res+(gBL**2*vR*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,4))/2._dp
+res = res-(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*ZH(gt1,4))
+res = res+(g2**2*vR*Sin(TW)**2*Tan(TW)**2*ZH(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43239,14 +40793,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhVZRVZRL  
  
  
-Subroutine CouplingHpmcHpmVZRL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZRL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43271,14 +40823,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,2))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,1)*UC(gt2,1))
+res = res-1._dp/2._dp*(g2*Cos(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(gBL*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+(g2*Sin(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43290,14 +40840,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZRL  
  
  
-Subroutine CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43314,9 +40862,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))
+res = res+(g2**2*k1*Cos(TW)*Sin(PhiW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43328,14 +40876,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWLmVZRL  
  
  
-Subroutine CouplingHpmVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVWRmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43352,9 +40898,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Cos(TW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43366,13 +40912,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVWRmVZRL  
  
  
-Subroutine CouplingcVWLmVWLmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWLmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43381,10 +40925,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZR' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,2))
-res = res-1._dp/2._dp*(g2*ZZ(2,2))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,2))/2._dp
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43396,13 +40938,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZRL  
  
  
-Subroutine CouplingcVWRmVWLmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWLmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43411,8 +40951,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZR' 
  
 res = 0._dp 
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*Sin(2._dp*(PhiW)))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43424,13 +40963,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWLmVZRL  
  
  
-Subroutine CouplingcVWRmVWRmVZRL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVWRmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43439,10 +40976,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZR' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*ZZ(1,2))
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*ZZ(2,2))
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43454,14 +40989,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZRL  
  
  
-Subroutine CouplingAhAhVZRVZRL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZRVZRL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43486,18 +41019,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,2))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,2))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UP(gt1,2)*UP(gt2,2)
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+g2**2*Sin(TW)**2*UP(gt1,3)*UP(gt2,3)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43509,14 +41040,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVZRVZRL  
  
  
-Subroutine CouplinghhhhVZRVZRL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZRVZRL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43541,18 +41070,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,2))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,2))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,2))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,2))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*ZH(gt1,2)*ZH(gt2,2)
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+g2**2*Sin(TW)**2*ZH(gt1,3)*ZH(gt2,3)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43564,14 +41091,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZRVZRL  
  
  
-Subroutine CouplingHpmcHpmVZRVZRL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZRVZRL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43596,18 +41121,16 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,2)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,2)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,2)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,2)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,2)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,2)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))**2*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(g2**2*Cos(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2**2*Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res-(g2**2*Sin(TW)**2*UC(gt1,3)*UC(gt2,3))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)**2*UC(gt1,4)*UC(gt2,4)
+res = res+(g2**2*Sin(TW)**2*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43619,13 +41142,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZRVZRL  
  
  
-Subroutine CouplingcVWLmVWLmVZRVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZRVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -43634,20 +41155,20 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,2)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res1 = res1-(g2**2*ZZ(2,2)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2
+res1 = res1+(-3*g2**2*1/Cos(TW)**2)/4._dp
+res1 = res1-1._dp/2._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res1 = res1-1._dp/4._dp*(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)
+res1 = res1-1._dp/2._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,2)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,2)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res2 = res2+(3*g2**2*1/Cos(TW)**2)/8._dp
+res2 = res2+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/4._dp
+res2 = res2+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res2 = res2+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/4._dp
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)/2._dp
-res3 = res3+(g2**2*ZZ(2,2)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res3 = res3+(3*g2**2*1/Cos(TW)**2)/8._dp
+res3 = res3+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/4._dp
+res3 = res3+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res3 = res3+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/4._dp
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43659,13 +41180,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZRVZRL  
  
  
-Subroutine CouplingcVWRmVWRmVZRVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZRVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -43674,20 +41193,20 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,2)**2)
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2
-res1 = res1-(g2**2*ZZ(2,2)**2)
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)
+res1 = res1+(-3*g2**2*1/Cos(TW)**2)/4._dp
+res1 = res1+(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)/2._dp
+res1 = res1-1._dp/4._dp*(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)
+res1 = res1+(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)/2._dp
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,2)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res2 = res2+(g2**2*ZZ(2,2)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res2 = res2+(3*g2**2*1/Cos(TW)**2)/8._dp
+res2 = res2-1._dp/4._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res2 = res2+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res2 = res2-1._dp/4._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)**2)/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)**2)
-res3 = res3+(g2**2*ZZ(2,2)**2)/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res3 = res3+(3*g2**2*1/Cos(TW)**2)/8._dp
+res3 = res3-1._dp/4._dp*(g2**2*Cos(2*(PhiW - TW))*1/Cos(TW)**2)
+res3 = res3+(g2**2*Cos(4._dp*(TW))*1/Cos(TW)**2)/8._dp
+res3 = res3-1._dp/4._dp*(g2**2*Cos(2*(PhiW + TW))*1/Cos(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -43699,14 +41218,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZRVZRL  
  
  
-Subroutine CouplingAhhhVPL(gt1,gt2,gBL,g2,ZZ,ZH,UP,res)
+Subroutine CouplingAhhhVPL(gt1,gt2,gBL,g2,ZH,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -43731,14 +41248,11 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(1,3))/2._dp
-res = res+(g2*UP(gt1,2)*ZH(gt2,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2*UP(gt1,1)*ZH(gt2,1)*ZZ(2,3))
-res = res+(g2*UP(gt1,3)*ZH(gt2,3)*ZZ(2,3))/2._dp
-res = res+(g2*UP(gt1,4)*ZH(gt2,4)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(gBL*UP(gt1,2)*ZH(gt2,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(gBL*UP(gt1,4)*ZH(gt2,4)*ZZ(3,3))
+res = res+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,1)*ZH(gt2,1))/2._dp
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,2)*ZH(gt2,2))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,3)*ZH(gt2,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UP(gt1,4)*ZH(gt2,4))
+res = res-1._dp/2._dp*(gBL*Tan(TW)*UP(gt1,4)*ZH(gt2,4))
 res = -(0.,1.)*res 
  
 If (Real(res,dp).ne.Real(res,dp)) Then 
@@ -43752,14 +41266,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhhhVPL  
  
  
-Subroutine CouplingcFdFdVPL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFdFdVPL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -43785,17 +41297,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,3))/2._dp
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -43808,14 +41317,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFdFdVPL  
  
  
-Subroutine CouplingcFeFeVPL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFeFeVPL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -43841,17 +41348,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL+(g2*ZZ(1,3))/2._dp
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL+(gBL*ZZ(3,3))/2._dp
+resL = resL+(gBL*Tan(TW))/2._dp
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(g2*ZZ(2,3))/2._dp
+resR = resR-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR+(gBL*ZZ(3,3))/2._dp
+resR = resR+(gBL*Tan(TW))/2._dp
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -43864,14 +41368,12 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFeVPL  
  
  
-Subroutine CouplingcFuFuVPL(gt1,gt2,gBL,g2,ZZ,resL,resR)
+Subroutine CouplingcFuFuVPL(gt1,gt2,gBL,g2,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,TW
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -43897,17 +41399,14 @@ End If
 
 resL = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/2._dp*(g2*ZZ(1,3))
-End If 
-If ((gt1.eq.gt2)) Then 
-resL = resL-1._dp/6._dp*(gBL*ZZ(3,3))
+resL = resL-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 resR = 0._dp 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/2._dp*(g2*ZZ(2,3))
+resR = resR+(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))/2._dp
 End If 
 If ((gt1.eq.gt2)) Then 
-resR = resR-1._dp/6._dp*(gBL*ZZ(3,3))
+resR = resR-1._dp/6._dp*(gBL*Tan(TW))
 End If 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -43920,14 +41419,14 @@ Iname = Iname - 1
 End Subroutine CouplingcFuFuVPL  
  
  
-Subroutine CouplingFvFvVPL(gt1,gt2,gBL,g2,ZZ,ZM,resL,resR)
+Subroutine CouplingFvFvVPL(gt1,gt2,gBL,g2,ZM,TW,resL,resR)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2
+Real(dp), Intent(in) :: gBL,g2,TW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: ZM(9,9)
 
 Complex(dp), Intent(out) :: resL, resR 
  
@@ -43953,29 +41452,23 @@ End If
 
 resL = 0._dp 
 Do j1 = 1,3
-resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(1,3))
+resL = resL+(gBL*Conjg(ZM(gt2,j1))*Tan(TW)*ZM(gt1,j1))/2._dp
 End Do 
 Do j1 = 1,3
-resL = resL+(g2*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(2,3))/2._dp
+resL = resL-1._dp/2._dp*(g2*Conjg(ZM(gt2,3 + j1))*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZM(gt1,3 + j1))
 End Do 
 Do j1 = 1,3
-resL = resL+(gBL*Conjg(ZM(gt2,j1))*ZM(gt1,j1)*ZZ(3,3))/2._dp
-End Do 
-Do j1 = 1,3
-resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*ZM(gt1,3 + j1)*ZZ(3,3))
+resL = resL-1._dp/2._dp*(gBL*Conjg(ZM(gt2,3 + j1))*Tan(TW)*ZM(gt1,3 + j1))
 End Do 
 resR = 0._dp 
 Do j1 = 1,3
-resR = resR+(g2*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(1,3))/2._dp
+resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*Tan(TW)*ZM(gt2,j1))
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(g2*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(2,3))
+resR = resR+(g2*Conjg(ZM(gt1,3 + j1))*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 Do j1 = 1,3
-resR = resR-1._dp/2._dp*(gBL*Conjg(ZM(gt1,j1))*ZM(gt2,j1)*ZZ(3,3))
-End Do 
-Do j1 = 1,3
-resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*ZM(gt2,3 + j1)*ZZ(3,3))/2._dp
+resR = resR+(gBL*Conjg(ZM(gt1,3 + j1))*Tan(TW)*ZM(gt2,3 + j1))/2._dp
 End Do 
 If ((Real(resL,dp).ne.Real(resL,dp)).or.(Real(resR,dp).ne.Real(resR,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
@@ -43988,13 +41481,11 @@ Iname = Iname - 1
 End Subroutine CouplingFvFvVPL  
  
  
-Subroutine CouplingcgWLmgWLmVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgWLmVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44003,8 +41494,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgWLmVP' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)**2*ZZ(1,3))
-res = res-(g2*Sin(PhiW)**2*ZZ(2,3))
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44016,13 +41506,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgWLmVPL  
  
  
-Subroutine CouplingcgWRmgWLmVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWLmVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44031,8 +41519,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWLmVP' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44044,13 +41531,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWLmVPL  
  
  
-Subroutine CouplingcgWLpgWLpVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgWLpVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44059,8 +41544,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgWLpVP' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,3))*Sin(PhiW)**2
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44072,13 +41556,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgWLpVPL  
  
  
-Subroutine CouplingcgWRpgWLpVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWLpVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44087,8 +41569,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWLpVP' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44100,13 +41581,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWLpVPL  
  
  
-Subroutine CouplingcgWRmgWRmVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgWRmVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44115,8 +41594,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgWRmVP' 
  
 res = 0._dp 
-res = res-(g2*Sin(PhiW)**2*ZZ(1,3))
-res = res-(g2*Cos(PhiW)**2*ZZ(2,3))
+res = res+g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44128,13 +41606,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgWRmVPL  
  
  
-Subroutine CouplingcgWRpgWRpVPL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgWRpVPL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44143,8 +41619,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgWRpVP' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,3))*Sin(PhiW)**2
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44156,14 +41631,12 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgWRpVPL  
  
  
-Subroutine CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44188,14 +41661,11 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,2)*UC(gt2,2)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3))/2._dp
-res = res+(g2*UC(gt1,1)*UC(gt2,1)*ZZ(2,3))/2._dp
-res = res+(g2*UC(gt1,3)*UC(gt2,3)*ZZ(2,3))/2._dp
-res = res+(g2*UC(gt1,4)*UC(gt2,4)*ZZ(2,3))/2._dp
-res = res+(gBL*UC(gt1,2)*UC(gt2,2)*ZZ(3,3))/2._dp
-res = res+(gBL*UC(gt1,4)*UC(gt2,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1)*UC(gt2,1))
+res = res+(gBL*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,3)*UC(gt2,3))
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44207,14 +41677,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPL  
  
  
-Subroutine CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44231,9 +41699,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,3))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1))/2._dp
+res = res+(g2*gBL*vR*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44245,14 +41712,12 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVPVWLmL  
  
  
-Subroutine CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44269,9 +41734,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt1,1))
+res = res+(g2*gBL*vR*Cos(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44283,13 +41747,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmVPVWRmL  
  
  
-Subroutine CouplingcVWLmVPVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVPVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44298,10 +41760,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLm' 
  
 res = 0._dp 
-res = res+(g2*ZZ(1,3))/2._dp
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(1,3))/2._dp
-res = res+(g2*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(2,3))
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44313,13 +41772,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmL  
  
  
-Subroutine CouplingcVWRmVPVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVPVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44328,8 +41785,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWLm' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(1,3))
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(2._dp*(PhiW)))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44341,13 +41797,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWLmL  
  
  
-Subroutine CouplingcVWRmVPVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWRmVPVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44356,10 +41810,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRm' 
  
 res = 0._dp 
-res = res+(g2*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*ZZ(1,3))
-res = res+(g2*ZZ(2,3))/2._dp
-res = res+(g2*Cos(2._dp*(PhiW))*ZZ(2,3))/2._dp
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44371,14 +41822,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWRmL  
  
  
-Subroutine CouplingAhAhVPVPL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVPVPL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44403,18 +41852,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res-(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,3))
-res = res-(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res-(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,3))
-res = res-(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,3)*UP(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4)
+res = res+(gBL**2*Tan(TW)**2*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44426,14 +41869,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVPVPL  
  
  
-Subroutine CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44458,18 +41899,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res-(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,3))
-res = res-(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res-(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,3))
-res = res-(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4)
+res = res+(gBL**2*Tan(TW)**2*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44481,14 +41916,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVPVPL  
  
  
-Subroutine CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44513,18 +41946,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)**2)/2._dp
-res = res+g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,3)
-res = res+g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,3)
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,3)**2)/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)**2)/2._dp
-res = res+g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,3)
-res = res+g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,3)
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,3)**2)/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,3)**2)/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(gBL**2*Tan(TW)**2*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Tan(TW)**2*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44536,13 +41963,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPVPL  
  
  
-Subroutine CouplingcVWLmVPVPVWLmL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVPVWLmL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -44551,20 +41976,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVPVWLm' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,3)**2)/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)/2._dp
-res1 = res1+(g2**2*ZZ(2,3)**2)/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res1 = res1+g2**2*Sin(PhiW)**2
+res1 = res1-(g2**2*Sin(PhiW)**2*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,3)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)/2._dp
-res2 = res2+(g2**2*ZZ(2,3)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res2 = res2+g2**2*Sin(PhiW)**2
+res2 = res2-(g2**2*Sin(PhiW)**2*Tan(TW)**2)
 res3 = 0._dp 
-res3 = res3-(g2**2*ZZ(1,3)**2)
-res3 = res3-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res3 = res3-(g2**2*ZZ(2,3)**2)
-res3 = res3+g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2
+res3 = res3-2*g2**2*Sin(PhiW)**2
+res3 = res3+2*g2**2*Sin(PhiW)**2*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44576,13 +41995,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVPVWLmL  
  
  
-Subroutine CouplingcVWRmVPVPVWRmL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVPVWRmL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -44591,20 +42008,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVPVWRm' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,3)**2)/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res1 = res1+(g2**2*ZZ(2,3)**2)/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res1 = res1+g2**2*Cos(PhiW)**2
+res1 = res1-(g2**2*Cos(PhiW)**2*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,3)**2)/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2)
-res2 = res2+(g2**2*ZZ(2,3)**2)/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res2 = res2+g2**2*Cos(PhiW)**2
+res2 = res2-(g2**2*Cos(PhiW)**2*Tan(TW)**2)
 res3 = 0._dp 
-res3 = res3-(g2**2*ZZ(1,3)**2)
-res3 = res3+g2**2*Cos(2._dp*(PhiW))*ZZ(1,3)**2
-res3 = res3-(g2**2*ZZ(2,3)**2)
-res3 = res3-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,3)**2)
+res3 = res3-2*g2**2*Cos(PhiW)**2
+res3 = res3+2*g2**2*Cos(PhiW)**2*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44801,13 +42212,11 @@ Iname = Iname - 1
 End Subroutine CouplingFvFecVWLmL  
  
  
-Subroutine CouplingcgWLpgPcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgPcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44816,8 +42225,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgPcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,3))*Sin(PhiW)**2)
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44829,13 +42237,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgPcVWLmL  
  
  
-Subroutine CouplingcgWRpgPcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgPcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44844,8 +42250,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgPcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44857,13 +42262,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgPcVWLmL  
  
  
-Subroutine CouplingcgPgWLmcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLmcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44872,8 +42275,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,3))*Sin(PhiW)**2
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44885,13 +42287,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLmcVWLmL  
  
  
-Subroutine CouplingcgZgWLmcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWLmcVWLmL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44900,8 +42300,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44913,13 +42312,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWLmcVWLmL  
  
  
-Subroutine CouplingcgZpgWLmcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLmcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44928,8 +42325,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLmcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(2,2))*Sin(PhiW)**2
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44941,13 +42338,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLmcVWLmL  
  
  
-Subroutine CouplingcgPgWRmcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRmcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -44956,8 +42351,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRmcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -44969,41 +42363,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRmcVWLmL  
  
  
-Subroutine CouplingcgZgWRmcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRmcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWRmcVWLm' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWRmcVWLmL  
- 
- 
-Subroutine CouplingcgZpgWRmcVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45012,8 +42376,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRmcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45025,13 +42388,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRmcVWLmL  
  
  
-Subroutine CouplingcgWLpgZcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZcVWLmL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45040,8 +42401,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45053,41 +42413,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZcVWLmL  
  
  
-Subroutine CouplingcgWRpgZcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZpcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRpgZcVWLm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRpgZcVWLmL  
- 
- 
-Subroutine CouplingcgWLpgZpcVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45096,8 +42426,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZpcVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,2))*Sin(PhiW)**2)
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45109,13 +42439,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpcVWLmL  
  
  
-Subroutine CouplingcgWRpgZpcVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZpcVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45124,8 +42452,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZpcVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45255,14 +42582,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcVWLmVWRmL  
  
  
-Subroutine CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45279,9 +42604,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,3))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*UC(gt1,1))/2._dp
+res = res+(g2*gBL*vR*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45293,13 +42617,11 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWLmVPL  
  
  
-Subroutine CouplingcVWLmVPVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVPVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45308,8 +42630,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWRm' 
  
 res = 0._dp 
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(1,3))
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(2,3))/2._dp
+res = res-1._dp/2._dp*(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(2._dp*(PhiW)))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45321,41 +42642,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWRmL  
  
  
-Subroutine CouplingcVWLmVWRmVZL(g2,ZZ,PhiW,res)
+Subroutine CouplingcVWLmVWRmVZRL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZ' 
- 
-res = 0._dp 
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(1,1))/2._dp
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWLmVWRmVZL  
- 
- 
-Subroutine CouplingcVWLmVWRmVZRL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45364,8 +42655,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWRmVZR' 
  
 res = 0._dp 
-res = res+(g2*Sin(2._dp*(PhiW))*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2*Sin(2._dp*(PhiW))*ZZ(2,2))
+res = res-1._dp/2._dp*(g2*1/Cos(TW)*Sin(2._dp*(PhiW)))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45377,14 +42667,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWRmVZRL  
  
  
-Subroutine CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45401,9 +42689,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,1))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,1))
+res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45415,14 +42703,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWLmVZL  
  
  
-Subroutine CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45439,9 +42725,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Sin(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,1)*ZZ(2,2))
-res = res+(g2*gBL*vR*Sin(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))
+res = res+(g2**2*k1*Cos(TW)*Sin(PhiW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45843,13 +43129,11 @@ Iname = Iname - 1
 End Subroutine CouplingFvFecVWRmL  
  
  
-Subroutine CouplingcgWLpgPcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgPcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45858,8 +43142,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgPcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45871,13 +43154,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgPcVWRmL  
  
  
-Subroutine CouplingcgWRpgPcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgPcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45886,8 +43167,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgPcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,3))*Sin(PhiW)**2)
+res = res+g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45899,13 +43179,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgPcVWRmL  
  
  
-Subroutine CouplingcgPgWLmcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLmcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45914,8 +43192,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLmcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45927,41 +43204,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLmcVWRmL  
  
  
-Subroutine CouplingcgZgWLmcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLmcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWLmcVWRm' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWLmcVWRmL  
- 
- 
-Subroutine CouplingcgZpgWLmcVWRmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45970,8 +43217,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLmcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -45983,13 +43229,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLmcVWRmL  
  
  
-Subroutine CouplingcgPgWRmcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRmcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -45998,8 +43242,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,3))*Sin(PhiW)**2
+res = res-(g2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46011,13 +43254,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRmcVWRmL  
  
  
-Subroutine CouplingcgZgWRmcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZgWRmcVWRmL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46026,8 +43267,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,1))*Sin(PhiW)**2
+res = res+g2*Sin(TW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46039,13 +43279,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZgWRmcVWRmL  
  
  
-Subroutine CouplingcgZpgWRmcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRmcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46054,8 +43292,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRmcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)**2
-res = res+g2*Conjg(ZZ(1,2))*Sin(PhiW)**2
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46067,41 +43305,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRmcVWRmL  
  
  
-Subroutine CouplingcgWLpgZcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZcVWRmL(g2,TW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgZcVWRm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgZcVWRmL  
- 
- 
-Subroutine CouplingcgWRpgZcVWRmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46110,8 +43318,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,1))*Sin(PhiW)**2)
+res = res-(g2*Sin(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46123,13 +43330,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRpgZcVWRmL  
  
  
-Subroutine CouplingcgWLpgZpcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLpgZpcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46138,8 +43343,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLpgZpcVWRm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46151,13 +43355,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLpgZpcVWRmL  
  
  
-Subroutine CouplingcgWRpgZpcVWRmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRpgZpcVWRmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46166,8 +43368,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRpgZpcVWRm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(1,2))*Sin(PhiW)**2)
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46297,14 +43499,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhcVWRmVWRmL  
  
  
-Subroutine CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46321,9 +43521,8 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,3))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)*UC(gt1,1))
+res = res+(g2*gBL*vR*Cos(PhiW)*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46335,14 +43534,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWRmVPL  
  
  
-Subroutine CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46359,9 +43556,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,1))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,1))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,1))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*UC(gt1,1))/2._dp
+res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*Sin(TW)*UC(gt1,3))
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46373,14 +43570,12 @@ Iname = Iname - 1
 End Subroutine CouplingcHpmcVWRmVZL  
  
  
-Subroutine CouplingcHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,res)
+Subroutine CouplingcHpmcVWRmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1
-Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,k1,vR,UC(4,4),TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46397,9 +43592,9 @@ If ((gt1.Lt.1).Or.(gt1.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res-1._dp/2._dp*(g2**2*k1*Cos(PhiW)*UC(gt1,3)*ZZ(1,2))
-res = res+(g2**2*k1*Sin(PhiW)*UC(gt1,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*vR*Cos(PhiW)*UC(gt1,4)*ZZ(3,2))/2._dp
+res = res+(g2**2*k1*Sin(PhiW)*Sin(TW)*Tan(TW)*UC(gt1,1))/2._dp
+res = res+(g2**2*k1*Cos(PhiW)*Cos(TW)*UC(gt1,3))/2._dp
+res = res+(g2*gBL*vR*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46587,126 +43782,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmcVWRmVWRmVWRmL  
  
  
-Subroutine CouplingcgWLmgWRmVZRL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgWRmVZR' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgWRmVZRL  
- 
- 
-Subroutine CouplingcgWLpgWRpVZRL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgWRpVZR' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgWRpVZRL  
- 
- 
-Subroutine CouplingcgWLmgWRmVZL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgWRmVZ' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgWRmVZL  
- 
- 
-Subroutine CouplingcgWLpgWRpVZL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgWRpVZ' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgWRpVZL  
- 
- 
-Subroutine CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46731,22 +43812,13 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*Cos(TW)*Sqrt(Cos(2._dp*(TW)))*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UP(gt1,2)*UP(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46758,14 +43830,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVZVZRL  
  
  
-Subroutine CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46790,22 +43860,13 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,2))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,2))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res+(g2*gBL*Cos(TW)*Sqrt(Cos(2._dp*(TW)))*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Cos(TW)*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
+res = res-(g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(g2**2*Sin(TW)**2*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46817,14 +43878,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVZVZRL  
  
  
-Subroutine CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -46849,22 +43908,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(1,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(2,2))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)*ZZ(3,2))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)*ZZ(3,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*1/Cos(TW)*Sin(3._dp*(TW))*UC(gt1,1)*UC(gt2,1))
+res = res+(g2**2*Tan(TW)*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/4._dp*(g2**2*Tan(TW)*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(g2**2*Tan(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/4._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Cos(2._dp*(TW))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
+res = res+g2*gBL*Sqrt(Cos(2._dp*(TW)))*Sin(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46876,13 +43930,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVZVZRL  
  
  
-Subroutine CouplingcVWLmVWLmVZVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVWLmVZVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -46891,20 +43943,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVWLmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)*ZZ(1,2))
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res1 = res1-(g2**2*ZZ(2,1)*ZZ(2,2))
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2)
+res1 = res1+g2**2*Cos(2._dp*(PhiW))*Tan(TW)
+res1 = res1+g2**2*Cos(2._dp*(TW))*Tan(TW)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46916,13 +43962,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVWLmVZVZRL  
  
  
-Subroutine CouplingcVWRmVWRmVZVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWRmVZVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -46931,20 +43975,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWRmVZVZR' 
  
 res1 = 0._dp 
-res1 = res1-(g2**2*ZZ(1,1)*ZZ(1,2))
-res1 = res1+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2)
-res1 = res1-(g2**2*ZZ(2,1)*ZZ(2,2))
-res1 = res1-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))
+res1 = res1-(g2**2*Cos(2._dp*(PhiW))*Tan(TW))
+res1 = res1+g2**2*Cos(2._dp*(TW))*Tan(TW)
 res2 = 0._dp 
-res2 = res2+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res2 = res2+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res2 = res2+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))/2._dp
+res2 = res2+(g2**2*Cos(2._dp*(PhiW))*Tan(TW))/2._dp
+res2 = res2-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,2))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,2))
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,2))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,2))/2._dp
+res3 = res3+(g2**2*Cos(2._dp*(PhiW))*Tan(TW))/2._dp
+res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(TW))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -46956,70 +43994,12 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWRmVZVZRL  
  
  
-Subroutine CouplingcgWLmgWRmVPL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgWRmVP' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3)
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgWRmVPL  
- 
- 
-Subroutine CouplingcgWLpgWRpVPL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLpgWRpVP' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW))
-res = res+g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLpgWRpVPL  
- 
- 
-Subroutine CouplingAhAhVPVZL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingAhAhVPVZL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47044,22 +44024,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,1)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*Tan(TW)*UP(gt1,2)*UP(gt2,2))
+res = res-1._dp/4._dp*(g2*gBL*1/Cos(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UP(gt1,4)*UP(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47071,14 +44041,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVPVZL  
  
  
-Subroutine CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47103,22 +44071,12 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,1))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,1)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,1)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,1))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,1)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,1)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*Tan(TW)*ZH(gt1,2)*ZH(gt2,2))
+res = res-1._dp/4._dp*(g2*gBL*1/Cos(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47130,14 +44088,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVPVZL  
  
  
-Subroutine CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47162,22 +44118,14 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,1))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,1))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,1)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,1)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,1)*ZZ(3,3))/2._dp
+res = res-(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,1)*UC(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res+(g2*gBL*Sin(TW)*Tan(TW)*UC(gt1,2)*UC(gt2,2))/2._dp
+res = res-(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,3)*UC(gt2,3))
+res = res+(g2*gBL*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res+(-3*g2*gBL*Cos(2._dp*(TW))*1/Cos(TW)*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)*UC(gt1,4)*UC(gt2,4))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47189,13 +44137,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPVZL  
  
  
-Subroutine CouplingcVWLmVPVWLmVZL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWLmVZL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -47204,20 +44150,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLmVZ' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res1 = res1-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,1)*ZZ(1,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res2 = res2-(g2**2*ZZ(2,1)*ZZ(2,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3)
+res2 = res2+2*g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res3 = res3-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47229,13 +44166,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmVZL  
  
  
-Subroutine CouplingcVWRmVPVWRmVZL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWRmVZL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -47244,20 +44179,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRmVZ' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res1 = res1+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))/2._dp
+res1 = res1-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,1)*ZZ(1,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3)
-res2 = res2-(g2**2*ZZ(2,1)*ZZ(2,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))
+res2 = res2+2*g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,1)*ZZ(1,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,1)*ZZ(1,3))
-res3 = res3+(g2**2*ZZ(2,1)*ZZ(2,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,1)*ZZ(2,3))/2._dp
+res3 = res3-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW))
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47269,14 +44195,112 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVPVWRmVZL  
  
  
-Subroutine CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,ZZ,UP,res)
+Subroutine CouplingcgWLmgWRmVPL(g2,TW,PhiW,res)
+
+Implicit None 
+
+Real(dp), Intent(in) :: g2,TW,PhiW
+
+Complex(dp), Intent(out) :: res 
+ 
+Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
+Iname = Iname +1 
+NameOfUnit(Iname) = 'CouplingcgWLmgWRmVP' 
+ 
+res = 0._dp 
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
+If (Real(res,dp).ne.Real(res,dp)) Then 
+ Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
+ Call TerminateProgram 
+End If 
+
+
+Iname = Iname - 1 
+ 
+End Subroutine CouplingcgWLmgWRmVPL  
+ 
+ 
+Subroutine CouplingcgWLpgWRpVPL(g2,TW,PhiW,res)
+
+Implicit None 
+
+Real(dp), Intent(in) :: g2,TW,PhiW
+
+Complex(dp), Intent(out) :: res 
+ 
+Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
+Iname = Iname +1 
+NameOfUnit(Iname) = 'CouplingcgWLpgWRpVP' 
+ 
+res = 0._dp 
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
+If (Real(res,dp).ne.Real(res,dp)) Then 
+ Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
+ Call TerminateProgram 
+End If 
+
+
+Iname = Iname - 1 
+ 
+End Subroutine CouplingcgWLpgWRpVPL  
+ 
+ 
+Subroutine CouplingcgWLmgWRmVZRL(g2,TW,PhiW,res)
+
+Implicit None 
+
+Real(dp), Intent(in) :: g2,TW,PhiW
+
+Complex(dp), Intent(out) :: res 
+ 
+Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
+Iname = Iname +1 
+NameOfUnit(Iname) = 'CouplingcgWLmgWRmVZR' 
+ 
+res = 0._dp 
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
+If (Real(res,dp).ne.Real(res,dp)) Then 
+ Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
+ Call TerminateProgram 
+End If 
+
+
+Iname = Iname - 1 
+ 
+End Subroutine CouplingcgWLmgWRmVZRL  
+ 
+ 
+Subroutine CouplingcgWLpgWRpVZRL(g2,TW,PhiW,res)
+
+Implicit None 
+
+Real(dp), Intent(in) :: g2,TW,PhiW
+
+Complex(dp), Intent(out) :: res 
+ 
+Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
+Iname = Iname +1 
+NameOfUnit(Iname) = 'CouplingcgWLpgWRpVZR' 
+ 
+res = 0._dp 
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
+If (Real(res,dp).ne.Real(res,dp)) Then 
+ Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
+ Call TerminateProgram 
+End If 
+
+
+Iname = Iname - 1 
+ 
+End Subroutine CouplingcgWLpgWRpVZRL  
+ 
+ 
+Subroutine CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,UP,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UP(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UP(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47301,22 +44325,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(1,2)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*UP(gt1,1)*UP(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,3)*UP(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,2)*UP(gt2,2)*ZZ(1,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*UP(gt1,4)*UP(gt2,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*UP(gt1,2)*UP(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UP(gt1,4)*UP(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,1)*UP(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,2)*UP(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,2)*UP(gt2,2))
+res = res+(g2*gBL*Sin(TW)*UP(gt1,2)*UP(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,3)*UP(gt2,3))
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UP(gt1,4)*UP(gt2,4))
+res = res+(3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*UP(gt1,4)*UP(gt2,4))/8._dp
+res = res+(-5*g2*gBL*1/Cos(TW)*Tan(TW)*UP(gt1,4)*UP(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47328,14 +44347,12 @@ Iname = Iname - 1
 End Subroutine CouplingAhAhVPVZRL  
  
  
-Subroutine CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZZ,ZH,res)
+Subroutine CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZH,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47360,22 +44377,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,3)*ZZ(2,2))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(1,2)*ZZ(2,3))
-res = res-1._dp/2._dp*(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(1,2)*ZZ(2,3))
-res = res+(g2**2*ZH(gt1,1)*ZH(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,3)*ZH(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,3)*ZZ(3,2))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,2)*ZH(gt2,2)*ZZ(1,2)*ZZ(3,3))
-res = res-1._dp/2._dp*(g2*gBL*ZH(gt1,4)*ZH(gt2,4)*ZZ(2,2)*ZZ(3,3))
-res = res+(gBL**2*ZH(gt1,2)*ZH(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*ZH(gt1,4)*ZH(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,1)*ZH(gt2,1))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,2)*ZH(gt2,2))
+res = res+(g2*gBL*Sin(TW)*ZH(gt1,2)*ZH(gt2,2))/2._dp
+res = res-1._dp/2._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,3)*ZH(gt2,3))
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*ZH(gt1,4)*ZH(gt2,4))
+res = res+(3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*ZH(gt1,4)*ZH(gt2,4))/8._dp
+res = res+(-5*g2*gBL*1/Cos(TW)*Tan(TW)*ZH(gt1,4)*ZH(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47387,14 +44399,12 @@ Iname = Iname - 1
 End Subroutine CouplinghhhhVPVZRL  
  
  
-Subroutine CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,ZZ,UC,res)
+Subroutine CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,UC,TW,res)
 
 Implicit None 
 
 Integer, Intent(in) :: gt1,gt2
-Real(dp), Intent(in) :: gBL,g2,UC(4,4)
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: gBL,g2,UC(4,4),TW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47419,22 +44429,17 @@ If ((gt2.Lt.1).Or.(gt2.Gt.4)) Then
 End If 
 
 res = 0._dp 
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(1,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,3)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,3)*ZZ(2,2))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(1,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(1,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,1)*UC(gt2,1)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,3)*UC(gt2,3)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2**2*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(2,3))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,3)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,3)*ZZ(3,2))/2._dp
-res = res+(g2*gBL*UC(gt1,2)*UC(gt2,2)*ZZ(1,2)*ZZ(3,3))/2._dp
-res = res+(g2*gBL*UC(gt1,4)*UC(gt2,4)*ZZ(2,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,2)*UC(gt2,2)*ZZ(3,2)*ZZ(3,3))/2._dp
-res = res+(gBL**2*UC(gt1,4)*UC(gt2,4)*ZZ(3,2)*ZZ(3,3))/2._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,1)*UC(gt2,1))/2._dp
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,2)*UC(gt2,2))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,2)*UC(gt2,2))
+res = res-1._dp/2._dp*(g2*gBL*Sin(TW)*UC(gt1,2)*UC(gt2,2))
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,3)*UC(gt2,3))/2._dp
+res = res-1._dp/4._dp*(g2**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))
+res = res+(gBL**2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res+(g2**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))/4._dp
+res = res-1._dp/4._dp*(gBL**2*Cos(2._dp*(TW))**1.5_dp*1/Cos(TW)**2*UC(gt1,4)*UC(gt2,4))
+res = res+(-3*g2*gBL*1/Cos(TW)**2*Sin(3._dp*(TW))*UC(gt1,4)*UC(gt2,4))/8._dp
+res = res+(5*g2*gBL*1/Cos(TW)*Tan(TW)*UC(gt1,4)*UC(gt2,4))/8._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47446,13 +44451,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmVPVZRL  
  
  
-Subroutine CouplingcVWLmVPVWLmVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWLmVPVWLmVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -47461,20 +44464,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWLmVPVWLmVZR' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res1 = res1-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,2)*ZZ(1,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res2 = res2-(g2**2*ZZ(2,2)*ZZ(2,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3)
+res2 = res2+2*g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res3 = res3-(g2**2*Sqrt(Cos(2._dp*(TW)))*Sin(PhiW)**2*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47486,13 +44480,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWLmVPVWLmVZRL  
  
  
-Subroutine CouplingcVWRmVPVWRmVZRL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVWRmVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -47501,20 +44493,11 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVWRmVZR' 
  
 res1 = 0._dp 
-res1 = res1+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res1 = res1-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res1 = res1+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res1 = res1+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))/2._dp
+res1 = res1-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-(g2**2*ZZ(1,2)*ZZ(1,3))
-res2 = res2+g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3)
-res2 = res2-(g2**2*ZZ(2,2)*ZZ(2,3))
-res2 = res2-(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))
+res2 = res2+2*g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3+(g2**2*ZZ(1,2)*ZZ(1,3))/2._dp
-res3 = res3-1._dp/2._dp*(g2**2*Cos(2._dp*(PhiW))*ZZ(1,2)*ZZ(1,3))
-res3 = res3+(g2**2*ZZ(2,2)*ZZ(2,3))/2._dp
-res3 = res3+(g2**2*Cos(2._dp*(PhiW))*ZZ(2,2)*ZZ(2,3))/2._dp
+res3 = res3-(g2**2*Cos(PhiW)**2*Sqrt(Cos(2._dp*(TW)))*Tan(TW)**2)
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47675,13 +44658,11 @@ Iname = Iname - 1
 End Subroutine CouplingcFeFvVWLmL  
  
  
-Subroutine CouplingcgWLmgPVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgPVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47690,8 +44671,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgPVWLm' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,3)
-res = res+g2*Sin(PhiW)**2*ZZ(2,3)
+res = res-(g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47703,13 +44683,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgPVWLmL  
  
  
-Subroutine CouplingcgWRmgPVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgPVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47718,8 +44696,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgPVWLm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,3))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,3)
+res = res-(g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47731,13 +44708,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWRmgPVWLmL  
  
  
-Subroutine CouplingcgPgWLpVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWLpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47746,8 +44721,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWLpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,3))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,3))*Sin(PhiW)**2)
+res = res+g2*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)**2
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47759,41 +44733,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWLpVWLmL  
  
  
-Subroutine CouplingcgZgWLpVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWLpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWLpVWLm' 
- 
-res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,1))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,1))*Sin(PhiW)**2)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWLpVWLmL  
- 
- 
-Subroutine CouplingcgZpgWLpVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47802,8 +44746,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWLpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Conjg(ZZ(1,2))*Cos(PhiW)**2)
-res = res-(g2*Conjg(ZZ(2,2))*Sin(PhiW)**2)
+res = res+(g2*Cos(2._dp*(PhiW))*1/Cos(TW))/2._dp
+res = res+(g2*Cos(2._dp*(TW))*1/Cos(TW))/2._dp
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47815,13 +44759,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWLpVWLmL  
  
  
-Subroutine CouplingcgPgWRpVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgPgWRpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47830,8 +44772,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgPgWRpVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,3))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,3))*Cos(PhiW)*Sin(PhiW))
+res = res+g2*Cos(PhiW)*Sqrt(Cos(2._dp*(TW)))*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47843,41 +44784,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgPgWRpVWLmL  
  
  
-Subroutine CouplingcgZgWRpVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgZpgWRpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgZgWRpVWLm' 
- 
-res = 0._dp 
-res = res+g2*Conjg(ZZ(1,1))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,1))*Cos(PhiW)*Sin(PhiW))
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgZgWRpVWLmL  
- 
- 
-Subroutine CouplingcgZpgWRpVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47886,8 +44797,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgZpgWRpVWLm' 
  
 res = 0._dp 
-res = res+g2*Conjg(ZZ(1,2))*Cos(PhiW)*Sin(PhiW)
-res = res-(g2*Conjg(ZZ(2,2))*Cos(PhiW)*Sin(PhiW))
+res = res-(g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47899,69 +44809,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgZpgWRpVWLmL  
  
  
-Subroutine CouplingcgWLmgZVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWLmgZpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWLmgZVWLm' 
- 
-res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,1)
-res = res+g2*Sin(PhiW)**2*ZZ(2,1)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWLmgZVWLmL  
- 
- 
-Subroutine CouplingcgWRmgZVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcgWRmgZVWLm' 
- 
-res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,1))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,1)
-If (Real(res,dp).ne.Real(res,dp)) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcgWRmgZVWLmL  
- 
- 
-Subroutine CouplingcgWLmgZpVWLmL(g2,ZZ,PhiW,res)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47970,8 +44822,8 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWLmgZpVWLm' 
  
 res = 0._dp 
-res = res+g2*Cos(PhiW)**2*ZZ(1,2)
-res = res+g2*Sin(PhiW)**2*ZZ(2,2)
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(PhiW))*1/Cos(TW))
+res = res-1._dp/2._dp*(g2*Cos(2._dp*(TW))*1/Cos(TW))
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -47983,13 +44835,11 @@ Iname = Iname - 1
 End Subroutine CouplingcgWLmgZpVWLmL  
  
  
-Subroutine CouplingcgWRmgZpVWLmL(g2,ZZ,PhiW,res)
+Subroutine CouplingcgWRmgZpVWLmL(g2,TW,PhiW,res)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res 
  
@@ -47998,8 +44848,7 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcgWRmgZpVWLm' 
  
 res = 0._dp 
-res = res-(g2*Cos(PhiW)*Sin(PhiW)*ZZ(1,2))
-res = res+g2*Cos(PhiW)*Sin(PhiW)*ZZ(2,2)
+res = res+g2*Cos(PhiW)*1/Cos(TW)*Sin(PhiW)
 If (Real(res,dp).ne.Real(res,dp)) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -48191,13 +45040,11 @@ Iname = Iname - 1
 End Subroutine CouplingHpmcHpmcVWRmVWLmL  
  
  
-Subroutine CouplingcVWRmVPVPVWLmL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVPVPVWLmL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -48206,14 +45053,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVPVPVWLm' 
  
 res1 = 0._dp 
-res1 = res1-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,3)**2)
-res1 = res1+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res1 = res1+g2**2*Cos(PhiW)*Sin(PhiW)
+res1 = res1-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res2 = 0._dp 
-res2 = res2-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,3)**2)
-res2 = res2+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,3)**2)/2._dp
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2)
 res3 = 0._dp 
-res3 = res3+g2**2*Sin(2._dp*(PhiW))*ZZ(1,3)**2
-res3 = res3-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,3)**2)
+res3 = res3-2*g2**2*Cos(PhiW)*Sin(PhiW)
+res3 = res3+2*g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -48283,47 +45130,11 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmcVWRmVWLmVWRmL  
  
  
-Subroutine CouplingcVWRmVWLmVZVZL(g2,ZZ,PhiW,res1,res2,res3)
+Subroutine CouplingcVWRmVWLmVZRVZRL(g2,TW,PhiW,res1,res2,res3)
 
 Implicit None 
 
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
-
-Complex(dp), Intent(out) :: res1, res2, res3 
- 
-Integer :: j1,j2,j3,j4,j5,j6, j7, j8, j9, j10, j11, j12 
-Iname = Iname +1 
-NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZVZ' 
- 
-res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)**2)
-res2 = 0._dp 
-res2 = res2-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)**2)
-res2 = res2+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
-res3 = 0._dp 
-res3 = res3-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,1)**2)
-res3 = res3+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,1)**2)/2._dp
-If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
- Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
- Call TerminateProgram 
-End If 
-
-
-Iname = Iname - 1 
- 
-End Subroutine CouplingcVWRmVWLmVZVZL  
- 
- 
-Subroutine CouplingcVWRmVWLmVZRVZRL(g2,ZZ,PhiW,res1,res2,res3)
-
-Implicit None 
-
-Real(dp), Intent(in) :: g2,PhiW
-
-Complex(dp), Intent(in) :: ZZ(3,3)
+Real(dp), Intent(in) :: g2,TW,PhiW
 
 Complex(dp), Intent(out) :: res1, res2, res3 
  
@@ -48332,14 +45143,14 @@ Iname = Iname +1
 NameOfUnit(Iname) = 'CouplingcVWRmVWLmVZRVZR' 
  
 res1 = 0._dp 
-res1 = res1+g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)**2
-res1 = res1-(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)**2)
+res1 = res1+2*g2**2*Cos(PhiW)*Sin(PhiW)
+res1 = res1-2*g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 res2 = 0._dp 
-res2 = res2-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)**2)
-res2 = res2+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res2 = res2-(g2**2*Cos(PhiW)*Sin(PhiW))
+res2 = res2+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 res3 = 0._dp 
-res3 = res3-1._dp/2._dp*(g2**2*Sin(2._dp*(PhiW))*ZZ(1,2)**2)
-res3 = res3+(g2**2*Sin(2._dp*(PhiW))*ZZ(2,2)**2)/2._dp
+res3 = res3-(g2**2*Cos(PhiW)*Sin(PhiW))
+res3 = res3+g2**2*Cos(PhiW)*Sin(PhiW)*Tan(TW)**2
 If ((Real(res1,dp).ne.Real(res1,dp)).or.(Real(res2,dp).ne.Real(res2,dp)).or.(Real(res3,dp).ne.Real(res3,dp))) Then 
  Write(*,*) "NaN appearing in ",NameOfUnit(Iname) 
  Call TerminateProgram 
@@ -48351,90 +45162,82 @@ Iname = Iname - 1
 End Subroutine CouplingcVWRmVWLmVZRVZRL  
  
  
-Subroutine CouplingsForVectorBosons(gBL,g2,ZZ,ZH,UP,ZM,PhiW,k1,vR,UC,ZDL,             & 
+Subroutine CouplingsForVectorBosons(gBL,g2,ZH,UP,TW,ZM,vR,UC,k1,PhiW,ZDL,             & 
 & ZDR,ZUL,ZUR,ZEL,ZER,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,         & 
-& cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,           & 
-& cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,       & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,       & 
-& cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3,cplhhVPVZR,cplHpmVWLmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,            & 
-& cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplAhhhVP,cplcFdFdVPL,     & 
-& cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,cplFvFvVPL,cplFvFvVPR,     & 
-& cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,            & 
-& cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,cplcVWRmVPVWLm,   & 
-& cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,               & 
+& cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,           & 
+& cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,             & 
+& cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,       & 
+& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplhhVPVZR,cplHpmVWLmVZR,cplcVWLmVWLmVZR,          & 
+& cplcVWRmVWLmVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,           & 
+& cplAhhhVP,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,     & 
+& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
+& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,   & 
+& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,& 
 & cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
 & cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,         & 
 & cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,           & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,     & 
-& cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,      & 
-& cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZ,            & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,      & 
-& cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
-& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcVWRmVWLm,   & 
-& cplhhcVWRmVWLm,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,            & 
+& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
+& cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,          & 
+& cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,          & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplAhcVWRmVWLm,cplhhcVWRmVWLm,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,    & 
 & cplAhAhVZVZR,cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,       & 
 & cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,           & 
-& cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,& 
-& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,               & 
-& cplcVWRmVPVWRmVZ3,cplAhAhVPVZR,cplhhhhVPVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1,        & 
-& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,           & 
-& cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,             & 
-& cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,cplcgZgWLpVWLm,             & 
-& cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZVWLm,          & 
-& cplcgWRmgZVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm,cplAhAhcVWRmVWLm,          & 
-& cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,              & 
-& cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
-& cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZVZ1,& 
-& cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,           & 
-& cplcVWRmVWLmVZRVZR3)
+& cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,            & 
+& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
+& cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZR,cplhhhhVPVZR,cplHpmcHpmVPVZR,               & 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,           & 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,        & 
+& cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,              & 
+& cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,        & 
+& cplhhHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,cplcVWRmVPVPVWLm1,  & 
+& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,     & 
+& cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
+& cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
 Implicit None 
-Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),PhiW,k1,vR,UC(4,4)
+Real(dp), Intent(in) :: gBL,g2,ZH(4,4),UP(4,4),TW,vR,UC(4,4),k1,PhiW
 
-Complex(dp), Intent(in) :: ZZ(3,3),ZM(9,9),ZDL(3,3),ZDR(3,3),ZUL(3,3),ZUR(3,3),ZEL(3,3),ZER(3,3)
+Complex(dp), Intent(in) :: ZM(9,9),ZDL(3,3),ZDR(3,3),ZUL(3,3),ZUR(3,3),ZEL(3,3),ZER(3,3)
 
 Complex(dp), Intent(out) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),   & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplcgWLmgWLmVZ,      & 
-& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
-& cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),             & 
-& cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ(4,4),         & 
-& cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,              & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
-& cplhhVPVZR(4),cplHpmVWLmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWLmVWLmVZRVZR1,    & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplAhhhVP(4,4),cplcFdFdVPL(3,3),               & 
-& cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),  & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,          & 
-& cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP(4,4),cplHpmVPVWLm(4),        & 
-& cplHpmVPVWRm(4),cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP(4,4),         & 
-& cplhhhhVPVP(4,4),cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,              & 
-& cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,               & 
-& cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm, & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,     & 
-& cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4), & 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWRm,cplcVWLmVWRmVZ,   & 
-& cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),            & 
-& cplhhhhcVWLmVWLm(4,4),cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,& 
-& cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,& 
-& cplAhcVWRmVWLm(4),cplhhcVWRmVWLm(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),               & 
-& cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,cplAhAhVZVZR(4,4),cplhhhhVZVZR(4,4),cplHpmcHpmVZVZR(4,4),& 
-& cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,           & 
-& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZ(4,4),  & 
-& cplhhhhVPVZ(4,4),cplHpmcHpmVPVZ(4,4),cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,              & 
-& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
-& cplAhAhVPVZR(4,4),cplhhhhVPVZR(4,4),cplHpmcHpmVPVZR(4,4),cplcVWLmVPVWLmVZR1,           & 
-& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,           & 
-& cplcVWRmVPVWRmVZR3,cplAhHpmVWLm(4,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),            & 
-& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,    & 
-& cplcgZgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZgWRpVWLm,cplcgZpgWRpVWLm,          & 
-& cplcgWLmgZVWLm,cplcgWRmgZVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm(4,4),       & 
-& cplAhAhcVWRmVWLm(4,4),cplhhhhcVWRmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplcVWRmVPVPVWLm1,& 
-& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2
-
-Complex(dp), Intent(out) :: cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
-& cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,             & 
+& cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),  & 
+& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
+& cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,               & 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
+& cplcVWRmVWRmVZVZ3,cplhhVPVZR(4),cplHpmVWLmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,      & 
+& cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplAhhhVP(4,4),            & 
+& cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFuFuVPL(3,3),  & 
+& cplcFuFuVPR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,cplcgWRmgWLmVP,        & 
+& cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP(4,4),         & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplAhAhVPVP(4,4),cplhhhhVPVP(4,4),cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm1,               & 
+& cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
+& cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),           & 
+& cplcFuFdcVWLmR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,             & 
+& cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4),& 
+& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWRm,cplcVWLmVWRmVZR,  & 
+& cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),      & 
+& cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
+& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcVWRmVWLm(4),& 
+& cplhhcVWRmVWLm(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplAhAhVZVZR(4,4),               & 
+& cplhhhhVZVZR(4,4),cplHpmcHpmVZVZR(4,4),cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,          & 
+& cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,           & 
+& cplAhAhVPVZ(4,4),cplhhhhVPVZ(4,4),cplHpmcHpmVPVZ(4,4),cplcVWLmVPVWLmVZ1,               & 
+& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,               & 
+& cplcVWRmVPVWRmVZ3,cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZR(4,4),cplhhhhVPVZR(4,4),   & 
+& cplHpmcHpmVPVZR(4,4),cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,         & 
+& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm(4,4),            & 
+& cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),           & 
+& cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,           & 
+& cplcgZpgWRpVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,cplhhHpmVWLm(4,4),cplAhAhcVWRmVWLm(4,4),& 
+& cplhhhhcVWRmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,    & 
+& cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,& 
+& cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,& 
 & cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3
 
 Integer :: gt1, gt2, gt3, gt4, ct1, ct2, ct3, ct4
@@ -48445,7 +45248,7 @@ NameOfUnit(Iname) = 'CouplingsForVectorBosons'
 cplAhhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVZL(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVZ(gt1,gt2))
+Call CouplingAhhhVZL(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -48455,7 +45258,7 @@ cplcFdFdVZL = 0._dp
 cplcFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVZL(gt1,gt2,gBL,g2,ZZ,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
+Call CouplingcFdFdVZL(gt1,gt2,gBL,g2,TW,cplcFdFdVZL(gt1,gt2),cplcFdFdVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48465,7 +45268,7 @@ cplcFeFeVZL = 0._dp
 cplcFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZL(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
+Call CouplingcFeFeVZL(gt1,gt2,gBL,g2,TW,cplcFeFeVZL(gt1,gt2),cplcFeFeVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48475,7 +45278,7 @@ cplcFuFuVZL = 0._dp
 cplcFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVZL(gt1,gt2,gBL,g2,ZZ,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
+Call CouplingcFuFuVZL(gt1,gt2,gBL,g2,TW,cplcFuFuVZL(gt1,gt2),cplcFuFuVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48485,59 +45288,49 @@ cplFvFvVZL = 0._dp
 cplFvFvVZR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZL(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
+Call CouplingFvFvVZL(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZL(gt1,gt2),cplFvFvVZR(gt1,gt2))
 
  End Do 
 End Do 
 
 
 cplcgWLmgWLmVZ = 0._dp 
-Call CouplingcgWLmgWLmVZL(g2,ZZ,PhiW,cplcgWLmgWLmVZ)
-
-
-
-cplcgWRmgWLmVZ = 0._dp 
-Call CouplingcgWRmgWLmVZL(g2,ZZ,PhiW,cplcgWRmgWLmVZ)
+Call CouplingcgWLmgWLmVZL(g2,TW,cplcgWLmgWLmVZ)
 
 
 
 cplcgWLpgWLpVZ = 0._dp 
-Call CouplingcgWLpgWLpVZL(g2,ZZ,PhiW,cplcgWLpgWLpVZ)
-
-
-
-cplcgWRpgWLpVZ = 0._dp 
-Call CouplingcgWRpgWLpVZL(g2,ZZ,PhiW,cplcgWRpgWLpVZ)
+Call CouplingcgWLpgWLpVZL(g2,TW,cplcgWLpgWLpVZ)
 
 
 
 cplcgWRmgWRmVZ = 0._dp 
-Call CouplingcgWRmgWRmVZL(g2,ZZ,PhiW,cplcgWRmgWRmVZ)
+Call CouplingcgWRmgWRmVZL(g2,TW,cplcgWRmgWRmVZ)
 
 
 
 cplcgWRpgWRpVZ = 0._dp 
-Call CouplingcgWRpgWRpVZL(g2,ZZ,PhiW,cplcgWRpgWRpVZ)
+Call CouplingcgWRpgWRpVZL(g2,TW,cplcgWRpgWRpVZ)
 
 
 
 cplhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZ(gt1))
+Call CouplinghhVPVZL(gt1,gBL,g2,vR,ZH,TW,cplhhVPVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZ(gt1))
+Call CouplinghhVZVZL(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZ(gt1))
 
 End Do 
 
 
 cplhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVZVZR(gt1))
+Call CouplinghhVZVZRL(gt1,gBL,g2,vR,ZH,TW,cplhhVZVZR(gt1))
 
 End Do 
 
@@ -48545,7 +45338,7 @@ End Do
 cplHpmcHpmVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZ(gt1,gt2))
+Call CouplingHpmcHpmVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -48553,37 +45346,32 @@ End Do
 
 cplHpmVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZ(gt1))
+Call CouplingHpmVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZ(gt1))
 
 End Do 
 
 
 cplHpmVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWRmVZ(gt1))
+Call CouplingHpmVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWRmVZ(gt1))
 
 End Do 
 
 
 cplcVWLmVWLmVZ = 0._dp 
-Call CouplingcVWLmVWLmVZL(g2,ZZ,PhiW,cplcVWLmVWLmVZ)
-
-
-
-cplcVWRmVWLmVZ = 0._dp 
-Call CouplingcVWRmVWLmVZL(g2,ZZ,PhiW,cplcVWRmVWLmVZ)
+Call CouplingcVWLmVWLmVZL(g2,TW,cplcVWLmVWLmVZ)
 
 
 
 cplcVWRmVWRmVZ = 0._dp 
-Call CouplingcVWRmVWRmVZL(g2,ZZ,PhiW,cplcVWRmVWRmVZ)
+Call CouplingcVWRmVWRmVZL(g2,TW,cplcVWRmVWRmVZ)
 
 
 
 cplAhAhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZ(gt1,gt2))
+Call CouplingAhAhVZVZL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -48592,7 +45380,7 @@ End Do
 cplhhhhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZ(gt1,gt2))
+Call CouplinghhhhVZVZL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -48601,7 +45389,7 @@ End Do
 cplHpmcHpmVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZ(gt1,gt2))
+Call CouplingHpmcHpmVZVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -48610,47 +45398,45 @@ End Do
 cplcVWLmVWLmVZVZ1 = 0._dp 
 cplcVWLmVWLmVZVZ2 = 0._dp 
 cplcVWLmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,           & 
-& cplcVWLmVWLmVZVZ3)
+Call CouplingcVWLmVWLmVZVZL(g2,TW,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3)
 
 
 
 cplcVWRmVWRmVZVZ1 = 0._dp 
 cplcVWRmVWRmVZVZ2 = 0._dp 
 cplcVWRmVWRmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZL(g2,ZZ,PhiW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,           & 
-& cplcVWRmVWRmVZVZ3)
+Call CouplingcVWRmVWRmVZVZL(g2,TW,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3)
 
 
 
 cplhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,ZH,cplhhVPVZR(gt1))
+Call CouplinghhVPVZRL(gt1,gBL,g2,k1,vR,ZH,TW,cplhhVPVZR(gt1))
 
 End Do 
 
 
 cplHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingHpmVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
 
 End Do 
 
 
 cplcVWLmVWLmVZR = 0._dp 
-Call CouplingcVWLmVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZR)
+Call CouplingcVWLmVWLmVZRL(g2,TW,PhiW,cplcVWLmVWLmVZR)
 
 
 
 cplcVWRmVWLmVZR = 0._dp 
-Call CouplingcVWRmVWLmVZRL(g2,ZZ,PhiW,cplcVWRmVWLmVZR)
+Call CouplingcVWRmVWLmVZRL(g2,TW,PhiW,cplcVWRmVWLmVZR)
 
 
 
 cplcVWLmVWLmVZRVZR1 = 0._dp 
 cplcVWLmVWLmVZRVZR2 = 0._dp 
 cplcVWLmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
+Call CouplingcVWLmVWLmVZRVZRL(g2,TW,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,     & 
 & cplcVWLmVWLmVZRVZR3)
 
 
@@ -48658,7 +45444,7 @@ Call CouplingcVWLmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2
 cplAhhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhhhVPL(gt1,gt2,gBL,g2,ZZ,ZH,UP,cplAhhhVP(gt1,gt2))
+Call CouplingAhhhVPL(gt1,gt2,gBL,g2,ZH,UP,TW,cplAhhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -48668,7 +45454,7 @@ cplcFdFdVPL = 0._dp
 cplcFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFdFdVPL(gt1,gt2,gBL,g2,ZZ,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
+Call CouplingcFdFdVPL(gt1,gt2,gBL,g2,TW,cplcFdFdVPL(gt1,gt2),cplcFdFdVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48678,7 +45464,7 @@ cplcFeFeVPL = 0._dp
 cplcFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVPL(gt1,gt2,gBL,g2,ZZ,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
+Call CouplingcFeFeVPL(gt1,gt2,gBL,g2,TW,cplcFeFeVPL(gt1,gt2),cplcFeFeVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48688,7 +45474,7 @@ cplcFuFuVPL = 0._dp
 cplcFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFuFuVPL(gt1,gt2,gBL,g2,ZZ,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
+Call CouplingcFuFuVPL(gt1,gt2,gBL,g2,TW,cplcFuFuVPL(gt1,gt2),cplcFuFuVPR(gt1,gt2))
 
  End Do 
 End Do 
@@ -48698,46 +45484,46 @@ cplFvFvVPL = 0._dp
 cplFvFvVPR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVPL(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
+Call CouplingFvFvVPL(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVPL(gt1,gt2),cplFvFvVPR(gt1,gt2))
 
  End Do 
 End Do 
 
 
 cplcgWLmgWLmVP = 0._dp 
-Call CouplingcgWLmgWLmVPL(g2,ZZ,PhiW,cplcgWLmgWLmVP)
+Call CouplingcgWLmgWLmVPL(g2,TW,PhiW,cplcgWLmgWLmVP)
 
 
 
 cplcgWRmgWLmVP = 0._dp 
-Call CouplingcgWRmgWLmVPL(g2,ZZ,PhiW,cplcgWRmgWLmVP)
+Call CouplingcgWRmgWLmVPL(g2,TW,PhiW,cplcgWRmgWLmVP)
 
 
 
 cplcgWLpgWLpVP = 0._dp 
-Call CouplingcgWLpgWLpVPL(g2,ZZ,PhiW,cplcgWLpgWLpVP)
+Call CouplingcgWLpgWLpVPL(g2,TW,PhiW,cplcgWLpgWLpVP)
 
 
 
 cplcgWRpgWLpVP = 0._dp 
-Call CouplingcgWRpgWLpVPL(g2,ZZ,PhiW,cplcgWRpgWLpVP)
+Call CouplingcgWRpgWLpVPL(g2,TW,PhiW,cplcgWRpgWLpVP)
 
 
 
 cplcgWRmgWRmVP = 0._dp 
-Call CouplingcgWRmgWRmVPL(g2,ZZ,PhiW,cplcgWRmgWRmVP)
+Call CouplingcgWRmgWRmVPL(g2,TW,PhiW,cplcgWRmgWRmVP)
 
 
 
 cplcgWRpgWRpVP = 0._dp 
-Call CouplingcgWRpgWRpVPL(g2,ZZ,PhiW,cplcgWRpgWRpVP)
+Call CouplingcgWRpgWRpVPL(g2,TW,PhiW,cplcgWRpgWRpVP)
 
 
 
 cplHpmcHpmVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVP(gt1,gt2))
+Call CouplingHpmcHpmVPL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -48745,37 +45531,37 @@ End Do
 
 cplHpmVPVWLm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWLm(gt1))
+Call CouplingHpmVPVWLmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWLm(gt1))
 
 End Do 
 
 
 cplHpmVPVWRm = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVPVWRm(gt1))
+Call CouplingHpmVPVWRmL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVPVWRm(gt1))
 
 End Do 
 
 
 cplcVWLmVPVWLm = 0._dp 
-Call CouplingcVWLmVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVWLm)
+Call CouplingcVWLmVPVWLmL(g2,TW,PhiW,cplcVWLmVPVWLm)
 
 
 
 cplcVWRmVPVWLm = 0._dp 
-Call CouplingcVWRmVPVWLmL(g2,ZZ,PhiW,cplcVWRmVPVWLm)
+Call CouplingcVWRmVPVWLmL(g2,TW,PhiW,cplcVWRmVPVWLm)
 
 
 
 cplcVWRmVPVWRm = 0._dp 
-Call CouplingcVWRmVPVWRmL(g2,ZZ,PhiW,cplcVWRmVPVWRm)
+Call CouplingcVWRmVPVWRmL(g2,TW,PhiW,cplcVWRmVPVWRm)
 
 
 
 cplAhAhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVPL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVP(gt1,gt2))
+Call CouplingAhAhVPVPL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -48784,7 +45570,7 @@ End Do
 cplhhhhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVP(gt1,gt2))
+Call CouplinghhhhVPVPL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -48793,7 +45579,7 @@ End Do
 cplHpmcHpmVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVP(gt1,gt2))
+Call CouplingHpmcHpmVPVPL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -48802,7 +45588,7 @@ End Do
 cplcVWLmVPVPVWLm1 = 0._dp 
 cplcVWLmVPVPVWLm2 = 0._dp 
 cplcVWLmVPVPVWLm3 = 0._dp 
-Call CouplingcVWLmVPVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
+Call CouplingcVWLmVPVPVWLmL(g2,TW,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,           & 
 & cplcVWLmVPVPVWLm3)
 
 
@@ -48810,7 +45596,7 @@ Call CouplingcVWLmVPVPVWLmL(g2,ZZ,PhiW,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,     
 cplcVWRmVPVPVWRm1 = 0._dp 
 cplcVWRmVPVPVWRm2 = 0._dp 
 cplcVWRmVPVPVWRm3 = 0._dp 
-Call CouplingcVWRmVPVPVWRmL(g2,ZZ,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
+Call CouplingcVWRmVPVPVWRmL(g2,TW,PhiW,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,           & 
 & cplcVWRmVPVPVWRm3)
 
 
@@ -48854,62 +45640,52 @@ End Do
 
 
 cplcgWLpgPcVWLm = 0._dp 
-Call CouplingcgWLpgPcVWLmL(g2,ZZ,PhiW,cplcgWLpgPcVWLm)
+Call CouplingcgWLpgPcVWLmL(g2,TW,PhiW,cplcgWLpgPcVWLm)
 
 
 
 cplcgWRpgPcVWLm = 0._dp 
-Call CouplingcgWRpgPcVWLmL(g2,ZZ,PhiW,cplcgWRpgPcVWLm)
+Call CouplingcgWRpgPcVWLmL(g2,TW,PhiW,cplcgWRpgPcVWLm)
 
 
 
 cplcgPgWLmcVWLm = 0._dp 
-Call CouplingcgPgWLmcVWLmL(g2,ZZ,PhiW,cplcgPgWLmcVWLm)
+Call CouplingcgPgWLmcVWLmL(g2,TW,PhiW,cplcgPgWLmcVWLm)
 
 
 
 cplcgZgWLmcVWLm = 0._dp 
-Call CouplingcgZgWLmcVWLmL(g2,ZZ,PhiW,cplcgZgWLmcVWLm)
+Call CouplingcgZgWLmcVWLmL(g2,TW,cplcgZgWLmcVWLm)
 
 
 
 cplcgZpgWLmcVWLm = 0._dp 
-Call CouplingcgZpgWLmcVWLmL(g2,ZZ,PhiW,cplcgZpgWLmcVWLm)
+Call CouplingcgZpgWLmcVWLmL(g2,TW,PhiW,cplcgZpgWLmcVWLm)
 
 
 
 cplcgPgWRmcVWLm = 0._dp 
-Call CouplingcgPgWRmcVWLmL(g2,ZZ,PhiW,cplcgPgWRmcVWLm)
-
-
-
-cplcgZgWRmcVWLm = 0._dp 
-Call CouplingcgZgWRmcVWLmL(g2,ZZ,PhiW,cplcgZgWRmcVWLm)
+Call CouplingcgPgWRmcVWLmL(g2,TW,PhiW,cplcgPgWRmcVWLm)
 
 
 
 cplcgZpgWRmcVWLm = 0._dp 
-Call CouplingcgZpgWRmcVWLmL(g2,ZZ,PhiW,cplcgZpgWRmcVWLm)
+Call CouplingcgZpgWRmcVWLmL(g2,TW,PhiW,cplcgZpgWRmcVWLm)
 
 
 
 cplcgWLpgZcVWLm = 0._dp 
-Call CouplingcgWLpgZcVWLmL(g2,ZZ,PhiW,cplcgWLpgZcVWLm)
-
-
-
-cplcgWRpgZcVWLm = 0._dp 
-Call CouplingcgWRpgZcVWLmL(g2,ZZ,PhiW,cplcgWRpgZcVWLm)
+Call CouplingcgWLpgZcVWLmL(g2,TW,cplcgWLpgZcVWLm)
 
 
 
 cplcgWLpgZpcVWLm = 0._dp 
-Call CouplingcgWLpgZpcVWLmL(g2,ZZ,PhiW,cplcgWLpgZpcVWLm)
+Call CouplingcgWLpgZpcVWLmL(g2,TW,PhiW,cplcgWLpgZpcVWLm)
 
 
 
 cplcgWRpgZpcVWLm = 0._dp 
-Call CouplingcgWRpgZpcVWLmL(g2,ZZ,PhiW,cplcgWRpgZpcVWLm)
+Call CouplingcgWRpgZpcVWLmL(g2,TW,PhiW,cplcgWRpgZpcVWLm)
 
 
 
@@ -48938,36 +45714,31 @@ End Do
 
 cplcHpmcVWLmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVP(gt1))
+Call CouplingcHpmcVWLmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVP(gt1))
 
 End Do 
 
 
 cplcVWLmVPVWRm = 0._dp 
-Call CouplingcVWLmVPVWRmL(g2,ZZ,PhiW,cplcVWLmVPVWRm)
-
-
-
-cplcVWLmVWRmVZ = 0._dp 
-Call CouplingcVWLmVWRmVZL(g2,ZZ,PhiW,cplcVWLmVWRmVZ)
+Call CouplingcVWLmVPVWRmL(g2,TW,PhiW,cplcVWLmVPVWRm)
 
 
 
 cplcVWLmVWRmVZR = 0._dp 
-Call CouplingcVWLmVWRmVZRL(g2,ZZ,PhiW,cplcVWLmVWRmVZR)
+Call CouplingcVWLmVWRmVZRL(g2,TW,PhiW,cplcVWLmVWRmVZR)
 
 
 
 cplcHpmcVWLmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZ(gt1))
+Call CouplingcHpmcVWLmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZ(gt1))
 
 End Do 
 
 
 cplcHpmcVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWLmVZR(gt1))
+Call CouplingcHpmcVWLmVZRL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWLmVZR(gt1))
 
 End Do 
 
@@ -49031,32 +45802,22 @@ End Do
 
 cplcHpmcVWRmVP = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVP(gt1))
+Call CouplingcHpmcVWRmVPL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVP(gt1))
 
 End Do 
 
 
 cplcHpmcVWRmVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplcHpmcVWRmVZ(gt1))
+Call CouplingcHpmcVWRmVZL(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmcVWRmVZ(gt1))
 
 End Do 
-
-
-cplcgWLmgWRmVZ = 0._dp 
-Call CouplingcgWLmgWRmVZL(g2,ZZ,PhiW,cplcgWLmgWRmVZ)
-
-
-
-cplcgWLpgWRpVZ = 0._dp 
-Call CouplingcgWLpgWRpVZL(g2,ZZ,PhiW,cplcgWLpgWRpVZ)
-
 
 
 cplAhAhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVZVZR(gt1,gt2))
+Call CouplingAhAhVZVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49065,7 +45826,7 @@ End Do
 cplhhhhVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVZVZR(gt1,gt2))
+Call CouplinghhhhVZVZRL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49074,7 +45835,7 @@ End Do
 cplHpmcHpmVZVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVZVZR(gt1,gt2))
+Call CouplingHpmcHpmVZVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVZVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49083,7 +45844,7 @@ End Do
 cplcVWLmVWLmVZVZR1 = 0._dp 
 cplcVWLmVWLmVZVZR2 = 0._dp 
 cplcVWLmVWLmVZVZR3 = 0._dp 
-Call CouplingcVWLmVWLmVZVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
+Call CouplingcVWLmVWLmVZVZRL(g2,TW,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,        & 
 & cplcVWLmVWLmVZVZR3)
 
 
@@ -49091,25 +45852,15 @@ Call CouplingcVWLmVWLmVZVZRL(g2,ZZ,PhiW,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,  
 cplcVWRmVWRmVZVZR1 = 0._dp 
 cplcVWRmVWRmVZVZR2 = 0._dp 
 cplcVWRmVWRmVZVZR3 = 0._dp 
-Call CouplingcVWRmVWRmVZVZRL(g2,ZZ,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
+Call CouplingcVWRmVWRmVZVZRL(g2,TW,PhiW,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,        & 
 & cplcVWRmVWRmVZVZR3)
-
-
-
-cplcgWLmgWRmVP = 0._dp 
-Call CouplingcgWLmgWRmVPL(g2,ZZ,PhiW,cplcgWLmgWRmVP)
-
-
-
-cplcgWLpgWRpVP = 0._dp 
-Call CouplingcgWLpgWRpVPL(g2,ZZ,PhiW,cplcgWLpgWRpVP)
 
 
 
 cplAhAhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZ(gt1,gt2))
+Call CouplingAhAhVPVZL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -49118,7 +45869,7 @@ End Do
 cplhhhhVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZ(gt1,gt2))
+Call CouplinghhhhVPVZL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -49127,7 +45878,7 @@ End Do
 cplHpmcHpmVPVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZ(gt1,gt2))
+Call CouplingHpmcHpmVPVZL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -49136,7 +45887,7 @@ End Do
 cplcVWLmVPVWLmVZ1 = 0._dp 
 cplcVWLmVPVWLmVZ2 = 0._dp 
 cplcVWLmVPVWLmVZ3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
+Call CouplingcVWLmVPVWLmVZL(g2,TW,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,           & 
 & cplcVWLmVPVWLmVZ3)
 
 
@@ -49144,15 +45895,25 @@ Call CouplingcVWLmVPVWLmVZL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,     
 cplcVWRmVPVWRmVZ1 = 0._dp 
 cplcVWRmVPVWRmVZ2 = 0._dp 
 cplcVWRmVPVWRmVZ3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZL(g2,ZZ,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
+Call CouplingcVWRmVPVWRmVZL(g2,TW,PhiW,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,           & 
 & cplcVWRmVPVWRmVZ3)
+
+
+
+cplcgWLmgWRmVP = 0._dp 
+Call CouplingcgWLmgWRmVPL(g2,TW,PhiW,cplcgWLmgWRmVP)
+
+
+
+cplcgWLpgWRpVP = 0._dp 
+Call CouplingcgWLpgWRpVPL(g2,TW,PhiW,cplcgWLpgWRpVP)
 
 
 
 cplAhAhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhAhVPVZR(gt1,gt2))
+Call CouplingAhAhVPVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhAhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49161,7 +45922,7 @@ End Do
 cplhhhhVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZZ,ZH,cplhhhhVPVZR(gt1,gt2))
+Call CouplinghhhhVPVZRL(gt1,gt2,gBL,g2,ZH,TW,cplhhhhVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49170,7 +45931,7 @@ End Do
 cplHpmcHpmVPVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,ZZ,UC,cplHpmcHpmVPVZR(gt1,gt2))
+Call CouplingHpmcHpmVPVZRL(gt1,gt2,gBL,g2,UC,TW,cplHpmcHpmVPVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49179,7 +45940,7 @@ End Do
 cplcVWLmVPVWLmVZR1 = 0._dp 
 cplcVWLmVPVWLmVZR2 = 0._dp 
 cplcVWLmVPVWLmVZR3 = 0._dp 
-Call CouplingcVWLmVPVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
+Call CouplingcVWLmVPVWLmVZRL(g2,TW,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,        & 
 & cplcVWLmVPVWLmVZR3)
 
 
@@ -49187,7 +45948,7 @@ Call CouplingcVWLmVPVWLmVZRL(g2,ZZ,PhiW,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,  
 cplcVWRmVPVWRmVZR1 = 0._dp 
 cplcVWRmVPVWRmVZR2 = 0._dp 
 cplcVWRmVPVWRmVZR3 = 0._dp 
-Call CouplingcVWRmVPVWRmVZRL(g2,ZZ,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
+Call CouplingcVWRmVPVWRmVZRL(g2,TW,PhiW,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,        & 
 & cplcVWRmVPVWRmVZR3)
 
 
@@ -49224,62 +45985,42 @@ End Do
 
 
 cplcgWLmgPVWLm = 0._dp 
-Call CouplingcgWLmgPVWLmL(g2,ZZ,PhiW,cplcgWLmgPVWLm)
+Call CouplingcgWLmgPVWLmL(g2,TW,PhiW,cplcgWLmgPVWLm)
 
 
 
 cplcgWRmgPVWLm = 0._dp 
-Call CouplingcgWRmgPVWLmL(g2,ZZ,PhiW,cplcgWRmgPVWLm)
+Call CouplingcgWRmgPVWLmL(g2,TW,PhiW,cplcgWRmgPVWLm)
 
 
 
 cplcgPgWLpVWLm = 0._dp 
-Call CouplingcgPgWLpVWLmL(g2,ZZ,PhiW,cplcgPgWLpVWLm)
-
-
-
-cplcgZgWLpVWLm = 0._dp 
-Call CouplingcgZgWLpVWLmL(g2,ZZ,PhiW,cplcgZgWLpVWLm)
+Call CouplingcgPgWLpVWLmL(g2,TW,PhiW,cplcgPgWLpVWLm)
 
 
 
 cplcgZpgWLpVWLm = 0._dp 
-Call CouplingcgZpgWLpVWLmL(g2,ZZ,PhiW,cplcgZpgWLpVWLm)
+Call CouplingcgZpgWLpVWLmL(g2,TW,PhiW,cplcgZpgWLpVWLm)
 
 
 
 cplcgPgWRpVWLm = 0._dp 
-Call CouplingcgPgWRpVWLmL(g2,ZZ,PhiW,cplcgPgWRpVWLm)
-
-
-
-cplcgZgWRpVWLm = 0._dp 
-Call CouplingcgZgWRpVWLmL(g2,ZZ,PhiW,cplcgZgWRpVWLm)
+Call CouplingcgPgWRpVWLmL(g2,TW,PhiW,cplcgPgWRpVWLm)
 
 
 
 cplcgZpgWRpVWLm = 0._dp 
-Call CouplingcgZpgWRpVWLmL(g2,ZZ,PhiW,cplcgZpgWRpVWLm)
-
-
-
-cplcgWLmgZVWLm = 0._dp 
-Call CouplingcgWLmgZVWLmL(g2,ZZ,PhiW,cplcgWLmgZVWLm)
-
-
-
-cplcgWRmgZVWLm = 0._dp 
-Call CouplingcgWRmgZVWLmL(g2,ZZ,PhiW,cplcgWRmgZVWLm)
+Call CouplingcgZpgWRpVWLmL(g2,TW,PhiW,cplcgZpgWRpVWLm)
 
 
 
 cplcgWLmgZpVWLm = 0._dp 
-Call CouplingcgWLmgZpVWLmL(g2,ZZ,PhiW,cplcgWLmgZpVWLm)
+Call CouplingcgWLmgZpVWLmL(g2,TW,PhiW,cplcgWLmgZpVWLm)
 
 
 
 cplcgWRmgZpVWLm = 0._dp 
-Call CouplingcgWRmgZpVWLmL(g2,ZZ,PhiW,cplcgWRmgZpVWLm)
+Call CouplingcgWRmgZpVWLmL(g2,TW,PhiW,cplcgWRmgZpVWLm)
 
 
 
@@ -49322,7 +46063,7 @@ End Do
 cplcVWRmVPVPVWLm1 = 0._dp 
 cplcVWRmVPVPVWLm2 = 0._dp 
 cplcVWRmVPVPVWLm3 = 0._dp 
-Call CouplingcVWRmVPVPVWLmL(g2,ZZ,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
+Call CouplingcVWRmVPVPVWLmL(g2,TW,PhiW,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,           & 
 & cplcVWRmVPVPVWLm3)
 
 
@@ -49343,18 +46084,10 @@ Call CouplingcVWRmcVWRmVWLmVWRmL(g2,PhiW,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWL
 
 
 
-cplcVWRmVWLmVZVZ1 = 0._dp 
-cplcVWRmVWLmVZVZ2 = 0._dp 
-cplcVWRmVWLmVZVZ3 = 0._dp 
-Call CouplingcVWRmVWLmVZVZL(g2,ZZ,PhiW,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
-& cplcVWRmVWLmVZVZ3)
-
-
-
 cplcVWRmVWLmVZRVZR1 = 0._dp 
 cplcVWRmVWLmVZRVZR2 = 0._dp 
 cplcVWRmVWLmVZRVZR3 = 0._dp 
-Call CouplingcVWRmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
+Call CouplingcVWRmVWLmVZRVZRL(g2,TW,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,     & 
 & cplcVWRmVWLmVZRVZR3)
 
 
@@ -49362,7 +46095,7 @@ Call CouplingcVWRmVWLmVZRVZRL(g2,ZZ,PhiW,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2
 Iname = Iname - 1 
 End Subroutine CouplingsForVectorBosons
 
-Subroutine CouplingsForSMfermions(YQ1,YQ2,UP,ZDL,ZDR,ZH,g3,gBL,g2,ZZ,UC,              & 
+Subroutine CouplingsForSMfermions(YQ1,YQ2,UP,ZDL,ZDR,ZH,g3,gBL,g2,TW,UC,              & 
 & ZUL,ZUR,PhiW,Y,Yt,ZEL,ZER,YR,ZM,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,cplcUFdFdhhR,   & 
 & cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,cplcUFdFdVZR,         & 
 & cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL,              & 
@@ -49375,10 +46108,10 @@ Subroutine CouplingsForSMfermions(YQ1,YQ2,UP,ZDL,ZDR,ZH,g3,gBL,g2,ZZ,UC,        
 & cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR)
 
 Implicit None 
-Real(dp), Intent(in) :: UP(4,4),ZH(4,4),g3,gBL,g2,UC(4,4),PhiW
+Real(dp), Intent(in) :: UP(4,4),ZH(4,4),g3,gBL,g2,TW,UC(4,4),PhiW
 
-Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),ZZ(3,3),ZUL(3,3),ZUR(3,3),Y(3,3),Yt(3,3),         & 
-& ZEL(3,3),ZER(3,3),YR(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),ZUL(3,3),ZUR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),        & 
+& ZER(3,3),YR(3,3),ZM(9,9)
 
 Complex(dp), Intent(out) :: cplcUFdFdAhL(3,3,4),cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),cplcUFdFdhhR(3,3,4),      & 
 & cplcUFdFdVGL(3,3),cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),cplcUFdFdVPR(3,3),               & 
@@ -49439,7 +46172,7 @@ cplcUFdFdVPL = 0._dp
 cplcUFdFdVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVPL(gt1,gt2),               & 
+Call CouplingcUFdFdVPL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVPL(gt1,gt2),               & 
 & cplcUFdFdVPR(gt1,gt2))
 
  End Do 
@@ -49450,7 +46183,7 @@ cplcUFdFdVZL = 0._dp
 cplcUFdFdVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVZL(gt1,gt2),               & 
+Call CouplingcUFdFdVZL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVZL(gt1,gt2),               & 
 & cplcUFdFdVZR(gt1,gt2))
 
  End Do 
@@ -49461,7 +46194,7 @@ cplcUFdFdVZRL = 0._dp
 cplcUFdFdVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZZ,ZDL,ZDR,cplcUFdFdVZRL(gt1,gt2)              & 
+Call CouplingcUFdFdVZRL(gt1,gt2,gBL,g2,ZDL,ZDR,TW,cplcUFdFdVZRL(gt1,gt2)              & 
 & ,cplcUFdFdVZRR(gt1,gt2))
 
  End Do 
@@ -49578,7 +46311,7 @@ cplcUFuFuVPL = 0._dp
 cplcUFuFuVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVPL(gt1,gt2),               & 
+Call CouplingcUFuFuVPL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVPL(gt1,gt2),               & 
 & cplcUFuFuVPR(gt1,gt2))
 
  End Do 
@@ -49589,7 +46322,7 @@ cplcUFuFuVZL = 0._dp
 cplcUFuFuVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVZL(gt1,gt2),               & 
+Call CouplingcUFuFuVZL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVZL(gt1,gt2),               & 
 & cplcUFuFuVZR(gt1,gt2))
 
  End Do 
@@ -49600,7 +46333,7 @@ cplcUFuFuVZRL = 0._dp
 cplcUFuFuVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZZ,ZUL,ZUR,cplcUFuFuVZRL(gt1,gt2)              & 
+Call CouplingcUFuFuVZRL(gt1,gt2,gBL,g2,ZUL,ZUR,TW,cplcUFuFuVZRL(gt1,gt2)              & 
 & ,cplcUFuFuVZRR(gt1,gt2))
 
  End Do 
@@ -49637,7 +46370,7 @@ cplcUFeFeVPL = 0._dp
 cplcUFeFeVPR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVPL(gt1,gt2),               & 
+Call CouplingcUFeFeVPL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVPL(gt1,gt2),               & 
 & cplcUFeFeVPR(gt1,gt2))
 
  End Do 
@@ -49648,7 +46381,7 @@ cplcUFeFeVZL = 0._dp
 cplcUFeFeVZR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVZL(gt1,gt2),               & 
+Call CouplingcUFeFeVZL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVZL(gt1,gt2),               & 
 & cplcUFeFeVZR(gt1,gt2))
 
  End Do 
@@ -49659,7 +46392,7 @@ cplcUFeFeVZRL = 0._dp
 cplcUFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZZ,ZEL,ZER,cplcUFeFeVZRL(gt1,gt2)              & 
+Call CouplingcUFeFeVZRL(gt1,gt2,gBL,g2,ZEL,ZER,TW,cplcUFeFeVZRL(gt1,gt2)              & 
 & ,cplcUFeFeVZRR(gt1,gt2))
 
  End Do 
@@ -49703,7 +46436,7 @@ Iname = Iname - 1
 End Subroutine CouplingsForSMfermions
 
 Subroutine CouplingsForTadpoles(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,              & 
-& LAM6,LAM3,LAM4,k1,vR,UP,UC,gBL,g2,ZZ,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,             & 
+& LAM6,LAM3,LAM4,k1,vR,UP,UC,gBL,g2,TW,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,             & 
 & YR,ZM,PhiW,ZH,cplAhAhUhh,cplAhUhhcHpm,cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,               & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,               & 
@@ -49716,10 +46449,10 @@ Subroutine CouplingsForTadpoles(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,        
 
 Implicit None 
 Real(dp), Intent(in) :: LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,k1,vR,UP(4,4),UC(4,4),         & 
-& gBL,g2,PhiW,ZH(4,4)
+& gBL,g2,TW,PhiW,ZH(4,4)
 
-Complex(dp), Intent(in) :: ZZ(3,3),YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),         & 
-& ZUL(3,3),ZUR(3,3),YR(3,3),ZM(9,9)
+Complex(dp), Intent(in) :: YQ1(3,3),YQ2(3,3),ZDL(3,3),ZDR(3,3),Y(3,3),Yt(3,3),ZEL(3,3),ZER(3,3),ZUL(3,3),        & 
+& ZUR(3,3),YR(3,3),ZM(9,9)
 
 Complex(dp), Intent(out) :: cplAhAhUhh(4,4,4),cplAhUhhcHpm(4,4,4),cplAhUhhVP(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),& 
 & cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),       & 
@@ -49764,7 +46497,7 @@ End Do
 cplAhUhhVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVPL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVP(gt1,gt2))
+Call CouplingAhUhhVPL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -49773,7 +46506,7 @@ End Do
 cplAhUhhVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVZL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVZ(gt1,gt2))
+Call CouplingAhUhhVZL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -49782,7 +46515,7 @@ End Do
 cplAhUhhVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhUhhVZRL(gt1,gt2,gBL,g2,ZZ,UP,cplAhUhhVZR(gt1,gt2))
+Call CouplingAhUhhVZRL(gt1,gt2,gBL,g2,UP,TW,cplAhUhhVZR(gt1,gt2))
 
  End Do 
 End Do 
@@ -49897,28 +46630,28 @@ End Do
 
 cplcgZgZUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZgZUhh(gt3))
+Call CouplingcgZgZUhhL(gt3,gBL,g2,vR,TW,cplcgZgZUhh(gt3))
 
 End Do 
 
 
 cplcgZpgZUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZpgZUhh(gt3))
+Call CouplingcgZpgZUhhL(gt3,gBL,g2,vR,TW,cplcgZpgZUhh(gt3))
 
 End Do 
 
 
 cplcgZgZpUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZgZpUhh(gt3))
+Call CouplingcgZgZpUhhL(gt3,gBL,g2,vR,TW,cplcgZgZpUhh(gt3))
 
 End Do 
 
 
 cplcgZpgZpUhh = 0._dp 
 Do gt3 = 1, 4
-Call CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,ZZ,cplcgZpgZpUhh(gt3))
+Call CouplingcgZpgZpUhhL(gt3,gBL,g2,k1,vR,TW,cplcgZpgZpUhh(gt3))
 
 End Do 
 
@@ -49978,14 +46711,14 @@ End Do
 
 cplUhhVPVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVPVZL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVPVZ(gt1))
+Call CouplingUhhVPVZL(gt1,gBL,g2,vR,TW,cplUhhVPVZ(gt1))
 
 End Do 
 
 
 cplUhhVPVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVPVZR(gt1))
+Call CouplingUhhVPVZRL(gt1,gBL,g2,k1,vR,TW,cplUhhVPVZR(gt1))
 
 End Do 
 
@@ -50013,21 +46746,21 @@ End Do
 
 cplUhhVZVZ = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZVZL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZVZ(gt1))
+Call CouplingUhhVZVZL(gt1,gBL,g2,vR,TW,cplUhhVZVZ(gt1))
 
 End Do 
 
 
 cplUhhVZVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZVZR(gt1))
+Call CouplingUhhVZVZRL(gt1,gBL,g2,vR,TW,cplUhhVZVZR(gt1))
 
 End Do 
 
 
 cplUhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,ZZ,cplUhhVZRVZR(gt1))
+Call CouplingUhhVZRVZRL(gt1,gBL,g2,k1,vR,TW,cplUhhVZRVZR(gt1))
 
 End Do 
 
@@ -50077,7 +46810,7 @@ End Do
 cplUhhUhhVPVP = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVPVP(gt1,gt2))
+Call CouplingUhhUhhVPVPL(gt1,gt2,gBL,g2,TW,cplUhhUhhVPVP(gt1,gt2))
 
  End Do 
 End Do 
@@ -50104,7 +46837,7 @@ End Do
 cplUhhUhhVZVZ = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVZVZ(gt1,gt2))
+Call CouplingUhhUhhVZVZL(gt1,gt2,gBL,g2,TW,cplUhhUhhVZVZ(gt1,gt2))
 
  End Do 
 End Do 
@@ -50113,7 +46846,7 @@ End Do
 cplUhhUhhVZRVZR = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,ZZ,cplUhhUhhVZRVZR(gt1,gt2))
+Call CouplingUhhUhhVZRVZRL(gt1,gt2,gBL,g2,TW,cplUhhUhhVZRVZR(gt1,gt2))
 
  End Do 
 End Do 

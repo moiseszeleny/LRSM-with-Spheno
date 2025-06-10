@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:22 on 9.6.2025   
+! File created at 23:37 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -35,16 +35,16 @@ Subroutine CalculateBox2L2d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,       
 & cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
 & cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
 & cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,BOllddSLL,BOllddSRR,BOllddSRL,BOllddSLR,BOllddVRR,BOllddVLL,             & 
-& BOllddVRL,BOllddVLR,BOllddTLL,BOllddTLR,BOllddTRL,BOllddTRR)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
+& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
+& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
+& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
+& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
+& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
+& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,BOllddSLL,          & 
+& BOllddSRR,BOllddSRL,BOllddSLR,BOllddVRR,BOllddVLL,BOllddVRL,BOllddVLR,BOllddTLL,       & 
+& BOllddTLR,BOllddTRL,BOllddTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -73,17 +73,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -2094,16 +2093,16 @@ Subroutine CalculatePengS2L2d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PSOllddSLL,PSOllddSRR,PSOllddSRL,PSOllddSLR,PSOllddVRR,     & 
-& PSOllddVLL,PSOllddVRL,PSOllddVLR,PSOllddTLL,PSOllddTLR,PSOllddTRL,PSOllddTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PSOllddSLL,PSOllddSRR,PSOllddSRL,PSOllddSLR,PSOllddVRR,PSOllddVLL,       & 
+& PSOllddVRL,PSOllddVLR,PSOllddTLL,PSOllddTLR,PSOllddTRL,PSOllddTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -2132,17 +2131,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -10565,16 +10563,16 @@ Subroutine CalculatePengV2L2d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PVOllddSLL,PVOllddSRR,PVOllddSRL,PVOllddSLR,PVOllddVRR,     & 
-& PVOllddVLL,PVOllddVRL,PVOllddVLR,PVOllddTLL,PVOllddTLR,PVOllddTRL,PVOllddTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PVOllddSLL,PVOllddSRR,PVOllddSRL,PVOllddSLR,PVOllddVRR,PVOllddVLL,       & 
+& PVOllddVRL,PVOllddVLR,PVOllddTLL,PVOllddTLR,PVOllddTRL,PVOllddTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -10603,17 +10601,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -14246,56 +14243,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt2,i1)
-coup2R = cplcFeFvVWLmR(gt2,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFdFdVZL(gt4,gt3)
-coup4R = cplcFdFdVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVOllddSLL=PVOllddSLL+0.
-  PVOllddSRR=PVOllddSRR+0.
-  PVOllddSRL=PVOllddSRL+0.
-  PVOllddSLR=PVOllddSLR+0.
-  PVOllddVRR=PVOllddVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLL=PVOllddVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVRL=PVOllddVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLR=PVOllddVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddTLL=PVOllddTLL+0.
-  PVOllddTLR=PVOllddTLR+0.
-  PVOllddTRL=PVOllddTRL+0.
-  PVOllddTRR=PVOllddTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 1
 chargefactor = 1 
@@ -14340,56 +14287,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt2,i1)
-coup2R = cplcFeFvVWRmR(gt2,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFdFdVZL(gt4,gt3)
-coup4R = cplcFdFdVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVOllddSLL=PVOllddSLL+0.
-  PVOllddSRR=PVOllddSRR+0.
-  PVOllddSRL=PVOllddSRL+0.
-  PVOllddSLR=PVOllddSLR+0.
-  PVOllddVRR=PVOllddVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLL=PVOllddVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVRL=PVOllddVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLR=PVOllddVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddTLL=PVOllddTLL+0.
-  PVOllddTLR=PVOllddTLR+0.
-  PVOllddTRL=PVOllddTRL+0.
-  PVOllddTRR=PVOllddTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -15831,56 +15728,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: bar[Fu],VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,3
-If ((MFu2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplcFuFdcVWRmL(i1,gt3)
-coup1R = cplcFuFdcVWRmR(i1,gt3)
-coup2L = cplcFdFuVWLmL(gt4,i1)
-coup2R = cplcFdFuVWLmR(gt4,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFu(i1)
-mF12 = MFu2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVOllddSLL=PVOllddSLL+0.
-  PVOllddSRR=PVOllddSRR+0.
-  PVOllddSRL=PVOllddSRL+0.
-  PVOllddSLR=PVOllddSLR+0.
-  PVOllddVRR=PVOllddVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLL=PVOllddVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVRL=PVOllddVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLR=PVOllddVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddTLL=PVOllddTLL+0.
-  PVOllddTLR=PVOllddTLR+0.
-  PVOllddTRL=PVOllddTRL+0.
-  PVOllddTRR=PVOllddTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: bar[Fu],conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 4
 chargefactor = 1 
@@ -15925,56 +15772,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: bar[Fu],VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,3
-If ((MFu2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplcFuFdcVWLmL(i1,gt3)
-coup1R = cplcFuFdcVWLmR(i1,gt3)
-coup2L = cplcFdFuVWRmL(gt4,i1)
-coup2R = cplcFdFuVWRmR(gt4,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFu(i1)
-mF12 = MFu2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVOllddSLL=PVOllddSLL+0.
-  PVOllddSRR=PVOllddSRR+0.
-  PVOllddSRL=PVOllddSRL+0.
-  PVOllddSLR=PVOllddSLR+0.
-  PVOllddVRR=PVOllddVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLL=PVOllddVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVRL=PVOllddVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddVLR=PVOllddVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOllddTLL=PVOllddTLL+0.
-  PVOllddTLR=PVOllddTLR+0.
-  PVOllddTRL=PVOllddTRL+0.
-  PVOllddTRR=PVOllddTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: bar[Fu],VWRm,VWRm
@@ -18528,16 +18325,16 @@ Subroutine CalculateTreeS2L2d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TSOllddSLL,TSOllddSRR,TSOllddSRL,TSOllddSLR,TSOllddVRR,     & 
-& TSOllddVLL,TSOllddVRL,TSOllddVLR,TSOllddTLL,TSOllddTLR,TSOllddTRL,TSOllddTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TSOllddSLL,TSOllddSRR,TSOllddSRL,TSOllddSLR,TSOllddVRR,TSOllddVLL,       & 
+& TSOllddVRL,TSOllddVLR,TSOllddTLL,TSOllddTLR,TSOllddTRL,TSOllddTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -18566,17 +18363,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -18716,16 +18512,16 @@ Subroutine CalculateTreeV2L2d(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TVOllddSLL,TVOllddSRR,TVOllddSRL,TVOllddSLR,TVOllddVRR,     & 
-& TVOllddVLL,TVOllddVRL,TVOllddVLR,TVOllddTLL,TVOllddTLR,TVOllddTRL,TVOllddTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TVOllddSLL,TVOllddSRR,TVOllddSRL,TVOllddSLR,TVOllddVRR,TVOllddVLL,       & 
+& TVOllddVRL,TVOllddVLR,TVOllddTLL,TVOllddTLR,TVOllddTRL,TVOllddTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -18754,17 +18550,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -18900,16 +18695,16 @@ Subroutine CalculateBox2L2u(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,MFe,       
 & cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,             & 
 & cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,           & 
 & cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,          & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
-& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
-& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
-& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
-& cplHpmVWRmVZR,BOlluuSLL,BOlluuSRR,BOlluuSRL,BOlluuSLR,BOlluuVRR,BOlluuVLL,             & 
-& BOlluuVRL,BOlluuVLR,BOlluuTLL,BOlluuTLR,BOlluuTRL,BOlluuTRR)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
+& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
+& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
+& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
+& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
+& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
+& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,BOlluuSLL,          & 
+& BOlluuSRR,BOlluuSRL,BOlluuSLR,BOlluuVRR,BOlluuVLL,BOlluuVRL,BOlluuVLR,BOlluuTLL,       & 
+& BOlluuTLR,BOlluuTRL,BOlluuTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -18938,17 +18733,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -20927,16 +20721,16 @@ Subroutine CalculatePengS2L2u(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PSOlluuSLL,PSOlluuSRR,PSOlluuSRL,PSOlluuSLR,PSOlluuVRR,     & 
-& PSOlluuVLL,PSOlluuVRL,PSOlluuVLR,PSOlluuTLL,PSOlluuTLR,PSOlluuTRL,PSOlluuTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PSOlluuSLL,PSOlluuSRR,PSOlluuSRL,PSOlluuSLR,PSOlluuVRR,PSOlluuVLL,       & 
+& PSOlluuVRL,PSOlluuVLR,PSOlluuTLL,PSOlluuTLR,PSOlluuTRL,PSOlluuTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -20965,17 +20759,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -29398,16 +29191,16 @@ Subroutine CalculatePengV2L2u(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PVOlluuSLL,PVOlluuSRR,PVOlluuSRL,PVOlluuSLR,PVOlluuVRR,     & 
-& PVOlluuVLL,PVOlluuVRL,PVOlluuVLR,PVOlluuTLL,PVOlluuTLR,PVOlluuTRL,PVOlluuTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PVOlluuSLL,PVOlluuSRR,PVOlluuSRL,PVOlluuSLR,PVOlluuVRR,PVOlluuVLL,       & 
+& PVOlluuVRL,PVOlluuVLR,PVOlluuTLL,PVOlluuTLR,PVOlluuTRL,PVOlluuTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -29436,17 +29229,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -33079,56 +32871,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt2,i1)
-coup2R = cplcFeFvVWLmR(gt2,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFuFuVZL(gt4,gt3)
-coup4R = cplcFuFuVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVOlluuSLL=PVOlluuSLL+0.
-  PVOlluuSRR=PVOlluuSRR+0.
-  PVOlluuSRL=PVOlluuSRL+0.
-  PVOlluuSLR=PVOlluuSLR+0.
-  PVOlluuVRR=PVOlluuVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLL=PVOlluuVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVRL=PVOlluuVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLR=PVOlluuVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuTLL=PVOlluuTLL+0.
-  PVOlluuTLR=PVOlluuTLR+0.
-  PVOlluuTRL=PVOlluuTRL+0.
-  PVOlluuTRR=PVOlluuTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 1
 chargefactor = 1 
@@ -33173,56 +32915,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt2,i1)
-coup2R = cplcFeFvVWRmR(gt2,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFuFuVZL(gt4,gt3)
-coup4R = cplcFuFuVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVOlluuSLL=PVOlluuSLL+0.
-  PVOlluuSRR=PVOlluuSRR+0.
-  PVOlluuSRL=PVOlluuSRL+0.
-  PVOlluuSLR=PVOlluuSLR+0.
-  PVOlluuVRR=PVOlluuVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLL=PVOlluuVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVRL=PVOlluuVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLR=PVOlluuVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuTLL=PVOlluuTLL+0.
-  PVOlluuTLR=PVOlluuTLR+0.
-  PVOlluuTRL=PVOlluuTRL+0.
-  PVOlluuTRR=PVOlluuTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -34621,56 +34313,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: bar[Fd],conj[VWRm],conj[VWLm]
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplcFdFuVWRmL(i1,gt3)
-coup1R = cplcFdFuVWRmR(i1,gt3)
-coup2L = cplcFuFdcVWLmL(gt4,i1)
-coup2R = cplcFuFdcVWLmR(gt4,i1)
-coup3 = cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFd(i1)
-mF12 = MFd2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVOlluuSLL=PVOlluuSLL+0.
-  PVOlluuSRR=PVOlluuSRR+0.
-  PVOlluuSRL=PVOlluuSRL+0.
-  PVOlluuSLR=PVOlluuSLR+0.
-  PVOlluuVRR=PVOlluuVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLL=PVOlluuVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVRL=PVOlluuVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLR=PVOlluuVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuTLL=PVOlluuTLL+0.
-  PVOlluuTLR=PVOlluuTLR+0.
-  PVOlluuTRL=PVOlluuTRL+0.
-  PVOlluuTRR=PVOlluuTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: bar[Fd],Hpm,conj[VWRm]
 ! Generic diagram: FSV,  InsertionOrder: 4
 chargefactor = 1 
@@ -34715,56 +34357,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: bar[Fd],conj[VWLm],conj[VWRm]
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,3
-If ((MFd2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplcFdFuVWLmL(i1,gt3)
-coup1R = cplcFdFuVWLmR(i1,gt3)
-coup2L = cplcFuFdcVWRmL(gt4,i1)
-coup2R = cplcFuFdcVWRmR(gt4,i1)
-coup3 = cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFd(i1)
-mF12 = MFd2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVOlluuSLL=PVOlluuSLL+0.
-  PVOlluuSRR=PVOlluuSRR+0.
-  PVOlluuSRL=PVOlluuSRL+0.
-  PVOlluuSLR=PVOlluuSLR+0.
-  PVOlluuVRR=PVOlluuVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLL=PVOlluuVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVRL=PVOlluuVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuVLR=PVOlluuVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-               & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVOlluuTLL=PVOlluuTLL+0.
-  PVOlluuTLR=PVOlluuTLR+0.
-  PVOlluuTRL=PVOlluuTRL+0.
-  PVOlluuTRR=PVOlluuTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: bar[Fd],conj[VWRm],conj[VWRm]
@@ -37361,16 +36953,16 @@ Subroutine CalculateTreeS2L2u(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TSOlluuSLL,TSOlluuSRR,TSOlluuSRL,TSOlluuSLR,TSOlluuVRR,     & 
-& TSOlluuVLL,TSOlluuVRL,TSOlluuVLR,TSOlluuTLL,TSOlluuTLR,TSOlluuTRL,TSOlluuTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TSOlluuSLL,TSOlluuSRR,TSOlluuSRL,TSOlluuSLR,TSOlluuVRR,TSOlluuVLL,       & 
+& TSOlluuVRL,TSOlluuVLR,TSOlluuTLL,TSOlluuTLR,TSOlluuTRL,TSOlluuTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -37399,17 +36991,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -37549,16 +37140,16 @@ Subroutine CalculateTreeV2L2u(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFd,MFd2,         
 & cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,cplcFuFuVZR,               & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,               & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TVOlluuSLL,TVOlluuSRR,TVOlluuSRL,TVOlluuSLR,TVOlluuVRR,     & 
-& TVOlluuVLL,TVOlluuVRL,TVOlluuVLR,TVOlluuTLL,TVOlluuTLR,TVOlluuTRL,TVOlluuTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TVOlluuSLL,TVOlluuSRR,TVOlluuSRL,TVOlluuSLR,TVOlluuVRR,TVOlluuVLL,       & 
+& TVOlluuVRL,TVOlluuVLR,TVOlluuTLL,TVOlluuTLR,TVOlluuTRL,TVOlluuTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -37587,17 +37178,16 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcHpmcVWLmVP(4),& 
 & cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),              & 
 & cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,       & 
-& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,           & 
-& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
-& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
-& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
-& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
-& cplHpmVWRmVZR(4)
+& cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),              & 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9), & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4), & 
+& cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),             & 
+& cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),              & 
+& cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),              & 
+& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),  & 
+& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -37727,16 +37317,16 @@ Subroutine CalculateBox4L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,MFv,         
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,             & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,BO4lSLL,BO4lSRR,BO4lSRL,BO4lSLR,BO4lVRR,BO4lVLL,            & 
-& BO4lVRL,BO4lVLR,BO4lTLL,BO4lTLR,BO4lTRL,BO4lTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,BO4lSLL,BO4lSRR,BO4lSRL,BO4lSLR,BO4lVRR,BO4lVLL,BO4lVRL,BO4lVLR,         & 
+& BO4lTLL,BO4lTLR,BO4lTRL,BO4lTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -37757,17 +37347,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -40480,16 +40070,16 @@ Subroutine CalculatePengS4L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,MFv,       
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,             & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PSO4lSLL,PSO4lSRR,PSO4lSRL,PSO4lSLR,PSO4lVRR,               & 
-& PSO4lVLL,PSO4lVRL,PSO4lVLR,PSO4lTLL,PSO4lTLR,PSO4lTRL,PSO4lTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PSO4lSLL,PSO4lSRR,PSO4lSRL,PSO4lSLR,PSO4lVRR,PSO4lVLL,PSO4lVRL,          & 
+& PSO4lVLR,PSO4lTLL,PSO4lTLR,PSO4lTRL,PSO4lTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -40510,17 +40100,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -48937,16 +48527,16 @@ Subroutine CalculatePengV4L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,MFv,       
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,             & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,PVO4lSLL,PVO4lSRR,PVO4lSRL,PVO4lSLR,PVO4lVRR,               & 
-& PVO4lVLL,PVO4lVRL,PVO4lVLR,PVO4lTLL,PVO4lTLR,PVO4lTRL,PVO4lTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PVO4lSLL,PVO4lSRR,PVO4lSRL,PVO4lSLR,PVO4lVRR,PVO4lVLL,PVO4lVRL,          & 
+& PVO4lVLR,PVO4lTLL,PVO4lTLR,PVO4lTRL,PVO4lTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -48967,17 +48557,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -52610,56 +52200,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt2,i1)
-coup2R = cplcFeFvVWLmR(gt2,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt4,gt3)
-coup4R = cplcFeFeVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLL=PVO4lSLL+0.
-  PVO4lSRR=PVO4lSRR+0.
-  PVO4lSRL=PVO4lSRL+0.
-  PVO4lSLR=PVO4lSLR+0.
-  PVO4lVRR=PVO4lVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLL=PVO4lVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRL=PVO4lVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLR=PVO4lVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLL=PVO4lTLL+0.
-  PVO4lTLR=PVO4lTLR+0.
-  PVO4lTRL=PVO4lTRL+0.
-  PVO4lTRR=PVO4lTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 1
 chargefactor = 1 
@@ -52704,56 +52244,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt2,i1)
-coup2R = cplcFeFvVWRmR(gt2,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt4,gt3)
-coup4R = cplcFeFeVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLL=PVO4lSLL+0.
-  PVO4lSRR=PVO4lSRR+0.
-  PVO4lSRL=PVO4lSRL+0.
-  PVO4lSLR=PVO4lSLR+0.
-  PVO4lVRR=PVO4lVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLL=PVO4lVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRL=PVO4lVRL+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLR=PVO4lVLR+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLL=PVO4lTLL+0.
-  PVO4lTLR=PVO4lTLR+0.
-  PVO4lTRL=PVO4lTRL+0.
-  PVO4lTRR=PVO4lTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -53699,56 +53189,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt3)
-coup1R = cplFvFecVWRmR(i1,gt3)
-coup2L = cplcFeFvVWLmL(gt4,i1)
-coup2R = cplcFeFvVWLmR(gt4,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLL=PVO4lSLL+0.
-  PVO4lSRR=PVO4lSRR+0.
-  PVO4lSRL=PVO4lSRL+0.
-  PVO4lSLR=PVO4lSLR+0.
-  PVO4lVRR=PVO4lVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLL=PVO4lVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRL=PVO4lVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLR=PVO4lVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLL=PVO4lTLL+0.
-  PVO4lTLR=PVO4lTLR+0.
-  PVO4lTRL=PVO4lTRL+0.
-  PVO4lTRR=PVO4lTRR+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 4
 chargefactor = 1 
@@ -53793,56 +53233,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt3)
-coup1R = cplFvFecVWLmR(i1,gt3)
-coup2L = cplcFeFvVWRmL(gt4,i1)
-coup2R = cplcFeFvVWRmR(gt4,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLL=PVO4lSLL+0.
-  PVO4lSRR=PVO4lSRR+0.
-  PVO4lSRL=PVO4lSRL+0.
-  PVO4lSLR=PVO4lSLR+0.
-  PVO4lVRR=PVO4lVRR+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLL=PVO4lVLL+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRL=PVO4lVRL+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLR=PVO4lVLR+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-1.*Finite +        & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLL=PVO4lTLL+0.
-  PVO4lTLR=PVO4lTLR+0.
-  PVO4lTRL=PVO4lTRL+0.
-  PVO4lTRR=PVO4lTRR+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -56886,16 +56276,16 @@ Subroutine CalculateTreeS4L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,MFv,       
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,             & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TSO4lSLL,TSO4lSRR,TSO4lSRL,TSO4lSLR,TSO4lVRR,               & 
-& TSO4lVLL,TSO4lVRL,TSO4lVLR,TSO4lTLL,TSO4lTLR,TSO4lTRL,TSO4lTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TSO4lSLL,TSO4lSRR,TSO4lSRL,TSO4lSLR,TSO4lVRR,TSO4lVLL,TSO4lVRL,          & 
+& TSO4lVLR,TSO4lTLL,TSO4lTLR,TSO4lTRL,TSO4lTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -56916,17 +56306,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -57060,16 +56450,16 @@ Subroutine CalculateTreeV4L(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,MFv,       
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,             & 
 & cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWRm,           & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,       & 
-& cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,          & 
-& cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,      & 
-& cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,       & 
-& cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,       & 
-& cplHpmVWRmVZ,cplHpmVWRmVZR,TVO4lSLL,TVO4lSRR,TVO4lSRL,TVO4lSLR,TVO4lVRR,               & 
-& TVO4lVLL,TVO4lVRL,TVO4lVLR,TVO4lTLL,TVO4lTLR,TVO4lTRL,TVO4lTRR)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,            & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,             & 
+& cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,         & 
+& cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,               & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TVO4lSLL,TVO4lSRR,TVO4lSRL,TVO4lSLR,TVO4lVRR,TVO4lVLL,TVO4lVRL,          & 
+& TVO4lVLR,TVO4lTLL,TVO4lTLR,TVO4lTRL,TVO4lTRR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -57090,17 +56480,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -57230,17 +56620,17 @@ Subroutine CalculateBox4Lcross(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,        
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
 & cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,               & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
-& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
-& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,BO4lSLLcross,       & 
-& BO4lSRRcross,BO4lSRLcross,BO4lSLRcross,BO4lVRRcross,BO4lVLLcross,BO4lVRLcross,         & 
-& BO4lVLRcross,BO4lTLLcross,BO4lTLRcross,BO4lTRLcross,BO4lTRRcross)
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,           & 
+& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
+& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,          & 
+& cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,   & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,BO4lSLLcross,BO4lSRRcross,BO4lSRLcross,BO4lSLRcross,BO4lVRRcross,        & 
+& BO4lVLLcross,BO4lVRLcross,BO4lVLRcross,BO4lTLLcross,BO4lTLRcross,BO4lTRLcross,         & 
+& BO4lTRRcross)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -57261,17 +56651,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -62121,17 +61511,17 @@ Subroutine CalculatePengS4Lcross(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,      
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
 & cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,               & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
-& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
-& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,PSO4lSLLcross,      & 
-& PSO4lSRRcross,PSO4lSRLcross,PSO4lSLRcross,PSO4lVRRcross,PSO4lVLLcross,PSO4lVRLcross,   & 
-& PSO4lVLRcross,PSO4lTLLcross,PSO4lTLRcross,PSO4lTRLcross,PSO4lTRRcross)
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,           & 
+& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
+& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,          & 
+& cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,   & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PSO4lSLLcross,PSO4lSRRcross,PSO4lSRLcross,PSO4lSLRcross,PSO4lVRRcross,   & 
+& PSO4lVLLcross,PSO4lVRLcross,PSO4lVLRcross,PSO4lTLLcross,PSO4lTLRcross,PSO4lTRLcross,   & 
+& PSO4lTRRcross)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -62152,17 +61542,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -79251,17 +78641,17 @@ Subroutine CalculatePengV4Lcross(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,      
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
 & cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,               & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
-& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
-& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,PVO4lSLLcross,      & 
-& PVO4lSRRcross,PVO4lSRLcross,PVO4lSLRcross,PVO4lVRRcross,PVO4lVLLcross,PVO4lVRLcross,   & 
-& PVO4lVLRcross,PVO4lTLLcross,PVO4lTLRcross,PVO4lTRLcross,PVO4lTRRcross)
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,           & 
+& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
+& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,          & 
+& cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,   & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,PVO4lSLLcross,PVO4lSRRcross,PVO4lSRLcross,PVO4lSLRcross,PVO4lVRRcross,   & 
+& PVO4lVLLcross,PVO4lVRLcross,PVO4lVLRcross,PVO4lTLLcross,PVO4lTLRcross,PVO4lTRLcross,   & 
+& PVO4lTRRcross)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -79282,17 +78672,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -86389,56 +85779,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt2,i1)
-coup2R = cplcFeFvVWLmR(gt2,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt4,gt3)
-coup4R = cplcFeFeVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+0.
-  PVO4lSLRcross=PVO4lSLRcross+0.
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLRcross=PVO4lVLRcross+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 1
 chargefactor = 1 
@@ -86483,56 +85823,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt2,i1)
-coup2R = cplcFeFvVWRmR(gt2,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt4,gt3)
-coup4R = cplcFeFeVZR(gt4,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+0.
-  PVO4lSLRcross=PVO4lSLRcross+0.
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLRcross=PVO4lVLRcross+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -87478,56 +86768,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 3
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt4,i1)
-coup2R = cplcFeFvVWLmR(gt4,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt2,gt3)
-coup4R = cplcFeFeVZR(gt2,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+2.*chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(Finite -& 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lSLRcross=PVO4lSLRcross+2.*chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(Finite -& 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+0.
-  PVO4lVLRcross=PVO4lVLRcross+0.
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 3
 chargefactor = 1 
@@ -87572,56 +86812,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 3
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt4,i1)
-coup2R = cplcFeFvVWRmR(gt4,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt2,gt3)
-coup4R = cplcFeFeVZR(gt2,gt3)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV22, mV12)
-  int3=C0check(mF12, mV22, mV12)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+2.*chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(Finite -& 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lSLRcross=PVO4lSLRcross+2.*chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(Finite -& 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+0.
-  PVO4lVLRcross=PVO4lVLRcross+0.
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -88567,56 +87757,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt3)
-coup1R = cplFvFecVWRmR(i1,gt3)
-coup2L = cplcFeFvVWLmL(gt4,i1)
-coup2R = cplcFeFvVWLmR(gt4,i1)
-coup3 = -cplcVWLmVWRmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+0.
-  PVO4lSLRcross=PVO4lSLRcross+0.
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLRcross=PVO4lVLRcross+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 4
 chargefactor = 1 
@@ -88661,56 +87801,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 4
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt3)
-coup1R = cplFvFecVWLmR(i1,gt3)
-coup2L = cplcFeFvVWRmL(gt4,i1)
-coup2R = cplcFeFvVWRmR(gt4,i1)
-coup3 = -cplcVWRmVWLmVZ
-coup4L = cplcFeFeVZL(gt2,gt1)
-coup4R = cplcFeFeVZR(gt2,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+0.
-  PVO4lSLRcross=PVO4lSLRcross+0.
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLRcross=PVO4lVLRcross+chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-         & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,VWRm,VWRm
@@ -90122,56 +89212,6 @@ End if
     End Do 
 
 
- ! Propagator: VZ, Loop particles: Fv,conj[VWRm],conj[VWLm]
-! Generic diagram: FVV,  InsertionOrder: 6
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = -cplcFeFvVWRmR(gt2,i1)
-coup1R = -cplcFeFvVWRmL(gt2,i1)
-coup2L = -cplFvFecVWLmR(i1,gt3)
-coup2R = -cplFvFecVWLmL(i1,gt3)
-coup3 = cplcVWRmVWLmVZ
-coup4L = -cplcFeFeVZR(gt4,gt1)
-coup4R = -cplcFeFeVZL(gt4,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+2.*chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-      & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lSLRcross=PVO4lSLRcross+2.*chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-      & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(Finite -  & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(Finite -  & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+0.
-  PVO4lVLRcross=PVO4lVLRcross+0.
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
-
-
  ! Propagator: VZ, Loop particles: Fv,Hpm,conj[VWRm]
 ! Generic diagram: FSV,  InsertionOrder: 6
 chargefactor = 1 
@@ -90216,56 +89256,6 @@ IMP2 = 1._dp/MP2
 End if 
     End Do 
    End Do 
-
-
- ! Propagator: VZ, Loop particles: Fv,conj[VWLm],conj[VWRm]
-! Generic diagram: FVV,  InsertionOrder: 6
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = -cplcFeFvVWLmR(gt2,i1)
-coup1R = -cplcFeFvVWLmL(gt2,i1)
-coup2L = -cplFvFecVWRmR(i1,gt3)
-coup2R = -cplFvFecVWRmL(i1,gt3)
-coup3 = cplcVWLmVWRmVZ
-coup4L = -cplcFeFeVZR(gt4,gt1)
-coup4R = -cplcFeFeVZL(gt4,gt1)
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Propagator and inverse propagator mass 
-MP = MVZ
-MP2 = MVZ2
-IMP = 1._dp/MP  
-IMP2 = 1._dp/MP2 
-! Amplitude 
-  int1=B0(0._dp, mV12, mV22)
-  int2=C00_3m(mF12, mV12, mV22)
-  int3=C0check(mF12, mV12, mV22)
-  PVO4lSLLcross=PVO4lSLLcross+0.
-  PVO4lSRRcross=PVO4lSRRcross+0.
-  PVO4lSRLcross=PVO4lSRLcross+2.*chargefactor*coup1L*coup2L*coup3*coup4R*IMP2*(-      & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lSLRcross=PVO4lSLRcross+2.*chargefactor*coup1R*coup2R*coup3*coup4L*IMP2*(-      & 
-& 1.*Finite + 2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRRcross=PVO4lVRRcross+chargefactor*coup1R*coup2R*coup3*coup4R*IMP2*(Finite -  & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVLLcross=PVO4lVLLcross+chargefactor*coup1L*coup2L*coup3*coup4L*IMP2*(Finite -  & 
-&  2.*(int1 + 2.*int2 + int3*mF12))
-  PVO4lVRLcross=PVO4lVRLcross+0.
-  PVO4lVLRcross=PVO4lVLRcross+0.
-  PVO4lTLLcross=PVO4lTLLcross+0.
-  PVO4lTLRcross=PVO4lTLRcross+0.
-  PVO4lTRLcross=PVO4lTRLcross+0.
-  PVO4lTRRcross=PVO4lTRRcross+0.
-  End if 
-End if 
-    End Do 
 
 
  ! Propagator: VZ, Loop particles: Fv,conj[VWRm],conj[VWRm]
@@ -95021,17 +94011,17 @@ Subroutine CalculateTreeS4Lcross(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,      
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
 & cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,               & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
-& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
-& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,TSO4lSLLcross,      & 
-& TSO4lSRRcross,TSO4lSRLcross,TSO4lSLRcross,TSO4lVRRcross,TSO4lVLLcross,TSO4lVRLcross,   & 
-& TSO4lVLRcross,TSO4lTLLcross,TSO4lTLRcross,TSO4lTRLcross,TSO4lTRRcross)
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,           & 
+& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
+& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,          & 
+& cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,   & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TSO4lSLLcross,TSO4lSRRcross,TSO4lSRLcross,TSO4lSLRcross,TSO4lVRRcross,   & 
+& TSO4lVLLcross,TSO4lVRLcross,TSO4lVLRcross,TSO4lTLLcross,TSO4lTLRcross,TSO4lTRLcross,   & 
+& TSO4lTRRcross)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -95052,17 +94042,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -95258,17 +94248,17 @@ Subroutine CalculateTreeV4Lcross(gt1,gt2,gt3,gt4,OnlySM,MAh,MAh2,MFe,MFe2,      
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,       & 
 & cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVP,cplcHpmcVWLmVZ,               & 
 & cplcHpmcVWLmVZR,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVPVWLm,          & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,               & 
-& cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,        & 
-& cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,               & 
-& cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,            & 
-& cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,     & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmVPVWLm,             & 
-& cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,TVO4lSLLcross,      & 
-& TVO4lSRRcross,TVO4lSRLcross,TVO4lSLRcross,TVO4lVRRcross,TVO4lVLLcross,TVO4lVRLcross,   & 
-& TVO4lVLRcross,TVO4lTLLcross,TVO4lTLRcross,TVO4lTRLcross,TVO4lTRRcross)
+& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
+& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL,           & 
+& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvAhL,          & 
+& cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZL,cplFvFvVZR,          & 
+& cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,   & 
+& cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhhh,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,        & 
+& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,       & 
+& cplHpmVWRmVZR,TVO4lSLLcross,TVO4lSRRcross,TVO4lSRLcross,TVO4lSLRcross,TVO4lVRRcross,   & 
+& TVO4lVLLcross,TVO4lVRLcross,TVO4lVLRcross,TVO4lTLLcross,TVO4lTLRcross,TVO4lTRLcross,   & 
+& TVO4lTRRcross)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -95289,17 +94279,17 @@ Complex(dp),Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,
 & cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
 & cplcFeFvVWRmR(3,9),cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),             & 
 & cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,  & 
-& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,          & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
-& cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),   & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),               & 
-& cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),              & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),& 
-& cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),  & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
+& cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),      & 
+& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),& 
+& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),         & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),     & 
+& cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),      & 
+& cplHpmVWRmVZR(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3,gt4 
 Logical, Intent(in) :: OnlySM 
@@ -99574,10 +98564,9 @@ Subroutine CalculateZ2l(gt1,gt2,gt3,OnlySM,MAh,MAh2,MFe,MFe2,MFv,MFv2,Mhh,      
 & cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,               & 
 & cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,     & 
 & cplcFeFvVWRmL,cplcFeFvVWRmR,cplcHpmcVWLmVZ,cplcHpmcVWRmVZ,cplcVWLmVWLmVZ,              & 
-& cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFecVWLmL,cplFvFecVWLmR,              & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,cplFvFvVZL,cplFvFvVZR,             & 
-& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,OZ2lSL,OZ2lSR,             & 
-& OZ2lVL,OZ2lVR)
+& cplcVWRmVWRmVZ,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,    & 
+& cplFvFeHpmR,cplFvFvVZL,cplFvFvVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,      & 
+& cplHpmVWRmVZ,OZ2lSL,OZ2lSR,OZ2lVL,OZ2lVR)
 
 ! ---------------------------------------------------------------- 
 ! Code based on automatically generated SARAH extensions by 'PreSARAH' 
@@ -99594,10 +98583,10 @@ Complex(dp),Intent(in) :: cplAhhhVZ(4,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),c
 & cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
 & cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),       & 
 & cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),             & 
-& cplcVWLmVWLmVZ,cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFecVWLmL(9,3),        & 
-& cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),           & 
-& cplFvFeHpmR(9,3,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplhhVZVZ(4),cplhhVZVZR(4),         & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
+& cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),& 
+& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvVZL(9,9),              & 
+& cplFvFvVZR(9,9),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),          & 
+& cplHpmVWRmVZ(4)
 
 Integer,Intent(in) :: gt1, gt2,gt3 
 Integer :: gt4 
@@ -100332,41 +99321,6 @@ End if
     End Do 
 
 
- ! Loop particles: Fv,VWRm,VWLm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWRmL(i1,gt1)
-coup1R = cplFvFecVWRmR(i1,gt1)
-coup2L = cplcFeFvVWLmL(gt2,i1)
-coup2R = cplcFeFvVWLmR(gt2,i1)
-coup3 = -cplcVWLmVWRmVZ
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWRm
-mV12 = MVWRm2
-mV2 = MVWLm
-mV22 = MVWLm2
-! Amplitude 
-  int1=B0(MassEx32, mV12, mV22)
-  int2=C0(0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int3=Cget("C00 ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int4=Cget("C1  ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int5=Cget("C2  ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  OZ2lSL=OZ2lSL+6.*chargefactor*coup1L*coup2R*coup3*(int4 + int5)*mF1
-  OZ2lSR=OZ2lSR+6.*chargefactor*coup1R*coup2L*coup3*(int4 + int5)*mF1
-  OZ2lVL=OZ2lVL+chargefactor*coup1L*coup2L*coup3*(Finite - 2.*(int1 + 2.*int3 +       & 
-&  int2*mF12))
-  OZ2lVR=OZ2lVR+chargefactor*coup1R*coup2R*coup3*(Finite - 2.*(int1 + 2.*int3 +       & 
-&  int2*mF12))
-  End if 
-End if 
-    End Do 
-
-
  ! Loop particles: Fv,conj[Hpm],VWLm
 ! Generic diagram: FSV,  InsertionOrder: 1
 chargefactor = 1 
@@ -100397,41 +99351,6 @@ mV22 = MVWLm2
 End if 
     End Do 
    End Do 
-
-
- ! Loop particles: Fv,VWLm,VWRm
-! Generic diagram: FVV,  InsertionOrder: 1
-chargefactor = 1 
-Do i1=1,9
-If ((MFv2(i1).gt.mf_l2(3)).Or.(MVWLm2.gt.mf_l2(3)).Or.(MVWRm2.gt.mf_l2(3))) Then
-If (.not.OnlySM) Then 
-coup1L = cplFvFecVWLmL(i1,gt1)
-coup1R = cplFvFecVWLmR(i1,gt1)
-coup2L = cplcFeFvVWRmL(gt2,i1)
-coup2R = cplcFeFvVWRmR(gt2,i1)
-coup3 = -cplcVWRmVWLmVZ
-! Masses in loop
-mF1 = MFv(i1)
-mF12 = MFv2(i1)
-mV1 = MVWLm
-mV12 = MVWLm2
-mV2 = MVWRm
-mV22 = MVWRm2
-! Amplitude 
-  int1=B0(MassEx32, mV12, mV22)
-  int2=C0(0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int3=Cget("C00 ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int4=Cget("C1  ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  int5=Cget("C2  ",0._dp, MassEx32, 0._dp, mF12, mV22, mV12)
-  OZ2lSL=OZ2lSL+6.*chargefactor*coup1L*coup2R*coup3*(int4 + int5)*mF1
-  OZ2lSR=OZ2lSR+6.*chargefactor*coup1R*coup2L*coup3*(int4 + int5)*mF1
-  OZ2lVL=OZ2lVL+chargefactor*coup1L*coup2L*coup3*(Finite - 2.*(int1 + 2.*int3 +       & 
-&  int2*mF12))
-  OZ2lVR=OZ2lVR+chargefactor*coup1R*coup2R*coup3*(Finite - 2.*(int1 + 2.*int3 +       & 
-&  int2*mF12))
-  End if 
-End if 
-    End Do 
 
 
  ! Loop particles: Fv,VWRm,VWRm

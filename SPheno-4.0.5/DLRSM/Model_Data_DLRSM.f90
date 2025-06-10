@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:21 on 9.6.2025   
+! File created at 23:37 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1148,8 +1148,6 @@ Complex(dp) :: ZEROS_0(3, 3)
 Complex(dp) :: ZEROS_p2(3, 3)
 Complex(dp) :: ZMOS_0(9, 9)
 Complex(dp) :: ZMOS_p2(9, 9)
-Complex(dp) :: ZZOS_0(3, 3)
-Complex(dp) :: ZZOS_p2(3, 3)
 Real(dp) :: MU12Tree 
 Real(dp) :: MU121L 
 Real(dp) :: MU122L 
@@ -1180,9 +1178,9 @@ Complex(dp) :: YGUT(3,3),YQ1GUT(3,3),YQ2GUT(3,3),YtGUT(3,3),YLGUT(3,3),YRGUT(3,3
 
 Real(dp) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,               & 
-& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4)
+& MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
 
-Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4),ZZ(3,3)
+Complex(dp) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Real(dp) :: k1,vR
 
@@ -1192,16 +1190,16 @@ Real(dp) :: k1Fix,vRFix
 
 Real(dp) :: gPFu(3,441),gTFu(3),BRFu(3,441),gPFe(3,465),gTFe(3),BRFe(3,465),gPFd(3,441),          & 
 & gTFd(3),BRFd(3,441),gPhh(4,119),gThh(4),BRhh(4,119),gPFv(9,1083),gTFv(9),              & 
-& BRFv(9,1083),gPVZ(1,99),gTVZ,BRVZ(1,99),gPVZR(1,99),gTVZR,BRVZR(1,99),gPHpm(4,96),     & 
-& gTHpm(4),BRHpm(4,96),gPAh(4,111),gTAh(4),BRAh(4,111),gPVWLm(1,66),gTVWLm,              & 
-& BRVWLm(1,66),gPVWRm(1,66),gTVWRm,BRVWRm(1,66)
+& BRFv(9,1083),gPVZ(1,98),gTVZ,BRVZ(1,98),gPVZR(1,99),gTVZR,BRVZR(1,99),gPHpm(4,96),     & 
+& gTHpm(4),BRHpm(4,96),gPAh(4,111),gTAh(4),BRAh(4,111),gPVWLm(1,65),gTVWLm,              & 
+& BRVWLm(1,65),gPVWRm(1,65),gTVWRm,BRVWRm(1,65)
 
 Real(dp) :: gP1LFu(3,36),gT1LFu(3),BR1LFu(3,36),gP1LFe(3,60),gT1LFe(3),BR1LFe(3,60),              & 
 & gP1LFd(3,36),gT1LFd(3),BR1LFd(3,36),gP1Lhh(4,119),gT1Lhh(4),BR1Lhh(4,119),             & 
-& gP1LFv(9,84),gT1LFv(9),BR1LFv(9,84),gP1LVZ(1,99),gT1LVZ,BR1LVZ(1,99),gP1LVZR(1,99),    & 
+& gP1LFv(9,84),gT1LFv(9),BR1LFv(9,84),gP1LVZ(1,98),gT1LVZ,BR1LVZ(1,98),gP1LVZR(1,99),    & 
 & gT1LVZR,BR1LVZR(1,99),gP1LHpm(4,96),gT1LHpm(4),BR1LHpm(4,96),gP1LAh(4,111),            & 
-& gT1LAh(4),BR1LAh(4,111),gP1LVWLm(1,66),gT1LVWLm,BR1LVWLm(1,66),gP1LVWRm(1,66),         & 
-& gT1LVWRm,BR1LVWRm(1,66)
+& gT1LAh(4),BR1LAh(4,111),gP1LVWLm(1,65),gT1LVWLm,BR1LVWLm(1,65),gP1LVWRm(1,65),         & 
+& gT1LVWRm,BR1LVWRm(1,65)
 
 Real(dp) :: ratioFd(4,3),ratioFe(4,3),ratioFu(4,3),ratioHpm(4,4),ratioVWLm(4),ratioVWRm(4)
 
@@ -1252,6 +1250,8 @@ Logical, save :: CheckSugraDetails(10) =.False. &
                         &, UseFixedGUTScale =.False. 
 Real(dp), save :: GUT_scale 
 Real(dp) :: g3running 
+Real(dp) :: gYaux 
+Real(dp) :: gYauxMZ 
 Logical, save :: InputValueforgBL =.False. 
 Logical, save :: InputValueforg2 =.False. 
 Logical, save :: InputValueforg3 =.False. 
@@ -1299,7 +1299,8 @@ Real(dp) :: lam6input
 Real(dp) :: rho1input
 Real(dp) :: rho2input
 Real(dp) :: alp1input
-Complex(dp) :: alp2input*alp3input
+Real(dp) :: alp2input
+Real(dp) :: alp3input
 Real(dp) :: k1MZ 
 Real(dp) :: k1SUSY 
 Real(dp) :: vRMZ 
@@ -2101,7 +2102,8 @@ lam6input= 0._dp
 rho1input= 0._dp 
 rho2input= 0._dp 
 alp1input= 0._dp 
-alp2input*alp3input=(0._dp,0._dp) 
+alp2input= 0._dp 
+alp3input= 0._dp 
 End Subroutine Set_All_Parameters_0 
  
 
@@ -2120,23 +2122,23 @@ Logical,Intent(in)::MZsuffix
 Real(dp), Intent(in) :: g1SM, g2SM, g3SM, vSM 
 Complex(dp),Intent(in) :: YuSM(3,3),YdSM(3,3),YeSM(3,3) 
 If (MZsuffix) Then 
-  hyperchargeCoupling = g1SM 
   g2MZ = g2SM 
   g3MZ = g3SM 
-  k1MZ = vSM/Sqrt(1 + TanBeta**2) 
-  k2 = k1*TanBeta 
-  UpYukawa = (vSM*YuSM)/k2 
-  DownYukawa = (vSM*YdSM)/k1 
-  ElectronYukawa = (vSM*YeSM)/k1 
+  gR = g2 
+  gBLMZ = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW))) 
+  k1MZ = vSM 
+  YtMZ = YeSM 
+  YQ2MZ = YdSM 
+  YQ1MZ = YuSM 
 Else 
-  hyperchargeCoupling = g1SM 
   g2 = g2SM 
   g3 = g3SM 
-  k1 = vSM/Sqrt(1 + TanBeta**2) 
-  k2 = k1*TanBeta 
-  UpYukawa = (vSM*YuSM)/k2 
-  DownYukawa = (vSM*YdSM)/k1 
-  ElectronYukawa = (vSM*YeSM)/k1 
+  gR = g2 
+  gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW))) 
+  k1 = vSM 
+  Yt = YeSM 
+  YQ2 = YdSM 
+  YQ1 = YuSM 
 End if 
 End Subroutine SetMatchingConditions 
 End Module Model_Data_DLRSM

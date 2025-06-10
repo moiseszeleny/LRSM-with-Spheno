@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 19:19 on 9.6.2025   
+! File created at 23:34 on 9.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -186,13 +186,13 @@ End Function AlphaS_T
 
 
 Subroutine DeltaVB(sinW2,sinW2_dr,rho,MAh,MFe,MFv,Mhh,MHpm,MVWLm,MVWRm,               & 
-& MVZR,g2,gBL,k1,PhiW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,ZZ,res)
+& MVZR,g2,gBL,k1,PhiW,TW,UC,ZER,UP,ZEL,vR,Y,YR,Yt,ZH,ZM,res)
 
 Implicit None 
-Real(dp),Intent(in) :: MAh(4),MFe(3),MFv(9),Mhh(4),MHpm(4),MVWLm,MVWRm,MVZR,g2,gBL,k1,PhiW,UC(4,4),          & 
-& UP(4,4),vR,ZH(4,4)
+Real(dp),Intent(in) :: MAh(4),MFe(3),MFv(9),Mhh(4),MHpm(4),MVWLm,MVWRm,MVZR,g2,gBL,k1,PhiW,TW,               & 
+& UC(4,4),UP(4,4),vR,ZH(4,4)
 
-Complex(dp),Intent(in) :: ZER(3,3),ZEL(3,3),Y(3,3),YR(3,3),Yt(3,3),ZM(9,9),ZZ(3,3)
+Complex(dp),Intent(in) :: ZER(3,3),ZEL(3,3),Y(3,3),YR(3,3),Yt(3,3),ZM(9,9)
 
 Real(dp) :: MAh2(4),MFe2(3),MFv2(9),Mhh2(4),MHpm2(4),MVWLm2,MVWRm2,MVZR2
 
@@ -320,7 +320,7 @@ cplcFeFeVZRL = 0._dp
 cplcFeFeVZRR = 0._dp 
 Do gt1 = 1, 3
  Do gt2 = 1, 3
-Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,ZZ,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
+Call CouplingcFeFeVZRT(gt1,gt2,gBL,g2,TW,cplcFeFeVZRL(gt1,gt2),cplcFeFeVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -343,7 +343,7 @@ cplFvFvVZRL = 0._dp
 cplFvFvVZRR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 9
-Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZZ,ZM,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
+Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,gt2))
 
  End Do 
 End Do 
@@ -409,18 +409,18 @@ End Do
 
 cplHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,ZZ,UC,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
 
 End Do 
 
 
 cplcVWLmVWLmVZR = 0._dp 
-Call CouplingcVWLmVWLmVZRT(g2,ZZ,PhiW,cplcVWLmVWLmVZR)
+Call CouplingcVWLmVWLmVZRT(g2,TW,PhiW,cplcVWLmVWLmVZR)
 
 
 
 cplcVWRmVWLmVZR = 0._dp 
-Call CouplingcVWRmVWLmVZRT(g2,ZZ,PhiW,cplcVWRmVWLmVZR)
+Call CouplingcVWRmVWLmVZRT(g2,TW,PhiW,cplcVWRmVWLmVZR)
 
 
 

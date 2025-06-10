@@ -250,7 +250,7 @@ ParameterDefinitions = {
      Dependence -> None, 
      DependenceNum -> None, (*ArcCos[(Sqrt[g2^2 + gBL^2])/Sqrt[g2^2 + 2*gBL^2]], *)
      DependenceOptional -> None, 
-     DependenceSPheno -> ArcSin[Abs[ZZ[2, 1]]], 
+     DependenceSPheno -> ArcSin[Abs[ZZ[1, 1]]], 
      Real -> True, 
      LesHouches -> ThetaW, 
      LaTeX -> "\\Theta_W", 
@@ -544,7 +544,11 @@ ParameterDefinitions = {
 
 {ZZ,{ 
      Description -> "Photon-Z-Z' Mixing Matrix", 
-     Dependence -> None, 
+     Dependence -> {
+          {Sin[ThetaW], -Cos[ThetaW], 0},
+          {Sin[ThetaW], Sin[ThetaW]*Tan[ThetaW], -Sqrt[Cos[2*ThetaW]]/Cos[ThetaW]},
+          {Sqrt[Cos[2*ThetaW]], Sqrt[Cos[2*ThetaW]]*Tan[ThetaW], Tan[ThetaW]}
+     },
      DependenceNum -> None, 
      DependenceOptional -> None, 
      DependenceSPheno -> None, 
