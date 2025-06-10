@@ -28,8 +28,7 @@ ParametersToSolveTadpoles = {mu12,mu22};
 BoundaryLowScaleInput={
     {g3, g3SM},
     {g2, g2SM},
-    {gR, g2},
-    {gBL, (g1SM*gR)/Sqrt[-g1SM^2 + gR^2]},
+    {gBL, g1SM*Sin[ThetaW]/Sqrt[Cos[2*ThetaW]]},
     {vR, vRinput},
     {k1, vSM}
 };
