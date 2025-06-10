@@ -39,7 +39,6 @@ BoundaryLowScaleInput={
 DEFINITION[MatchingConditions]={
     {g2, g2SM},
     {g3, g3SM},
-    {gR, g2},
     {gBL, g1SM*Sin[ThetaW]/Sqrt[Cos[2*ThetaW]]},
     {k1, vSM},
     {Yt, YeSM},

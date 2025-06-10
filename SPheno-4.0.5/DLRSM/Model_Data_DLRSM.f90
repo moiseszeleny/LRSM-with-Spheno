@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 23:37 on 9.6.2025   
+! File created at 1:22 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -2124,7 +2124,6 @@ Complex(dp),Intent(in) :: YuSM(3,3),YdSM(3,3),YeSM(3,3)
 If (MZsuffix) Then 
   g2MZ = g2SM 
   g3MZ = g3SM 
-  gR = g2 
   gBLMZ = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW))) 
   k1MZ = vSM 
   YtMZ = YeSM 
@@ -2133,7 +2132,6 @@ If (MZsuffix) Then
 Else 
   g2 = g2SM 
   g3 = g3SM 
-  gR = g2 
   gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW))) 
   k1 = vSM 
   Yt = YeSM 
