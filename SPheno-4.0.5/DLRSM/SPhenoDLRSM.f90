@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:26 on 10.6.2025   
+! File created at 10:51 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -230,9 +230,7 @@ g2 = g2SM
 gR = g2
 gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
 vR = vRinput
-vL = 0
 k1 = vSM
-k2 = 0
 
  
  ! Setting VEVs used for low energy constraints 
@@ -266,9 +264,7 @@ g2 = g2SM
 gR = g2
 gBL = (g1SM*gR)/Sqrt(-g1SM**2 + gR**2)
 vR = vRinput
-vL = 0
 k1 = vSM
-k2 = 0
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 

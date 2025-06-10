@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:22 on 10.6.2025   
+! File created at 10:42 on 10.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1214,6 +1214,7 @@ Real(dp) :: gForTadpoles(144)
 Complex(dp) :: tForTadpoles(2)
 Real(dp) :: gBL_saveEP 
 Real(dp) :: g2_saveEP 
+Real(dp) :: g2_saveEP 
 Complex(dp) :: Y_saveEP(3,3) 
 Complex(dp) :: YQ1_saveEP(3,3) 
 Complex(dp) :: YQ2_saveEP(3,3) 
@@ -1286,8 +1287,6 @@ Real(dp) :: nuMasses(9)
 Complex(dp) :: nuMixing(9,9) 
 Complex(dp) :: temporaryValue 
 Complex(dp) :: gR
-Complex(dp) :: k2
-Complex(dp) :: vL
 Real(dp) :: vRinput
 Real(dp) :: lam1input
 Real(dp) :: lam2input
