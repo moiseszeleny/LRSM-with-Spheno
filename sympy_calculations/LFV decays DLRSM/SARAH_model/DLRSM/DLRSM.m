@@ -133,7 +133,7 @@ DEFINITION[EWSB][MatterSector]=
 (*------------------------------------------------------*)
 
 
-DEFINITION[GaugeES][DiracSpinors]={
+(*DEFINITION[GaugeES][DiracSpinors]={
   Fd1 -> {dL, 0},
   Fd2 -> {0, dR},
   Fu1 -> {uL, 0},
@@ -143,7 +143,7 @@ DEFINITION[GaugeES][DiracSpinors]={
   Fv1  -> {nuL,0},
   Fv2 -> {0,nuR},
   Fs -> {S1, conj[S1]}
-  };
+  };*)
 
 
 
