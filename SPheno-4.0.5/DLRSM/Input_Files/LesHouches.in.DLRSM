@@ -25,10 +25,6 @@ Block MINPAR      # Input parameters
 Block SPhenoInput   # SPheno specific input 
   1 -1              # error level 
   2  0              # SPA conventions 
-  7  0              # Skip 2-loop Higgs corrections 
-  8  3              # Method used for two-loop calculation 
-  9  1              # Gaugeless limit used at two-loop 
- 10  0              # safe-mode used at two-loop 
  11 1               # calculate branching ratios 
  13 1               # 3-Body decays: none (0), fermion (1), scalar (2), both (3) 
  14 0               # Run couplings to scale of decaying particle 
@@ -137,15 +133,11 @@ Block YTIN    #
  3 1   0.000000E+00         # Yt(3,1)
  3 2   0.000000E+00         # Yt(3,2)
  3 3   0.000000E+00         # Yt(3,3)
-Block LRINPUTIN       #  
- 14   0.000000E+00         # ALP1
- 16   0.000000E+00         # ALP2
- 20   0.000000E+00         # ALP3
- 1   0.000000E+00         # LAM1
- 2   0.000000E+00         # LAM2
- 4   0.000000E+00         # LAM3
- 5   0.000000E+00         # LAM4
- 6   0.000000E+00         # LAM5
- 7   0.000000E+00         # LAM6
- 8   0.000000E+00         # RHO1
- 9   0.000000E+00         # RHO2
+Block HMIXIN       #  
+ 102   0.000000E+00         # k1
+Block VEVIN       #  
+ 4   0.000000E+00         # vR
+Block GAUGEIN       #  
+ 2   0.000000E+00         # g2
+ 3   0.000000E+00         # g3
+ 4   0.000000E+00         # gBL

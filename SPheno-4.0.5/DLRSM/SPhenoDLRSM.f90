@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 21:56 on 10.6.2025   
+! File created at 1:11 on 11.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -225,11 +225,17 @@ If (MatchingOrder.eq.-1) Then
  Mux = MuxIN 
  MU12 = MU12IN 
  MU22 = MU22IN 
- g3 = g3SM
-g2 = g2SM
-gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW)))
-vR = vRinput
-k1 = vSM
+ LAM1 = lam1input
+LAM2 = lam2input
+LAM3 = lam3input
+LAM4 = lam4input
+LAM5 = lam5input
+LAM6 = lam6input
+RHO1 = rho1input
+RHO2 = rho2input
+ALP1 = alp1input
+ALP2 = alp2input
+ALP3 = alp3input
 
  
  ! Setting VEVs used for low energy constraints 
@@ -258,11 +264,17 @@ YeSM= Transpose(YeSM)
 & g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
 & YL,YR,Mux,MU12,MU22,.False.)
 
-g3 = g3SM
-g2 = g2SM
-gBL = (g1SM*Sin(TW))/Sqrt(Cos(2._dp*(TW)))
-vR = vRinput
-k1 = vSM
+LAM1 = lam1input
+LAM2 = lam2input
+LAM3 = lam3input
+LAM4 = lam4input
+LAM5 = lam5input
+LAM6 = lam6input
+RHO1 = rho1input
+RHO2 = rho2input
+ALP1 = alp1input
+ALP2 = alp2input
+ALP3 = alp3input
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 

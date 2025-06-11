@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 21:41 on 10.6.2025   
+! File created at 1:01 on 11.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -20,7 +20,6 @@ Use MathematicsQP
 Use Model_Data_DLRSM 
 Use StandardModel 
 Use Tadpoles_DLRSM 
- Use Pole2L_DLRSM 
  Use TreeLevelMasses_DLRSM 
  
 Real(dp), Private :: Mhh_1L(4), Mhh2_1L(4)  
@@ -35,11 +34,6 @@ Real(dp), Private :: MVZ_1L, MVZ2_1L
 Real(dp), Private :: MVZR_1L, MVZR2_1L  
 Real(dp), Private :: MVWLm_1L, MVWLm2_1L  
 Real(dp), Private :: MVWRm_1L, MVWRm2_1L  
-Real(dp) :: pi2A0  
-Real(dp) :: ti_ep2L(4)  
-Real(dp) :: pi_ep2L(4,4)
-Real(dp) :: Pi2S_EffPot(4,4)
-Real(dp) :: PiP2S_EffPot(4,4)
 Contains 
  
 Subroutine OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,            & 
@@ -162,9 +156,6 @@ Complex(dp) :: cplhhhhVPVZ(4,4),cplhhhhVPVZR(4,4),cplhhhhVZRVZR(4,4),cplhhhhVZVZ
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1, j2, j3, j4, il, i_count, ierr 
-Integer :: i2L, iFin 
-Logical :: Convergence2L 
-Real(dp) :: Pi2S_EffPot_save(4,4), diff(4,4)
 Complex(dp) :: Tad1Loop(4), dmz2  
 Real(dp) :: comp(2), tanbQ, vev2, vSM
 Iname = Iname + 1 
@@ -327,7 +318,7 @@ Call CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,       
 & cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
 & cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
-Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
+Call OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhUhh,     & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,               & 
@@ -336,92 +327,12 @@ Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,           
 
 MU12Tree  = MU12
 MU22Tree  = MU22
-If (CalculateTwoLoopHiggsMasses) Then 
-    If(GaugelessLimit) Then 
-  k1Fix = 0._dp 
-  vRFix = 0._dp 
-   gBL_saveEP =gBL
-   gBL = 0._dp 
-   g2_saveEP =g2
-   g2 = 0._dp 
-   g2_saveEP =g2
-   g2 = 0._dp 
-     Else 
-  k1Fix = k1 
-  vRFix = vR 
-     End if 
-
-SELECT CASE (TwoLoopMethod) 
-CASE ( 1 , 2 ) 
-
-
- CASE ( 3 ) ! Diagrammatic method 
-  ! Make sure that there are no exactly degenerated masses! 
-   Y_saveEP =Y
-   where (aint(Abs(Y)).eq.Y) Y=Y*(1 + 1*1.0E-12_dp)
-   YQ1_saveEP =YQ1
-   where (aint(Abs(YQ1)).eq.YQ1) YQ1=YQ1*(1 + 2*1.0E-12_dp)
-   YQ2_saveEP =YQ2
-   where (aint(Abs(YQ2)).eq.YQ2) YQ2=YQ2*(1 + 3*1.0E-12_dp)
-   Yt_saveEP =Yt
-   where (aint(Abs(Yt)).eq.Yt) Yt=Yt*(1 + 4*1.0E-12_dp)
-   YL_saveEP =YL
-   where (aint(Abs(YL)).eq.YL) YL=YL*(1 + 5*1.0E-12_dp)
-   YR_saveEP =YR
-   where (aint(Abs(YR)).eq.YR) YR=YR*(1 + 6*1.0E-12_dp)
-   Mux_saveEP =Mux
-   where (aint(Abs(Mux)).eq.Mux) Mux=Mux*(1 + 7*1.0E-12_dp)
-
-If (NewGBC) Then 
-Call CalculatePi2S(125._dp**2,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,               & 
-& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont,ti_ep2L,           & 
-& Pi2S_EffPot,PiP2S_EffPot)
-
-Else 
-Call CalculatePi2S(0._dp,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,               & 
-& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont,ti_ep2L,Pi2S_EffPot,    & 
-& PiP2S_EffPot)
-
-End if 
-   Y =Y_saveEP 
-   YQ1 =YQ1_saveEP 
-   YQ2 =YQ2_saveEP 
-   Yt =Yt_saveEP 
-   YL =YL_saveEP 
-   YR =YR_saveEP 
-   Mux =Mux_saveEP 
-
-
- CASE ( 8 , 9 ) ! Hard-coded routines 
-  
- END SELECT
- 
-   If(GaugelessLimit) Then 
-   gBL =gBL_saveEP 
-   g2 =g2_saveEP 
-   g2 =g2_saveEP 
-   End if 
-
-Else ! Two loop turned off 
-Pi2S_EffPot = 0._dp 
-
-Pi2A0 = 0._dp 
-
-ti_ep2L = 0._dp 
-
-End if 
 Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop)
 
 MU121L = MU12
 MU221L = MU22
-Tad1Loop(1:4) = Tad1Loop(1:4) - ti_ep2L 
-Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
-& LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop)
-
-MU122L = MU12
-MU222L = MU22
-Call OneLoophh(MU122L,MU222L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,            & 
+Call OneLoophh(MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,            & 
 & LAM3,k1,vR,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,              & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,              & 
 & cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
@@ -434,19 +345,6 @@ Call OneLoophh(MU122L,MU222L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,      
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,0.1_dp*delta_mass, & 
 & Mhh_1L,Mhh2_1L,ZH_1L,kont)
 
-If (TwoLoopMethod.gt.2) Then 
-Call OneLoopAh(gBL,g2,MU122L,MU222L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,               & 
-& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,            & 
-& MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,   & 
-& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
-& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
-& cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& 0.1_dp*delta_mass,MAh_1L,MAh2_1L,UP_1L,kont)
-
-Else 
 Call OneLoopAh(gBL,g2,MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,               & 
 & LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,            & 
 & MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,   & 
@@ -458,7 +356,6 @@ Call OneLoopAh(gBL,g2,MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,         
 & cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
 & 0.1_dp*delta_mass,MAh_1L,MAh2_1L,UP_1L,kont)
 
-End if 
 Call OneLoopHpm(g2,MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,k1,               & 
 & vR,PhiW,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,MFd,MFd2,               & 
 & MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,              & 
@@ -567,7 +464,7 @@ End if
 Iname = Iname -1 
 End Subroutine OneLoopMasses 
  
-Subroutine OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
+Subroutine OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & cplAhAhUhh,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,           & 
 & cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,  & 
@@ -584,7 +481,7 @@ Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,
 & cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
 & cplUhhcVWLmVWLm(4),cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZRVZR(4)
 
-Real(dp), Intent(in) :: k1,vR
+Real(dp), Intent(in) :: 0,k1,vR
 
 Integer :: i1,i2, gO1, gO2 
 Complex(dp) :: coupL, coupR, coup, temp, res, A0m, sumI(4)  
@@ -887,7 +784,6 @@ Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,         
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,              & 
 & PiSf(1,:,:))
 
-PiSf(1,:,:) = PiSf(1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -912,7 +808,6 @@ Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,         
 
 End Do 
 Do i1=4,1,-1 
-PiSf(i1,:,:) = PiSf(i1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -967,7 +862,6 @@ Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,         
 
 End Do 
 Do i1=4,1,-1 
-PiSf(i1,:,:) = PiSf(i1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1771,7 +1665,6 @@ Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,      
 & cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
 & kont,PiSf(1,:,:))
 
-PiSf(1,:,:) = PiSf(1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1796,7 +1689,6 @@ Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,      
 
 End Do 
 Do i1=4,1,-1 
-PiSf(i1,:,:) = PiSf(i1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1853,7 +1745,6 @@ Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,      
 
 End Do 
 Do i1=4,1,-1 
-PiSf(i1,:,:) = PiSf(i1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 

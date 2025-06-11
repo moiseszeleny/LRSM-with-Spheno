@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 21:43 on 10.6.2025   
+! File created at 1:03 on 11.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1213,14 +1213,8 @@ Complex(dp) :: ratioPGG(4),ratioPPP(4)
 Real(dp) :: gForTadpoles(144)
 Complex(dp) :: tForTadpoles(2)
 Real(dp) :: gBL_saveEP 
-Real(dp) :: g2_saveEP
-Complex(dp) :: Y_saveEP(3,3) 
-Complex(dp) :: YQ1_saveEP(3,3) 
-Complex(dp) :: YQ2_saveEP(3,3) 
-Complex(dp) :: Yt_saveEP(3,3) 
-Complex(dp) :: YL_saveEP(3,3) 
-Complex(dp) :: YR_saveEP(3,3) 
-Complex(dp) :: Mux_saveEP(3,3) 
+Real(dp) :: g2_saveEP 
+Real(dp) :: g2_saveEP 
 Logical :: RotateNegativeFermionMasses=.True. 
 Logical,save::IgnoreNegativeMasses= .False.
 Logical,save::IgnoreMuSignFlip= .False.

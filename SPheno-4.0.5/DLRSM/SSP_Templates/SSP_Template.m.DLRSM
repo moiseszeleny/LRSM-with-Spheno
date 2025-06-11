@@ -55,7 +55,7 @@ RunScans = {Scan1, Scan2,...};
 (*    PARAMETER RANGES                          *)
 (*----------------------------------------------*)
 
-DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,LRINPUTIN,MUXMIXIN,YIN,YLIN,YQ1IN,YQ2IN,YRIN,YTIN}; 
+DEFINITION[a_][Blocks]={MODSEL,SMINPUTS,SPhenoInput,MINPAR,GAUGEIN,HMIXIN,MUXMIXIN,VEVIN,YIN,YLIN,YQ1IN,YQ2IN,YRIN,YTIN}; 
  
 DEFINITION[a_][MODSEL]={ 
 {{1},{Value->1}}, 
@@ -103,18 +103,16 @@ DEFINITION[a_][SPhenoInput]={
 {{86},{Value->0.}},  (* Maximal width to be counted as invisible in Higgs decays; -1: only LSP *) 
 {{530},{Value->1.}}  (* Write Blocks for Vevacious *) 
 }; 
-DEFINITION[a_][LRINPUTIN]={ 
-{{14},{Value->0}}  (*ALP1*) , 
-{{16},{Value->0}}  (*ALP2*) , 
-{{20},{Value->0}}  (*ALP3*) , 
-{{1},{Value->0}}  (*LAM1*) , 
-{{2},{Value->0}}  (*LAM2*) , 
-{{4},{Value->0}}  (*LAM3*) , 
-{{5},{Value->0}}  (*LAM4*) , 
-{{6},{Value->0}}  (*LAM5*) , 
-{{7},{Value->0}}  (*LAM6*) , 
-{{8},{Value->0}}  (*RHO1*) , 
-{{9},{Value->0}}  (*RHO2*) }; 
+DEFINITION[a_][GAUGEIN]={ 
+{{2},{Value->0}}  (*g2*) , 
+{{3},{Value->0}}  (*g3*) , 
+{{4},{Value->0}}  (*gBL*) }; 
+ 
+DEFINITION[a_][HMIXIN]={ 
+{{102},{Value->0}}  (*k1*) }; 
+ 
+DEFINITION[a_][VEVIN]={ 
+{{4},{Value->0}}  (*vR*) }; 
  
 DEFINITION[a_][MUXMIXIN]={ 
 {{1,1},{Value->0}} , 
