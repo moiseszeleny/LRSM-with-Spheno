@@ -318,7 +318,7 @@ Call CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,       
 & cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
 & cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
-Call OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
+Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhUhh,     & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,               & 
@@ -464,7 +464,7 @@ End if
 Iname = Iname -1 
 End Subroutine OneLoopMasses 
  
-Subroutine OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
+Subroutine OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & cplAhAhUhh,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,           & 
 & cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,  & 
@@ -481,7 +481,7 @@ Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,
 & cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
 & cplUhhcVWLmVWLm(4),cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZRVZR(4)
 
-Real(dp), Intent(in) :: 0,k1,vR
+Real(dp), Intent(in) :: k1,vR
 
 Integer :: i1,i2, gO1, gO2 
 Complex(dp) :: coupL, coupR, coup, temp, res, A0m, sumI(4)  

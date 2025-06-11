@@ -1213,8 +1213,7 @@ Complex(dp) :: ratioPGG(4),ratioPPP(4)
 Real(dp) :: gForTadpoles(144)
 Complex(dp) :: tForTadpoles(2)
 Real(dp) :: gBL_saveEP 
-Real(dp) :: g2_saveEP 
-Real(dp) :: g2_saveEP 
+Real(dp) :: g2_saveEP
 Logical :: RotateNegativeFermionMasses=.True. 
 Logical,save::IgnoreNegativeMasses= .False.
 Logical,save::IgnoreMuSignFlip= .False.
