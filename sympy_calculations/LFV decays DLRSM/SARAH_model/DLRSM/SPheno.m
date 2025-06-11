@@ -26,11 +26,17 @@ RealParameters = {
 ParametersToSolveTadpoles = {mu12,mu22};
 
 BoundaryLowScaleInput={
-    {g3, g3SM},
-    {g2, g2SM},
-    {gBL, g1SM*Sin[ThetaW]/Sqrt[Cos[2*ThetaW]]},
-    {vR, vRinput},
-    {k1, vSM}
+    {lam1, lam1input},
+    {lam2, lam2input},
+    {lam3, lam3input},
+    {lam4, lam4input},
+    {lam5, lam5input},
+    {lam6, lam6input},
+    {rho1, rho1input},
+    {rho2, rho2input},
+    {alp1, alp1input},
+    {alp2, alp2input},
+    {alp3, alp3input}
 };
 
 DEFINITION[MatchingConditions]={
