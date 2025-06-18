@@ -248,9 +248,9 @@ ParameterDefinitions = {
 {ThetaW,{ 
      Description -> "Weinberg-Angle", 
      Dependence -> None, 
-     DependenceNum -> None, (*ArcCos[(Sqrt[g2^2 + gBL^2])/Sqrt[g2^2 + 2*gBL^2]], *)
+     DependenceNum -> None, (*ArcCos[(Sqrt[g2^2 + gBL^2])/Sqrt[g2^2 + 2*gBL^2]],*)
      DependenceOptional -> None, 
-     DependenceSPheno -> ArcSin[Abs[ZZ[[1, 1]]]], 
+     DependenceSPheno -> ArcSin[Abs[ZZ[1, 1]]],
      Real -> True, 
      LesHouches -> ThetaW, 
      LaTeX -> "\\Theta_W", 

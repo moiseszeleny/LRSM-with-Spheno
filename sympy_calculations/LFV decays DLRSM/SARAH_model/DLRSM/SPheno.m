@@ -45,8 +45,6 @@ DEFINITION[MatchingConditions]={
     {gBL, e/Sqrt[Cos[2*ThetaW]]},
     {k1, vSM},
     {Yt, YeSM},
-    (*{YQ2, Conjg[(Transpose[YdSM]*k1*vSM)/k1^2]},
-    {YQ1, Conjg[(-(MatMul[Transpose[YuSM],Conjg[CKMR]])*vSM*k1)/(-k1^2)]}*)
     {YQ2, YdSM},
     {YQ1, YuSM}
 };
