@@ -114,7 +114,7 @@ MHpm2(1)=MVWLm2*RXiWLm
 MHpm(2)=MVWRm*sqrt(RXiWRm)
 MHpm2(2)=MVWRm2*RXiWRm
 PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-TW = ASin(Abs(Part(ZZ,1,1)))
+TW = ASin(Abs(ZZ(1,1)))
 Iname = Iname - 1 
  
 End Subroutine  TreeMasses 
@@ -1343,7 +1343,7 @@ MVZ = VPVZVZR(2)
 MVZ2 = VPVZVZR2(2) 
 MVZR = VPVZVZR(3) 
 MVZR2 = VPVZVZR2(3) 
-TW = ASin(Abs(Part(ZZ,1,1)))
+TW = ASin(Abs(ZZ(1,1)))
 
  Iname = Iname - 1 
  

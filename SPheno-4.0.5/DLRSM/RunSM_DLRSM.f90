@@ -87,7 +87,7 @@ Call GtoParameters62_SM(g62_SM, g1SM, g2SM, g3SM, lambdaSM, YuSM, YdSM, YeSM, mu
 ! Overwrite values obtained from SUSY running 
 g2 = g2SM 
 g3 = g3SM 
-k1=vSM/Sqrt(1._dp+TanBeta**2) 
+k1=vSM 
 ! Calculate running CKM matrix 
 Call FermionMass(YuSM,1._dp,test,dummy,CKMout,kont) 
  

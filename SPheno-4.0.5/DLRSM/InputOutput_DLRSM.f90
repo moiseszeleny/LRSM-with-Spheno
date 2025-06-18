@@ -1627,7 +1627,7 @@ Write(io_L,104) 1,Real(ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2)),dp), "# Phi
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block THETAW Q=",Q,"# (Renormalization Scale)" 
-Write(io_L,104) 1,Real(ASin(Abs(Part(ZZ,1,1))),dp), "# TW" 
+Write(io_L,104) 1,Real(ASin(Abs(ZZ(1,1))),dp), "# TW" 
 If (WriteTreeLevelTadpoleParameters) Then 
 If (HighScaleModel.Eq."LOW") Then 
 WriteNextBlock = .false. 
@@ -8233,7 +8233,7 @@ Write(123,*) ""
  
 Write(123,*) "" 
 Write(123,*) "PhiW= ",ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-Write(123,*) "TW= ",ASin(Abs(Part(ZZ,1,1)))
+Write(123,*) "TW= ",ASin(Abs(ZZ(1,1)))
 Write(123,*) "" 
 Write(123,*) "" 
 

@@ -367,7 +367,7 @@ MAhL = MAh
 MAh2L = MAhL**2 
  
 PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-TW = ASin(Abs(Part(ZZ,1,1)))
+TW = ASin(Abs(ZZ(1,1)))
 If ((L_BR).And.(kont.Eq.0)) Then 
  Call CalculateBR(CalcTBD,ratioWoM,epsI,deltaM,kont,MAh,MAh2,MFd,MFd2,MFe,             & 
 & MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
