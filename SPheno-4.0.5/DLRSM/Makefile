@@ -58,6 +58,7 @@ ${name}:  ${name}(Settings.o) ${name}(Model_Data_DLRSM.o)  \
  ${name}(TreeLevel_Decays_DLRSM.o) \
  ${name}(Fu.o)  ${name}(Fe.o)  ${name}(Fd.o)  ${name}(Fv.o)  \
 ${name}(AddLoopFunctions.o) ${name}(Kinematics.o) \
+ ${name}(2LPoleFunctions.o) ${name}(2LPole_DLRSM.o) \
  ${name}(LoopMasses_DLRSM.o) \
  ${name}(RGEs_SM_HC.o) ${name}(Couplings_SM_HC.o) ${name}(TreeLevelMasses_SM_HC.o) ${name}(LoopMasses_SM_HC.o)   \
  ${name}(BranchingRatios_DLRSM.o) ${name}(HiggsCS_DLRSM.o) ${name}(RunSM_DLRSM.o) \

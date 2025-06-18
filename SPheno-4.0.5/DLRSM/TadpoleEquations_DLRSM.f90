@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:11 on 11.6.2025   
+! File created at 21:34 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -20,11 +20,11 @@ Use Mathematics
 Contains 
 
 
-Subroutine SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+Subroutine SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,             & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop)
 
 Implicit None
-Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -68,10 +68,10 @@ If (MU12.ne.MU12) Then
  End if 
 End Subroutine SolveTadpoleEquations
 
-Subroutine CalculateTadpoles(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,            & 
+Subroutine CalculateTadpoles(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,            & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop,TadpoleValues)
 
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 

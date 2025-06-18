@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:01 on 11.6.2025   
+! File created at 21:28 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -20,6 +20,7 @@ Use MathematicsQP
 Use Model_Data_DLRSM 
 Use StandardModel 
 Use Tadpoles_DLRSM 
+ Use Pole2L_DLRSM 
  Use TreeLevelMasses_DLRSM 
  
 Real(dp), Private :: Mhh_1L(4), Mhh2_1L(4)  
@@ -34,15 +35,20 @@ Real(dp), Private :: MVZ_1L, MVZ2_1L
 Real(dp), Private :: MVZR_1L, MVZR2_1L  
 Real(dp), Private :: MVWLm_1L, MVWLm2_1L  
 Real(dp), Private :: MVWRm_1L, MVWRm2_1L  
+Real(dp) :: pi2A0  
+Real(dp) :: ti_ep2L(4)  
+Real(dp) :: pi_ep2L(4,4)
+Real(dp) :: Pi2S_EffPot(4,4)
+Real(dp) :: PiP2S_EffPot(4,4)
 Contains 
  
 Subroutine OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,            & 
 & Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
-& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
-& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,            & 
+& ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 Implicit None 
-Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
+Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
 Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -54,108 +60,106 @@ Complex(dp),Intent(inout) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,
 
 Real(dp),Intent(inout) :: k1,vR
 
-Complex(dp) :: cplAhAhcUHpm(4,4,4),cplAhAhcVWLmVWLm(4,4),cplAhAhcVWRmVWLm(4,4),cplAhAhcVWRmVWRm(4,4),& 
-& cplAhAhUhh(4,4,4),cplAhAhUhhUhh(4,4,4,4),cplAhAhUHpmcUHpm(4,4,4,4),cplAhAhVPVP(4,4),   & 
-& cplAhAhVPVZ(4,4),cplAhAhVPVZR(4,4),cplAhAhVZRVZR(4,4),cplAhAhVZVZ(4,4),cplAhAhVZVZR(4,4),& 
-& cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcUHpmcVWLm(4,4),cplAhcUHpmcVWRm(4,4),     & 
-& cplAhcVWLmVWRm(4),cplAhcVWRmVWLm(4),cplAhhhcUHpm(4,4,4),cplAhhhVP(4,4),cplAhhhVZ(4,4), & 
-& cplAhhhVZR(4,4),cplAhHpmcUHpm(4,4,4),cplAhHpmVWLm(4,4),cplAhUhhcHpm(4,4,4),            & 
-& cplAhUhhVP(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),cplcFdFdUAhL(3,3,4),cplcFdFdUAhR(3,3,4),& 
-& cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFdFdVGL(3,3),cplcFdFdVGR(3,3),             & 
-& cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3), & 
-& cplcFdFdVZRR(3,3),cplcFdFucUHpmL(3,3,4),cplcFdFucUHpmR(3,3,4),cplcFdFuVWLmL(3,3),      & 
-& cplcFdFuVWLmR(3,3),cplcFeFeUAhL(3,3,4),cplcFeFeUAhR(3,3,4),cplcFeFeUhhL(3,3,4),        & 
-& cplcFeFeUhhR(3,3,4),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),& 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvcUHpmL(3,9,4),cplcFeFvcUHpmR(3,9,4),       & 
-& cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeUFvcHpmL(3,9,4),cplcFeUFvcHpmR(3,9,4),     & 
-& cplcFeUFvVWLmL(3,9),cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),cplcFeUFvVWRmR(3,9),       & 
-& cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),       & 
-& cplcFuFuUAhL(3,3,4),cplcFuFuUAhR(3,3,4),cplcFuFuUhhL(3,3,4),cplcFuFuUhhR(3,3,4),       & 
-& cplcFuFuVGL(3,3),cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZL(3,3),  & 
-& cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgGgGVG,cplcgPgWLmcVWLm,       & 
-& cplcgPgWLmcVWRm,cplcgPgWLpVWLm,cplcgPgWRmcVWLm,cplcgPgWRmcVWRm,cplcgPgWRpVWLm,         & 
-& cplcgWLmgPVWLm,cplcgWLmgWLmUAh(4),cplcgWLmgWLmUhh(4),cplcgWLmgWLmVP,cplcgWLmgWLmVZ,    & 
-& cplcgWLmgWLmVZR,cplcgWLmgWRmUAh(4),cplcgWLmgWRmUhh(4),cplcgWLmgWRmVP,cplcgWLmgWRmVZR,  & 
-& cplcgWLmgZcUHpm(4),cplcgWLmgZpcUHpm(4),cplcgWLmgZpVWLm,cplcgWLpgPcVWLm,cplcgWLpgPcVWRm,& 
-& cplcgWLpgWLpUAh(4),cplcgWLpgWLpUhh(4),cplcgWLpgWLpVP,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,   & 
-& cplcgWLpgWRpUAh(4),cplcgWLpgWRpUhh(4),cplcgWLpgWRpVP,cplcgWLpgWRpVZR,cplcgWLpgZcVWLm,  & 
-& cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWLpgZpUHpm(4),cplcgWLpgZUHpm(4),cplcgWRmgPVWLm, & 
-& cplcgWRmgWLmUAh(4),cplcgWRmgWLmUhh(4),cplcgWRmgWLmVP,cplcgWRmgWLmVZR,cplcgWRmgWRmUAh(4),& 
-& cplcgWRmgWRmUhh(4),cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRmgZcUHpm(4),   & 
-& cplcgWRmgZpcUHpm(4),cplcgWRmgZpVWLm,cplcgWRpgPcVWLm,cplcgWRpgPcVWRm,cplcgWRpgWLpUAh(4),& 
-& cplcgWRpgWLpUhh(4),cplcgWRpgWLpVP,cplcgWRpgWLpVZR,cplcgWRpgWRpUAh(4),cplcgWRpgWRpUhh(4),& 
-& cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcgWRpgZcVWRm,cplcgWRpgZpcVWLm,        & 
-& cplcgWRpgZpcVWRm,cplcgWRpgZpUHpm(4),cplcgWRpgZUHpm(4),cplcgZgWLmcVWLm,cplcgZgWLmUHpm(4),& 
-& cplcgZgWLpcUHpm(4),cplcgZgWRmcVWRm,cplcgZgWRmUHpm(4),cplcgZgWRpcUHpm(4),               & 
-& cplcgZgZpUhh(4),cplcgZgZUhh(4),cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgZpgWLmUHpm(4),   & 
-& cplcgZpgWLpcUHpm(4),cplcgZpgWLpVWLm,cplcgZpgWRmcVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRmUHpm(4),& 
-& cplcgZpgWRpcUHpm(4),cplcgZpgWRpVWLm,cplcgZpgZpUhh(4),cplcgZpgZUhh(4),cplcHpmcVWLmVP(4),& 
-& cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4)
+Complex(dp) :: cplAhAhcVWLmVWLm(4,4),cplAhAhcVWRmVWLm(4,4),cplAhAhcVWRmVWRm(4,4),cplAhAhUhh(4,4,4),  & 
+& cplAhAhUhhUhh(4,4,4,4),cplAhAhUHpmcUHpm(4,4,4,4),cplAhAhVZRVZR(4,4),cplAhAhVZVZ(4,4),  & 
+& cplAhAhVZVZR(4,4),cplAhcHpmVWLm(4,4),cplAhcUHpmVWLm(4,4),cplAhcUHpmVWRm(4,4),          & 
+& cplAhcVWLmVWRm(4),cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcUHpm(4,4,4),& 
+& cplAhHpmcVWLm(4,4),cplAhHpmcVWRm(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),cplcFdFdUAhL(3,3,4),& 
+& cplcFdFdUAhR(3,3,4),cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFdFdVGL(3,3),          & 
+& cplcFdFdVGR(3,3),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),  & 
+& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),             & 
+& cplcFeFeUAhL(3,3,4),cplcFeFeUAhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),       & 
+& cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3), & 
+& cplcFeFeVZRR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeUFvHpmL(3,9,4),          & 
+& cplcFeUFvHpmR(3,9,4),cplcFeUFvVWLmL(3,9),cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),      & 
+& cplcFeUFvVWRmR(3,9),cplcFuFdcUHpmL(3,3,4),cplcFuFdcUHpmR(3,3,4),cplcFuFdcVWLmL(3,3),   & 
+& cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),cplcFuFuUAhL(3,3,4),       & 
+& cplcFuFuUAhR(3,3,4),cplcFuFuUhhL(3,3,4),cplcFuFuUhhR(3,3,4),cplcFuFuVGL(3,3),          & 
+& cplcFuFuVGR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),  & 
+& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgGgGVG,cplcgPgWLmcVWLm,cplcgPgWRmcVWRm,        & 
+& cplcgWLmgWLmUAh(4),cplcgWLmgWLmUhh(4),cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,   & 
+& cplcgWLmgWRmUAh(4),cplcgWLmgWRmUhh(4),cplcgWLmgWRmVZ,cplcgWLmgWRmVZR,cplcgWLmgZpUHpm(4),& 
+& cplcgWLmgZpVWLm,cplcgWLmgZUHpm(4),cplcgWLmgZVWLm,cplcgWLpgPcVWLm,cplcgWLpgWLpUAh(4),   & 
+& cplcgWLpgWLpUhh(4),cplcgWLpgWLpVP,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWLpgWRpUAh(4),   & 
+& cplcgWLpgWRpUhh(4),cplcgWLpgWRpVZ,cplcgWLpgWRpVZR,cplcgWLpgZcUHpm(4),cplcgWLpgZcVWLm,  & 
+& cplcgWLpgZcVWRm,cplcgWLpgZpcUHpm(4),cplcgWLpgZpcVWLm,cplcgWLpgZpcVWRm,cplcgWRmgWLmUAh(4),& 
+& cplcgWRmgWLmUhh(4),cplcgWRmgWLmVZ,cplcgWRmgWLmVZR,cplcgWRmgWRmUAh(4),cplcgWRmgWRmUhh(4),& 
+& cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRmgZpUHpm(4),cplcgWRmgZpVWLm,      & 
+& cplcgWRmgZUHpm(4),cplcgWRmgZVWLm,cplcgWRpgPcVWRm,cplcgWRpgWLpUAh(4),cplcgWRpgWLpUhh(4),& 
+& cplcgWRpgWLpVZ,cplcgWRpgWLpVZR,cplcgWRpgWRpUAh(4),cplcgWRpgWRpUhh(4),cplcgWRpgWRpVP,   & 
+& cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcgWRpgZcUHpm(4),cplcgWRpgZcVWLm,cplcgWRpgZcVWRm,     & 
+& cplcgWRpgZpcUHpm(4),cplcgWRpgZpcVWLm,cplcgWRpgZpcVWRm,cplcgZgWLmcUHpm(4),              & 
+& cplcgZgWLmcVWLm,cplcgZgWLmcVWRm,cplcgZgWLpUHpm(4),cplcgZgWLpVWLm,cplcgZgWRmcUHpm(4),   & 
+& cplcgZgWRmcVWLm,cplcgZgWRmcVWRm,cplcgZgWRpUHpm(4),cplcgZgWRpVWLm,cplcgZgZpUhh(4),      & 
+& cplcgZgZUhh(4),cplcgZpgWLmcUHpm(4),cplcgZpgWLmcVWLm,cplcgZpgWLmcVWRm,cplcgZpgWLpUHpm(4),& 
+& cplcgZpgWLpVWLm,cplcgZpgWRmcUHpm(4),cplcgZpgWRmcVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRpUHpm(4),& 
+& cplcgZpgWRpVWLm,cplcgZpgZpUhh(4),cplcgZpgZUhh(4),cplcHpmVPVWLm(4),cplcHpmVPVWRm(4),    & 
+& cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4),cplcUFdFdAhL(3,3,4),& 
+& cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),cplcUFdFdhhR(3,3,4),cplcUFdFdVGL(3,3),         & 
+& cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),cplcUFdFdVPR(3,3),cplcUFdFdVZL(3,3)
 
-Complex(dp) :: cplcHpmcVWRmVZR(4),cplcUFdFdAhL(3,3,4),cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),        & 
-& cplcUFdFdhhR(3,3,4),cplcUFdFdVGL(3,3),cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),             & 
-& cplcUFdFdVPR(3,3),cplcUFdFdVZL(3,3),cplcUFdFdVZR(3,3),cplcUFdFdVZRL(3,3),              & 
-& cplcUFdFdVZRR(3,3),cplcUFdFucHpmL(3,3,4),cplcUFdFucHpmR(3,3,4),cplcUFdFuVWLmL(3,3),    & 
-& cplcUFdFuVWLmR(3,3),cplcUFdFuVWRmL(3,3),cplcUFdFuVWRmR(3,3),cplcUFeFeAhL(3,3,4),       & 
-& cplcUFeFeAhR(3,3,4),cplcUFeFehhL(3,3,4),cplcUFeFehhR(3,3,4),cplcUFeFeVPL(3,3),         & 
-& cplcUFeFeVPR(3,3),cplcUFeFeVZL(3,3),cplcUFeFeVZR(3,3),cplcUFeFeVZRL(3,3),              & 
-& cplcUFeFeVZRR(3,3),cplcUFeFvcHpmL(3,9,4),cplcUFeFvcHpmR(3,9,4),cplcUFeFvVWLmL(3,9),    & 
-& cplcUFeFvVWLmR(3,9),cplcUFeFvVWRmL(3,9),cplcUFeFvVWRmR(3,9),cplcUFuFdcVWLmL(3,3),      & 
-& cplcUFuFdcVWLmR(3,3),cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),cplcUFuFdHpmL(3,3,4),   & 
-& cplcUFuFdHpmR(3,3,4),cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFuhhL(3,3,4),      & 
-& cplcUFuFuhhR(3,3,4),cplcUFuFuVGL(3,3),cplcUFuFuVGR(3,3),cplcUFuFuVPL(3,3),             & 
-& cplcUFuFuVPR(3,3),cplcUFuFuVZL(3,3),cplcUFuFuVZR(3,3),cplcUFuFuVZRL(3,3),              & 
-& cplcUFuFuVZRR(3,3),cplcUHpmcVWLmVP(4),cplcUHpmcVWLmVZ(4),cplcUHpmcVWLmVZR(4),          & 
-& cplcUHpmcVWRmVP(4),cplcUHpmcVWRmVZ(4),cplcUHpmcVWRmVZR(4),cplcVWLmcVWLmVWLmVWLm1,      & 
-& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,& 
-& cplcVWLmcVWRmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,& 
-& cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,& 
-& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,             & 
-& cplcVWLmVPVWLmVZR3,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZRVZR1,  & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,           & 
-& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,            & 
-& cplcVWLmVWRmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,  & 
-& cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmVPVPVWLm1,& 
-& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
-& cplcVWRmVPVPVWRm3,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,   & 
-& cplcVWRmVPVWRmVZ3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,            & 
-& cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,           & 
-& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,& 
-& cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZVZR1,              & 
-& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),           & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFvUAhL(9,9,4),cplFvFvUAhR(9,9,4),           & 
-& cplFvFvUhhL(9,9,4),cplFvFvUhhR(9,9,4),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9), & 
-& cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),& 
-& cplhhcUHpmcVWLm(4,4),cplhhcUHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),         & 
-& cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcUHpm(4,4,4),cplhhhhcVWLmVWLm(4,4),         & 
-& cplhhhhcVWRmVWLm(4,4),cplhhhhcVWRmVWRm(4,4),cplhhhhUHpmcUHpm(4,4,4,4),cplhhhhVPVP(4,4)
+Complex(dp) :: cplcUFdFdVZR(3,3),cplcUFdFdVZRL(3,3),cplcUFdFdVZRR(3,3),cplcUFdFuHpmL(3,3,4),          & 
+& cplcUFdFuHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),cplcUFdFuVWRmL(3,3),      & 
+& cplcUFdFuVWRmR(3,3),cplcUFeFeAhL(3,3,4),cplcUFeFeAhR(3,3,4),cplcUFeFehhL(3,3,4),       & 
+& cplcUFeFehhR(3,3,4),cplcUFeFeVPL(3,3),cplcUFeFeVPR(3,3),cplcUFeFeVZL(3,3),             & 
+& cplcUFeFeVZR(3,3),cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvHpmL(3,9,4),          & 
+& cplcUFeFvHpmR(3,9,4),cplcUFeFvVWLmL(3,9),cplcUFeFvVWLmR(3,9),cplcUFeFvVWRmL(3,9),      & 
+& cplcUFeFvVWRmR(3,9),cplcUFuFdcHpmL(3,3,4),cplcUFuFdcHpmR(3,3,4),cplcUFuFdcVWLmL(3,3),  & 
+& cplcUFuFdcVWLmR(3,3),cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),cplcUFuFuAhL(3,3,4),    & 
+& cplcUFuFuAhR(3,3,4),cplcUFuFuhhL(3,3,4),cplcUFuFuhhR(3,3,4),cplcUFuFuVGL(3,3),         & 
+& cplcUFuFuVGR(3,3),cplcUFuFuVPL(3,3),cplcUFuFuVPR(3,3),cplcUFuFuVZL(3,3),               & 
+& cplcUFuFuVZR(3,3),cplcUFuFuVZRL(3,3),cplcUFuFuVZRR(3,3),cplcUHpmVPVWLm(4),             & 
+& cplcUHpmVPVWRm(4),cplcUHpmVWLmVZ(4),cplcUHpmVWLmVZR(4),cplcUHpmVWRmVZ(4),              & 
+& cplcUHpmVWRmVZR(4),cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
+& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,& 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,     & 
+& cplcVWLmVPVPVWLm3,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,& 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWLmVWLmVZ,               & 
+& cplcVWLmVWLmVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,           & 
+& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZVZR1,              & 
+& cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmcVWRmVWLmVWRm1,& 
+& cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,          & 
+& cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVPVWRmVZR1,& 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,& 
+& cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
+& cplcVWRmVWLmVZVZ3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,& 
+& cplcVWRmVWRmVZRVZR3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,             & 
+& cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplFvFecUHpmL(9,3,4),         & 
+& cplFvFecUHpmR(9,3,4),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),         & 
+& cplFvFecVWRmR(9,3),cplFvFvUAhL(9,9,4),cplFvFvUAhR(9,9,4),cplFvFvUhhL(9,9,4),           & 
+& cplFvFvUhhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),  & 
+& cplhhcHpmVWLm(4,4),cplhhcUHpmVWLm(4,4),cplhhcUHpmVWRm(4,4),cplhhcVWLmVWLm(4),          & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcVWLmVWLm(4,4),           & 
+& cplhhhhcVWRmVWLm(4,4),cplhhhhcVWRmVWRm(4,4),cplhhhhUHpmcUHpm(4,4,4,4),cplhhhhVZRVZR(4,4),& 
+& cplhhhhVZVZ(4,4),cplhhhhVZVZR(4,4),cplhhHpmcUHpm(4,4,4),cplhhHpmcVWLm(4,4),            & 
+& cplhhHpmcVWRm(4,4),cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmcVWLmVWLm(4,4), & 
+& cplHpmcHpmcVWRmVWLm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplHpmcHpmVP(4,4),cplHpmcHpmVPVP(4,4)
 
-Complex(dp) :: cplhhhhVPVZ(4,4),cplhhhhVPVZR(4,4),cplhhhhVZRVZR(4,4),cplhhhhVZVZ(4,4),cplhhhhVZVZR(4,4),& 
-& cplhhHpmcUHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),      & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmcVWLmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),          & 
-& cplHpmcHpmcVWRmVWRm(4,4),cplHpmcHpmVP(4,4),cplHpmcHpmVPVP(4,4),cplHpmcHpmVPVZ(4,4),    & 
-& cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmcHpmVZRVZR(4,4),       & 
-& cplHpmcHpmVZVZ(4,4),cplHpmcHpmVZVZR(4,4),cplHpmcUHpmcHpm(4,4,4),cplHpmcUHpmVP(4,4),    & 
-& cplHpmcUHpmVZ(4,4),cplHpmcUHpmVZR(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),cplHpmVWLmVZ(4),& 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4),cplUAhAhcHpm(4,4,4),cplUAhAhhh(4,4,4),& 
-& cplUAhcVWRmVWLm(4),cplUAhhhcHpm(4,4,4),cplUAhhhVP(4,4),cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),& 
-& cplUAhHpmcHpm(4,4,4),cplUAhHpmVWLm(4,4),cplUAhHpmVWRm(4,4),cplUAhUAhAhAh(4,4,4,4),     & 
-& cplUAhUAhcVWLmVWLm(4,4),cplUAhUAhcVWRmVWRm(4,4),cplUAhUAhhhhh(4,4,4,4),cplUAhUAhHpmcHpm(4,4,4,4),& 
-& cplUAhUAhVPVP(4,4),cplUAhUAhVZRVZR(4,4),cplUAhUAhVZVZ(4,4),cplUFvFecVWLmL(9,3),        & 
-& cplUFvFecVWLmR(9,3),cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),cplUFvFeHpmL(9,3,4),       & 
-& cplUFvFeHpmR(9,3,4),cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFvhhL(9,9,4),          & 
-& cplUFvFvhhR(9,9,4),cplUFvFvVPL(9,9),cplUFvFvVPR(9,9),cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),& 
-& cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplUhhcVWLmVWLm(4),cplUhhcVWRmVWLm(4),             & 
-& cplUhhcVWRmVWRm(4),cplUhhhhcHpm(4,4,4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),         & 
-& cplUhhHpmVWLm(4,4),cplUhhHpmVWRm(4,4),cplUhhUhhcVWLmVWLm(4,4),cplUhhUhhcVWRmVWRm(4,4), & 
-& cplUhhUhhhhhh(4,4,4,4),cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhVPVP(4,4),cplUhhUhhVZRVZR(4,4),& 
-& cplUhhUhhVZVZ(4,4),cplUhhVPVZ(4),cplUhhVPVZR(4),cplUhhVZRVZR(4),cplUhhVZVZ(4),         & 
-& cplUhhVZVZR(4),cplUHpmcUHpmcVWLmVWLm(4,4),cplUHpmcUHpmcVWRmVWRm(4,4),cplUHpmcUHpmVPVP(4,4),& 
-& cplUHpmcUHpmVZRVZR(4,4),cplUHpmcUHpmVZVZ(4,4),cplUHpmHpmcUHpmcHpm(4,4,4,4),            & 
-& cplVGVGVG,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3
+Complex(dp) :: cplHpmcHpmVPVZ(4,4),cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),         & 
+& cplHpmcHpmVZRVZR(4,4),cplHpmcHpmVZVZ(4,4),cplHpmcHpmVZVZR(4,4),cplHpmcUHpmVP(4,4),     & 
+& cplHpmcUHpmVZ(4,4),cplHpmcUHpmVZR(4,4),cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),              & 
+& cplHpmcVWLmVZR(4),cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4),cplUAhAhhh(4,4,4),& 
+& cplUAhcVWRmVWLm(4),cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),cplUAhHpmcHpm(4,4,4),              & 
+& cplUAhHpmcVWLm(4,4),cplUAhHpmcVWRm(4,4),cplUAhUAhAhAh(4,4,4,4),cplUAhUAhcVWLmVWLm(4,4),& 
+& cplUAhUAhcVWRmVWRm(4,4),cplUAhUAhhhhh(4,4,4,4),cplUAhUAhHpmcHpm(4,4,4,4),              & 
+& cplUAhUAhVZRVZR(4,4),cplUAhUAhVZVZ(4,4),cplUFvFecHpmL(9,3,4),cplUFvFecHpmR(9,3,4),     & 
+& cplUFvFecVWLmL(9,3),cplUFvFecVWLmR(9,3),cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),       & 
+& cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFvhhL(9,9,4),cplUFvFvhhR(9,9,4),           & 
+& cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplUhhcVWLmVWLm(4),& 
+& cplUhhcVWRmVWLm(4),cplUhhcVWRmVWRm(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),          & 
+& cplUhhHpmcVWLm(4,4),cplUhhHpmcVWRm(4,4),cplUhhUhhcVWLmVWLm(4,4),cplUhhUhhcVWRmVWRm(4,4),& 
+& cplUhhUhhhhhh(4,4,4,4),cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhVZRVZR(4,4),cplUhhUhhVZVZ(4,4),& 
+& cplUhhVZRVZR(4),cplUhhVZVZ(4),cplUhhVZVZR(4),cplUHpmcUHpmcVWLmVWLm(4,4),               & 
+& cplUHpmcUHpmcVWRmVWRm(4,4),cplUHpmcUHpmVPVP(4,4),cplUHpmcUHpmVZRVZR(4,4),              & 
+& cplUHpmcUHpmVZVZ(4,4),cplUHpmHpmcUHpmcHpm(4,4,4,4),cplVGVGVG,cplVGVGVGVG1,             & 
+& cplVGVGVGVG2,cplVGVGVGVG3
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1, j2, j3, j4, il, i_count, ierr 
+Integer :: i2L, iFin 
+Logical :: Convergence2L 
+Real(dp) :: Pi2S_EffPot_save(4,4), diff(4,4)
 Complex(dp) :: Tad1Loop(4), dmz2  
 Real(dp) :: comp(2), tanbQ, vev2, vSM
 Iname = Iname + 1 
@@ -177,7 +181,7 @@ RXiZR = RXi
  
 Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
 & MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,             & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 MU12Tree  = MU12
@@ -190,135 +194,129 @@ If ((DecoupleAtRenScale).and.(Abs(1._dp-RXiNew).lt.0.01_dp)) Then
 vSM=vSM_Q 
 k1=vSM 
 Else 
-Call CouplingsForVectorBosons(gBL,g2,ZH,UP,TW,ZM,vR,UC,k1,PhiW,ZDL,ZDR,               & 
-& ZUL,ZUR,ZEL,ZER,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,             & 
-& cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,           & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,             & 
-& cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,       & 
-& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
-& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplhhVPVZR,cplHpmVWLmVZR,cplcVWLmVWLmVZR,          & 
-& cplcVWRmVWLmVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,           & 
-& cplAhhhVP,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,     & 
-& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
-& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,   & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,& 
-& cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
-& cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,         & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,           & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
-& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
-& cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,          & 
-& cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,          & 
-& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplAhcVWRmVWLm,cplhhcVWRmVWLm,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,    & 
-& cplAhAhVZVZR,cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,       & 
-& cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,           & 
-& cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,            & 
-& cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
-& cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplAhAhVPVZR,cplhhhhVPVZR,cplHpmcHpmVPVZR,               & 
-& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,           & 
-& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,        & 
-& cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,cplcgPgWLpVWLm,              & 
-& cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZpVWLm,cplcgWRmgZpVWLm,        & 
-& cplhhHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,cplcVWRmVPVPVWLm1,  & 
-& cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,     & 
-& cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,& 
-& cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
+Call CouplingsForVectorBosons(gBL,g2,TW,UC,k1,vR,PhiW,ZH,UP,ZM,ZDL,ZDR,               & 
+& ZUL,ZUR,ZEL,ZER,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,           & 
+& cplcFuFuVPR,cplcgWLmgWLmVP,cplcgWLpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,               & 
+& cplHpmcHpmVP,cplHpmcVWLmVP,cplHpmcVWRmVP,cplcVWLmVPVWLm,cplcVWRmVPVWRm,cplHpmcHpmVPVP, & 
+& cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,               & 
+& cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,     & 
+& cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,              & 
+& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
+& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,cplcVWLmVWLmVZ,          & 
+& cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,& 
+& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
+& cplcVWRmVWRmVZVZ3,cplHpmcVWLmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWLmVWLmVZRVZR1,  & 
+& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplAhHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,   & 
+& cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,            & 
+& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
+& cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhHpmcVWLm,cplhhcVWLmVWLm,        & 
+& cplhhcVWLmVWRm,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,       & 
+& cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,& 
+& cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplAhcVWRmVWLm,   & 
+& cplhhcVWRmVWLm,cplcHpmVWLmVZ,cplcHpmVWRmVZ,cplcHpmVPVWLm,cplcHpmVPVWRm,cplHpmcHpmVPVZ, & 
+& cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,               & 
+& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcHpmVWLmVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1, & 
+& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,           & 
+& cplcVWRmVPVWRmVZR3,cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,cplAhAhVZVZR,cplhhhhVZVZR,            & 
+& cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,              & 
+& cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplAhcHpmVWLm,cplcFdFuVWLmL,  & 
+& cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgZgWLpVWLm,cplcgZpgWLpVWLm,              & 
+& cplcgZgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZVWLm,cplcgWRmgZVWLm,cplcgWLmgZpVWLm,          & 
+& cplcgWRmgZpVWLm,cplhhcHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,   & 
+& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,& 
+& cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,     & 
+& cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
 End if 
-Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
+Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
 & MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,             & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
-Call CouplingsForLoopMasses(LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,             & 
-& LAM3,LAM4,k1,vR,UP,UC,gBL,g2,TW,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,YR,               & 
-& ZM,PhiW,ZH,g3,cplAhAhUhh,cplAhUhhcHpm,cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,               & 
-& cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
-& cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,               & 
-& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
-& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhhhcHpm,           & 
-& cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,cplUhhVPVZR,cplUhhcVWLmVWLm,      & 
-& cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,     & 
-& cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,    & 
-& cplUhhUhhVZVZ,cplUhhUhhVZRVZR,cplUAhAhhh,cplUAhAhcHpm,cplcFdFdUAhL,cplcFdFdUAhR,       & 
-& cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,cplFvFvUAhL,cplFvFvUAhR,           & 
-& cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,       & 
-& cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,cplUAhhhcHpm,cplUAhhhVP,               & 
-& cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,cplUAhHpmVWRm,cplUAhcVWRmVWLm,      & 
-& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,         & 
-& cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,cplAhAhcUHpm,cplAhhhcUHpm,            & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,cplcUFdFdhhR,cplcUFdFdVGL,   & 
-& cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,        & 
-& cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL,cplcUFdFuVWLmR,             & 
-& cplcUFdFuVWRmL,cplcUFdFuVWRmR,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,               & 
-& cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,           & 
-& cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,         & 
-& cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,cplcUFeFeAhL,cplcUFeFeAhR,       & 
-& cplcUFeFehhL,cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,         & 
-& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,              & 
-& cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL,   & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,cplcFdFdVGL,cplcFdFdVGR,cplcFuFuVGL,cplcFuFuVGR,         & 
-& cplcgGgGVG,cplVGVGVG,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplAhhhVZ,cplcFdFdVZL,     & 
+Call CouplingsForLoopMasses(LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,             & 
+& LAM3,LAM4,k1,vR,UP,gBL,g2,TW,YQ1,YQ2,ZDL,ZDR,Y,Yt,ZEL,ZER,ZUL,ZUR,YR,ZM,               & 
+& PhiW,ZH,UC,g3,cplAhAhUhh,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,             & 
+& cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,           & 
+& cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,       & 
+& cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,              & 
+& cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,cplUhhHpmcVWLm,cplUhhHpmcVWRm,     & 
+& cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,   & 
+& cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,    & 
+& cplUhhUhhVZVZ,cplUhhUhhVZRVZR,cplUAhAhhh,cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,       & 
+& cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,        & 
+& cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,       & 
+& cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,   & 
+& cplUAhHpmcVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,           & 
+& cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,cplAhHpmcUHpm,     & 
+& cplAhcUHpmVWLm,cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,             & 
+& cplFvFecUHpmR,cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,         & 
+& cplcgZgWRmcUHpm,cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,       & 
+& cplcgZgWLpUHpm,cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,        & 
+& cplcgWRpgZpcUHpm,cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,          & 
+& cplHpmcUHpmVP,cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,              & 
+& cplcUHpmVWLmVZ,cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,        & 
+& cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,           & 
+& cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,cplcUFdFdAhL,cplcUFdFdAhR,   & 
+& cplcUFdFdhhL,cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,         & 
+& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,     & 
+& cplcUFdFuVWLmL,cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,cplcUFuFuAhL,              & 
+& cplcUFuFuAhR,cplcUFuFdcHpmL,cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,            & 
+& cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,   & 
+& cplcUFuFuVPL,cplcUFuFuVPR,cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,       & 
+& cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,         & 
+& cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,     & 
+& cplcUFeFvVWLmL,cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR,cplUFvFvAhL,               & 
+& cplUFvFvAhR,cplUFvFecHpmL,cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,  & 
+& cplUFvFecVWRmR,cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,           & 
+& cplUFvFvVZRR,cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL, & 
+& cplcFeUFvVWRmR,cplcFdFdVGL,cplcFdFdVGR,cplcFuFuVGL,cplcFuFuVGR,cplcgGgGVG,             & 
+& cplVGVGVG,cplVGVGVGVG1,cplVGVGVGVG2,cplVGVGVGVG3,cplcFdFdVPL,cplcFdFdVPR,              & 
+& cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,cplcgWLmgWLmVP,cplcgWLpgWLpVP,         & 
+& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmcVWLmVP,cplHpmcVWRmVP,cplcVWLmVPVWLm, & 
+& cplcVWRmVPVWRm,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,   & 
+& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWRmVPVPVWRm3,cplAhhhVZ,cplcFdFdVZL,           & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
-& cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,       & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,            & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
-& cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,           & 
-& cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,  & 
-& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
-& cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,           & 
-& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
-& cplAhhhVP,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,     & 
-& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
-& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplHpmcHpmVP,cplHpmVPVWLm,cplHpmVPVWRm,cplcVWLmVPVWLm,   & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,cplHpmcHpmVPVP,cplcVWLmVPVPVWLm1,& 
-& cplcVWLmVPVPVWLm2,cplcVWLmVPVPVWLm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,               & 
-& cplcVWRmVPVPVWRm3,cplAhcHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,         & 
-& cplFvFecVWLmL,cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,           & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
-& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,        & 
-& cplcHpmcVWLmVP,cplcVWLmVPVWRm,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,          & 
+& cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
+& cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,          & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,   & 
+& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,               & 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,              & 
+& cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,           & 
+& cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,       & 
+& cplcgWRpgWRpVZR,cplhhVZRVZR,cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,               & 
+& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,           & 
+& cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,          & 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,cplAhHpmcVWLm,             & 
+& cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
+& cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
+& cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,            & 
 & cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmcVWLmVWLmVWLm1,          & 
 & cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmcVWRmVWLmVWRm2,& 
-& cplcVWLmcVWRmVWLmVWRm3,cplAhcHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,    & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,           & 
-& cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,     & 
-& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,        & 
-& cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,       & 
-& cplHpmcHpmcVWRmVWRm,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,& 
-& cplAhAhVZVZR,cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,       & 
-& cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,           & 
-& cplAhAhVPVZ,cplhhhhVPVZ,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,            & 
+& cplcVWLmcVWRmVWLmVWRm3,cplAhHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,     & 
+& cplFvFecVWRmL,cplFvFecVWRmR,cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,          & 
+& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
+& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,         & 
+& cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmcVWRmVWRmVWRm1,          & 
+& cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcHpmVWLmVZ,cplcHpmVWRmVZ,             & 
+& cplcHpmVPVWLm,cplcHpmVPVWRm,cplHpmcHpmVPVZ,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,        & 
 & cplcVWLmVPVWLmVZ3,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,               & 
-& cplcgWLmgWRmVP,cplcgWLpgWRpVP,cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,cplAhAhVPVZR,            & 
-& cplhhhhVPVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3, & 
-& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplAhHpmVWLm,cplcFdFuVWLmL,   & 
-& cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgWLmgPVWLm,cplcgWRmgPVWLm,               & 
-& cplcgPgWLpVWLm,cplcgZpgWLpVWLm,cplcgPgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZpVWLm,         & 
-& cplcgWRmgZpVWLm,cplhhHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,    & 
-& cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWLmcVWRmVWLmVWLm1,          & 
-& cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,& 
-& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
+& cplcHpmVWLmVZR,cplcHpmVWRmVZR,cplHpmcHpmVPVZR,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,   & 
+& cplcVWLmVPVWLmVZR3,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,           & 
+& cplcgWLmgWRmVZR,cplcgWLpgWRpVZR,cplcgWLmgWRmVZ,cplcgWLpgWRpVZ,cplAhAhVZVZR,            & 
+& cplhhhhVZVZR,cplHpmcHpmVZVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3, & 
+& cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplAhcHpmVWLm,cplcFdFuVWLmL,  & 
+& cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcgZgWLpVWLm,cplcgZpgWLpVWLm,              & 
+& cplcgZgWRpVWLm,cplcgZpgWRpVWLm,cplcgWLmgZVWLm,cplcgWRmgZVWLm,cplcgWLmgZpVWLm,          & 
+& cplcgWRmgZpVWLm,cplhhcHpmVWLm,cplAhAhcVWRmVWLm,cplhhhhcVWRmVWLm,cplHpmcHpmcVWRmVWLm,   & 
+& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWRmcVWRmVWLmVWRm1,& 
+& cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,     & 
+& cplcVWRmVWLmVZVZ3,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3)
 
-Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
+Call OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,               & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhUhh,     & 
 & cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
 & cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,               & 
@@ -327,74 +325,164 @@ Call OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,           
 
 MU12Tree  = MU12
 MU22Tree  = MU22
-Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
+If (CalculateTwoLoopHiggsMasses) Then 
+    If(GaugelessLimit) Then 
+  k1Fix = 0._dp 
+  vRFix = 0._dp 
+   gBL_saveEP =gBL
+   gBL = 0._dp 
+   g2_saveEP =g2
+   g2 = 0._dp 
+   g2_saveEP =g2
+   g2 = 0._dp 
+     Else 
+  k1Fix = k1 
+  vRFix = vR 
+     End if 
+
+SELECT CASE (TwoLoopMethod) 
+CASE ( 1 , 2 ) 
+
+
+ CASE ( 3 ) ! Diagrammatic method 
+  ! Make sure that there are no exactly degenerated masses! 
+   Y_saveEP =Y
+   where (aint(Abs(Y)).eq.Y) Y=Y*(1 + 1*1.0E-12_dp)
+   YQ1_saveEP =YQ1
+   where (aint(Abs(YQ1)).eq.YQ1) YQ1=YQ1*(1 + 2*1.0E-12_dp)
+   YQ2_saveEP =YQ2
+   where (aint(Abs(YQ2)).eq.YQ2) YQ2=YQ2*(1 + 3*1.0E-12_dp)
+   Yt_saveEP =Yt
+   where (aint(Abs(Yt)).eq.Yt) Yt=Yt*(1 + 4*1.0E-12_dp)
+   YL_saveEP =YL
+   where (aint(Abs(YL)).eq.YL) YL=YL*(1 + 5*1.0E-12_dp)
+   YR_saveEP =YR
+   where (aint(Abs(YR)).eq.YR) YR=YR*(1 + 6*1.0E-12_dp)
+   Mux_saveEP =Mux
+   where (aint(Abs(Mux)).eq.Mux) Mux=Mux*(1 + 7*1.0E-12_dp)
+
+If (NewGBC) Then 
+Call CalculatePi2S(125._dp**2,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,               & 
+& ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont,ti_ep2L,           & 
+& Pi2S_EffPot,PiP2S_EffPot)
+
+Else 
+Call CalculatePi2S(0._dp,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,               & 
+& ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont,ti_ep2L,Pi2S_EffPot,    & 
+& PiP2S_EffPot)
+
+End if 
+   Y =Y_saveEP 
+   YQ1 =YQ1_saveEP 
+   YQ2 =YQ2_saveEP 
+   Yt =Yt_saveEP 
+   YL =YL_saveEP 
+   YR =YR_saveEP 
+   Mux =Mux_saveEP 
+
+
+ CASE ( 8 , 9 ) ! Hard-coded routines 
+  
+ END SELECT
+ 
+   If(GaugelessLimit) Then 
+   gBL =gBL_saveEP 
+   g2 =g2_saveEP 
+   g2 =g2_saveEP 
+   End if 
+
+Else ! Two loop turned off 
+Pi2S_EffPot = 0._dp 
+
+Pi2A0 = 0._dp 
+
+ti_ep2L = 0._dp 
+
+End if 
+Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop)
 
 MU121L = MU12
 MU221L = MU22
-Call OneLoophh(MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,            & 
-& LAM3,k1,vR,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,              & 
-& MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,              & 
-& cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
-& cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,        & 
-& cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,       & 
-& cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,   & 
-& cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,          & 
-& cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,    & 
-& cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,               & 
+Tad1Loop(1:4) = Tad1Loop(1:4) - ti_ep2L 
+Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,              & 
+& LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tad1Loop)
+
+MU122L = MU12
+MU222L = MU22
+Call OneLoophh(MU122L,MU222L,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,            & 
+& LAM3,k1,vR,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,           & 
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhVZ,cplAhUhhVZR,       & 
+& cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,         & 
+& cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,               & 
+& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
+& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,          & 
+& cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,         & 
+& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,0.1_dp*delta_mass, & 
 & Mhh_1L,Mhh2_1L,ZH_1L,kont)
 
-Call OneLoopAh(gBL,g2,MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,               & 
-& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,            & 
-& MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,   & 
+If (TwoLoopMethod.gt.2) Then 
+Call OneLoopAh(gBL,g2,MU122L,MU222L,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,               & 
+& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
+& MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,              & 
 & cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
 & cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
 & cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& 0.1_dp*delta_mass,MAh_1L,MAh2_1L,UP_1L,kont)
+& cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,    & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,0.1_dp*delta_mass,MAh_1L,MAh2_1L,UP_1L,kont)
 
-Call OneLoopHpm(g2,MU121L,MU221L,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,k1,               & 
-& vR,PhiW,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,MFd,MFd2,               & 
-& MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,              & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,0.1_dp*delta_mass,MHpm_1L,MHpm2_1L,UC_1L,kont)
+Else 
+Call OneLoopAh(gBL,g2,MU121L,MU221L,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,               & 
+& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
+& MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,              & 
+& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
+& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
+& cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
+& cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,    & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,0.1_dp*delta_mass,MAh_1L,MAh2_1L,UP_1L,kont)
 
-Call OneLoopFv(Mux,Y,YR,k1,vR,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,MFe2,MVWRm,          & 
-& MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL, & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,0.1_dp*delta_mass,MFv_1L,MFv2_1L,ZM_1L,kont)
+End if 
+Call OneLoopHpm(g2,MU121L,MU221L,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,k1,               & 
+& vR,PhiW,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,               & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,cplAhcUHpmVWLm,           & 
+& cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,cplFvFecUHpmR,              & 
+& cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,cplcgZgWRmcUHpm,       & 
+& cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,cplcgZgWLpUHpm,        & 
+& cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,cplcgWRpgZpcUHpm,      & 
+& cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,cplHpmcUHpmVP,             & 
+& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,cplcUHpmVWLmVZ,             & 
+& cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,      & 
+& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
+& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,0.1_dp*delta_mass,MHpm_1L,MHpm2_1L,UC_1L,kont)
+
+Call OneLoopFv(Mux,Y,YR,k1,vR,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,MVWLm,            & 
+& MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,              & 
+& cplUFvFecHpmL,cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,              & 
+& cplUFvFecVWRmR,cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,           & 
+& cplUFvFvVZRR,cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL, & 
+& cplcFeUFvVWRmR,0.1_dp*delta_mass,MFv_1L,MFv2_1L,ZM_1L,kont)
 
 Call OneLoopVZR(gBL,g2,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,              & 
 & MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZR,     & 
 & cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,         & 
 & cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,               & 
-& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,     & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,             & 
-& cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,      & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,       & 
-& cplcVWRmVWRmVZRVZR3,0.1_dp*delta_mass,MVZR_1L,MVZR2_1L,kont)
+& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
+& cplHpmcVWLmVZR,cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,         & 
+& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
+& 0.1_dp*delta_mass,MVZR_1L,MVZR2_1L,kont)
 
 Call OneLoopVWRm(g2,k1,vR,PhiW,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,             & 
-& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,cplAhcHpmcVWRm,   & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWRm,    & 
 & cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,      & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
-& cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,cplcVWRmVPVWLm,            & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,          & 
-& cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
+& cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,      & 
+& cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
+& cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
 & cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,     & 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,             & 
@@ -464,7 +552,7 @@ End if
 Iname = Iname -1 
 End Subroutine OneLoopMasses 
  
-Subroutine OneLoopTadpoleshh(k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
+Subroutine OneLoopTadpoleshh(0,k1,vR,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,             & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & cplAhAhUhh,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,           & 
 & cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWLpgWLpUhh,cplcgWRmgWRmUhh,  & 
@@ -481,7 +569,7 @@ Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,
 & cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
 & cplUhhcVWLmVWLm(4),cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZRVZR(4)
 
-Real(dp), Intent(in) :: k1,vR
+Real(dp), Intent(in) :: 0,k1,vR
 
 Integer :: i1,i2, gO1, gO2 
 Complex(dp) :: coupL, coupR, coup, temp, res, A0m, sumI(4)  
@@ -687,36 +775,34 @@ tadpoles = oo16pi2*tadpoles
 Iname = Iname - 1 
 End Subroutine OneLoopTadpoleshh 
  
-Subroutine OneLoophh(MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,               & 
-& LAM6,LAM3,k1,vR,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,             & 
-& MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,          & 
-& cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
-& cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,        & 
-& cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,       & 
-& cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,   & 
-& cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,          & 
-& cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,    & 
-& cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,               & 
+Subroutine OneLoophh(MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,               & 
+& LAM6,LAM3,k1,vR,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,MFu2,               & 
+& MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhVZ,          & 
+& cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,          & 
+& cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,  & 
+& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
+& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,          & 
+& cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,         & 
+& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,delta,             & 
 & mass,mass2,RS,kont)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MHpm(4),MHpm2(4),MVZ,MVZ2,MVZR,MVZR2,MFd(3),MFd2(3),MFe(3),            & 
-& MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MVZ,MVZ2,MVZR,MVZR2,MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),              & 
+& MFu2(3),MFv(9),MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
 
-Real(dp), Intent(in) :: MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,k1,vR
+Real(dp), Intent(in) :: MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,k1,vR
 
-Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplAhUhhcHpm(4,4,4),cplAhUhhVP(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),& 
-& cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),       & 
-& cplcFuFuUhhL(3,3,4),cplcFuFuUhhR(3,3,4),cplFvFvUhhL(9,9,4),cplFvFvUhhR(9,9,4),         & 
-& cplcgWLmgWLmUhh(4),cplcgWRmgWLmUhh(4),cplcgWLmgWRmUhh(4),cplcgWLpgWLpUhh(4),           & 
-& cplcgWRpgWLpUhh(4),cplcgWLpgWRpUhh(4),cplcgWRmgWRmUhh(4),cplcgWRpgWRpUhh(4),           & 
-& cplcgZgZUhh(4),cplcgZpgZUhh(4),cplcgZgZpUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),     & 
-& cplUhhhhcHpm(4,4,4),cplUhhHpmcHpm(4,4,4),cplUhhHpmVWLm(4,4),cplUhhHpmVWRm(4,4),        & 
-& cplUhhVPVZ(4),cplUhhVPVZR(4),cplUhhcVWLmVWLm(4),cplUhhcVWRmVWLm(4),cplUhhcVWRmVWRm(4), & 
-& cplUhhVZVZ(4),cplUhhVZVZR(4),cplUhhVZRVZR(4),cplAhAhUhhUhh(4,4,4,4),cplUhhUhhhhhh(4,4,4,4),& 
-& cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhVPVP(4,4),cplUhhUhhcVWLmVWLm(4,4),cplUhhUhhcVWRmVWRm(4,4),& 
-& cplUhhUhhVZVZ(4,4),cplUhhUhhVZRVZR(4,4)
+Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),cplcFdFdUhhL(3,3,4),               & 
+& cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),cplcFuFuUhhL(3,3,4),       & 
+& cplcFuFuUhhR(3,3,4),cplFvFvUhhL(9,9,4),cplFvFvUhhR(9,9,4),cplcgWLmgWLmUhh(4),          & 
+& cplcgWRmgWLmUhh(4),cplcgWLmgWRmUhh(4),cplcgWLpgWLpUhh(4),cplcgWRpgWLpUhh(4),           & 
+& cplcgWLpgWRpUhh(4),cplcgWRmgWRmUhh(4),cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),               & 
+& cplcgZpgZUhh(4),cplcgZgZpUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
+& cplUhhHpmcVWLm(4,4),cplUhhHpmcVWRm(4,4),cplUhhcVWLmVWLm(4),cplUhhcVWRmVWLm(4),         & 
+& cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZVZR(4),cplUhhVZRVZR(4),cplAhAhUhhUhh(4,4,4,4),& 
+& cplUhhUhhhhhh(4,4,4,4),cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhcVWLmVWLm(4,4),              & 
+& cplUhhUhhcVWRmVWRm(4,4),cplUhhUhhVZVZ(4,4),cplUhhUhhVZRVZR(4,4)
 
 Complex(dp) :: mat2a(4,4), mat2(4,4),  PiSf(4,4,4)
 Integer , Intent(inout):: kont 
@@ -772,18 +858,18 @@ End do
 ! Rotation matrix for p2=0 
 PiSf(1,:,:) = ZeroC 
 p2 = 0._dp 
-Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,               & 
-& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,     & 
-& cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
-& cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,        & 
-& cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,       & 
-& cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,   & 
-& cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,          & 
-& cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,    & 
-& cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,               & 
+Call Pi1Loophh(p2,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
+& MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhVZ,          & 
+& cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,          & 
+& cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,  & 
+& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
+& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,          & 
+& cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,         & 
+& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,              & 
 & PiSf(1,:,:))
 
+PiSf(1,:,:) = PiSf(1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -794,20 +880,20 @@ ZHOS_0 = RS
 Do i1=1,4
 PiSf(i1,:,:) = ZeroC 
 p2 = Mhh2(i1)
-Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,               & 
-& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,     & 
-& cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
-& cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,        & 
-& cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,       & 
-& cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,   & 
-& cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,          & 
-& cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,    & 
-& cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,               & 
+Call Pi1Loophh(p2,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
+& MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhVZ,          & 
+& cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,          & 
+& cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,  & 
+& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
+& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,          & 
+& cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,         & 
+& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,              & 
 & PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
+PiSf(i1,:,:) = PiSf(i1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -848,20 +934,20 @@ test_m2 = mass2
 Do i1=1,4
 PiSf(i1,:,:) = ZeroC 
 p2 =  mass2(i1) 
-Call Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,               & 
-& MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhcHpm,     & 
-& cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,              & 
-& cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,        & 
-& cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,       & 
-& cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,   & 
-& cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,cplUhhHpmVWRm,cplUhhVPVZ,          & 
-& cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,    & 
-& cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,cplUhhUhhVPVP,               & 
+Call Pi1Loophh(p2,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
+& MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,cplAhUhhVZ,          & 
+& cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,          & 
+& cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,  & 
+& cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,       & 
+& cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhHpmcHpm,          & 
+& cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,         & 
+& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
 & cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,              & 
 & PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
+PiSf(i1,:,:) = PiSf(i1,:,:) - Pi2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -913,32 +999,30 @@ Iname = Iname -1
 End Subroutine OneLoophh
  
  
-Subroutine Pi1Loophh(p2,MAh,MAh2,MHpm,MHpm2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,             & 
-& MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,              & 
-& cplAhUhhcHpm,cplAhUhhVP,cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,              & 
-& cplcFeFeUhhL,cplcFeFeUhhR,cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,           & 
-& cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,       & 
-& cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,              & 
-& cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,cplUhhhhcHpm,cplUhhHpmcHpm,cplUhhHpmVWLm,        & 
-& cplUhhHpmVWRm,cplUhhVPVZ,cplUhhVPVZR,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,cplUhhcVWRmVWRm,  & 
-& cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,cplUhhUhhHpmcHpm,      & 
-& cplUhhUhhVPVP,cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,res)
+Subroutine Pi1Loophh(p2,MAh,MAh2,MVZ,MVZ2,MVZR,MVZR2,MFd,MFd2,MFe,MFe2,               & 
+& MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhAhUhh,            & 
+& cplAhUhhVZ,cplAhUhhVZR,cplcFdFdUhhL,cplcFdFdUhhR,cplcFeFeUhhL,cplcFeFeUhhR,            & 
+& cplcFuFuUhhL,cplcFuFuUhhR,cplFvFvUhhL,cplFvFvUhhR,cplcgWLmgWLmUhh,cplcgWRmgWLmUhh,     & 
+& cplcgWLmgWRmUhh,cplcgWLpgWLpUhh,cplcgWRpgWLpUhh,cplcgWLpgWRpUhh,cplcgWRmgWRmUhh,       & 
+& cplcgWRpgWRpUhh,cplcgZgZUhh,cplcgZpgZUhh,cplcgZgZpUhh,cplcgZpgZpUhh,cplUhhhhhh,        & 
+& cplUhhHpmcHpm,cplUhhHpmcVWLm,cplUhhHpmcVWRm,cplUhhcVWLmVWLm,cplUhhcVWRmVWLm,           & 
+& cplUhhcVWRmVWRm,cplUhhVZVZ,cplUhhVZVZR,cplUhhVZRVZR,cplAhAhUhhUhh,cplUhhUhhhhhh,       & 
+& cplUhhUhhHpmcHpm,cplUhhUhhcVWLmVWLm,cplUhhUhhcVWRmVWRm,cplUhhUhhVZVZ,cplUhhUhhVZRVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MHpm(4),MHpm2(4),MVZ,MVZ2,MVZR,MVZR2,MFd(3),MFd2(3),MFe(3),            & 
-& MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MVZ,MVZ2,MVZR,MVZR2,MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),              & 
+& MFu2(3),MFv(9),MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
 
-Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplAhUhhcHpm(4,4,4),cplAhUhhVP(4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),& 
-& cplcFdFdUhhL(3,3,4),cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),       & 
-& cplcFuFuUhhL(3,3,4),cplcFuFuUhhR(3,3,4),cplFvFvUhhL(9,9,4),cplFvFvUhhR(9,9,4),         & 
-& cplcgWLmgWLmUhh(4),cplcgWRmgWLmUhh(4),cplcgWLmgWRmUhh(4),cplcgWLpgWLpUhh(4),           & 
-& cplcgWRpgWLpUhh(4),cplcgWLpgWRpUhh(4),cplcgWRmgWRmUhh(4),cplcgWRpgWRpUhh(4),           & 
-& cplcgZgZUhh(4),cplcgZpgZUhh(4),cplcgZgZpUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),     & 
-& cplUhhhhcHpm(4,4,4),cplUhhHpmcHpm(4,4,4),cplUhhHpmVWLm(4,4),cplUhhHpmVWRm(4,4),        & 
-& cplUhhVPVZ(4),cplUhhVPVZR(4),cplUhhcVWLmVWLm(4),cplUhhcVWRmVWLm(4),cplUhhcVWRmVWRm(4), & 
-& cplUhhVZVZ(4),cplUhhVZVZR(4),cplUhhVZRVZR(4),cplAhAhUhhUhh(4,4,4,4),cplUhhUhhhhhh(4,4,4,4),& 
-& cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhVPVP(4,4),cplUhhUhhcVWLmVWLm(4,4),cplUhhUhhcVWRmVWRm(4,4),& 
-& cplUhhUhhVZVZ(4,4),cplUhhUhhVZRVZR(4,4)
+Complex(dp), Intent(in) :: cplAhAhUhh(4,4,4),cplAhUhhVZ(4,4),cplAhUhhVZR(4,4),cplcFdFdUhhL(3,3,4),               & 
+& cplcFdFdUhhR(3,3,4),cplcFeFeUhhL(3,3,4),cplcFeFeUhhR(3,3,4),cplcFuFuUhhL(3,3,4),       & 
+& cplcFuFuUhhR(3,3,4),cplFvFvUhhL(9,9,4),cplFvFvUhhR(9,9,4),cplcgWLmgWLmUhh(4),          & 
+& cplcgWRmgWLmUhh(4),cplcgWLmgWRmUhh(4),cplcgWLpgWLpUhh(4),cplcgWRpgWLpUhh(4),           & 
+& cplcgWLpgWRpUhh(4),cplcgWRmgWRmUhh(4),cplcgWRpgWRpUhh(4),cplcgZgZUhh(4),               & 
+& cplcgZpgZUhh(4),cplcgZgZpUhh(4),cplcgZpgZpUhh(4),cplUhhhhhh(4,4,4),cplUhhHpmcHpm(4,4,4),& 
+& cplUhhHpmcVWLm(4,4),cplUhhHpmcVWRm(4,4),cplUhhcVWLmVWLm(4),cplUhhcVWRmVWLm(4),         & 
+& cplUhhcVWRmVWRm(4),cplUhhVZVZ(4),cplUhhVZVZR(4),cplUhhVZRVZR(4),cplAhAhUhhUhh(4,4,4,4),& 
+& cplUhhUhhhhhh(4,4,4,4),cplUhhUhhHpmcHpm(4,4,4,4),cplUhhUhhcVWLmVWLm(4,4),              & 
+& cplUhhUhhcVWRmVWRm(4,4),cplUhhUhhVZVZ(4,4),cplUhhUhhVZRVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2,B1m2, m1, m2 
@@ -969,40 +1053,6 @@ End Do
 res = res +1._dp/2._dp* SumI  
       End Do 
      End Do 
- !------------------------ 
-! conj[Hpm], Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MHpm2(i1),MAh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhUhhcHpm(i2,gO1,i1)
-coup2 = Conjg(cplAhUhhcHpm(i2,gO2,i1))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +2._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VP, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,MAh2(i2),0._dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhUhhVP(i2,gO1)
-coup2 =  Conjg(cplAhUhhVP(i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
  !------------------------ 
 ! VZ, Ah 
 !------------------------ 
@@ -1268,24 +1318,6 @@ res = res +1._dp/2._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! conj[Hpm], hh 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MHpm2(i1),Mhh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUhhhhcHpm(gO1,i2,i1)
-coup2 = Conjg(cplUhhhhcHpm(gO2,i2,i1))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +2._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
 ! conj[Hpm], Hpm 
 !------------------------ 
 sumI = 0._dp 
@@ -1304,7 +1336,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -1312,15 +1344,15 @@ sumI = 0._dp
  F0m2 = FloopRXi(p2,MHpm2(i2),MVWLm2) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplUhhHpmVWLm(gO1,i2)
-coup2 =  Conjg(cplUhhHpmVWLm(gO2,i2))
+coup1 = cplUhhHpmcVWLm(gO1,i2)
+coup2 =  Conjg(cplUhhHpmcVWLm(gO2,i2))
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -1328,42 +1360,14 @@ sumI = 0._dp
  F0m2 = FloopRXi(p2,MHpm2(i2),MVWRm2) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplUhhHpmVWRm(gO1,i2)
-coup2 =  Conjg(cplUhhHpmVWRm(gO2,i2))
+coup1 = cplUhhHpmcVWRm(gO1,i2)
+coup2 =  Conjg(cplUhhHpmcVWRm(gO2,i2))
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VZ, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-F0m2 = Real(SVVloop(p2,0._dp,MVZ2),dp)   
- Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUhhVPVZ(gO1)
-coup2 =  Conjg(cplUhhVPVZ(gO2)) 
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-!------------------------ 
-! VZR, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-F0m2 = Real(SVVloop(p2,0._dp,MVZR2),dp)   
- Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUhhVPVZR(gO1)
-coup2 =  Conjg(cplUhhVPVZR(gO2)) 
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-!------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
 sumI = 0._dp 
@@ -1493,11 +1497,6 @@ End Do
 res = res +1._dp* SumI  
       End Do 
  !------------------------ 
-! VP, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-!------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
 sumI = 0._dp 
@@ -1561,32 +1560,30 @@ res = oo16pi2*res
  
 End Subroutine Pi1Loophh 
  
-Subroutine OneLoopAh(gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,             & 
-& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,            & 
-& MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,   & 
+Subroutine OneLoopAh(gBL,g2,MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,             & 
+& LAM5,LAM6,LAM4,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
+& MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,              & 
 & cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
 & cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
 & cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& delta,mass,mass2,RS,kont)
+& cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,    & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,delta,mass,mass2,RS,kont)
 
 Implicit None 
-Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),         & 
-& MFu(3),MFu2(3),MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2
+Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
+& MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
 
-Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM4,k1,vR,TW
+Real(dp), Intent(in) :: gBL,g2,MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM4,k1,vR,TW
 
-Complex(dp), Intent(in) :: cplUAhAhhh(4,4,4),cplUAhAhcHpm(4,4,4),cplcFdFdUAhL(3,3,4),cplcFdFdUAhR(3,3,4),        & 
-& cplcFeFeUAhL(3,3,4),cplcFeFeUAhR(3,3,4),cplcFuFuUAhL(3,3,4),cplcFuFuUAhR(3,3,4),       & 
-& cplFvFvUAhL(9,9,4),cplFvFvUAhR(9,9,4),cplcgWLmgWLmUAh(4),cplcgWRmgWLmUAh(4),           & 
-& cplcgWLmgWRmUAh(4),cplcgWLpgWLpUAh(4),cplcgWRpgWLpUAh(4),cplcgWLpgWRpUAh(4),           & 
-& cplcgWRmgWRmUAh(4),cplcgWRpgWRpUAh(4),cplUAhhhcHpm(4,4,4),cplUAhhhVP(4,4),             & 
-& cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),cplUAhHpmcHpm(4,4,4),cplUAhHpmVWLm(4,4),              & 
-& cplUAhHpmVWRm(4,4),cplUAhcVWRmVWLm(4),cplUAhUAhAhAh(4,4,4,4),cplUAhUAhhhhh(4,4,4,4),   & 
-& cplUAhUAhHpmcHpm(4,4,4,4),cplUAhUAhVPVP(4,4),cplUAhUAhcVWLmVWLm(4,4),cplUAhUAhcVWRmVWRm(4,4),& 
-& cplUAhUAhVZVZ(4,4),cplUAhUAhVZRVZR(4,4)
+Complex(dp), Intent(in) :: cplUAhAhhh(4,4,4),cplcFdFdUAhL(3,3,4),cplcFdFdUAhR(3,3,4),cplcFeFeUAhL(3,3,4),        & 
+& cplcFeFeUAhR(3,3,4),cplcFuFuUAhL(3,3,4),cplcFuFuUAhR(3,3,4),cplFvFvUAhL(9,9,4),        & 
+& cplFvFvUAhR(9,9,4),cplcgWLmgWLmUAh(4),cplcgWRmgWLmUAh(4),cplcgWLmgWRmUAh(4),           & 
+& cplcgWLpgWLpUAh(4),cplcgWRpgWLpUAh(4),cplcgWLpgWRpUAh(4),cplcgWRmgWRmUAh(4),           & 
+& cplcgWRpgWRpUAh(4),cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),cplUAhHpmcHpm(4,4,4),              & 
+& cplUAhHpmcVWLm(4,4),cplUAhHpmcVWRm(4,4),cplUAhcVWRmVWLm(4),cplUAhUAhAhAh(4,4,4,4),     & 
+& cplUAhUAhhhhh(4,4,4,4),cplUAhUAhHpmcHpm(4,4,4,4),cplUAhUAhcVWLmVWLm(4,4),              & 
+& cplUAhUAhcVWRmVWRm(4,4),cplUAhUAhVZVZ(4,4),cplUAhUAhVZRVZR(4,4)
 
 Complex(dp) :: mat2a(4,4), mat2(4,4),  PiSf(4,4,4)
 Integer , Intent(inout):: kont 
@@ -1622,25 +1619,28 @@ mat2a(3,3) = mat2a(3,3)-(k1**2*LAM2)
 mat2a(3,3) = mat2a(3,3)+MU12
 mat2a(3,3) = mat2a(3,3)-1._dp/2._dp*(ALP1*vR**2)
 mat2a(3,3) = mat2a(3,3)-1._dp/2._dp*(ALP3*vR**2)
-mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*Cos(TW)**2*RXiZR)/4._dp
-mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*RXiZR*Sin(TW)**2)/2._dp
-mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
+mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*Cos(TW)**2*RXiZ)/4._dp
+mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*Cos(2._dp*(TW))*RXiZR*1/Cos(TW)**2)/4._dp
+mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*RXiZ*Sin(TW)**2)/2._dp
+mat2a(3,3) = mat2a(3,3)+(g2**2*k1**2*RXiZ*Sin(TW)**2*Tan(TW)**2)/4._dp
 mat2a(3,4) = 0._dp 
-mat2a(3,4) = mat2a(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW))
-mat2a(3,4) = mat2a(3,4)+(g2**2*k1*vR*RXiZR*Sin(TW)**2)/4._dp
-mat2a(3,4) = mat2a(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2)
-mat2a(3,4) = mat2a(3,4)+(g2**2*k1*vR*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
+mat2a(3,4) = mat2a(3,4)+(g2**2*k1*vR*Cos(2._dp*(TW))*RXiZR*1/Cos(TW)**2)/4._dp
+mat2a(3,4) = mat2a(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW))
+mat2a(3,4) = mat2a(3,4)+(g2**2*k1*vR*RXiZ*Sin(TW)**2)/4._dp
+mat2a(3,4) = mat2a(3,4)+(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZR*1/Cos(TW)*Tan(TW))/4._dp
+mat2a(3,4) = mat2a(3,4)-1._dp/4._dp*(g2*gBL*k1*vR*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW)*Tan(TW)**2)
+mat2a(3,4) = mat2a(3,4)+(g2**2*k1*vR*RXiZ*Sin(TW)**2*Tan(TW)**2)/4._dp
 mat2a(4,4) = 0._dp 
 mat2a(4,4) = mat2a(4,4)-1._dp/2._dp*(ALP1*k1**2)
 mat2a(4,4) = mat2a(4,4)-1._dp/2._dp*(ALP3*k1**2)
 mat2a(4,4) = mat2a(4,4)+MU22
 mat2a(4,4) = mat2a(4,4)-(RHO1*vR**2)
-mat2a(4,4) = mat2a(4,4)+(gBL**2*vR**2*Cos(2._dp*(TW))*RXiZ)/4._dp
-mat2a(4,4) = mat2a(4,4)-1._dp/2._dp*(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW))
-mat2a(4,4) = mat2a(4,4)+(g2**2*vR**2*RXiZ*Sin(TW)**2)/4._dp
-mat2a(4,4) = mat2a(4,4)+(gBL**2*vR**2*Cos(2._dp*(TW))*RXiZR*Tan(TW)**2)/4._dp
-mat2a(4,4) = mat2a(4,4)-1._dp/2._dp*(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZR*Sin(TW)*Tan(TW)**2)
-mat2a(4,4) = mat2a(4,4)+(g2**2*vR**2*RXiZR*Sin(TW)**2*Tan(TW)**2)/4._dp
+mat2a(4,4) = mat2a(4,4)+(g2**2*vR**2*Cos(2._dp*(TW))*RXiZR*1/Cos(TW)**2)/4._dp
+mat2a(4,4) = mat2a(4,4)+(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZR*1/Cos(TW)*Tan(TW))/2._dp
+mat2a(4,4) = mat2a(4,4)+(gBL**2*vR**2*Cos(2._dp*(TW))*RXiZ*Tan(TW)**2)/4._dp
+mat2a(4,4) = mat2a(4,4)+(gBL**2*vR**2*RXiZR*Tan(TW)**2)/4._dp
+mat2a(4,4) = mat2a(4,4)-1._dp/2._dp*(g2*gBL*vR**2*Sqrt(Cos(2._dp*(TW)))*RXiZ*Sin(TW)*Tan(TW)**2)
+mat2a(4,4) = mat2a(4,4)+(g2**2*vR**2*RXiZ*Sin(TW)**2*Tan(TW)**2)/4._dp
 
  
  Do i1=2,4
@@ -1655,16 +1655,16 @@ PiSf(1,:,:) = ZeroC
 p2 = 0._dp 
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
-& MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,        & 
-& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
-& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
-& cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& kont,PiSf(1,:,:))
+Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplcFdFdUAhL,      & 
+& cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,cplFvFvUAhL,          & 
+& cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,cplcgWLpgWLpUAh,           & 
+& cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,cplUAhhhVZ,            & 
+& cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,               & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,kont,PiSf(1,:,:))
 
+PiSf(1,:,:) = PiSf(1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1677,18 +1677,18 @@ PiSf(i1,:,:) = ZeroC
 p2 = MAh2(i1)
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
-& MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,        & 
-& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
-& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
-& cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& kont,PiSf(i1,:,:))
+Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplcFdFdUAhL,      & 
+& cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,cplFvFvUAhL,          & 
+& cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,cplcgWLpgWLpUAh,           & 
+& cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,cplUAhhhVZ,            & 
+& cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,               & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,kont,PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
+PiSf(i1,:,:) = PiSf(i1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1733,18 +1733,18 @@ PiSf(i1,:,:) = ZeroC
 p2 =  mass2(i1) 
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
-& MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplUAhAhcHpm,        & 
-& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
-& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
-& cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,     & 
-& kont,PiSf(i1,:,:))
+Call Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
+& MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,cplcFdFdUAhL,      & 
+& cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,cplFvFvUAhL,          & 
+& cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,cplcgWLpgWLpUAh,           & 
+& cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,cplUAhhhVZ,            & 
+& cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,               & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,kont,PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
+PiSf(i1,:,:) = PiSf(i1,:,:) - PiP2S_EffPot 
 mat2 = mat2a - Real(PiSf(i1,:,:),dp) 
 Call Chop(mat2) 
 Call Eigensystem(mat2,mi2,RS,kont,test) 
@@ -1796,28 +1796,27 @@ Iname = Iname -1
 End Subroutine OneLoopAh
  
  
-Subroutine Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MFe,MFe2,               & 
-& MFu,MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,            & 
-& cplUAhAhcHpm,cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,         & 
-& cplcFuFuUAhR,cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,  & 
+Subroutine Pi1LoopAh(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
+& MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplUAhAhhh,              & 
+& cplcFdFdUAhL,cplcFdFdUAhR,cplcFeFeUAhL,cplcFeFeUAhR,cplcFuFuUAhL,cplcFuFuUAhR,         & 
+& cplFvFvUAhL,cplFvFvUAhR,cplcgWLmgWLmUAh,cplcgWRmgWLmUAh,cplcgWLmgWRmUAh,               & 
 & cplcgWLpgWLpUAh,cplcgWRpgWLpUAh,cplcgWLpgWRpUAh,cplcgWRmgWRmUAh,cplcgWRpgWRpUAh,       & 
-& cplUAhhhcHpm,cplUAhhhVP,cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmVWLm,            & 
-& cplUAhHpmVWRm,cplUAhcVWRmVWLm,cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,            & 
-& cplUAhUAhVPVP,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,cplUAhUAhVZVZ,cplUAhUAhVZRVZR,kont,res)
+& cplUAhhhVZ,cplUAhhhVZR,cplUAhHpmcHpm,cplUAhHpmcVWLm,cplUAhHpmcVWRm,cplUAhcVWRmVWLm,    & 
+& cplUAhUAhAhAh,cplUAhUAhhhhh,cplUAhUAhHpmcHpm,cplUAhUAhcVWLmVWLm,cplUAhUAhcVWRmVWRm,    & 
+& cplUAhUAhVZVZ,cplUAhUAhVZRVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),         & 
-& MFu(3),MFu2(3),MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MVWLm,MVWLm2,MVWRm,MVWRm2
+Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
+& MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
 
-Complex(dp), Intent(in) :: cplUAhAhhh(4,4,4),cplUAhAhcHpm(4,4,4),cplcFdFdUAhL(3,3,4),cplcFdFdUAhR(3,3,4),        & 
-& cplcFeFeUAhL(3,3,4),cplcFeFeUAhR(3,3,4),cplcFuFuUAhL(3,3,4),cplcFuFuUAhR(3,3,4),       & 
-& cplFvFvUAhL(9,9,4),cplFvFvUAhR(9,9,4),cplcgWLmgWLmUAh(4),cplcgWRmgWLmUAh(4),           & 
-& cplcgWLmgWRmUAh(4),cplcgWLpgWLpUAh(4),cplcgWRpgWLpUAh(4),cplcgWLpgWRpUAh(4),           & 
-& cplcgWRmgWRmUAh(4),cplcgWRpgWRpUAh(4),cplUAhhhcHpm(4,4,4),cplUAhhhVP(4,4),             & 
-& cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),cplUAhHpmcHpm(4,4,4),cplUAhHpmVWLm(4,4),              & 
-& cplUAhHpmVWRm(4,4),cplUAhcVWRmVWLm(4),cplUAhUAhAhAh(4,4,4,4),cplUAhUAhhhhh(4,4,4,4),   & 
-& cplUAhUAhHpmcHpm(4,4,4,4),cplUAhUAhVPVP(4,4),cplUAhUAhcVWLmVWLm(4,4),cplUAhUAhcVWRmVWRm(4,4),& 
-& cplUAhUAhVZVZ(4,4),cplUAhUAhVZRVZR(4,4)
+Complex(dp), Intent(in) :: cplUAhAhhh(4,4,4),cplcFdFdUAhL(3,3,4),cplcFdFdUAhR(3,3,4),cplcFeFeUAhL(3,3,4),        & 
+& cplcFeFeUAhR(3,3,4),cplcFuFuUAhL(3,3,4),cplcFuFuUAhR(3,3,4),cplFvFvUAhL(9,9,4),        & 
+& cplFvFvUAhR(9,9,4),cplcgWLmgWLmUAh(4),cplcgWRmgWLmUAh(4),cplcgWLmgWRmUAh(4),           & 
+& cplcgWLpgWLpUAh(4),cplcgWRpgWLpUAh(4),cplcgWLpgWRpUAh(4),cplcgWRmgWRmUAh(4),           & 
+& cplcgWRpgWRpUAh(4),cplUAhhhVZ(4,4),cplUAhhhVZR(4,4),cplUAhHpmcHpm(4,4,4),              & 
+& cplUAhHpmcVWLm(4,4),cplUAhHpmcVWRm(4,4),cplUAhcVWRmVWLm(4),cplUAhUAhAhAh(4,4,4,4),     & 
+& cplUAhUAhhhhh(4,4,4,4),cplUAhUAhHpmcHpm(4,4,4,4),cplUAhUAhcVWLmVWLm(4,4),              & 
+& cplUAhUAhcVWRmVWRm(4,4),cplUAhUAhVZVZ(4,4),cplUAhUAhVZRVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2,B1m2, m1, m2 
@@ -1846,24 +1845,6 @@ coup2 = Conjg(cplUAhAhhh(gO2,i2,i1))
    End Do 
 End Do 
 res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[Hpm], Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MHpm2(i1),MAh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUAhAhcHpm(gO1,i2,i1)
-coup2 = Conjg(cplUAhAhcHpm(gO2,i2,i1))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +2._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
@@ -2039,40 +2020,6 @@ coup2 =  cplcgWRpgWRpUAh(gO2)
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], hh 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MHpm2(i1),Mhh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUAhhhcHpm(gO1,i2,i1)
-coup2 = Conjg(cplUAhhhcHpm(gO2,i2,i1))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +2._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,Mhh2(i2),0._dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplUAhhhVP(gO1,i2)
-coup2 =  Conjg(cplUAhhhVP(gO2,i2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -2123,7 +2070,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -2131,15 +2078,15 @@ sumI = 0._dp
  F0m2 = FloopRXi(p2,MHpm2(i2),MVWLm2) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplUAhHpmVWLm(gO1,i2)
-coup2 =  Conjg(cplUAhHpmVWLm(gO2,i2))
+coup1 = cplUAhHpmcVWLm(gO1,i2)
+coup2 =  Conjg(cplUAhHpmcVWLm(gO2,i2))
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -2147,8 +2094,8 @@ sumI = 0._dp
  F0m2 = FloopRXi(p2,MHpm2(i2),MVWRm2) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplUAhHpmVWRm(gO1,i2)
-coup2 =  Conjg(cplUAhHpmVWRm(gO2,i2))
+coup1 = cplUAhHpmcVWRm(gO1,i2)
+coup2 =  Conjg(cplUAhHpmcVWRm(gO2,i2))
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
@@ -2214,11 +2161,6 @@ End Do
 res = res +1._dp* SumI  
       End Do 
  !------------------------ 
-! VP, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-!------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
 sumI = 0._dp 
@@ -2282,36 +2224,34 @@ res = oo16pi2*res
  
 End Subroutine Pi1LoopAh 
  
-Subroutine OneLoopHpm(g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,k1,             & 
-& vR,PhiW,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,MFd,MFd2,               & 
-& MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,              & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,delta,mass,mass2,RS,kont)
+Subroutine OneLoopHpm(g2,MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,k1,             & 
+& vR,PhiW,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,               & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,cplAhcUHpmVWLm,           & 
+& cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,cplFvFecUHpmR,              & 
+& cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,cplcgZgWRmcUHpm,       & 
+& cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,cplcgZgWLpUHpm,        & 
+& cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,cplcgWRpgZpcUHpm,      & 
+& cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,cplHpmcUHpmVP,             & 
+& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,cplcUHpmVWLmVZ,             & 
+& cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,      & 
+& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
+& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,delta,mass,mass2,RS,kont)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm(4),MHpm2(4),             & 
-& MFd(3),MFd2(3),MFu(3),MFu2(3),MFe(3),MFe2(3),MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MFu(3),MFu2(3),             & 
+& MFd(3),MFd2(3),MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
-Real(dp), Intent(in) :: g2,MU12,MU22,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,k1,vR,PhiW
+Real(dp), Intent(in) :: g2,MU12,MU22,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,k1,vR,PhiW
 
-Complex(dp), Intent(in) :: cplAhAhcUHpm(4,4,4),cplAhhhcUHpm(4,4,4),cplAhcUHpmcVWLm(4,4),cplAhcUHpmcVWRm(4,4),    & 
-& cplAhHpmcUHpm(4,4,4),cplcFdFucUHpmL(3,3,4),cplcFdFucUHpmR(3,3,4),cplcFeFvcUHpmL(3,9,4),& 
-& cplcFeFvcUHpmR(3,9,4),cplcgZgWLpcUHpm(4),cplcgWLpgZUHpm(4),cplcgZpgWLpcUHpm(4),        & 
-& cplcgWLpgZpUHpm(4),cplcgZgWRpcUHpm(4),cplcgWRpgZUHpm(4),cplcgZpgWRpcUHpm(4),           & 
-& cplcgWRpgZpUHpm(4),cplcgWLmgZcUHpm(4),cplcgZgWLmUHpm(4),cplcgWRmgZcUHpm(4),            & 
-& cplcgZgWRmUHpm(4),cplcgWLmgZpcUHpm(4),cplcgZpgWLmUHpm(4),cplcgWRmgZpcUHpm(4),          & 
-& cplcgZpgWRmUHpm(4),cplhhhhcUHpm(4,4,4),cplhhcUHpmcVWLm(4,4),cplhhcUHpmcVWRm(4,4),      & 
-& cplhhHpmcUHpm(4,4,4),cplHpmcUHpmcHpm(4,4,4),cplHpmcUHpmVP(4,4),cplHpmcUHpmVZ(4,4),     & 
-& cplHpmcUHpmVZR(4,4),cplcUHpmcVWLmVP(4),cplcUHpmcVWRmVP(4),cplcUHpmcVWLmVZ(4),          & 
-& cplcUHpmcVWRmVZ(4),cplcUHpmcVWLmVZR(4),cplcUHpmcVWRmVZR(4),cplAhAhUHpmcUHpm(4,4,4,4),  & 
+Complex(dp), Intent(in) :: cplAhHpmcUHpm(4,4,4),cplAhcUHpmVWLm(4,4),cplAhcUHpmVWRm(4,4),cplcFuFdcUHpmL(3,3,4),   & 
+& cplcFuFdcUHpmR(3,3,4),cplFvFecUHpmL(9,3,4),cplFvFecUHpmR(9,3,4),cplcgZgWLmcUHpm(4),    & 
+& cplcgWLmgZUHpm(4),cplcgZpgWLmcUHpm(4),cplcgWLmgZpUHpm(4),cplcgZgWRmcUHpm(4),           & 
+& cplcgWRmgZUHpm(4),cplcgZpgWRmcUHpm(4),cplcgWRmgZpUHpm(4),cplcgWLpgZcUHpm(4),           & 
+& cplcgZgWLpUHpm(4),cplcgWRpgZcUHpm(4),cplcgZgWRpUHpm(4),cplcgWLpgZpcUHpm(4),            & 
+& cplcgZpgWLpUHpm(4),cplcgWRpgZpcUHpm(4),cplcgZpgWRpUHpm(4),cplhhHpmcUHpm(4,4,4),        & 
+& cplhhcUHpmVWLm(4,4),cplhhcUHpmVWRm(4,4),cplHpmcUHpmVP(4,4),cplHpmcUHpmVZ(4,4),         & 
+& cplHpmcUHpmVZR(4,4),cplcUHpmVPVWLm(4),cplcUHpmVPVWRm(4),cplcUHpmVWLmVZ(4),             & 
+& cplcUHpmVWLmVZR(4),cplcUHpmVWRmVZ(4),cplcUHpmVWRmVZR(4),cplAhAhUHpmcUHpm(4,4,4,4),     & 
 & cplhhhhUHpmcUHpm(4,4,4,4),cplUHpmHpmcUHpmcHpm(4,4,4,4),cplUHpmcUHpmVPVP(4,4),          & 
 & cplUHpmcUHpmcVWLmVWLm(4,4),cplUHpmcUHpmcVWRmVWRm(4,4),cplUHpmcUHpmVZVZ(4,4),           & 
 & cplUHpmcUHpmVZRVZR(4,4)
@@ -2382,18 +2322,17 @@ PiSf(1,:,:) = ZeroC
 p2 = 0._dp 
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopHpm(p2,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,            & 
-& MFd,MFd2,MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,     & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,kont,PiSf(1,:,:))
+Call Pi1LoopHpm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MFu,MFu2,            & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,cplAhcUHpmVWLm,  & 
+& cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,cplFvFecUHpmR,              & 
+& cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,cplcgZgWRmcUHpm,       & 
+& cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,cplcgZgWLpUHpm,        & 
+& cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,cplcgWRpgZpcUHpm,      & 
+& cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,cplHpmcUHpmVP,             & 
+& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,cplcUHpmVWLmVZ,             & 
+& cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,      & 
+& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
+& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,kont,PiSf(1,:,:))
 
 mat2 = mat2a - Real(PiSf(1,:,:),dp) 
 Call Chop(mat2) 
@@ -2407,18 +2346,17 @@ PiSf(i1,:,:) = ZeroC
 p2 = MHpm2(i1)
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopHpm(p2,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,            & 
-& MFd,MFd2,MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,     & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,kont,PiSf(i1,:,:))
+Call Pi1LoopHpm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MFu,MFu2,            & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,cplAhcUHpmVWLm,  & 
+& cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,cplFvFecUHpmR,              & 
+& cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,cplcgZgWRmcUHpm,       & 
+& cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,cplcgZgWLpUHpm,        & 
+& cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,cplcgWRpgZpcUHpm,      & 
+& cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,cplHpmcUHpmVP,             & 
+& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,cplcUHpmVWLmVZ,             & 
+& cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,      & 
+& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
+& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,kont,PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
@@ -2466,18 +2404,17 @@ PiSf(i1,:,:) = ZeroC
 p2 =  mass2(i1) 
 If (i1.eq.1) p2 = 0._dp 
 If (i1.eq.2) p2 = 0._dp 
-Call Pi1LoopHpm(p2,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,MHpm2,            & 
-& MFd,MFd2,MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,cplAhhhcUHpm,     & 
-& cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,cplcFdFucUHpmR,           & 
-& cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,cplcgZpgWLpcUHpm,         & 
-& cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,cplcgWRpgZpUHpm,       & 
-& cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,cplcgWLmgZpcUHpm,        & 
-& cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,cplhhcUHpmcVWLm,         & 
-& cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,cplHpmcUHpmVZ,             & 
-& cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,cplcUHpmcVWRmVZ,        & 
-& cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,& 
-& cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,         & 
-& cplUHpmcUHpmVZRVZR,kont,PiSf(i1,:,:))
+Call Pi1LoopHpm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MFu,MFu2,            & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,cplAhcUHpmVWLm,  & 
+& cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,cplFvFecUHpmR,              & 
+& cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,cplcgZgWRmcUHpm,       & 
+& cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,cplcgZgWLpUHpm,        & 
+& cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,cplcgWRpgZpcUHpm,      & 
+& cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,cplHpmcUHpmVP,             & 
+& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,cplcUHpmVWLmVZ,             & 
+& cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,      & 
+& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
+& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,kont,PiSf(i1,:,:))
 
 End Do 
 Do i1=4,1,-1 
@@ -2532,33 +2469,31 @@ Iname = Iname -1
 End Subroutine OneLoopHpm
  
  
-Subroutine Pi1LoopHpm(p2,MAh,MAh2,Mhh,Mhh2,MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm,            & 
-& MHpm2,MFd,MFd2,MFu,MFu2,MFe,MFe2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcUHpm,            & 
-& cplAhhhcUHpm,cplAhcUHpmcVWLm,cplAhcUHpmcVWRm,cplAhHpmcUHpm,cplcFdFucUHpmL,             & 
-& cplcFdFucUHpmR,cplcFeFvcUHpmL,cplcFeFvcUHpmR,cplcgZgWLpcUHpm,cplcgWLpgZUHpm,           & 
-& cplcgZpgWLpcUHpm,cplcgWLpgZpUHpm,cplcgZgWRpcUHpm,cplcgWRpgZUHpm,cplcgZpgWRpcUHpm,      & 
-& cplcgWRpgZpUHpm,cplcgWLmgZcUHpm,cplcgZgWLmUHpm,cplcgWRmgZcUHpm,cplcgZgWRmUHpm,         & 
-& cplcgWLmgZpcUHpm,cplcgZpgWLmUHpm,cplcgWRmgZpcUHpm,cplcgZpgWRmUHpm,cplhhhhcUHpm,        & 
-& cplhhcUHpmcVWLm,cplhhcUHpmcVWRm,cplhhHpmcUHpm,cplHpmcUHpmcHpm,cplHpmcUHpmVP,           & 
-& cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmcVWLmVP,cplcUHpmcVWRmVP,cplcUHpmcVWLmVZ,          & 
-& cplcUHpmcVWRmVZ,cplcUHpmcVWLmVZR,cplcUHpmcVWRmVZR,cplAhAhUHpmcUHpm,cplhhhhUHpmcUHpm,   & 
-& cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,cplUHpmcUHpmcVWRmVWRm,      & 
-& cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,kont,res)
+Subroutine Pi1LoopHpm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MVWRm,MVWRm2,               & 
+& MFu,MFu2,MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcUHpm,        & 
+& cplAhcUHpmVWLm,cplAhcUHpmVWRm,cplcFuFdcUHpmL,cplcFuFdcUHpmR,cplFvFecUHpmL,             & 
+& cplFvFecUHpmR,cplcgZgWLmcUHpm,cplcgWLmgZUHpm,cplcgZpgWLmcUHpm,cplcgWLmgZpUHpm,         & 
+& cplcgZgWRmcUHpm,cplcgWRmgZUHpm,cplcgZpgWRmcUHpm,cplcgWRmgZpUHpm,cplcgWLpgZcUHpm,       & 
+& cplcgZgWLpUHpm,cplcgWRpgZcUHpm,cplcgZgWRpUHpm,cplcgWLpgZpcUHpm,cplcgZpgWLpUHpm,        & 
+& cplcgWRpgZpcUHpm,cplcgZpgWRpUHpm,cplhhHpmcUHpm,cplhhcUHpmVWLm,cplhhcUHpmVWRm,          & 
+& cplHpmcUHpmVP,cplHpmcUHpmVZ,cplHpmcUHpmVZR,cplcUHpmVPVWLm,cplcUHpmVPVWRm,              & 
+& cplcUHpmVWLmVZ,cplcUHpmVWLmVZR,cplcUHpmVWRmVZ,cplcUHpmVWRmVZR,cplAhAhUHpmcUHpm,        & 
+& cplhhhhUHpmcUHpm,cplUHpmHpmcUHpmcHpm,cplUHpmcUHpmVPVP,cplUHpmcUHpmcVWLmVWLm,           & 
+& cplUHpmcUHpmcVWRmVWRm,cplUHpmcUHpmVZVZ,cplUHpmcUHpmVZRVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MHpm(4),MHpm2(4),             & 
-& MFd(3),MFd2(3),MFu(3),MFu2(3),MFe(3),MFe2(3),MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MFu(3),MFu2(3),             & 
+& MFd(3),MFd2(3),MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhcUHpm(4,4,4),cplAhhhcUHpm(4,4,4),cplAhcUHpmcVWLm(4,4),cplAhcUHpmcVWRm(4,4),    & 
-& cplAhHpmcUHpm(4,4,4),cplcFdFucUHpmL(3,3,4),cplcFdFucUHpmR(3,3,4),cplcFeFvcUHpmL(3,9,4),& 
-& cplcFeFvcUHpmR(3,9,4),cplcgZgWLpcUHpm(4),cplcgWLpgZUHpm(4),cplcgZpgWLpcUHpm(4),        & 
-& cplcgWLpgZpUHpm(4),cplcgZgWRpcUHpm(4),cplcgWRpgZUHpm(4),cplcgZpgWRpcUHpm(4),           & 
-& cplcgWRpgZpUHpm(4),cplcgWLmgZcUHpm(4),cplcgZgWLmUHpm(4),cplcgWRmgZcUHpm(4),            & 
-& cplcgZgWRmUHpm(4),cplcgWLmgZpcUHpm(4),cplcgZpgWLmUHpm(4),cplcgWRmgZpcUHpm(4),          & 
-& cplcgZpgWRmUHpm(4),cplhhhhcUHpm(4,4,4),cplhhcUHpmcVWLm(4,4),cplhhcUHpmcVWRm(4,4),      & 
-& cplhhHpmcUHpm(4,4,4),cplHpmcUHpmcHpm(4,4,4),cplHpmcUHpmVP(4,4),cplHpmcUHpmVZ(4,4),     & 
-& cplHpmcUHpmVZR(4,4),cplcUHpmcVWLmVP(4),cplcUHpmcVWRmVP(4),cplcUHpmcVWLmVZ(4),          & 
-& cplcUHpmcVWRmVZ(4),cplcUHpmcVWLmVZR(4),cplcUHpmcVWRmVZR(4),cplAhAhUHpmcUHpm(4,4,4,4),  & 
+Complex(dp), Intent(in) :: cplAhHpmcUHpm(4,4,4),cplAhcUHpmVWLm(4,4),cplAhcUHpmVWRm(4,4),cplcFuFdcUHpmL(3,3,4),   & 
+& cplcFuFdcUHpmR(3,3,4),cplFvFecUHpmL(9,3,4),cplFvFecUHpmR(9,3,4),cplcgZgWLmcUHpm(4),    & 
+& cplcgWLmgZUHpm(4),cplcgZpgWLmcUHpm(4),cplcgWLmgZpUHpm(4),cplcgZgWRmcUHpm(4),           & 
+& cplcgWRmgZUHpm(4),cplcgZpgWRmcUHpm(4),cplcgWRmgZpUHpm(4),cplcgWLpgZcUHpm(4),           & 
+& cplcgZgWLpUHpm(4),cplcgWRpgZcUHpm(4),cplcgZgWRpUHpm(4),cplcgWLpgZpcUHpm(4),            & 
+& cplcgZpgWLpUHpm(4),cplcgWRpgZpcUHpm(4),cplcgZpgWRpUHpm(4),cplhhHpmcUHpm(4,4,4),        & 
+& cplhhcUHpmVWLm(4,4),cplhhcUHpmVWRm(4,4),cplHpmcUHpmVP(4,4),cplHpmcUHpmVZ(4,4),         & 
+& cplHpmcUHpmVZR(4,4),cplcUHpmVPVWLm(4),cplcUHpmVPVWRm(4),cplcUHpmVWLmVZ(4),             & 
+& cplcUHpmVWLmVZR(4),cplcUHpmVWRmVZ(4),cplcUHpmVWRmVZR(4),cplAhAhUHpmcUHpm(4,4,4,4),     & 
 & cplhhhhUHpmcUHpm(4,4,4,4),cplUHpmHpmcUHpmcHpm(4,4,4,4),cplUHpmcUHpmVPVP(4,4),          & 
 & cplUHpmcUHpmcVWLmVWLm(4,4),cplUHpmcUHpmcVWRmVWRm(4,4),cplUHpmcUHpmVZVZ(4,4),           & 
 & cplUHpmcUHpmVZRVZR(4,4)
@@ -2575,74 +2510,6 @@ Integer :: i1,i2,i3,i4,j1,j2,j3,j4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! Ah, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MAh2(i1),MAh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhAhcUHpm(i1,i2,gO1)
-coup2 = Conjg(cplAhAhcUHpm(i1,i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +1._dp/4._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,Mhh2(i1),MAh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhhhcUHpm(i2,i1,gO1)
-coup2 = Conjg(cplAhhhcUHpm(i2,i1,gO2))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +1._dp/2._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[VWLm], Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,MAh2(i2),MVWLm2) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhcUHpmcVWLm(i2,gO1)
-coup2 =  Conjg(cplAhcUHpmcVWLm(i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,MAh2(i2),MVWRm2) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplAhcUHpmcVWRm(i2,gO1)
-coup2 =  Conjg(cplAhcUHpmcVWRm(i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! Hpm, Ah 
 !------------------------ 
 sumI = 0._dp 
@@ -2661,20 +2528,52 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[Fd], Fu 
+! VWLm, Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ F0m2 = FloopRXi(p2,MAh2(i2),MVWLm2) 
+Do gO1 = 1, 4
+  Do gO2 = gO1, 4
+coup1 = cplAhcUHpmVWLm(i2,gO1)
+coup2 =  Conjg(cplAhcUHpmVWLm(i2,gO2))
+    SumI(gO1,gO2) = coup1*coup2*F0m2 
+   End Do 
+End Do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VWRm, Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ F0m2 = FloopRXi(p2,MAh2(i2),MVWRm2) 
+Do gO1 = 1, 4
+  Do gO2 = gO1, 4
+coup1 = cplAhcUHpmVWRm(i2,gO1)
+coup2 =  Conjg(cplAhcUHpmVWRm(i2,gO2))
+    SumI(gO1,gO2) = coup1*coup2*F0m2 
+   End Do 
+End Do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! bar[Fu], Fd 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 3
        Do i2 = 1, 3
- G0m2 = Real(SA_Gloop(p2,MFd2(i1),MFu2(i2)),dp) 
-B0m2 = -2._dp*MFd(i1)*MFu(i2)*Real(SA_B0(p2,MFd2(i1),MFu2(i2)),dp) 
+ G0m2 = Real(SA_Gloop(p2,MFu2(i1),MFd2(i2)),dp) 
+B0m2 = -2._dp*MFu(i1)*MFd(i2)*Real(SA_B0(p2,MFu2(i1),MFd2(i2)),dp) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coupL1 = cplcFdFucUHpmL(i1,i2,gO1)
-coupR1 = cplcFdFucUHpmR(i1,i2,gO1)
-coupL2 =  Conjg(cplcFdFucUHpmL(i1,i2,gO2))
-coupR2 =  Conjg(cplcFdFucUHpmR(i1,i2,gO2))
+coupL1 = cplcFuFdcUHpmL(i1,i2,gO1)
+coupR1 = cplcFuFdcUHpmR(i1,i2,gO1)
+coupL2 =  Conjg(cplcFuFdcUHpmL(i1,i2,gO2))
+coupR2 =  Conjg(cplcFuFdcUHpmR(i1,i2,gO2))
     SumI(gO1,gO2) = (coupL1*coupL2+coupR1*coupR2)*G0m2 & 
                 & + (coupL1*coupR2+coupR1*coupL2)*B0m2 
    End Do 
@@ -2683,20 +2582,20 @@ res = res +3._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[Fe], Fv 
+! Fv, Fe 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 3
-       Do i2 = 1, 9
- G0m2 = Real(SA_Gloop(p2,MFe2(i1),MFv2(i2)),dp) 
-B0m2 = -2._dp*MFe(i1)*MFv(i2)*Real(SA_B0(p2,MFe2(i1),MFv2(i2)),dp) 
+    Do i1 = 1, 9
+       Do i2 = 1, 3
+ G0m2 = Real(SA_Gloop(p2,MFv2(i1),MFe2(i2)),dp) 
+B0m2 = -2._dp*MFv(i1)*MFe(i2)*Real(SA_B0(p2,MFv2(i1),MFe2(i2)),dp) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coupL1 = cplcFeFvcUHpmL(i1,i2,gO1)
-coupR1 = cplcFeFvcUHpmR(i1,i2,gO1)
-coupL2 =  Conjg(cplcFeFvcUHpmL(i1,i2,gO2))
-coupR2 =  Conjg(cplcFeFvcUHpmR(i1,i2,gO2))
+coupL1 = cplFvFecUHpmL(i1,i2,gO1)
+coupR1 = cplFvFecUHpmR(i1,i2,gO1)
+coupL2 =  Conjg(cplFvFecUHpmL(i1,i2,gO2))
+coupR2 =  Conjg(cplFvFecUHpmR(i1,i2,gO2))
     SumI(gO1,gO2) = (coupL1*coupL2+coupR1*coupR2)*G0m2 & 
                 & + (coupL1*coupR2+coupR1*coupL2)*B0m2 
    End Do 
@@ -2705,168 +2604,118 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[gZ], gWLmC 
+! bar[gZ], gWLm 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVWLm2*RXi,MVZ2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgZgWLpcUHpm(gO1)
-coup2 =  cplcgWLpgZUHpm(gO2) 
+coup1 = cplcgZgWLmcUHpm(gO1)
+coup2 =  cplcgWLmgZUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gZR], gWLmC 
+! bar[gZR], gWLm 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVWLm2*RXi,MVZR2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgZpgWLpcUHpm(gO1)
-coup2 =  cplcgWLpgZpUHpm(gO2) 
+coup1 = cplcgZpgWLmcUHpm(gO1)
+coup2 =  cplcgWLmgZpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gZ], gWRmC 
+! bar[gZ], gWRm 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVWRm2*RXi,MVZ2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgZgWRpcUHpm(gO1)
-coup2 =  cplcgWRpgZUHpm(gO2) 
+coup1 = cplcgZgWRmcUHpm(gO1)
+coup2 =  cplcgWRmgZUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gZR], gWRmC 
+! bar[gZR], gWRm 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVWRm2*RXi,MVZR2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgZpgWRpcUHpm(gO1)
-coup2 =  cplcgWRpgZpUHpm(gO2) 
+coup1 = cplcgZpgWRmcUHpm(gO1)
+coup2 =  cplcgWRmgZpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWLm], gZ 
+! bar[gWLmC], gZ 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVZ2*RXi,MVWLm2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgWLmgZcUHpm(gO1)
-coup2 =  cplcgZgWLmUHpm(gO2) 
+coup1 = cplcgWLpgZcUHpm(gO1)
+coup2 =  cplcgZgWLpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWRm], gZ 
+! bar[gWRmC], gZ 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVZ2*RXi,MVWRm2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgWRmgZcUHpm(gO1)
-coup2 =  cplcgZgWRmUHpm(gO2) 
+coup1 = cplcgWRpgZcUHpm(gO1)
+coup2 =  cplcgZgWRpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWLm], gZR 
+! bar[gWLmC], gZR 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVZR2*RXi,MVWLm2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgWLmgZpcUHpm(gO1)
-coup2 =  cplcgZpgWLmUHpm(gO2) 
+coup1 = cplcgWLpgZpcUHpm(gO1)
+coup2 =  cplcgZpgWLpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWRm], gZR 
+! bar[gWRmC], gZR 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = -Real(SA_B0(p2,MVZR2*RXi,MVWRm2*RXi),dp) 
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcgWRmgZpcUHpm(gO1)
-coup2 =  cplcgZpgWRmUHpm(gO2) 
+coup1 = cplcgWRpgZpcUHpm(gO1)
+coup2 =  cplcgZpgWRpUHpm(gO2) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! hh, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,Mhh2(i1),Mhh2(i2)),dp) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplhhhhcUHpm(i1,i2,gO1)
-coup2 = Conjg(cplhhhhcUHpm(i1,i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
-   End Do 
-End Do 
-res = res +1._dp/4._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[VWLm], hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,Mhh2(i2),MVWLm2) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplhhcUHpmcVWLm(i2,gO1)
-coup2 =  Conjg(cplhhcUHpmcVWLm(i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- F0m2 = FloopRXi(p2,Mhh2(i2),MVWRm2) 
-Do gO1 = 1, 4
-  Do gO2 = gO1, 4
-coup1 = cplhhcUHpmcVWRm(i2,gO1)
-coup2 =  Conjg(cplhhcUHpmcVWRm(i2,gO2))
-    SumI(gO1,gO2) = coup1*coup2*F0m2 
-   End Do 
-End Do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! Hpm, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -2885,23 +2734,37 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! conj[Hpm], Hpm 
+! VWLm, hh 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B0m2 = Real(SA_B0(p2,MHpm2(i1),MHpm2(i2)),dp) 
+      Do i2 = 1, 4
+ F0m2 = FloopRXi(p2,Mhh2(i2),MVWLm2) 
 Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplHpmcUHpmcHpm(i2,gO1,i1)
-coup2 = Conjg(cplHpmcUHpmcHpm(i2,gO2,i1))
-    SumI(gO1,gO2) = coup1*coup2*B0m2 
+coup1 = cplhhcUHpmVWLm(i2,gO1)
+coup2 =  Conjg(cplhhcUHpmVWLm(i2,gO2))
+    SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
-res = res +1._dp/2._dp* SumI  
-      End Do 
-     End Do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VWRm, hh 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ F0m2 = FloopRXi(p2,Mhh2(i2),MVWRm2) 
+Do gO1 = 1, 4
+  Do gO2 = gO1, 4
+coup1 = cplhhcUHpmVWRm(i2,gO1)
+coup2 =  Conjg(cplhhcUHpmVWRm(i2,gO2))
+    SumI(gO1,gO2) = coup1*coup2*F0m2 
+   End Do 
+End Do 
+res = res +1._dp* SumI  
+    End Do 
  !------------------------ 
 ! VP, Hpm 
 !------------------------ 
@@ -2951,85 +2814,85 @@ End Do
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[VWLm], VP 
+! VWLm, VP 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = Real(SVVloop(p2,0._dp,MVWLm2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWLmVP(gO1)
-coup2 =  Conjg(cplcUHpmcVWLmVP(gO2)) 
+coup1 = cplcUHpmVPVWLm(gO1)
+coup2 =  Conjg(cplcUHpmVPVWLm(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWRm], VP 
+! VWRm, VP 
 !------------------------ 
 sumI = 0._dp 
  
 F0m2 = Real(SVVloop(p2,0._dp,MVWRm2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWRmVP(gO1)
-coup2 =  Conjg(cplcUHpmcVWRmVP(gO2)) 
+coup1 = cplcUHpmVPVWRm(gO1)
+coup2 =  Conjg(cplcUHpmVPVWRm(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWLm], VZ 
+! VZ, VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-F0m2 = Real(SVVloop(p2,MVZ2,MVWLm2),dp)   
+F0m2 = Real(SVVloop(p2,MVWLm2,MVZ2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWLmVZ(gO1)
-coup2 =  Conjg(cplcUHpmcVWLmVZ(gO2)) 
+coup1 = cplcUHpmVWLmVZ(gO1)
+coup2 =  Conjg(cplcUHpmVWLmVZ(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWRm], VZ 
+! VZR, VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-F0m2 = Real(SVVloop(p2,MVZ2,MVWRm2),dp)   
+F0m2 = Real(SVVloop(p2,MVWLm2,MVZR2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWRmVZ(gO1)
-coup2 =  Conjg(cplcUHpmcVWRmVZ(gO2)) 
+coup1 = cplcUHpmVWLmVZR(gO1)
+coup2 =  Conjg(cplcUHpmVWLmVZR(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWLm], VZR 
+! VZ, VWRm 
 !------------------------ 
 sumI = 0._dp 
  
-F0m2 = Real(SVVloop(p2,MVZR2,MVWLm2),dp)   
+F0m2 = Real(SVVloop(p2,MVWRm2,MVZ2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWLmVZR(gO1)
-coup2 =  Conjg(cplcUHpmcVWLmVZR(gO2)) 
+coup1 = cplcUHpmVWRmVZ(gO1)
+coup2 =  Conjg(cplcUHpmVWRmVZ(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWRm], VZR 
+! VZR, VWRm 
 !------------------------ 
 sumI = 0._dp 
  
-F0m2 = Real(SVVloop(p2,MVZR2,MVWRm2),dp)   
+F0m2 = Real(SVVloop(p2,MVWRm2,MVZR2),dp)   
  Do gO1 = 1, 4
   Do gO2 = gO1, 4
-coup1 = cplcUHpmcVWRmVZR(gO1)
-coup2 =  Conjg(cplcUHpmcVWRmVZR(gO2)) 
+coup1 = cplcUHpmVWRmVZR(gO1)
+coup2 =  Conjg(cplcUHpmVWRmVZR(gO2)) 
     SumI(gO1,gO2) = coup1*coup2*F0m2 
    End Do 
 End Do 
@@ -3151,7 +3014,7 @@ End Subroutine Pi1LoopHpm
 Subroutine OneLoopFd(YQ2,k1,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,           & 
 & MHpm,MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,               & 
 & cplcUFdFdhhL,cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,         & 
-& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,   & 
+& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,     & 
 & cplcUFdFuVWLmL,cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,delta,MFd_1L,              & 
 & MFd2_1L,ZDL_1L,ZDR_1L,ierr)
 
@@ -3166,7 +3029,7 @@ Complex(dp), Intent(in) :: YQ2(3,3)
 Complex(dp), Intent(in) :: cplcUFdFdAhL(3,3,4),cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),cplcUFdFdhhR(3,3,4),      & 
 & cplcUFdFdVGL(3,3),cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),cplcUFdFdVPR(3,3),               & 
 & cplcUFdFdVZL(3,3),cplcUFdFdVZR(3,3),cplcUFdFdVZRL(3,3),cplcUFdFdVZRR(3,3),             & 
-& cplcUFdFucHpmL(3,3,4),cplcUFdFucHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),   & 
+& cplcUFdFuHpmL(3,3,4),cplcUFdFuHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),     & 
 & cplcUFdFuVWRmL(3,3),cplcUFdFuVWRmR(3,3)
 
 Complex(dp) :: mat1a(3,3), mat1(3,3) 
@@ -3221,7 +3084,7 @@ p2 = 0._dp
 Call Sigma1LoopFd(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,       & 
 & cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,         & 
-& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL, & 
+& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,cplcUFdFuVWLmL,   & 
 & cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -3264,7 +3127,7 @@ p2 = MFd2(il)
 Call Sigma1LoopFd(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,       & 
 & cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,         & 
-& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL, & 
+& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,cplcUFdFuVWLmL,   & 
 & cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -3300,7 +3163,7 @@ p2 = MFd2_t(iL)
 Call Sigma1LoopFd(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,cplcUFdFdhhL,       & 
 & cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,cplcUFdFdVZL,         & 
-& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,cplcUFdFuVWLmL, & 
+& cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,cplcUFdFuVWLmL,   & 
 & cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -3378,7 +3241,7 @@ End Subroutine OneLoopFd
 Subroutine Sigma1LoopFd(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & MHpm,MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,               & 
 & cplcUFdFdhhL,cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,         & 
-& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,   & 
+& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,     & 
 & cplcUFdFuVWLmL,cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigL,sigR,sigSL,sigSR)
 
 Implicit None 
@@ -3388,7 +3251,7 @@ Real(dp), Intent(in) :: MFd(3),MFd2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MV
 Complex(dp), Intent(in) :: cplcUFdFdAhL(3,3,4),cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),cplcUFdFdhhR(3,3,4),      & 
 & cplcUFdFdVGL(3,3),cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),cplcUFdFdVPR(3,3),               & 
 & cplcUFdFdVZL(3,3),cplcUFdFdVZR(3,3),cplcUFdFdVZRL(3,3),cplcUFdFdVZRR(3,3),             & 
-& cplcUFdFucHpmL(3,3,4),cplcUFdFucHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),   & 
+& cplcUFdFuHpmL(3,3,4),cplcUFdFuHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),     & 
 & cplcUFdFuVWRmL(3,3),cplcUFdFuVWRmR(3,3)
 
 Complex(dp), Intent(out) :: SigL(3,3),SigR(3,3), SigSL(3,3), SigSR(3,3) 
@@ -3571,7 +3434,7 @@ SigSL = SigSL +1._dp* sumSL
 SigSR = SigSR +1._dp* sumSR 
     End Do 
  !------------------------ 
-! conj[Hpm], Fu 
+! Hpm, Fu 
 !------------------------ 
     Do i1 = 1, 4
        Do i2 = 1, 3
@@ -3583,10 +3446,10 @@ Do gO1 = 1, 3
   Do gO2 = 1, 3
 B1m2 = -Real(SA_B1(p2,MFu2(i2),MHpm2(i1)),dp) 
 B0m2 = MFu(i2)*Real(SA_B0(p2,MFu2(i2),MHpm2(i1)),dp) 
-coupL1 = cplcUFdFucHpmL(gO1,i2,i1)
-coupR1 = cplcUFdFucHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFdFucHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFdFucHpmR(gO2,i2,i1))
+coupL1 = cplcUFdFuHpmL(gO1,i2,i1)
+coupR1 = cplcUFdFuHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFdFuHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFdFuHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -3660,23 +3523,23 @@ SigSR = oo16pi2*SigSR
  
 End Subroutine Sigma1LoopFd 
  
-Subroutine OneLoopFu(YQ1,k1,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,            & 
-& MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,              & 
-& cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,         & 
-& cplcUFuFdHpmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,        & 
+Subroutine OneLoopFu(YQ1,k1,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,              & 
+& MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,            & 
+& cplcUFuFdcHpmL,cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,         & 
+& cplcUFuFdcVWRmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,      & 
 & cplcUFuFuVPR,cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,delta,              & 
 & MFu_1L,MFu2_1L,ZUL_1L,ZUR_1L,ierr)
 
 Implicit None 
-Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MVWLm,MVWLm2,MFd(3),MFd2(3),MVWRm,MVWRm2,               & 
-& MHpm(4),MHpm2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFd(3),MFd2(3),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
 Real(dp), Intent(in) :: k1
 
 Complex(dp), Intent(in) :: YQ1(3,3)
 
-Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),    & 
-& cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),cplcUFuFdHpmL(3,3,4),cplcUFuFdHpmR(3,3,4),   & 
+Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcHpmL(3,3,4),cplcUFuFdcHpmR(3,3,4),  & 
+& cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),   & 
 & cplcUFuFuhhL(3,3,4),cplcUFuFuhhR(3,3,4),cplcUFuFuVGL(3,3),cplcUFuFuVGR(3,3),           & 
 & cplcUFuFuVPL(3,3),cplcUFuFuVPR(3,3),cplcUFuFuVZL(3,3),cplcUFuFuVZR(3,3),               & 
 & cplcUFuFuVZRL(3,3),cplcUFuFuVZRR(3,3)
@@ -3730,9 +3593,9 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = 0._dp 
-Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,     & 
-& cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,           & 
+Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcHpmL,    & 
+& cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,        & 
 & cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,         & 
 & cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigL,sigR,sigSL,sigSR)
 
@@ -3773,9 +3636,9 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = MFu2(il) 
-Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,     & 
-& cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,           & 
+Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcHpmL,    & 
+& cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,        & 
 & cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,         & 
 & cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigL,sigR,sigSL,sigSR)
 
@@ -3809,9 +3672,9 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = MFu2_t(iL)
-Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcVWLmL,     & 
-& cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,cplcUFuFdHpmR,           & 
+Call Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,cplcUFuFdcHpmL,    & 
+& cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,        & 
 & cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,cplcUFuFuVPR,         & 
 & cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigL,sigR,sigSL,sigSR)
 
@@ -3887,19 +3750,19 @@ Iname = Iname -1
 End Subroutine OneLoopFu
  
  
-Subroutine Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,             & 
-& MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,              & 
-& cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,         & 
-& cplcUFuFdHpmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,        & 
+Subroutine Sigma1LoopFu(p2,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,               & 
+& MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,            & 
+& cplcUFuFdcHpmL,cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,         & 
+& cplcUFuFdcVWRmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,      & 
 & cplcUFuFuVPR,cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigL,               & 
 & sigR,sigSL,sigSR)
 
 Implicit None 
-Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MVWLm,MVWLm2,MFd(3),MFd2(3),MVWRm,MVWRm2,               & 
-& MHpm(4),MHpm2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFd(3),MFd2(3),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),    & 
-& cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),cplcUFuFdHpmL(3,3,4),cplcUFuFdHpmR(3,3,4),   & 
+Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcHpmL(3,3,4),cplcUFuFdcHpmR(3,3,4),  & 
+& cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),   & 
 & cplcUFuFuhhL(3,3,4),cplcUFuFuhhR(3,3,4),cplcUFuFuVGL(3,3),cplcUFuFuVGR(3,3),           & 
 & cplcUFuFuVPL(3,3),cplcUFuFuVPR(3,3),cplcUFuFuVZL(3,3),cplcUFuFuVZR(3,3),               & 
 & cplcUFuFuVZRL(3,3),cplcUFuFuVZRR(3,3)
@@ -3934,6 +3797,35 @@ coupL1 = cplcUFuFuAhL(gO1,i1,i2)
 coupR1 = cplcUFuFuAhR(gO1,i1,i2)
 coupL2 =  Conjg(cplcUFuFuAhL(gO2,i1,i2))
 coupR2 =  Conjg(cplcUFuFuAhR(gO2,i1,i2))
+SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
+SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
+sumR(gO1,gO2) = coupR1*coupR2*B1m2 
+sumL(gO1,gO2) = coupL1*coupL2*B1m2 
+   End Do 
+End Do 
+SigL = SigL +1._dp* sumL
+SigR = SigR +1._dp* sumR 
+SigSL = SigSL +1._dp* sumSL 
+SigSR = SigSR +1._dp* sumSR 
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[Hpm], Fd 
+!------------------------ 
+    Do i1 = 1, 4
+       Do i2 = 1, 3
+ SumSL = 0._dp 
+SumSR = 0._dp 
+sumR = 0._dp 
+sumL = 0._dp 
+Do gO1 = 1, 3
+  Do gO2 = 1, 3
+B1m2 = -Real(SA_B1(p2,MFd2(i2),MHpm2(i1)),dp) 
+B0m2 = MFd(i2)*Real(SA_B0(p2,MFd2(i2),MHpm2(i1)),dp) 
+coupL1 = cplcUFuFdcHpmL(gO1,i2,i1)
+coupR1 = cplcUFuFdcHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFuFdcHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFuFdcHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -4000,35 +3892,6 @@ SigR = SigR +1._dp* sumR
 SigSL = SigSL +1._dp* sumSL 
 SigSR = SigSR +1._dp* sumSR 
     End Do 
- !------------------------ 
-! Hpm, Fd 
-!------------------------ 
-    Do i1 = 1, 4
-       Do i2 = 1, 3
- SumSL = 0._dp 
-SumSR = 0._dp 
-sumR = 0._dp 
-sumL = 0._dp 
-Do gO1 = 1, 3
-  Do gO2 = 1, 3
-B1m2 = -Real(SA_B1(p2,MFd2(i2),MHpm2(i1)),dp) 
-B0m2 = MFd(i2)*Real(SA_B0(p2,MFd2(i2),MHpm2(i1)),dp) 
-coupL1 = cplcUFuFdHpmL(gO1,i2,i1)
-coupR1 = cplcUFuFdHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFuFdHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFuFdHpmR(gO2,i2,i1))
-SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
-SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
-sumR(gO1,gO2) = coupR1*coupR2*B1m2 
-sumL(gO1,gO2) = coupL1*coupL2*B1m2 
-   End Do 
-End Do 
-SigL = SigL +1._dp* sumL
-SigR = SigR +1._dp* sumR 
-SigSL = SigSL +1._dp* sumSL 
-SigSR = SigSR +1._dp* sumSR 
-      End Do 
-     End Do 
  !------------------------ 
 ! hh, Fu 
 !------------------------ 
@@ -4176,9 +4039,8 @@ End Subroutine Sigma1LoopFu
 Subroutine OneLoopFe(Yt,k1,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & MHpm,MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,               & 
 & cplcUFeFehhL,cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,         & 
-& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,              & 
-& cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR,delta,MFe_1L,MFe2_1L,ZEL_1L,              & 
-& ZER_1L,ierr)
+& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR, & 
+& cplcUFeFvVWRmL,cplcUFeFvVWRmR,delta,MFe_1L,MFe2_1L,ZEL_1L,ZER_1L,ierr)
 
 Implicit None 
 Real(dp), Intent(in) :: MFe(3),MFe2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),             & 
@@ -4190,7 +4052,7 @@ Complex(dp), Intent(in) :: Yt(3,3)
 
 Complex(dp), Intent(in) :: cplcUFeFeAhL(3,3,4),cplcUFeFeAhR(3,3,4),cplcUFeFehhL(3,3,4),cplcUFeFehhR(3,3,4),      & 
 & cplcUFeFeVPL(3,3),cplcUFeFeVPR(3,3),cplcUFeFeVZL(3,3),cplcUFeFeVZR(3,3),               & 
-& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvcHpmL(3,9,4),cplcUFeFvcHpmR(3,9,4),     & 
+& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvHpmL(3,9,4),cplcUFeFvHpmR(3,9,4),       & 
 & cplcUFeFvVWLmL(3,9),cplcUFeFvVWLmR(3,9),cplcUFeFvVWRmL(3,9),cplcUFeFvVWRmR(3,9)
 
 Complex(dp) :: mat1a(3,3), mat1(3,3) 
@@ -4245,7 +4107,7 @@ p2 = 0._dp
 Call Sigma1LoopFe(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,       & 
 & cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,        & 
-& cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,             & 
+& cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,               & 
 & cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -4288,7 +4150,7 @@ p2 = MFe2(il)
 Call Sigma1LoopFe(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,       & 
 & cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,        & 
-& cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,             & 
+& cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,               & 
 & cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -4324,7 +4186,7 @@ p2 = MFe2_t(iL)
 Call Sigma1LoopFe(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,MHpm,             & 
 & MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,cplcUFeFehhL,       & 
 & cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,cplcUFeFeVZRL,        & 
-& cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,             & 
+& cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR,               & 
 & cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - SigSL - 0.5_dp*(MatMul(SigR,mat1a) + MatMul(mat1a,SigL)) 
@@ -4402,8 +4264,8 @@ End Subroutine OneLoopFe
 Subroutine Sigma1LoopFe(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,            & 
 & MHpm,MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,               & 
 & cplcUFeFehhL,cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,         & 
-& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,              & 
-& cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
+& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR, & 
+& cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 Implicit None 
 Real(dp), Intent(in) :: MFe(3),MFe2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),             & 
@@ -4411,7 +4273,7 @@ Real(dp), Intent(in) :: MFe(3),MFe2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MV
 
 Complex(dp), Intent(in) :: cplcUFeFeAhL(3,3,4),cplcUFeFeAhR(3,3,4),cplcUFeFehhL(3,3,4),cplcUFeFehhR(3,3,4),      & 
 & cplcUFeFeVPL(3,3),cplcUFeFeVPR(3,3),cplcUFeFeVZL(3,3),cplcUFeFeVZR(3,3),               & 
-& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvcHpmL(3,9,4),cplcUFeFvcHpmR(3,9,4),     & 
+& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvHpmL(3,9,4),cplcUFeFvHpmR(3,9,4),       & 
 & cplcUFeFvVWLmL(3,9),cplcUFeFvVWLmR(3,9),cplcUFeFvVWRmL(3,9),cplcUFeFvVWRmR(3,9)
 
 Complex(dp), Intent(out) :: SigL(3,3),SigR(3,3), SigSL(3,3), SigSR(3,3) 
@@ -4567,7 +4429,7 @@ SigSL = SigSL +1._dp* sumSL
 SigSR = SigSR +1._dp* sumSR 
     End Do 
  !------------------------ 
-! conj[Hpm], Fv 
+! Hpm, Fv 
 !------------------------ 
     Do i1 = 1, 4
        Do i2 = 1, 9
@@ -4579,10 +4441,10 @@ Do gO1 = 1, 3
   Do gO2 = 1, 3
 B1m2 = -Real(SA_B1(p2,MFv2(i2),MHpm2(i1)),dp) 
 B0m2 = MFv(i2)*Real(SA_B0(p2,MFv2(i2),MHpm2(i1)),dp) 
-coupL1 = cplcUFeFvcHpmL(gO1,i2,i1)
-coupR1 = cplcUFeFvcHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFeFvcHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFeFvcHpmR(gO2,i2,i1))
+coupL1 = cplcUFeFvHpmL(gO1,i2,i1)
+coupR1 = cplcUFeFvHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFeFvHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFeFvHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -4656,27 +4518,26 @@ SigSR = oo16pi2*SigSR
  
 End Subroutine Sigma1LoopFe 
  
-Subroutine OneLoopFv(Mux,Y,YR,k1,vR,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,               & 
-& MFe2,MVWRm,MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,     & 
-& cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,              & 
-& cplUFvFeHpmR,cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,              & 
-& cplUFvFvVZR,cplUFvFvVZRL,cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,    & 
-& cplcFeUFvVWRmR,cplcFeUFvcHpmL,cplcFeUFvcHpmR,delta,MFv_1L,MFv2_1L,ZM_1L,ierr)
+Subroutine OneLoopFv(Mux,Y,YR,k1,vR,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,            & 
+& MVWLm,MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,        & 
+& cplUFvFecHpmL,cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,              & 
+& cplUFvFecVWRmR,cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,           & 
+& cplUFvFvVZRR,cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL, & 
+& cplcFeUFvVWRmR,delta,MFv_1L,MFv2_1L,ZM_1L,ierr)
 
 Implicit None 
-Real(dp), Intent(in) :: MFv(9),MFv2(9),MAh(4),MAh2(4),MVWLm,MVWLm2,MFe(3),MFe2(3),MVWRm,MVWRm2,               & 
-& MHpm(4),MHpm2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MFv(9),MFv2(9),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFe(3),MFe2(3),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
 Real(dp), Intent(in) :: k1,vR
 
 Complex(dp), Intent(in) :: Mux(3,3),Y(3,3),YR(3,3)
 
-Complex(dp), Intent(in) :: cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFecVWLmL(9,3),cplUFvFecVWLmR(9,3),        & 
-& cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),cplUFvFeHpmL(9,3,4),cplUFvFeHpmR(9,3,4),       & 
-& cplUFvFvhhL(9,9,4),cplUFvFvhhR(9,9,4),cplUFvFvVPL(9,9),cplUFvFvVPR(9,9),               & 
-& cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplcFeUFvVWLmL(3,9),& 
-& cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),cplcFeUFvVWRmR(3,9),cplcFeUFvcHpmL(3,9,4),     & 
-& cplcFeUFvcHpmR(3,9,4)
+Complex(dp), Intent(in) :: cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFecHpmL(9,3,4),cplUFvFecHpmR(9,3,4),      & 
+& cplUFvFecVWLmL(9,3),cplUFvFecVWLmR(9,3),cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),       & 
+& cplUFvFvhhL(9,9,4),cplUFvFvhhR(9,9,4),cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),               & 
+& cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplcFeUFvHpmL(3,9,4),cplcFeUFvHpmR(3,9,4),         & 
+& cplcFeUFvVWLmL(3,9),cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),cplcFeUFvVWRmR(3,9)
 
 Complex(dp) :: mat1a(9,9), mat1(9,9), mat2(9,9) 
 Integer , Intent(inout):: ierr 
@@ -4836,12 +4697,12 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = 0._dp 
-Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,MFe2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL,        & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,sigL,sigR,sigSL,sigSR)
+Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecHpmL,       & 
+& cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,             & 
+& cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,cplUFvFvVZRR,             & 
+& cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,              & 
+& cplcFeUFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - 0.5_dp*(Conjg(SigSL) + SigSR + & 
       & 0.5_dp*(MatMul(Transpose(SigL),mat1a) + MatMul(SigR,mat1a) + & 
@@ -4899,12 +4760,12 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = MFv2(il)
-Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,MFe2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL,        & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,sigL,sigR,sigSL,sigSR)
+Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecHpmL,       & 
+& cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,             & 
+& cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,cplUFvFvVZRR,             & 
+& cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,              & 
+& cplcFeUFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - 0.5_dp*(Conjg(SigSL) + SigSR + & 
       & 0.5_dp*(MatMul(Transpose(SigL),mat1a) + MatMul(SigR,mat1a) + & 
@@ -4993,12 +4854,12 @@ sigR=0._dp
 sigSL=0._dp 
 sigSR=0._dp 
 p2 = MFv2_1L(iL)
-Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,MFe2,MVWRm,MVWRm2,            & 
-& MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL,        & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,sigL,sigR,sigSL,sigSR)
+Call Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,MVWLm,MVWLm2,              & 
+& MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecHpmL,       & 
+& cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,             & 
+& cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,cplUFvFvVZRR,             & 
+& cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,              & 
+& cplcFeUFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 mat1 = mat1a - 0.5_dp*(Conjg(SigSL) + SigSR + & 
       & 0.5_dp*(MatMul(Transpose(SigL),mat1a) + MatMul(SigR,mat1a) + & 
@@ -5093,23 +4954,22 @@ Iname = Iname -1
 End Subroutine OneLoopFv
  
  
-Subroutine Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MVWLm,MVWLm2,MFe,MFe2,MVWRm,             & 
-& MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,cplUFvFecVWLmL, & 
-& cplUFvFecVWLmR,cplUFvFecVWRmL,cplUFvFecVWRmR,cplUFvFeHpmL,cplUFvFeHpmR,cplUFvFvhhL,    & 
-& cplUFvFvhhR,cplUFvFvVPL,cplUFvFvVPR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,              & 
-& cplUFvFvVZRR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL,cplcFeUFvVWRmR,              & 
-& cplcFeUFvcHpmL,cplcFeUFvcHpmR,sigL,sigR,sigSL,sigSR)
+Subroutine Sigma1LoopFv(p2,MFv,MFv2,MAh,MAh2,MHpm,MHpm2,MFe,MFe2,MVWLm,               & 
+& MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplUFvFvAhL,cplUFvFvAhR,              & 
+& cplUFvFecHpmL,cplUFvFecHpmR,cplUFvFecVWLmL,cplUFvFecVWLmR,cplUFvFecVWRmL,              & 
+& cplUFvFecVWRmR,cplUFvFvhhL,cplUFvFvhhR,cplUFvFvVZL,cplUFvFvVZR,cplUFvFvVZRL,           & 
+& cplUFvFvVZRR,cplcFeUFvHpmL,cplcFeUFvHpmR,cplcFeUFvVWLmL,cplcFeUFvVWLmR,cplcFeUFvVWRmL, & 
+& cplcFeUFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 Implicit None 
-Real(dp), Intent(in) :: MFv(9),MFv2(9),MAh(4),MAh2(4),MVWLm,MVWLm2,MFe(3),MFe2(3),MVWRm,MVWRm2,               & 
-& MHpm(4),MHpm2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MFv(9),MFv2(9),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFe(3),MFe2(3),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFecVWLmL(9,3),cplUFvFecVWLmR(9,3),        & 
-& cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),cplUFvFeHpmL(9,3,4),cplUFvFeHpmR(9,3,4),       & 
-& cplUFvFvhhL(9,9,4),cplUFvFvhhR(9,9,4),cplUFvFvVPL(9,9),cplUFvFvVPR(9,9),               & 
-& cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplcFeUFvVWLmL(3,9),& 
-& cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),cplcFeUFvVWRmR(3,9),cplcFeUFvcHpmL(3,9,4),     & 
-& cplcFeUFvcHpmR(3,9,4)
+Complex(dp), Intent(in) :: cplUFvFvAhL(9,9,4),cplUFvFvAhR(9,9,4),cplUFvFecHpmL(9,3,4),cplUFvFecHpmR(9,3,4),      & 
+& cplUFvFecVWLmL(9,3),cplUFvFecVWLmR(9,3),cplUFvFecVWRmL(9,3),cplUFvFecVWRmR(9,3),       & 
+& cplUFvFvhhL(9,9,4),cplUFvFvhhR(9,9,4),cplUFvFvVZL(9,9),cplUFvFvVZR(9,9),               & 
+& cplUFvFvVZRL(9,9),cplUFvFvVZRR(9,9),cplcFeUFvHpmL(3,9,4),cplcFeUFvHpmR(3,9,4),         & 
+& cplcFeUFvVWLmL(3,9),cplcFeUFvVWLmR(3,9),cplcFeUFvVWRmL(3,9),cplcFeUFvVWRmR(3,9)
 
 Complex(dp), Intent(out) :: SigL(9,9),SigR(9,9), SigSL(9,9), SigSR(9,9) 
 Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2,temp, sumL(9,9), sumR(9,9), sumSL(9,9), sumSR(9,9) 
@@ -5141,6 +5001,35 @@ coupL1 = cplUFvFvAhL(gO1,i1,i2)
 coupR1 = cplUFvFvAhR(gO1,i1,i2)
 coupL2 =  Conjg(cplUFvFvAhL(gO2,i1,i2))
 coupR2 =  Conjg(cplUFvFvAhR(gO2,i1,i2))
+SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
+SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
+sumR(gO1,gO2) = coupR1*coupR2*B1m2 
+sumL(gO1,gO2) = coupL1*coupL2*B1m2 
+   End Do 
+End Do 
+SigL = SigL +1._dp/2._dp* sumL
+SigR = SigR +1._dp/2._dp* sumR 
+SigSL = SigSL +1._dp/2._dp* sumSL 
+SigSR = SigSR +1._dp/2._dp* sumSR 
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[Hpm], Fe 
+!------------------------ 
+    Do i1 = 1, 4
+       Do i2 = 1, 3
+ SumSL = 0._dp 
+SumSR = 0._dp 
+sumR = 0._dp 
+sumL = 0._dp 
+Do gO1 = 1, 9
+  Do gO2 = 1, 9
+B1m2 = -2._dp*Real(SA_B1(p2,MFe2(i2),MHpm2(i1)),dp) 
+B0m2 = 2._dp*MFe(i2)*Real(SA_B0(p2,MFe2(i2),MHpm2(i1)),dp) 
+coupL1 = cplUFvFecHpmL(gO1,i2,i1)
+coupR1 = cplUFvFecHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplUFvFecHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplUFvFecHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -5208,35 +5097,6 @@ SigSL = SigSL +1._dp/2._dp* sumSL
 SigSR = SigSR +1._dp/2._dp* sumSR 
     End Do 
  !------------------------ 
-! Hpm, Fe 
-!------------------------ 
-    Do i1 = 1, 4
-       Do i2 = 1, 3
- SumSL = 0._dp 
-SumSR = 0._dp 
-sumR = 0._dp 
-sumL = 0._dp 
-Do gO1 = 1, 9
-  Do gO2 = 1, 9
-B1m2 = -2._dp*Real(SA_B1(p2,MFe2(i2),MHpm2(i1)),dp) 
-B0m2 = 2._dp*MFe(i2)*Real(SA_B0(p2,MFe2(i2),MHpm2(i1)),dp) 
-coupL1 = cplUFvFeHpmL(gO1,i2,i1)
-coupR1 = cplUFvFeHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplUFvFeHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplUFvFeHpmR(gO2,i2,i1))
-SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
-SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
-sumR(gO1,gO2) = coupR1*coupR2*B1m2 
-sumL(gO1,gO2) = coupL1*coupL2*B1m2 
-   End Do 
-End Do 
-SigL = SigL +1._dp/2._dp* sumL
-SigR = SigR +1._dp/2._dp* sumR 
-SigSL = SigSL +1._dp/2._dp* sumSL 
-SigSR = SigSR +1._dp/2._dp* sumSR 
-      End Do 
-     End Do 
- !------------------------ 
 ! hh, Fv 
 !------------------------ 
     Do i1 = 1, 4
@@ -5265,33 +5125,6 @@ SigSL = SigSL +1._dp/2._dp* sumSL
 SigSR = SigSR +1._dp/2._dp* sumSR 
       End Do 
      End Do 
- !------------------------ 
-! VP, Fv 
-!------------------------ 
-      Do i2 = 1, 9
- SumSL = 0._dp 
-SumSR = 0._dp 
-sumR = 0._dp 
-sumL = 0._dp 
-Do gO1 = 1, 9
-  Do gO2 = 1, 9
-B1m2 = -4._dp*(Real(SA_B1(p2,MFv2(i2),0._dp),dp) + 0.5_dp*rMS) 
-B0m2 = -8._dp*MFv(i2)*(Real(SA_B0(p2,MFv2(i2),0._dp),dp) - 0.5_dp*rMS) 
-coupL1 = cplUFvFvVPL(gO1,i2)
-coupR1 = cplUFvFvVPR(gO1,i2)
-coupL2 =  Conjg(cplUFvFvVPL(gO2,i2))
-coupR2 =  Conjg(cplUFvFvVPR(gO2,i2))
-SumSR(gO1,gO2) = coupL2*coupR1*B0m2 
-SumSL(gO1,gO2) = coupR2*coupL1*B0m2 
-sumL(gO1,gO2) = coupR1*coupR2*B1m2 
-sumR(gO1,gO2) = coupL1*coupL2*B1m2 
-   End Do 
-End Do 
-SigL = SigL +1._dp/2._dp* sumL
-SigR = SigR +1._dp/2._dp* sumR 
-SigSL = SigSL +1._dp/2._dp* sumSL 
-SigSR = SigSR +1._dp/2._dp* sumSR 
-    End Do 
  !------------------------ 
 ! VZ, Fv 
 !------------------------ 
@@ -5347,6 +5180,35 @@ SigSL = SigSL +1._dp/2._dp* sumSL
 SigSR = SigSR +1._dp/2._dp* sumSR 
     End Do 
  !------------------------ 
+! bar[Fe], Hpm 
+!------------------------ 
+    Do i1 = 1, 3
+       Do i2 = 1, 4
+ SumSL = 0._dp 
+SumSR = 0._dp 
+sumR = 0._dp 
+sumL = 0._dp 
+Do gO1 = 1, 9
+  Do gO2 = 1, 9
+B1m2 = -2._dp*Real(SA_B1(p2,MFe2(i1),MHpm2(i2)),dp) 
+B0m2 = 2._dp*MFe(i1)*Real(SA_B0(p2,MFe2(i1),MHpm2(i2)),dp) 
+coupL1 = cplcFeUFvHpmL(i1,gO1,i2)
+coupR1 = cplcFeUFvHpmR(i1,gO1,i2)
+coupL2 =  Conjg(cplcFeUFvHpmL(i1,gO2,i2))
+coupR2 =  Conjg(cplcFeUFvHpmR(i1,gO2,i2))
+SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
+SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
+sumR(gO1,gO2) = coupR1*coupR2*B1m2 
+sumL(gO1,gO2) = coupL1*coupL2*B1m2 
+   End Do 
+End Do 
+SigL = SigL +1._dp/2._dp* sumL
+SigR = SigR +1._dp/2._dp* sumR 
+SigSL = SigSL +1._dp/2._dp* sumSL 
+SigSR = SigSR +1._dp/2._dp* sumSR 
+      End Do 
+     End Do 
+ !------------------------ 
 ! bar[Fe], VWLm 
 !------------------------ 
     Do i1 = 1, 3
@@ -5400,35 +5262,6 @@ SigR = SigR +1._dp/2._dp* sumR
 SigSL = SigSL +1._dp/2._dp* sumSL 
 SigSR = SigSR +1._dp/2._dp* sumSR 
       End Do 
- !------------------------ 
-! conj[Hpm], bar[Fe] 
-!------------------------ 
-    Do i1 = 1, 4
-       Do i2 = 1, 3
- SumSL = 0._dp 
-SumSR = 0._dp 
-sumR = 0._dp 
-sumL = 0._dp 
-Do gO1 = 1, 9
-  Do gO2 = 1, 9
-B1m2 = -2._dp*Real(SA_B1(p2,MFe2(i2),MHpm2(i1)),dp) 
-B0m2 = 2._dp*MFe(i2)*Real(SA_B0(p2,MFe2(i2),MHpm2(i1)),dp) 
-coupL1 = cplcFeUFvcHpmL(i2,gO1,i1)
-coupR1 = cplcFeUFvcHpmR(i2,gO1,i1)
-coupL2 =  Conjg(cplcFeUFvcHpmL(i2,gO2,i1))
-coupR2 =  Conjg(cplcFeUFvcHpmR(i2,gO2,i1))
-SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
-SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
-sumR(gO1,gO2) = coupR1*coupR2*B1m2 
-sumL(gO1,gO2) = coupL1*coupL2*B1m2 
-   End Do 
-End Do 
-SigL = SigL +1._dp/2._dp* sumL
-SigR = SigR +1._dp/2._dp* sumR 
-SigSL = SigSL +1._dp/2._dp* sumSL 
-SigSR = SigSR +1._dp/2._dp* sumSR 
-      End Do 
-     End Do 
  
 
 SigL = oo16pi2*SigL 
@@ -5616,27 +5449,567 @@ res = oo16pi2*res
  
 End Subroutine DerPi1LoopVG 
  
-Subroutine OneLoopVZ(gBL,g2,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,            & 
-& MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,      & 
-& cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,               & 
-& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,     & 
-& cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,  & 
-& cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3,delta,mass,mass2,kont)
+Subroutine Pi1LoopVP(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,              & 
+& cplcFuFuVPR,cplcgWLmgWLmVP,cplcgWLpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,               & 
+& cplHpmcHpmVP,cplHpmcVWLmVP,cplHpmcVWRmVP,cplcVWLmVPVWLm,cplcVWRmVPVWRm,cplHpmcHpmVPVP, & 
+& cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWRmVPVPVWRm3,               & 
+& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFuFuVPL(3,3), & 
+& cplcFuFuVPR(3,3),cplcgWLmgWLmVP,cplcgWLpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,          & 
+& cplHpmcHpmVP(4,4),cplHpmcVWLmVP(4),cplHpmcVWRmVP(4),cplcVWLmVPVWLm,cplcVWRmVPVWRm,     & 
+& cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
+& cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2, A0m12, A0m22 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFd2(i1).gt.50._dp**2).and.(MFd2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFd2(i1).lt.50._dp**2).and.(MFd2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +3._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFe2(i1).gt.50._dp**2).and.(MFe2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFe2(i1).lt.50._dp**2).and.(MFe2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +1._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFu2(i1).gt.50._dp**2).and.(MFu2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFu2(i1).lt.50._dp**2).and.(MFu2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +3._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MHpm2(i2).gt.50._dp**2).and.(MHpm2(i1).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MHpm2(i2).lt.50._dp**2).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
+B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp)  
+coup1 = cplHpmcHpmVP(i2,i1)
+    SumI = Abs(coup1)**2*B22m2 
+res = res +1._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
+B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVP(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +2._dp* SumI  
+End If 
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
+B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVP(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +2._dp* SumI  
+End If 
+    End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+coup1 = cplcVWLmVPVWLm
+coup2 = Conjg(coup1) 
+    SumI = -VVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+coup1 = cplcVWRmVPVWRm
+coup2 = Conjg(coup1) 
+    SumI = -VVVloop(p2,MVWRm2,MVWRm2)*coup1*coup2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MHpm2(i1).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+ A0m2 = SA_A0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVP(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+End If 
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVPVWLm3
+coup2 = cplcVWLmVPVPVWLm1
+coup3 = cplcVWLmVPVPVWLm2
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+End If 
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVPVWRm3
+coup2 = cplcVWRmVPVPVWRm1
+coup3 = cplcVWRmVPVPVWRm2
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+End If 
+res = oo16pi2*res 
+ 
+End Subroutine Pi1LoopVP 
+ 
+Subroutine DerPi1LoopVP(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,               & 
+& MVWLm2,MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,       & 
+& cplcFuFuVPR,cplcgWLmgWLmVP,cplcgWLpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,               & 
+& cplHpmcHpmVP,cplHpmcVWLmVP,cplHpmcVWRmVP,cplcVWLmVPVWLm,cplcVWRmVPVWRm,cplHpmcHpmVPVP, & 
+& cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWRmVPVPVWRm3,               & 
+& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFuFuVPL(3,3), & 
+& cplcFuFuVPR(3,3),cplcgWLmgWLmVP,cplcgWLpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,          & 
+& cplHpmcHpmVP(4,4),cplHpmcVWLmVP(4),cplHpmcVWRmVP(4),cplcVWLmVPVWLm,cplcVWRmVPVWRm,     & 
+& cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
+& cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2, A0m12, A0m22 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+Real(dp) ::MVG,MVP,MVG2,MVP2
+MVG = Mass_Regulator_PhotonGluon 
+MVP = Mass_Regulator_PhotonGluon 
+MVG2 = Mass_Regulator_PhotonGluon**2 
+MVP2 = Mass_Regulator_PhotonGluon**2 
+
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFd2(i1).gt.50._dp**2).and.(MFd2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFd2(i1).lt.50._dp**2).and.(MFd2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +3._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFe2(i1).gt.50._dp**2).and.(MFe2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFe2(i1).lt.50._dp**2).and.(MFe2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +1._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MFu2(i1).gt.50._dp**2).and.(MFu2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MFu2(i1).lt.50._dp**2).and.(MFu2(i2).lt.50._dp**2)) )   Then 
+H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
+                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
+res = res +3._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MHpm2(i2).gt.50._dp**2).and.(MHpm2(i1).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MHpm2(i2).lt.50._dp**2).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
+B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp)  
+coup1 = cplHpmcHpmVP(i2,i1)
+    SumI = Abs(coup1)**2*B22m2 
+res = res +1._dp* SumI  
+End If 
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
+B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVP(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +2._dp* SumI  
+End If 
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
+B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVP(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +2._dp* SumI  
+End If 
+    End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
+coup1 = cplcVWLmVPVWLm
+coup2 = Conjg(coup1) 
+    SumI = -DerVVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
+coup1 = cplcVWRmVPVWRm
+coup2 = Conjg(coup1) 
+    SumI = -DerVVVloop(p2,MVWRm2,MVWRm2)*coup1*coup2 
+res = res +1._dp* SumI  
+End If 
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MHpm2(i1).gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+ A0m2 = SA_DerA0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVP(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+End If 
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVPVWLm3
+coup2 = cplcVWLmVPVPVWLm1
+coup3 = cplcVWLmVPVPVWLm2
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+End If 
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
+  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2))   & 
+  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2)) )   Then 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVPVWRm3
+coup2 = cplcVWRmVPVPVWRm1
+coup3 = cplcVWRmVPVPVWRm2
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+End If 
+res = oo16pi2*res 
+ 
+End Subroutine DerPi1LoopVP 
+ 
+Subroutine OneLoopVZ(gBL,g2,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,             & 
+& MFu,MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,            & 
+& cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,     & 
+& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,     & 
+& cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,         & 
+& cplHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,    & 
+& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,delta,mass,mass2,kont)
 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
 & MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
 
-Real(dp), Intent(in) :: gBL,g2,vR,TW
+Real(dp), Intent(in) :: gBL,g2,k1,vR,TW
 
 Complex(dp), Intent(in) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),   & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplcgWLmgWLmVZ,      & 
-& cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),  & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3
+& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4),        & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),        & 
+& cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,             & 
+& cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1,j2,j3,j4,il,i_count, ierr 
@@ -5655,11 +6028,11 @@ PiSf = ZeroC
 Call Pi1LoopVZ(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
 & MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
-& cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,       & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,            & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
-& kont,PiSf)
+& cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
+& cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,          & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,   & 
+& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,               & 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,PiSf)
 
 mass2 = mi2 + Real(PiSf,dp) 
 mass = sqrt(mass2) 
@@ -5672,11 +6045,11 @@ PiSf = ZeroC
 Call Pi1LoopVZ(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
 & MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,cplcFdFdVZL,        & 
 & cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,     & 
-& cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ,cplhhVZVZ,       & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,            & 
-& cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,               & 
-& kont,PiSf)
+& cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,            & 
+& cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,          & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,   & 
+& cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,               & 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,PiSf)
 
 mass2 = mi2 + Real(PiSf,dp) 
 mass = sqrt(mass2) 
@@ -5714,11 +6087,11 @@ End Subroutine OneLoopVZ
 Subroutine Pi1LoopVZ(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
 & MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,               & 
 & cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,               & 
-& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,     & 
-& cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,  & 
-& cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3,kont,res)
+& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,     & 
+& cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,         & 
+& cplHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,    & 
+& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
@@ -5726,11 +6099,11 @@ Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2
 
 Complex(dp), Intent(in) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),   & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplcgWLmgWLmVZ,      & 
-& cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),  & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3
+& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4),        & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),        & 
+& cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,             & 
+& cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -5832,6 +6205,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRmgWLmVZ
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -5842,6 +6226,17 @@ coup1 = cplcgWLpgWLpVZ
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRpgWLpVZ
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -5865,17 +6260,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,0._dp,Mhh2(i2)),dp)
-coup1 = cplhhVPVZ(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -5911,24 +6295,24 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWLmVZ(i2)
+coup1 = cplHpmcVWLmVZ(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWRmVZ(i2)
+coup1 = cplHpmcVWRmVZ(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
@@ -5941,6 +6325,15 @@ coup1 = cplcVWLmVWLmVZ
 coup2 = Conjg(coup1) 
     SumI = -VVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWRmVWLmVZ
+coup2 = Conjg(coup1) 
+    SumI = -VVVloop(p2,MVWRm2,MVWLm2)*coup1*coup2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
@@ -6007,11 +6400,11 @@ End Subroutine Pi1LoopVZ
 Subroutine DerPi1LoopVZ(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,              & 
 & MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZ,           & 
 & cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,cplcFuFuVZR,               & 
-& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,     & 
-& cplhhVPVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,cplcVWLmVWLmVZ,  & 
-& cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3,kont,res)
+& cplFvFvVZL,cplFvFvVZR,cplcgWLmgWLmVZ,cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,     & 
+& cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,         & 
+& cplHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ,cplhhhhVZVZ,    & 
+& cplHpmcHpmVZVZ,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,& 
+& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
@@ -6019,11 +6412,11 @@ Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2
 
 Complex(dp), Intent(in) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),   & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplcgWLmgWLmVZ,      & 
-& cplcgWLpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,cplhhVPVZ(4),cplhhVZVZ(4),cplhhVZVZR(4),  & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,       & 
-& cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,               & 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,               & 
-& cplcVWRmVWRmVZVZ3
+& cplcgWRmgWLmVZ,cplcgWLpgWLpVZ,cplcgWRpgWLpVZ,cplcgWRmgWRmVZ,cplcgWRpgWRpVZ,            & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4),        & 
+& cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplAhAhVZVZ(4,4),cplhhhhVZVZ(4,4),        & 
+& cplHpmcHpmVZVZ(4,4),cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,             & 
+& cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -6131,6 +6524,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRmgWLmVZ
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -6141,6 +6545,17 @@ coup1 = cplcgWLpgWLpVZ
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRpgWLpVZ
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -6164,17 +6579,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZ(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -6210,24 +6614,24 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWLmVZ(i2)
+coup1 = cplHpmcVWLmVZ(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWRmVZ(i2)
+coup1 = cplHpmcVWRmVZ(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
@@ -6240,6 +6644,15 @@ coup1 = cplcVWLmVWLmVZ
 coup2 = Conjg(coup1) 
     SumI = -DerVVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWRmVWLmVZ
+coup2 = Conjg(coup1) 
+    SumI = -DerVVVloop(p2,MVWRm2,MVWLm2)*coup1*coup2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
@@ -6307,11 +6720,11 @@ Subroutine OneLoopVZR(gBL,g2,k1,vR,TW,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,      
 & MFu,MFu2,MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,            & 
 & cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,           & 
 & cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,  & 
-& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,     & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,             & 
-& cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,      & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,       & 
-& cplcVWRmVWRmVZRVZR3,delta,mass,mass2,kont)
+& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
+& cplHpmcVWLmVZR,cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,         & 
+& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
+& delta,mass,mass2,kont)
 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
 & MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
@@ -6321,10 +6734,10 @@ Real(dp), Intent(in) :: gBL,g2,k1,vR,TW
 Complex(dp), Intent(in) :: cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
 & cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcgWLmgWLmVZR, & 
 & cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,       & 
-& cplhhVPVZR(4),cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),        & 
-& cplHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),   & 
-& cplhhhhVZRVZR(4,4),cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,      & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
+& cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4),   & 
+& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),cplhhhhVZRVZR(4,4), & 
+& cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,     & 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1,j2,j3,j4,il,i_count, ierr 
@@ -6344,11 +6757,10 @@ Call Pi1LoopVZR(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,       
 & MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZR,cplcFdFdVZRL,      & 
 & cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVZRL,          & 
 & cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,           & 
-& cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,       & 
-& cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,           & 
-& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
-& kont,PiSf)
+& cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,cplHpmcVWLmVZR,   & 
+& cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR,          & 
+& cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,& 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,kont,PiSf)
 
 mass2 = mi2 + Real(PiSf,dp) 
 mass = sqrt(mass2) 
@@ -6362,11 +6774,10 @@ Call Pi1LoopVZR(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,       
 & MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZR,cplcFdFdVZRL,      & 
 & cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVZRL,          & 
 & cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,           & 
-& cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,       & 
-& cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,           & 
-& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,       & 
-& kont,PiSf)
+& cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,cplHpmcVWLmVZR,   & 
+& cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR,          & 
+& cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,& 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,kont,PiSf)
 
 mass2 = mi2 + Real(PiSf,dp) 
 mass = sqrt(mass2) 
@@ -6405,11 +6816,10 @@ Subroutine Pi1LoopVZR(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,      
 & MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZR,              & 
 & cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,         & 
 & cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,               & 
-& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,     & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,             & 
-& cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,      & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,       & 
-& cplcVWRmVWRmVZRVZR3,kont,res)
+& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
+& cplHpmcVWLmVZR,cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,         & 
+& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
@@ -6418,10 +6828,10 @@ Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2
 Complex(dp), Intent(in) :: cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
 & cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcgWLmgWLmVZR, & 
 & cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,       & 
-& cplhhVPVZR(4),cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),        & 
-& cplHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),   & 
-& cplhhhhVZRVZR(4,4),cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,      & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
+& cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4),   & 
+& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),cplhhhhVZRVZR(4,4), & 
+& cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,     & 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -6578,17 +6988,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,0._dp,Mhh2(i2)),dp)
-coup1 = cplhhVPVZR(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -6624,24 +7023,24 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWLmVZR(i2)
+coup1 = cplHpmcVWLmVZR(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWRmVZR(i2)
+coup1 = cplHpmcVWRmVZR(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
@@ -6730,11 +7129,10 @@ Subroutine DerPi1LoopVZR(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,       
 & MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVZR,          & 
 & cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZRL,cplcFuFuVZRR,         & 
 & cplFvFvVZRL,cplFvFvVZRR,cplcgWLmgWLmVZR,cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,               & 
-& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVPVZR,cplhhVZVZR,cplhhVZRVZR,     & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,             & 
-& cplcVWRmVWRmVZR,cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,      & 
-& cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,       & 
-& cplcVWRmVWRmVZRVZR3,kont,res)
+& cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,cplhhVZVZR,cplhhVZRVZR,cplHpmcHpmVZR,  & 
+& cplHpmcVWLmVZR,cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,         & 
+& cplAhAhVZRVZR,cplhhhhVZRVZR,cplHpmcHpmVZRVZR,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,  & 
+& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
@@ -6743,10 +7141,10 @@ Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2
 Complex(dp), Intent(in) :: cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
 & cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplcgWLmgWLmVZR, & 
 & cplcgWRmgWLmVZR,cplcgWLpgWLpVZR,cplcgWRpgWLpVZR,cplcgWRmgWRmVZR,cplcgWRpgWRpVZR,       & 
-& cplhhVPVZR(4),cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),        & 
-& cplHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),   & 
-& cplhhhhVZRVZR(4,4),cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,      & 
-& cplcVWLmVWLmVZRVZR3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
+& cplhhVZVZR(4),cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4),   & 
+& cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplAhAhVZRVZR(4,4),cplhhhhVZRVZR(4,4), & 
+& cplHpmcHpmVZRVZR(4,4),cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3,     & 
+& cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -6909,17 +7307,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZR(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -6955,24 +7342,24 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWLmVZR(i2)
+coup1 = cplHpmcVWLmVZR(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVWRmVZR(i2)
+coup1 = cplHpmcVWRmVZR(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +2._dp* SumI  
     End Do 
@@ -7057,838 +7444,14 @@ res = oo16pi2*res
  
 End Subroutine DerPi1LoopVZR 
  
-Subroutine Pi1LoopVP(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
-& MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVP,               & 
-& cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,               & 
-& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
-& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplhhVPVZ,cplhhVPVZR,cplHpmcHpmVP,cplHpmVPVWLm,          & 
-& cplHpmVPVWRm,cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,     & 
-& cplHpmcHpmVPVP,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWRmVPVPVWRm3,& 
-& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
-& MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
-
-Complex(dp), Intent(in) :: cplAhhhVP(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),   & 
-& cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,      & 
-& cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,            & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplHpmcHpmVP(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),          & 
-& cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP(4,4),cplhhhhVPVP(4,4),        & 
-& cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
-& cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2, A0m12, A0m22 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MAh2(i2).gt.50._dp**2).and.(Mhh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MAh2(i2).lt.50._dp**2).and.(Mhh2(i1).lt.50._dp**2)) )   Then 
-B22m2 = Real(VSSloop(p2,MAh2(i2),Mhh2(i1)),dp)  
-coup1 = cplAhhhVP(i2,i1)
-    SumI = Abs(coup1)**2*B22m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFd2(i1).gt.50._dp**2).and.(MFd2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFd2(i1).lt.50._dp**2).and.(MFd2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVPL(i1,i2)
-coupR1 = cplcFdFdVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +3._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFe2(i1).gt.50._dp**2).and.(MFe2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFe2(i1).lt.50._dp**2).and.(MFe2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVPL(i1,i2)
-coupR1 = cplcFeFeVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFu2(i1).gt.50._dp**2).and.(MFu2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFu2(i1).lt.50._dp**2).and.(MFu2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVPL(i1,i2)
-coupR1 = cplcFuFuVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +3._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFv2(i1).gt.50._dp**2).and.(MFv2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFv2(i1).lt.50._dp**2).and.(MFv2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_Hloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 4._dp*MFv(i1)*MFv(i2)*Real(SA_B0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVPL(i1,i2)
-coupR1 = cplFvFvVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +0.5_dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRmgWLmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRpgWLpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVZ2.gt.50._dp**2).and.(Mhh2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVZ2.lt.50._dp**2).and.(Mhh2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(VVSloop(p2,MVZ2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZ(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVZR2.gt.50._dp**2).and.(Mhh2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVZR2.lt.50._dp**2).and.(Mhh2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(VVSloop(p2,MVZR2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZR(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MHpm2(i2).gt.50._dp**2).and.(MHpm2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MHpm2(i2).lt.50._dp**2).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
-B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp)  
-coup1 = cplHpmcHpmVP(i2,i1)
-    SumI = Abs(coup1)**2*B22m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVPVWLm(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +2._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVPVWRm(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +2._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWLmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -VVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! conj[VWRm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWRmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -VVVloop(p2,MVWRm2,MVWLm2)*coup1*coup2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWRmVPVWRm
-coup2 = Conjg(coup1) 
-    SumI = -VVVloop(p2,MVWRm2,MVWRm2)*coup1*coup2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MAh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MAh2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_A0(MAh2(i1))
- coup1 = cplAhAhVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-End If 
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(Mhh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(Mhh2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_A0(Mhh2(i1))
- coup1 = cplhhhhVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-End If 
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MHpm2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_A0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-End If 
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVPVWLm3
-coup2 = cplcVWLmVPVPVWLm1
-coup3 = cplcVWLmVPVPVWLm2
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-End If 
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVPVWRm3
-coup2 = cplcVWRmVPVPVWRm1
-coup3 = cplcVWRmVPVPVWRm2
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-End If 
-res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVP 
- 
-Subroutine DerPi1LoopVP(p2,Mhh,Mhh2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,              & 
-& MFv,MFv2,MVZ,MVZ2,MVZR,MVZR2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplAhhhVP,           & 
-& cplcFdFdVPL,cplcFdFdVPR,cplcFeFeVPL,cplcFeFeVPR,cplcFuFuVPL,cplcFuFuVPR,               & 
-& cplFvFvVPL,cplFvFvVPR,cplcgWLmgWLmVP,cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,     & 
-& cplcgWRmgWRmVP,cplcgWRpgWRpVP,cplhhVPVZ,cplhhVPVZR,cplHpmcHpmVP,cplHpmVPVWLm,          & 
-& cplHpmVPVWRm,cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP,cplhhhhVPVP,     & 
-& cplHpmcHpmVPVP,cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWRmVPVPVWRm3,& 
-& cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: Mhh(4),Mhh2(4),MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),           & 
-& MFv(9),MFv2(9),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2
-
-Complex(dp), Intent(in) :: cplAhhhVP(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),   & 
-& cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplcgWLmgWLmVP,      & 
-& cplcgWRmgWLmVP,cplcgWLpgWLpVP,cplcgWRpgWLpVP,cplcgWRmgWRmVP,cplcgWRpgWRpVP,            & 
-& cplhhVPVZ(4),cplhhVPVZR(4),cplHpmcHpmVP(4,4),cplHpmVPVWLm(4),cplHpmVPVWRm(4),          & 
-& cplcVWLmVPVWLm,cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplAhAhVPVP(4,4),cplhhhhVPVP(4,4),        & 
-& cplHpmcHpmVPVP(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,             & 
-& cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2, A0m12, A0m22 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MAh2(i2).gt.50._dp**2).and.(Mhh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MAh2(i2).lt.50._dp**2).and.(Mhh2(i1).lt.50._dp**2)) )   Then 
-B22m2 = Real(DerVSSloop(p2,MAh2(i2),Mhh2(i1)),dp)  
-coup1 = cplAhhhVP(i2,i1)
-    SumI = Abs(coup1)**2*B22m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFd2(i1).gt.50._dp**2).and.(MFd2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFd2(i1).lt.50._dp**2).and.(MFd2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVPL(i1,i2)
-coupR1 = cplcFdFdVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +3._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFe2(i1).gt.50._dp**2).and.(MFe2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFe2(i1).lt.50._dp**2).and.(MFe2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVPL(i1,i2)
-coupR1 = cplcFeFeVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFu2(i1).gt.50._dp**2).and.(MFu2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFu2(i1).lt.50._dp**2).and.(MFu2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVPL(i1,i2)
-coupR1 = cplcFuFuVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +3._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MFv2(i1).gt.50._dp**2).and.(MFv2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MFv2(i1).lt.50._dp**2).and.(MFv2(i2).lt.50._dp**2)) )   Then 
-H0m2 = Real(SA_DerHloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 4._dp*MFv(i1)*MFv(i2)*Real(SA_DerB0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVPL(i1,i2)
-coupR1 = cplFvFvVPR(i1,i2)
-    SumI = (Abs(coupL1)**2+Abs(coupR1)**2)*H0m2 & 
-                & + (Real(Conjg(coupL1)*coupR1,dp))*B0m2 
-res = res +0.5_dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRmgWLmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRpgWLpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVP
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVZ2.gt.50._dp**2).and.(Mhh2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVZ2.lt.50._dp**2).and.(Mhh2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(DerVVSloop(p2,MVZ2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZ(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVZR2.gt.50._dp**2).and.(Mhh2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVZR2.lt.50._dp**2).and.(Mhh2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(DerVVSloop(p2,MVZR2,Mhh2(i2)),dp)
-coup1 = cplhhVPVZR(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MHpm2(i2).gt.50._dp**2).and.(MHpm2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MHpm2(i2).lt.50._dp**2).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
-B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp)  
-coup1 = cplHpmcHpmVP(i2,i1)
-    SumI = Abs(coup1)**2*B22m2 
-res = res +1._dp* SumI  
-End If 
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp)
-coup1 = cplHpmVPVWLm(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +2._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MHpm2(i2).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MHpm2(i2).lt.50._dp**2)) )   Then 
-B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp)
-coup1 = cplHpmVPVWRm(i2)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +2._dp* SumI  
-End If 
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWLmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -DerVVVloop(p2,MVWLm2,MVWLm2)*coup1*coup2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! conj[VWRm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWLm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWRmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -DerVVVloop(p2,MVWRm2,MVWLm2)*coup1*coup2 
-res = res +2._dp* SumI  
-End If 
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2).and.(MVWRm2.lt.50._dp**2)) )   Then 
-coup1 = cplcVWRmVPVWRm
-coup2 = Conjg(coup1) 
-    SumI = -DerVVVloop(p2,MVWRm2,MVWRm2)*coup1*coup2 
-res = res +1._dp* SumI  
-End If 
-!------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MAh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MAh2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_DerA0(MAh2(i1))
- coup1 = cplAhAhVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-End If 
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(Mhh2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(Mhh2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_DerA0(Mhh2(i1))
- coup1 = cplhhhhVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-End If 
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MHpm2(i1).gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MHpm2(i1).lt.50._dp**2)) )   Then 
-SumI = 0._dp 
- A0m2 = SA_DerA0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVP(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-End If 
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWLm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWLm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVPVWLm3
-coup2 = cplcVWLmVPVPVWLm1
-coup3 = cplcVWLmVPVPVWLm2
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-End If 
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-If (((.not.OnlyHeavyStates).and.(.not.OnlyLightStates)) & 
-  & .or.((OnlyHeavyStates).and.(MVWRm2.gt.50._dp**2))   & 
-  & .or.((OnlyLightStates).and.(MVWRm2.lt.50._dp**2)) )   Then 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVPVWRm3
-coup2 = cplcVWRmVPVPVWRm1
-coup3 = cplcVWRmVPVPVWRm2
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-End If 
-res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVP 
- 
 Subroutine OneLoopVWLm(g2,k1,vR,PhiW,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,            & 
 & MFu2,MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,             & 
-& cplAhcHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,             & 
-& cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,         & 
-& cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,    & 
-& cplcgWRpgZpcVWLm,cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,          & 
-& cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,          & 
-& cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,  & 
+& cplAhHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,              & 
+& cplFvFecVWLmR,cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,        & 
+& cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,     & 
+& cplcgWRpgZpcVWLm,cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVP,            & 
+& cplHpmcVWLmVZ,cplHpmcVWLmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,            & 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,  & 
 & cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,          & 
 & cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,& 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,          & 
@@ -7899,17 +7462,16 @@ Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWRm,MVWRm2,MFu(3),MFu2
 
 Real(dp), Intent(in) :: g2,k1,vR,PhiW
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),        & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm, & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
-& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4),cplhhcVWLmVWLm(4),               & 
-& cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,      & 
-& cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),& 
-& cplhhhhcVWLmVWLm(4,4),cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,    & 
-& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
-& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
-& cplcVWLmVWLmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm, & 
+& cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,     & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhHpmcVWLm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),& 
+& cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplcVWLmVPVWLm,cplcVWLmVWLmVZ,     & 
+& cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),& 
+& cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,        & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
+& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1,j2,j3,j4,il,i_count, ierr 
@@ -7926,13 +7488,13 @@ mi2 = MVWLm2
 p2 = MVWLm2
 PiSf = ZeroC 
 Call Pi1LoopVWLm(p2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,               & 
-& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,            & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWLm,             & 
 & cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
-& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
-& cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
-& cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWLm,            & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
+& cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
+& cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVP,cplHpmcVWLmVZ,               & 
+& cplHpmcVWLmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
+& cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
 & cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,     & 
 & cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
 & cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,             & 
@@ -7947,13 +7509,13 @@ test_m2 = mass2
 p2 =  mass2 
 PiSf = ZeroC 
 Call Pi1LoopVWLm(p2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,MFd2,               & 
-& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,            & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWLm,             & 
 & cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
-& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
-& cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
-& cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWLm,            & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
+& cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
+& cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVP,cplHpmcVWLmVZ,               & 
+& cplHpmcVWLmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
+& cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
 & cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,     & 
 & cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
 & cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,             & 
@@ -7993,13 +7555,13 @@ End Subroutine OneLoopVWLm
  
  
 Subroutine Pi1LoopVWLm(p2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,MFd,              & 
-& MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,       & 
+& MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWLm,        & 
 & cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
-& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
-& cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
-& cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWLm,            & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
+& cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
+& cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVP,cplHpmcVWLmVZ,               & 
+& cplHpmcVWLmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
+& cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
 & cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,     & 
 & cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
 & cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,             & 
@@ -8009,17 +7571,16 @@ Implicit None
 Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWRm,MVWRm2,MFu(3),MFu2(3),MFd(3),MFd2(3),           & 
 & MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),        & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm, & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
-& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4),cplhhcVWLmVWLm(4),               & 
-& cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,      & 
-& cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),& 
-& cplhhhhcVWLmVWLm(4,4),cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,    & 
-& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
-& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
-& cplcVWLmVWLmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm, & 
+& cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,     & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhHpmcVWLm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),& 
+& cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplcVWLmVPVWLm,cplcVWLmVWLmVZ,     & 
+& cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),& 
+& cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,        & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
+& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -8033,14 +7594,14 @@ Integer :: i1,i2,i3,i4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! conj[Hpm], Ah 
+! Hpm, Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(VSSloop(p2,MAh2(i2),MHpm2(i1)),dp)  
-coup1 = cplAhcHpmcVWLm(i2,i1)
+coup1 = cplAhHpmcVWLm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -8100,17 +7661,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWRmC], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,0._dp,MVWRm2),dp)
-coup1 = cplcgWRpgPcVWLm
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
 ! bar[gP], gWLm 
 !------------------------ 
 sumI = 0._dp 
@@ -8144,13 +7694,13 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWRm 
+! bar[gZ], gWRm 
 !------------------------ 
 sumI = 0._dp 
  
 SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWRm2,0._dp),dp)
-coup1 = cplcgPgWRmcVWLm
+B0m2 = Real(VGGloop(p2,MVWRm2,MVZ2),dp)
+coup1 = cplcgZgWRmcVWLm
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
@@ -8177,6 +7727,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRmC], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVZ2,MVWRm2),dp)
+coup1 = cplcgWRpgZcVWLm
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gZR 
 !------------------------ 
 sumI = 0._dp 
@@ -8199,14 +7760,14 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], hh 
+! Hpm, hh 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(VSSloop(p2,Mhh2(i2),MHpm2(i1)),dp)  
-coup1 = cplhhcHpmcVWLm(i2,i1)
+coup1 = cplhhHpmcVWLm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -8234,16 +7795,38 @@ coup1 = cplhhcVWLmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[Hpm], VP 
+! VP, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,0._dp,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVP(i1)
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,0._dp,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVP(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
-      End Do 
+    End Do 
+ !------------------------ 
+! VZ, Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVZ(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VZR, Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVZR(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
  !------------------------ 
 ! VWLm, VP 
 !------------------------ 
@@ -8252,15 +7835,6 @@ sumI = 0._dp
 coup1 = cplcVWLmVPVWLm
 coup2 = Conjg(coup1) 
     SumI = -VVVloop(p2,MVWLm2,0._dp)*coup1*coup2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VWRm, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-coup1 = cplcVWLmVPVWRm
-coup2 = Conjg(coup1) 
-    SumI = -VVVloop(p2,MVWRm2,0._dp)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
 ! VZ, VWLm 
@@ -8281,6 +7855,15 @@ coup2 = Conjg(coup1)
     SumI = -VVVloop(p2,MVZR2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
+! VZ, VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWLmVWRmVZ
+coup2 = Conjg(coup1) 
+    SumI = -VVVloop(p2,MVZ2,MVWRm2)*coup1*coup2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! VZR, VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -8290,28 +7873,6 @@ coup2 = Conjg(coup1)
     SumI = -VVVloop(p2,MVZR2,MVWRm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], VZ 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVZ(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm], VZR 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVZR(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -8396,13 +7957,13 @@ res = oo16pi2*res
 End Subroutine Pi1LoopVWLm 
  
 Subroutine DerPi1LoopVWLm(p2,MHpm,MHpm2,MAh,MAh2,MVWRm,MVWRm2,MFu,MFu2,               & 
-& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmcVWLm,   & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWLm,    & 
 & cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,cplFvFecVWLmR,              & 
-& cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,      & 
-& cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
-& cplhhcHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplcHpmcVWLmVP,cplcVWLmVPVWLm,            & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
+& cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,      & 
+& cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,    & 
+& cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVP,cplHpmcVWLmVZ,               & 
+& cplHpmcVWLmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,           & 
+& cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm,cplhhhhcVWLmVWLm,cplHpmcHpmcVWLmVWLm,cplcVWLmVPVPVWLm3,& 
 & cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,     & 
 & cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
 & cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,             & 
@@ -8412,17 +7973,16 @@ Implicit None
 Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWRm,MVWRm2,MFu(3),MFu2(3),MFd(3),MFd2(3),           & 
 & MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWLm,MVWLm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),        & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgWRpgPcVWLm,cplcgPgWLmcVWLm, & 
-& cplcgZgWLmcVWLm,cplcgZpgWLmcVWLm,cplcgPgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,     & 
-& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhcHpmcVWLm(4,4),cplhhcVWLmVWLm(4),               & 
-& cplhhcVWLmVWRm(4),cplcHpmcVWLmVP(4),cplcVWLmVPVWLm,cplcVWLmVPVWRm,cplcVWLmVWLmVZ,      & 
-& cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),cplAhAhcVWLmVWLm(4,4),& 
-& cplhhhhcVWLmVWLm(4,4),cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,    & 
-& cplcVWLmVPVPVWLm2,cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,& 
-& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,& 
-& cplcVWLmVWLmVZVZ2,cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,           & 
-& cplcVWLmVWLmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplcgWLpgPcVWLm,cplcgPgWLmcVWLm,cplcgZgWLmcVWLm, & 
+& cplcgZpgWLmcVWLm,cplcgZgWRmcVWLm,cplcgZpgWRmcVWLm,cplcgWLpgZcVWLm,cplcgWRpgZcVWLm,     & 
+& cplcgWLpgZpcVWLm,cplcgWRpgZpcVWLm,cplhhHpmcVWLm(4,4),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),& 
+& cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplcVWLmVPVWLm,cplcVWLmVWLmVZ,     & 
+& cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplAhAhcVWLmVWLm(4,4),cplhhhhcVWLmVWLm(4,4),& 
+& cplHpmcHpmcVWLmVWLm(4,4),cplcVWLmVPVPVWLm3,cplcVWLmVPVPVWLm1,cplcVWLmVPVPVWLm2,        & 
+& cplcVWLmcVWLmVWLmVWLm2,cplcVWLmcVWLmVWLmVWLm3,cplcVWLmcVWLmVWLmVWLm1,cplcVWLmcVWRmVWLmVWRm2,& 
+& cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWLmVWLmVZVZ1,cplcVWLmVWLmVZVZ2,     & 
+& cplcVWLmVWLmVZVZ3,cplcVWLmVWLmVZRVZR1,cplcVWLmVWLmVZRVZR2,cplcVWLmVWLmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -8442,14 +8002,14 @@ MVP2 = Mass_Regulator_PhotonGluon**2
 res = 0._dp 
  
 !------------------------ 
-! conj[Hpm], Ah 
+! Hpm, Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(DerVSSloop(p2,MAh2(i2),MHpm2(i1)),dp)  
-coup1 = cplAhcHpmcVWLm(i2,i1)
+coup1 = cplAhHpmcVWLm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -8509,17 +8069,6 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gWRmC], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVP2,MVWRm2),dp)
-coup1 = cplcgWRpgPcVWLm
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
 ! bar[gP], gWLm 
 !------------------------ 
 sumI = 0._dp 
@@ -8553,13 +8102,13 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWRm 
+! bar[gZ], gWRm 
 !------------------------ 
 sumI = 0._dp 
  
 SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVP2),dp)
-coup1 = cplcgPgWRmcVWLm
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVZ2),dp)
+coup1 = cplcgZgWRmcVWLm
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
@@ -8586,6 +8135,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRmC], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVZ2,MVWRm2),dp)
+coup1 = cplcgWRpgZcVWLm
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gZR 
 !------------------------ 
 sumI = 0._dp 
@@ -8608,14 +8168,14 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], hh 
+! Hpm, hh 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(DerVSSloop(p2,Mhh2(i2),MHpm2(i1)),dp)  
-coup1 = cplhhcHpmcVWLm(i2,i1)
+coup1 = cplhhHpmcVWLm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -8643,16 +8203,38 @@ coup1 = cplhhcVWLmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[Hpm], VP 
+! VP, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVP(i1)
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVP(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
-      End Do 
+    End Do 
+ !------------------------ 
+! VZ, Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVZ(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VZR, Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWLmVZR(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
  !------------------------ 
 ! VWLm, VP 
 !------------------------ 
@@ -8661,15 +8243,6 @@ sumI = 0._dp
 coup1 = cplcVWLmVPVWLm
 coup2 = Conjg(coup1) 
     SumI = -DerVVVloop(p2,MVWLm2,MVP2)*coup1*coup2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VWRm, VP 
-!------------------------ 
-sumI = 0._dp 
- 
-coup1 = cplcVWLmVPVWRm
-coup2 = Conjg(coup1) 
-    SumI = -DerVVVloop(p2,MVWRm2,MVP2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
 ! VZ, VWLm 
@@ -8690,6 +8263,15 @@ coup2 = Conjg(coup1)
     SumI = -DerVVVloop(p2,MVZR2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
+! VZ, VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWLmVWRmVZ
+coup2 = Conjg(coup1) 
+    SumI = -DerVVVloop(p2,MVZ2,MVWRm2)*coup1*coup2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! VZR, VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -8699,28 +8281,6 @@ coup2 = Conjg(coup1)
     SumI = -DerVVVloop(p2,MVZR2,MVWRm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], VZ 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVZ(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm], VZR 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWLmVZR(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -8805,34 +8365,33 @@ res = oo16pi2*res
 End Subroutine DerPi1LoopVWLm 
  
 Subroutine OneLoopVWRm(g2,k1,vR,PhiW,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,            & 
-& MFu2,MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,             & 
-& cplAhcHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,             & 
-& cplFvFecVWRmR,cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,        & 
-& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,     & 
-& cplcgWRpgZpcVWRm,cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,          & 
-& cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,  & 
+& MFu2,MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,             & 
+& cplAhHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,              & 
+& cplFvFecVWRmR,cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,        & 
+& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,     & 
+& cplcgWRpgZpcVWRm,cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,            & 
+& cplHpmcVWRmVZ,cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,            & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,  & 
 & cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,          & 
 & cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,& 
 & cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,          & 
 & cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3,delta,mass,mass2,kont)
 
 Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWLm,MVWLm2,MFu(3),MFu2(3),MFd(3),MFd2(3),           & 
-& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2
+& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
 Real(dp), Intent(in) :: g2,k1,vR,PhiW
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),        & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm, & 
-& cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,     & 
-& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm(4,4),cplhhcVWRmVWLm(4),               & 
-& cplhhcVWRmVWRm(4),cplcHpmcVWRmVP(4),cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,     & 
-& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplAhAhcVWRmVWRm(4,4),& 
-& cplhhhhcVWRmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,    & 
-& cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
-& cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,& 
-& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,           & 
-& cplcVWRmVWRmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),         & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,& 
+& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
+& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhHpmcVWRm(4,4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),& 
+& cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4),cplcVWRmVPVWRm,cplcVWRmVWLmVZ,     & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm(4,4),cplhhhhcVWRmVWRm(4,4),& 
+& cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,        & 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,     & 
+& cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer , Intent(inout):: kont 
 Integer :: i1,i2,i3,i4,j1,j2,j3,j4,il,i_count, ierr 
@@ -8849,13 +8408,13 @@ mi2 = MVWRm2
 p2 = MVWRm2
 PiSf = ZeroC 
 Call Pi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,MFd,MFd2,               & 
-& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,cplAhcHpmcVWRm,            & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWRm,             & 
 & cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,      & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
-& cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,cplcVWRmVPVWLm,            & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,          & 
-& cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
+& cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,      & 
+& cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
+& cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
 & cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,     & 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,             & 
@@ -8870,13 +8429,13 @@ test_m2 = mass2
 p2 =  mass2 
 PiSf = ZeroC 
 Call Pi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,MFd,MFd2,               & 
-& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,cplAhcHpmcVWRm,            & 
+& MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWRm,             & 
 & cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,      & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
-& cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,cplcVWRmVPVWLm,            & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,          & 
-& cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
+& cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,      & 
+& cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
+& cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
 & cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,     & 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,             & 
@@ -8916,13 +8475,13 @@ End Subroutine OneLoopVWRm
  
  
 Subroutine Pi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,MFd,              & 
-& MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,cplAhcHpmcVWRm,       & 
+& MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWRm,        & 
 & cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,      & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
-& cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,cplcVWRmVPVWLm,            & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,          & 
-& cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
+& cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,      & 
+& cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
+& cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
 & cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,     & 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,             & 
@@ -8930,19 +8489,18 @@ Subroutine Pi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,MFd,        
 
 Implicit None 
 Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWLm,MVWLm2,MFu(3),MFu2(3),MFd(3),MFd2(3),           & 
-& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2
+& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),        & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm, & 
-& cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,     & 
-& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm(4,4),cplhhcVWRmVWLm(4),               & 
-& cplhhcVWRmVWRm(4),cplcHpmcVWRmVP(4),cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,     & 
-& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplAhAhcVWRmVWRm(4,4),& 
-& cplhhhhcVWRmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,    & 
-& cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
-& cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,& 
-& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,           & 
-& cplcVWRmVWRmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),         & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,& 
+& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
+& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhHpmcVWRm(4,4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),& 
+& cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4),cplcVWRmVPVWRm,cplcVWRmVWLmVZ,     & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm(4,4),cplhhhhcVWRmVWRm(4,4),& 
+& cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,        & 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,     & 
+& cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -8956,14 +8514,14 @@ Integer :: i1,i2,i3,i4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! conj[Hpm], Ah 
+! Hpm, Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(VSSloop(p2,MAh2(i2),MHpm2(i1)),dp)  
-coup1 = cplAhcHpmcVWRm(i2,i1)
+coup1 = cplAhHpmcVWRm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -9012,17 +8570,6 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[gWLmC], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,0._dp,MVWLm2),dp)
-coup1 = cplcgWLpgPcVWRm
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
 ! bar[gWRmC], gP 
 !------------------------ 
 sumI = 0._dp 
@@ -9034,13 +8581,13 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWLm 
+! bar[gZ], gWLm 
 !------------------------ 
 sumI = 0._dp 
  
 SumI = 0._dp 
-B0m2 = Real(VGGloop(p2,MVWLm2,0._dp),dp)
-coup1 = cplcgPgWLmcVWRm
+B0m2 = Real(VGGloop(p2,MVWLm2,MVZ2),dp)
+coup1 = cplcgZgWLmcVWRm
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
@@ -9089,6 +8636,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(VGGloop(p2,MVZ2,MVWLm2),dp)
+coup1 = cplcgWLpgZcVWRm
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gZ 
 !------------------------ 
 sumI = 0._dp 
@@ -9122,14 +8680,14 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], hh 
+! Hpm, hh 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(VSSloop(p2,Mhh2(i2),MHpm2(i1)),dp)  
-coup1 = cplhhcHpmcVWRm(i2,i1)
+coup1 = cplhhHpmcVWRm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -9157,26 +8715,39 @@ coup1 = cplhhcVWRmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[Hpm], VP 
+! VP, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,0._dp,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVP(i1)
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,0._dp,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVP(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
-      End Do 
+    End Do 
  !------------------------ 
-! VWLm, VP 
+! VZ, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-coup1 = cplcVWRmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -VVVloop(p2,MVWLm2,0._dp)*coup1*coup2 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVZ(i2)
+    SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VZR, Hpm 
 !------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVZR(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
 ! VWRm, VP 
 !------------------------ 
 sumI = 0._dp 
@@ -9184,6 +8755,15 @@ sumI = 0._dp
 coup1 = cplcVWRmVPVWRm
 coup2 = Conjg(coup1) 
     SumI = -VVVloop(p2,MVWRm2,0._dp)*coup1*coup2 
+res = res +1._dp* SumI  
+!------------------------ 
+! VZ, VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWRmVWLmVZ
+coup2 = Conjg(coup1) 
+    SumI = -VVVloop(p2,MVZ2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
 ! VZR, VWLm 
@@ -9213,28 +8793,6 @@ coup2 = Conjg(coup1)
     SumI = -VVVloop(p2,MVZR2,MVWRm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], VZ 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVZ(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm], VZR 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVZR(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -9319,13 +8877,13 @@ res = oo16pi2*res
 End Subroutine Pi1LoopVWRm 
  
 Subroutine DerPi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,               & 
-& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2,cplAhcHpmcVWRm,   & 
+& MFd,MFd2,MFv,MFv2,MFe,MFe2,Mhh,Mhh2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhHpmcVWRm,    & 
 & cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,cplFvFecVWRmR,              & 
-& cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,      & 
-& cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
-& cplhhcHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplcHpmcVWRmVP,cplcVWRmVPVWLm,            & 
-& cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,          & 
-& cplcHpmcVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
+& cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,      & 
+& cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,    & 
+& cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVP,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm,cplhhhhcVWRmVWRm,cplHpmcHpmcVWRmVWRm,cplcVWRmVPVPVWRm3,& 
 & cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,     & 
 & cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,& 
 & cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,             & 
@@ -9333,19 +8891,18 @@ Subroutine DerPi1LoopVWRm(p2,MHpm,MHpm2,MAh,MAh2,MVWLm,MVWLm2,MFu,MFu2,         
 
 Implicit None 
 Real(dp), Intent(in) :: MHpm(4),MHpm2(4),MAh(4),MAh2(4),MVWLm,MVWLm2,MFu(3),MFu2(3),MFd(3),MFd2(3),           & 
-& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZR,MVZR2,MVZ,MVZ2
+& MFv(9),MFv2(9),MFe(3),MFe2(3),Mhh(4),Mhh2(4),MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhcHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),        & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWLpgPcVWRm,cplcgWRpgPcVWRm,cplcgPgWLmcVWRm, & 
-& cplcgZpgWLmcVWRm,cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWRpgZcVWRm,     & 
-& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhcHpmcVWRm(4,4),cplhhcVWRmVWLm(4),               & 
-& cplhhcVWRmVWRm(4),cplcHpmcVWRmVP(4),cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,     & 
-& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplAhAhcVWRmVWRm(4,4),& 
-& cplhhhhcVWRmVWRm(4,4),cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,    & 
-& cplcVWRmVPVPVWRm2,cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,& 
-& cplcVWRmcVWRmVWRmVWRm2,cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,& 
-& cplcVWRmVWRmVZVZ2,cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,           & 
-& cplcVWRmVWRmVZRVZR3
+Complex(dp), Intent(in) :: cplAhHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),         & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplcgWRpgPcVWRm,cplcgZgWLmcVWRm,cplcgZpgWLmcVWRm,& 
+& cplcgPgWRmcVWRm,cplcgZgWRmcVWRm,cplcgZpgWRmcVWRm,cplcgWLpgZcVWRm,cplcgWRpgZcVWRm,      & 
+& cplcgWLpgZpcVWRm,cplcgWRpgZpcVWRm,cplhhHpmcVWRm(4,4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),& 
+& cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4),cplcVWRmVPVWRm,cplcVWRmVWLmVZ,     & 
+& cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplAhAhcVWRmVWRm(4,4),cplhhhhcVWRmVWRm(4,4),& 
+& cplHpmcHpmcVWRmVWRm(4,4),cplcVWRmVPVPVWRm3,cplcVWRmVPVPVWRm1,cplcVWRmVPVPVWRm2,        & 
+& cplcVWLmcVWRmVWLmVWRm2,cplcVWLmcVWRmVWLmVWRm3,cplcVWLmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWRmVWRm2,& 
+& cplcVWRmcVWRmVWRmVWRm3,cplcVWRmcVWRmVWRmVWRm1,cplcVWRmVWRmVZVZ1,cplcVWRmVWRmVZVZ2,     & 
+& cplcVWRmVWRmVZVZ3,cplcVWRmVWRmVZRVZR1,cplcVWRmVWRmVZRVZR2,cplcVWRmVWRmVZRVZR3
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -9365,14 +8922,14 @@ MVP2 = Mass_Regulator_PhotonGluon**2
 res = 0._dp 
  
 !------------------------ 
-! conj[Hpm], Ah 
+! Hpm, Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(DerVSSloop(p2,MAh2(i2),MHpm2(i1)),dp)  
-coup1 = cplAhcHpmcVWRm(i2,i1)
+coup1 = cplAhHpmcVWRm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -9421,17 +8978,6 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[gWLmC], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVP2,MVWLm2),dp)
-coup1 = cplcgWLpgPcVWRm
-coup2 = Conjg(coup1) 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
 ! bar[gWRmC], gP 
 !------------------------ 
 sumI = 0._dp 
@@ -9443,13 +8989,13 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWLm 
+! bar[gZ], gWLm 
 !------------------------ 
 sumI = 0._dp 
  
 SumI = 0._dp 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVP2),dp)
-coup1 = cplcgPgWLmcVWRm
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVZ2),dp)
+coup1 = cplcgZgWLmcVWRm
 coup2 = Conjg(coup1) 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
@@ -9498,6 +9044,17 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+SumI = 0._dp 
+B0m2 = Real(DerVGGloop(p2,MVZ2,MVWLm2),dp)
+coup1 = cplcgWLpgZcVWRm
+coup2 = Conjg(coup1) 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gZ 
 !------------------------ 
 sumI = 0._dp 
@@ -9531,14 +9088,14 @@ coup2 = Conjg(coup1)
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], hh 
+! Hpm, hh 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(DerVSSloop(p2,Mhh2(i2),MHpm2(i1)),dp)  
-coup1 = cplhhcHpmcVWRm(i2,i1)
+coup1 = cplhhHpmcVWRm(i2,i1)
     SumI = Abs(coup1)**2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -9566,26 +9123,39 @@ coup1 = cplhhcVWRmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[Hpm], VP 
+! VP, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVP(i1)
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVP(i2)
     SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
-      End Do 
+    End Do 
  !------------------------ 
-! VWLm, VP 
+! VZ, Hpm 
 !------------------------ 
 sumI = 0._dp 
  
-coup1 = cplcVWRmVPVWLm
-coup2 = Conjg(coup1) 
-    SumI = -DerVVVloop(p2,MVWLm2,MVP2)*coup1*coup2 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVZ(i2)
+    SumI = Abs(coup1)**2*B0m2 
 res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! VZR, Hpm 
 !------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i2)),dp)
+coup1 = cplHpmcVWRmVZR(i2)
+    SumI = Abs(coup1)**2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
 ! VWRm, VP 
 !------------------------ 
 sumI = 0._dp 
@@ -9593,6 +9163,15 @@ sumI = 0._dp
 coup1 = cplcVWRmVPVWRm
 coup2 = Conjg(coup1) 
     SumI = -DerVVVloop(p2,MVWRm2,MVP2)*coup1*coup2 
+res = res +1._dp* SumI  
+!------------------------ 
+! VZ, VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+coup1 = cplcVWRmVWLmVZ
+coup2 = Conjg(coup1) 
+    SumI = -DerVVVloop(p2,MVZ2,MVWLm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
 ! VZR, VWLm 
@@ -9622,28 +9201,6 @@ coup2 = Conjg(coup1)
     SumI = -DerVVVloop(p2,MVZR2,MVWRm2)*coup1*coup2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[Hpm], VZ 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVZ(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm], VZR 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i1)),dp)
-coup1 = cplcHpmcVWRmVZR(i1)
-    SumI = Abs(coup1)**2*B0m2 
-res = res +1._dp* SumI  
-      End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -9730,8 +9287,8 @@ End Subroutine DerPi1LoopVWRm
 Subroutine Sigma1LoopFeMZ(p2,MFe,MFe2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,          & 
 & MHpm,MHpm2,MFv,MFv2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFeFeAhL,cplcUFeFeAhR,               & 
 & cplcUFeFehhL,cplcUFeFehhR,cplcUFeFeVPL,cplcUFeFeVPR,cplcUFeFeVZL,cplcUFeFeVZR,         & 
-& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvcHpmL,cplcUFeFvcHpmR,cplcUFeFvVWLmL,              & 
-& cplcUFeFvVWLmR,cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
+& cplcUFeFeVZRL,cplcUFeFeVZRR,cplcUFeFvHpmL,cplcUFeFvHpmR,cplcUFeFvVWLmL,cplcUFeFvVWLmR, & 
+& cplcUFeFvVWRmL,cplcUFeFvVWRmR,sigL,sigR,sigSL,sigSR)
 
 Implicit None 
 Real(dp), Intent(in) :: MFe(3),MFe2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2,MHpm(4),             & 
@@ -9739,7 +9296,7 @@ Real(dp), Intent(in) :: MFe(3),MFe2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MV
 
 Complex(dp), Intent(in) :: cplcUFeFeAhL(3,3,4),cplcUFeFeAhR(3,3,4),cplcUFeFehhL(3,3,4),cplcUFeFehhR(3,3,4),      & 
 & cplcUFeFeVPL(3,3),cplcUFeFeVPR(3,3),cplcUFeFeVZL(3,3),cplcUFeFeVZR(3,3),               & 
-& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvcHpmL(3,9,4),cplcUFeFvcHpmR(3,9,4),     & 
+& cplcUFeFeVZRL(3,3),cplcUFeFeVZRR(3,3),cplcUFeFvHpmL(3,9,4),cplcUFeFvHpmR(3,9,4),       & 
 & cplcUFeFvVWLmL(3,9),cplcUFeFvVWLmR(3,9),cplcUFeFvVWRmL(3,9),cplcUFeFvVWRmR(3,9)
 
 Complex(dp), Intent(out) :: SigL(3,3),SigR(3,3), SigSL(3,3), SigSR(3,3) 
@@ -9888,7 +9445,7 @@ SigSL = SigSL +1._dp* sumSL
 SigSR = SigSR +1._dp* sumSR 
     End Do 
  !------------------------ 
-! conj[Hpm], Fv 
+! Hpm, Fv 
 !------------------------ 
     Do i1 = 1, 4
        Do i2 = 1, 9
@@ -9905,10 +9462,10 @@ Else
 B1m2 = -Real(SA_B1(p2,MFv2(i2),MHpm2(i1)),dp) 
 B0m2 = MFv(i2)*Real(SA_B0(p2,MFv2(i2),MHpm2(i1)),dp) 
 End If 
-coupL1 = cplcUFeFvcHpmL(gO1,i2,i1)
-coupR1 = cplcUFeFvcHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFeFvcHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFeFvcHpmR(gO2,i2,i1))
+coupL1 = cplcUFeFvHpmL(gO1,i2,i1)
+coupR1 = cplcUFeFvHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFeFvHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFeFvHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -9995,7 +9552,7 @@ End Subroutine Sigma1LoopFeMZ
 Subroutine Sigma1LoopFdMZ(p2,MFd,MFd2,MAh,MAh2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,          & 
 & MHpm,MHpm2,MFu,MFu2,MVWLm,MVWLm2,MVWRm,MVWRm2,cplcUFdFdAhL,cplcUFdFdAhR,               & 
 & cplcUFdFdhhL,cplcUFdFdhhR,cplcUFdFdVGL,cplcUFdFdVGR,cplcUFdFdVPL,cplcUFdFdVPR,         & 
-& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFucHpmL,cplcUFdFucHpmR,   & 
+& cplcUFdFdVZL,cplcUFdFdVZR,cplcUFdFdVZRL,cplcUFdFdVZRR,cplcUFdFuHpmL,cplcUFdFuHpmR,     & 
 & cplcUFdFuVWLmL,cplcUFdFuVWLmR,cplcUFdFuVWRmL,cplcUFdFuVWRmR,sigL,sigR,sigSL,sigSR)
 
 Implicit None 
@@ -10005,7 +9562,7 @@ Real(dp), Intent(in) :: MFd(3),MFd2(3),MAh(4),MAh2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MV
 Complex(dp), Intent(in) :: cplcUFdFdAhL(3,3,4),cplcUFdFdAhR(3,3,4),cplcUFdFdhhL(3,3,4),cplcUFdFdhhR(3,3,4),      & 
 & cplcUFdFdVGL(3,3),cplcUFdFdVGR(3,3),cplcUFdFdVPL(3,3),cplcUFdFdVPR(3,3),               & 
 & cplcUFdFdVZL(3,3),cplcUFdFdVZR(3,3),cplcUFdFdVZRL(3,3),cplcUFdFdVZRR(3,3),             & 
-& cplcUFdFucHpmL(3,3,4),cplcUFdFucHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),   & 
+& cplcUFdFuHpmL(3,3,4),cplcUFdFuHpmR(3,3,4),cplcUFdFuVWLmL(3,3),cplcUFdFuVWLmR(3,3),     & 
 & cplcUFdFuVWRmL(3,3),cplcUFdFuVWRmR(3,3)
 
 Complex(dp), Intent(out) :: SigL(3,3),SigR(3,3), SigSL(3,3), SigSR(3,3) 
@@ -10154,7 +9711,7 @@ SigSL = SigSL +1._dp* sumSL
 SigSR = SigSR +1._dp* sumSR 
     End Do 
  !------------------------ 
-! conj[Hpm], Fu 
+! Hpm, Fu 
 !------------------------ 
     Do i1 = 1, 4
        Do i2 = 1, 3
@@ -10171,10 +9728,10 @@ Else
 B1m2 = -Real(SA_B1(p2,MFu2(i2),MHpm2(i1)),dp) 
 B0m2 = MFu(i2)*Real(SA_B0(p2,MFu2(i2),MHpm2(i1)),dp) 
 End If 
-coupL1 = cplcUFdFucHpmL(gO1,i2,i1)
-coupR1 = cplcUFdFucHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFdFucHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFdFucHpmR(gO2,i2,i1))
+coupL1 = cplcUFdFuHpmL(gO1,i2,i1)
+coupR1 = cplcUFdFuHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFdFuHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFdFuHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -10258,19 +9815,19 @@ SigSR = oo16pi2*SigSR
  
 End Subroutine Sigma1LoopFdMZ 
  
-Subroutine Sigma1LoopFuMZ(p2,MFu,MFu2,MAh,MAh2,MVWLm,MVWLm2,MFd,MFd2,MVWRm,           & 
-& MVWRm2,MHpm,MHpm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,              & 
-& cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,cplcUFuFdcVWRmR,cplcUFuFdHpmL,         & 
-& cplcUFuFdHpmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,        & 
+Subroutine Sigma1LoopFuMZ(p2,MFu,MFu2,MAh,MAh2,MHpm,MHpm2,MFd,MFd2,MVWLm,             & 
+& MVWLm2,MVWRm,MVWRm2,Mhh,Mhh2,MVZ,MVZ2,MVZR,MVZR2,cplcUFuFuAhL,cplcUFuFuAhR,            & 
+& cplcUFuFdcHpmL,cplcUFuFdcHpmR,cplcUFuFdcVWLmL,cplcUFuFdcVWLmR,cplcUFuFdcVWRmL,         & 
+& cplcUFuFdcVWRmR,cplcUFuFuhhL,cplcUFuFuhhR,cplcUFuFuVGL,cplcUFuFuVGR,cplcUFuFuVPL,      & 
 & cplcUFuFuVPR,cplcUFuFuVZL,cplcUFuFuVZR,cplcUFuFuVZRL,cplcUFuFuVZRR,sigL,               & 
 & sigR,sigSL,sigSR)
 
 Implicit None 
-Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MVWLm,MVWLm2,MFd(3),MFd2(3),MVWRm,MVWRm2,               & 
-& MHpm(4),MHpm2(4),Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
+Real(dp), Intent(in) :: MFu(3),MFu2(3),MAh(4),MAh2(4),MHpm(4),MHpm2(4),MFd(3),MFd2(3),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2,Mhh(4),Mhh2(4),MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),    & 
-& cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),cplcUFuFdHpmL(3,3,4),cplcUFuFdHpmR(3,3,4),   & 
+Complex(dp), Intent(in) :: cplcUFuFuAhL(3,3,4),cplcUFuFuAhR(3,3,4),cplcUFuFdcHpmL(3,3,4),cplcUFuFdcHpmR(3,3,4),  & 
+& cplcUFuFdcVWLmL(3,3),cplcUFuFdcVWLmR(3,3),cplcUFuFdcVWRmL(3,3),cplcUFuFdcVWRmR(3,3),   & 
 & cplcUFuFuhhL(3,3,4),cplcUFuFuhhR(3,3,4),cplcUFuFuVGL(3,3),cplcUFuFuVGR(3,3),           & 
 & cplcUFuFuVPL(3,3),cplcUFuFuVPR(3,3),cplcUFuFuVZL(3,3),cplcUFuFuVZR(3,3),               & 
 & cplcUFuFuVZRL(3,3),cplcUFuFuVZRR(3,3)
@@ -10310,6 +9867,40 @@ coupL1 = cplcUFuFuAhL(gO1,i1,i2)
 coupR1 = cplcUFuFuAhR(gO1,i1,i2)
 coupL2 =  Conjg(cplcUFuFuAhL(gO2,i1,i2))
 coupR2 =  Conjg(cplcUFuFuAhR(gO2,i1,i2))
+SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
+SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
+sumR(gO1,gO2) = coupR1*coupR2*B1m2 
+sumL(gO1,gO2) = coupL1*coupL2*B1m2 
+   End Do 
+End Do 
+SigL = SigL +1._dp* sumL
+SigR = SigR +1._dp* sumR 
+SigSL = SigSL +1._dp* sumSL 
+SigSR = SigSR +1._dp* sumSR 
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[Hpm], Fd 
+!------------------------ 
+    Do i1 = 1, 4
+       Do i2 = 1, 3
+ SumSL = 0._dp 
+SumSR = 0._dp 
+sumR = 0._dp 
+sumL = 0._dp 
+Do gO1 = 1, 3
+  Do gO2 = 1, 3
+If(gO1.eq.gO2) Then 
+B1m2 = -Real(SA_B1(MFu2(gO1),MFd2(i2),MHpm2(i1)),dp) 
+B0m2 = MFd(i2)*Real(SA_B0(MFu2(gO1),MFd2(i2),MHpm2(i1)),dp) 
+Else 
+B1m2 = -Real(SA_B1(p2,MFd2(i2),MHpm2(i1)),dp) 
+B0m2 = MFd(i2)*Real(SA_B0(p2,MFd2(i2),MHpm2(i1)),dp) 
+End If 
+coupL1 = cplcUFuFdcHpmL(gO1,i2,i1)
+coupR1 = cplcUFuFdcHpmR(gO1,i2,i1)
+coupL2 =  Conjg(cplcUFuFdcHpmL(gO2,i2,i1))
+coupR2 =  Conjg(cplcUFuFdcHpmR(gO2,i2,i1))
 SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
 SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
 sumR(gO1,gO2) = coupR1*coupR2*B1m2 
@@ -10386,40 +9977,6 @@ SigR = SigR +1._dp* sumR
 SigSL = SigSL +1._dp* sumSL 
 SigSR = SigSR +1._dp* sumSR 
     End Do 
- !------------------------ 
-! Hpm, Fd 
-!------------------------ 
-    Do i1 = 1, 4
-       Do i2 = 1, 3
- SumSL = 0._dp 
-SumSR = 0._dp 
-sumR = 0._dp 
-sumL = 0._dp 
-Do gO1 = 1, 3
-  Do gO2 = 1, 3
-If(gO1.eq.gO2) Then 
-B1m2 = -Real(SA_B1(MFu2(gO1),MFd2(i2),MHpm2(i1)),dp) 
-B0m2 = MFd(i2)*Real(SA_B0(MFu2(gO1),MFd2(i2),MHpm2(i1)),dp) 
-Else 
-B1m2 = -Real(SA_B1(p2,MFd2(i2),MHpm2(i1)),dp) 
-B0m2 = MFd(i2)*Real(SA_B0(p2,MFd2(i2),MHpm2(i1)),dp) 
-End If 
-coupL1 = cplcUFuFdHpmL(gO1,i2,i1)
-coupR1 = cplcUFuFdHpmR(gO1,i2,i1)
-coupL2 =  Conjg(cplcUFuFdHpmL(gO2,i2,i1))
-coupR2 =  Conjg(cplcUFuFdHpmR(gO2,i2,i1))
-SumSL(gO1,gO2) = coupR1*coupL2*B0m2 
-SumSR(gO1,gO2) = coupL1*coupR2*B0m2 
-sumR(gO1,gO2) = coupR1*coupR2*B1m2 
-sumL(gO1,gO2) = coupL1*coupL2*B1m2 
-   End Do 
-End Do 
-SigL = SigL +1._dp* sumL
-SigR = SigR +1._dp* sumR 
-SigSL = SigSL +1._dp* sumSL 
-SigSR = SigSR +1._dp* sumSR 
-      End Do 
-     End Do 
  !------------------------ 
 ! hh, Fu 
 !------------------------ 
@@ -10525,18 +10082,1012 @@ SigSR = oo16pi2*SigSR
  
 End Subroutine Sigma1LoopFuMZ 
  
+Subroutine Pi1LoopVPVZ(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,MVWLm2,         & 
+& MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVPL,              & 
+& cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
+& cplcFuFuVZR,cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,               & 
+& cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmVPVWLm,             & 
+& cplcHpmVPVWRm,cplcHpmVWLmVZ,cplcHpmVWRmVZ,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,            & 
+& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,   & 
+& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplHpmcHpmVP,cplHpmcHpmVPVZ,        & 
+& cplHpmcHpmVZ,cplHpmcVWLmVP,cplHpmcVWLmVZ,cplHpmcVWRmVP,cplHpmcVWRmVZ,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVPL(3,3), & 
+& cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),  & 
+& cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,        & 
+& cplcgWLpgWLpVZ,cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,            & 
+& cplcHpmVPVWLm(4),cplcHpmVPVWRm(4),cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVPVWLm,    & 
+& cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,   & 
+& cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplHpmcHpmVP(4,4),& 
+& cplHpmcHpmVPVZ(4,4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),               & 
+& cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4)
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+coupL2 = cplcFdFdVZL(i2,i1)
+coupR2 = cplcFdFdVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+coupL2 = cplcFeFeVZL(i2,i1)
+coupR2 = cplcFeFeVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+coupL2 = cplcFuFuVZL(i2,i1)
+coupR2 = cplcFuFuVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = cplcgWLmgWLmVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = cplcgWLpgWLpVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = cplcgWRmgWRmVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = cplcgWRpgWRpVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
+coup1 = cplHpmcHpmVP(i2,i1)
+coup2 = cplHpmcHpmVZ(i1,i2)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWLmVP(i2)
+coup2 = cplcHpmVWLmVZ(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWRmVP(i2)
+coup2 = cplcHpmVWRmVZ(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcVWLmVZ(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWLm2,MVWLm2),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcVWLmVWLmVZ
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcVWRmVZ(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWRm2,MVWRm2),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcVWRmVWRmVZ
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ SumI = 0._dp 
+ A0m2 = SA_A0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVZ(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVWLmVZ2
+coup2 = cplcVWLmVPVWLmVZ1
+coup3 = cplcVWLmVPVWLmVZ3
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVWRmVZ2
+coup2 = cplcVWRmVPVWRmVZ1
+coup3 = cplcVWRmVPVWRmVZ3
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine Pi1LoopVPVZ 
+ 
+Subroutine DerPi1LoopVPVZ(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,             & 
+& MVWLm2,MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVPL,       & 
+& cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
+& cplcFuFuVZR,cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,               & 
+& cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmVPVWLm,             & 
+& cplcHpmVPVWRm,cplcHpmVWLmVZ,cplcHpmVWRmVZ,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,            & 
+& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,   & 
+& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplHpmcHpmVP,cplHpmcHpmVPVZ,        & 
+& cplHpmcHpmVZ,cplHpmcVWLmVP,cplHpmcVWLmVZ,cplHpmcVWRmVP,cplHpmcVWRmVZ,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVPL(3,3), & 
+& cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),  & 
+& cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,        & 
+& cplcgWLpgWLpVZ,cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,            & 
+& cplcHpmVPVWLm(4),cplcHpmVPVWRm(4),cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVPVWLm,    & 
+& cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,   & 
+& cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplHpmcHpmVP(4,4),& 
+& cplHpmcHpmVPVZ(4,4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVP(4),cplHpmcVWLmVZ(4),               & 
+& cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4)
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+Real(dp) ::MVG,MVP,MVG2,MVP2
+MVG = Mass_Regulator_PhotonGluon 
+MVP = Mass_Regulator_PhotonGluon 
+MVG2 = Mass_Regulator_PhotonGluon**2 
+MVP2 = Mass_Regulator_PhotonGluon**2 
+
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 2._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+coupL2 = cplcFdFdVZL(i2,i1)
+coupR2 = cplcFdFdVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 2._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+coupL2 = cplcFeFeVZL(i2,i1)
+coupR2 = cplcFeFeVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 2._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+coupL2 = cplcFuFuVZL(i2,i1)
+coupR2 = cplcFuFuVZR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = cplcgWLmgWLmVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = cplcgWLpgWLpVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = cplcgWRmgWRmVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = cplcgWRpgWRpVZ 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
+coup1 = cplHpmcHpmVP(i2,i1)
+coup2 = cplHpmcHpmVZ(i1,i2)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWLmVP(i2)
+coup2 = cplcHpmVWLmVZ(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWRmVP(i2)
+coup2 = cplcHpmVWRmVZ(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcVWLmVZ(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWLm2),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcVWLmVWLmVZ
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcVWRmVZ(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWRm2),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcVWRmVWRmVZ
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ SumI = 0._dp 
+ A0m2 = SA_DerA0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVZ(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVWLmVZ2
+coup2 = cplcVWLmVPVWLmVZ1
+coup3 = cplcVWLmVPVWLmVZ3
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVWRmVZ2
+coup2 = cplcVWRmVPVWRmVZ1
+coup3 = cplcVWRmVPVWRmVZ3
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine DerPi1LoopVPVZ 
+ 
+Subroutine Pi1LoopVPVZR(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,               & 
+& MVWLm2,MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVPL,     & 
+& cplcFeFeVPR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZRL,            & 
+& cplcFuFuVZRR,cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLpgWLpVP,cplcgWLpgWLpVZR,            & 
+& cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWRpVP,cplcgWRpgWRpVZR,cplcHpmVPVWLm,           & 
+& cplcHpmVPVWRm,cplcHpmVWLmVZR,cplcHpmVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,         & 
+& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWLmVWLmVZR,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZR1,& 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWRmVZR,cplHpmcHpmVP,cplHpmcHpmVPVZR,    & 
+& cplHpmcHpmVZR,cplHpmcVWLmVP,cplHpmcVWLmVZR,cplHpmcVWRmVP,cplHpmcVWRmVZR,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVPL(3,3),& 
+& cplcFeFeVPR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),& 
+& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLpgWLpVP,     & 
+& cplcgWLpgWLpVZR,cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWRpVP,cplcgWRpgWRpVZR,         & 
+& cplcHpmVPVWLm(4),cplcHpmVPVWRm(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVPVWLm,  & 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWLmVWLmVZR,              & 
+& cplcVWRmVPVWRm,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,               & 
+& cplcVWRmVWRmVZR,cplHpmcHpmVP(4,4),cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZR(4,4),             & 
+& cplHpmcVWLmVP(4),cplHpmcVWLmVZR(4),cplHpmcVWRmVP(4),cplHpmcVWRmVZR(4)
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+coupL2 = cplcFdFdVZRL(i2,i1)
+coupR2 = cplcFdFdVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+coupL2 = cplcFeFeVZRL(i2,i1)
+coupR2 = cplcFeFeVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+coupL2 = cplcFuFuVZRL(i2,i1)
+coupR2 = cplcFuFuVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = cplcgWLmgWLmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = cplcgWLpgWLpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = cplcgWRmgWRmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = cplcgWRpgWRpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
+coup1 = cplHpmcHpmVP(i2,i1)
+coup2 = cplHpmcHpmVZR(i1,i2)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWLmVP(i2)
+coup2 = cplcHpmVWLmVZR(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWRmVP(i2)
+coup2 = cplcHpmVWRmVZR(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcVWLmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWLm2,MVWLm2),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcVWLmVWLmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWRm2,MVWRm2),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcVWRmVWRmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ SumI = 0._dp 
+ A0m2 = SA_A0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVZR(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVWLmVZR2
+coup2 = cplcVWLmVPVWLmVZR1
+coup3 = cplcVWLmVPVWLmVZR3
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVWRmVZR2
+coup2 = cplcVWRmVPVWRmVZR1
+coup3 = cplcVWRmVPVWRmVZR3
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine Pi1LoopVPVZR 
+ 
+Subroutine DerPi1LoopVPVZR(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MHpm,MHpm2,MVWLm,            & 
+& MVWLm2,MVWRm,MVWRm2,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVPL,     & 
+& cplcFeFeVPR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZRL,            & 
+& cplcFuFuVZRR,cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLpgWLpVP,cplcgWLpgWLpVZR,            & 
+& cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWRpVP,cplcgWRpgWRpVZR,cplcHpmVPVWLm,           & 
+& cplcHpmVPVWRm,cplcHpmVWLmVZR,cplcHpmVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,         & 
+& cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWLmVWLmVZR,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZR1,& 
+& cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWRmVZR,cplHpmcHpmVP,cplHpmcHpmVPVZR,    & 
+& cplHpmcHpmVZR,cplHpmcVWLmVP,cplHpmcVWLmVZR,cplHpmcVWRmVP,cplHpmcVWRmVZR,kont,res)
+
+Implicit None 
+Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MHpm(4),MHpm2(4),MVWLm,MVWLm2,           & 
+& MVWRm,MVWRm2
+
+Complex(dp), Intent(in) :: cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVPL(3,3),& 
+& cplcFeFeVPR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),& 
+& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLpgWLpVP,     & 
+& cplcgWLpgWLpVZR,cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWRpVP,cplcgWRpgWRpVZR,         & 
+& cplcHpmVPVWLm(4),cplcHpmVPVWRm(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVPVWLm,  & 
+& cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,cplcVWLmVWLmVZR,              & 
+& cplcVWRmVPVWRm,cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,               & 
+& cplcVWRmVWRmVZR,cplHpmcHpmVP(4,4),cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZR(4,4),             & 
+& cplHpmcVWLmVP(4),cplHpmcVWLmVZR(4),cplHpmcVWRmVP(4),cplHpmcVWRmVZR(4)
+
+Integer, Intent(inout) :: kont 
+Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
+Real(dp), Intent(in) :: p2 
+Complex(dp) :: A0m2 
+Complex(dp), Intent(inout) :: res 
+Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
+Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
+ 
+ 
+Real(dp) ::MVG,MVP,MVG2,MVP2
+MVG = Mass_Regulator_PhotonGluon 
+MVP = Mass_Regulator_PhotonGluon 
+MVG2 = Mass_Regulator_PhotonGluon**2 
+MVP2 = Mass_Regulator_PhotonGluon**2 
+
+res = 0._dp 
+ 
+!------------------------ 
+! bar[Fd], Fd 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
+B0m2 = 2._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
+coupL1 = cplcFdFdVPL(i1,i2)
+coupR1 = cplcFdFdVPR(i1,i2)
+coupL2 = cplcFdFdVZRL(i2,i1)
+coupR2 = cplcFdFdVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fe 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
+B0m2 = 2._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
+coupL1 = cplcFeFeVPL(i1,i2)
+coupR1 = cplcFeFeVPR(i1,i2)
+coupL2 = cplcFeFeVZRL(i2,i1)
+coupR2 = cplcFeFeVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fu], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
+B0m2 = 2._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFuFuVPL(i1,i2)
+coupR1 = cplcFuFuVPR(i1,i2)
+coupL2 = cplcFuFuVZRL(i2,i1)
+coupR2 = cplcFuFuVZRR(i2,i1)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
+                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gWLm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLmgWLmVP
+coup2 = cplcgWLmgWLmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
+coup1 = cplcgWLpgWLpVP
+coup2 = cplcgWLpgWLpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRmgWRmVP
+coup2 = cplcgWRmgWRmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
+coup1 = cplcgWRpgWRpVP
+coup2 = cplcgWRpgWRpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
+coup1 = cplHpmcHpmVP(i2,i1)
+coup2 = cplHpmcHpmVZR(i1,i2)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! conj[VWLm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWLmVP(i2)
+coup2 = cplcHpmVWLmVZR(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], Hpm 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
+coup1 = cplHpmcVWRmVP(i2)
+coup2 = cplcHpmVWRmVZR(i2)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcVWLmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWLm2),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcVWLmVWLmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWRm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWRm2),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcVWRmVWRmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm] 
+!------------------------ 
+    Do i1 = 1, 4
+ SumI = 0._dp 
+ A0m2 = SA_DerA0(MHpm2(i1))
+ coup1 = cplHpmcHpmVPVZR(i1,i1)
+ SumI = coup1*A0m2 
+res = res +1* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
+coup1 = cplcVWLmVPVWLmVZR2
+coup2 = cplcVWLmVPVWLmVZR1
+coup3 = cplcVWLmVPVWLmVZR3
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+!------------------------ 
+! conj[VWRm] 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
+coup1 = cplcVWRmVPVWRmVZR2
+coup2 = cplcVWRmVPVWRmVZR1
+coup3 = cplcVWRmVPVWRmVZR3
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine DerPi1LoopVPVZR 
+ 
 Subroutine Pi1LoopVZVZR(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVZVZR,        & 
 & cplAhhhVZ,cplAhhhVZR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZL,    & 
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,            & 
-& cplcFuFuVZRR,cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,            & 
-& cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,         & 
-& cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZ,               & 
-& cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,              & 
-& cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVZVZR,cplhhVPVZ,cplhhVPVZR,       & 
-& cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmcHpmVZVZR,           & 
-& cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,kont,res)
+& cplcFuFuVZRR,cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLmgWRmVZ,cplcgWLmgWRmVZR,            & 
+& cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWLpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRmgWLmVZ,          & 
+& cplcgWRmgWLmVZR,cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWLpVZ,cplcgWRpgWLpVZR,         & 
+& cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,             & 
+& cplcHpmVWRmVZR,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,   & 
+& cplcVWLmVWLmVZVZR3,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,      & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,& 
+& cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVZVZR,cplhhVZRVZR,cplhhVZVZ,      & 
+& cplhhVZVZR,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmcHpmVZVZR,cplHpmcVWLmVZ,cplHpmcVWLmVZR,    & 
+& cplHpmcVWRmVZ,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
@@ -10545,14 +11096,17 @@ Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2
 Complex(dp), Intent(in) :: cplAhAhVZVZR(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),   & 
 & cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),& 
 & cplcFeFeVZRR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),& 
-& cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWRmgWRmVZ,          & 
-& cplcgWRmgWRmVZR,cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),   & 
-& cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,& 
-& cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,& 
-& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),& 
-& cplFvFvVZRR(9,9),cplhhhhVZVZR(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),          & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmcHpmVZVZR(4,4),  & 
-& cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLmgWRmVZ,cplcgWLmgWRmVZR,cplcgWLpgWLpVZ,          & 
+& cplcgWLpgWLpVZR,cplcgWLpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRmgWLmVZ,cplcgWRmgWLmVZR,         & 
+& cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWLpVZ,cplcgWRpgWLpVZR,cplcgWRpgWRpVZ,          & 
+& cplcgWRpgWRpVZR,cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4), & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,& 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,              & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhhhVZVZR(4,4),   & 
+& cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),        & 
+& cplHpmcHpmVZVZR(4,4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZ(4),              & 
+& cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -10662,6 +11216,16 @@ coup2 = cplcgWLmgWLmVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -10671,6 +11235,26 @@ coup1 = cplcgWLpgWLpVZ
 coup2 = cplcgWLpgWLpVZR 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWLm2),dp)
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -10682,6 +11266,16 @@ coup2 = cplcgWRmgWRmVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVWLm2),dp)
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
 sumI = 0._dp 
@@ -10692,14 +11286,6 @@ coup2 = cplcgWRpgWRpVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -10738,29 +11324,41 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWLmVZR(i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplcHpmVWLmVZR(i2)
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplcHpmcVWRmVZR(i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplcHpmVWRmVZR(i2)
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcVWLmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -10772,6 +11370,38 @@ coup2 = cplcVWLmVWLmVZR
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcVWLmVWRmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VVVloop(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplcVWRmVWLmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -10782,30 +11412,6 @@ coup2 = cplcVWRmVWRmVZR
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplHpmVWLmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplHpmVWRmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -10863,14 +11469,16 @@ Subroutine DerPi1LoopVZVZR(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,     
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVZVZR,        & 
 & cplAhhhVZ,cplAhhhVZR,cplcFdFdVZL,cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZL,    & 
 & cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,            & 
-& cplcFuFuVZRR,cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,            & 
-& cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmcVWLmVZ,          & 
-& cplcHpmcVWLmVZR,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,         & 
-& cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZ,               & 
-& cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,              & 
-& cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVZVZR,cplhhVPVZ,cplhhVPVZR,       & 
-& cplhhVZRVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmcHpmVZVZR,           & 
-& cplHpmVWLmVZ,cplHpmVWLmVZR,cplHpmVWRmVZ,cplHpmVWRmVZR,kont,res)
+& cplcFuFuVZRR,cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLmgWRmVZ,cplcgWLmgWRmVZR,            & 
+& cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWLpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRmgWLmVZ,          & 
+& cplcgWRmgWLmVZR,cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWLpVZ,cplcgWRpgWLpVZR,         & 
+& cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,             & 
+& cplcHpmVWRmVZR,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,   & 
+& cplcVWLmVWLmVZVZR3,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,      & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,& 
+& cplFvFvVZL,cplFvFvVZR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVZVZR,cplhhVZRVZR,cplhhVZVZ,      & 
+& cplhhVZVZR,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmcHpmVZVZR,cplHpmcVWLmVZ,cplHpmcVWLmVZR,    & 
+& cplHpmcVWRmVZ,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
@@ -10879,14 +11487,17 @@ Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2
 Complex(dp), Intent(in) :: cplAhAhVZVZR(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),   & 
 & cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),& 
 & cplcFeFeVZRR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),& 
-& cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLpgWLpVZ,cplcgWLpgWLpVZR,cplcgWRmgWRmVZ,          & 
-& cplcgWRmgWRmVZR,cplcgWRpgWRpVZ,cplcgWRpgWRpVZR,cplcHpmcVWLmVZ(4),cplcHpmcVWLmVZR(4),   & 
-& cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,& 
-& cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,& 
-& cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),& 
-& cplFvFvVZRR(9,9),cplhhhhVZVZR(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),          & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),cplHpmcHpmVZVZR(4,4),  & 
-& cplHpmVWLmVZ(4),cplHpmVWLmVZR(4),cplHpmVWRmVZ(4),cplHpmVWRmVZR(4)
+& cplcgWLmgWLmVZ,cplcgWLmgWLmVZR,cplcgWLmgWRmVZ,cplcgWLmgWRmVZR,cplcgWLpgWLpVZ,          & 
+& cplcgWLpgWLpVZR,cplcgWLpgWRpVZ,cplcgWLpgWRpVZR,cplcgWRmgWLmVZ,cplcgWRmgWLmVZR,         & 
+& cplcgWRmgWRmVZ,cplcgWRmgWRmVZR,cplcgWRpgWLpVZ,cplcgWRpgWLpVZR,cplcgWRpgWRpVZ,          & 
+& cplcgWRpgWRpVZR,cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4), & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWLmVZVZR1,cplcVWLmVWLmVZVZR2,cplcVWLmVWLmVZVZR3,& 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,          & 
+& cplcVWRmVWRmVZR,cplcVWRmVWRmVZVZR1,cplcVWRmVWRmVZVZR2,cplcVWRmVWRmVZVZR3,              & 
+& cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhhhVZVZR(4,4),   & 
+& cplhhVZRVZR(4),cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),        & 
+& cplHpmcHpmVZVZR(4,4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZ(4),              & 
+& cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -11002,6 +11613,16 @@ coup2 = cplcgWLmgWLmVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -11011,6 +11632,26 @@ coup1 = cplcgWLpgWLpVZ
 coup2 = cplcgWLpgWLpVZR 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWLm2),dp)
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -11022,6 +11663,16 @@ coup2 = cplcgWRmgWRmVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWLm2),dp)
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLpVZR 
+   SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
 sumI = 0._dp 
@@ -11032,18 +11683,6 @@ coup2 = cplcgWRpgWRpVZR
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,Mhh2(i2)),dp) 
-coup1 = cplhhVPVZ(i2)
-coup2 = cplhhVPVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -11082,29 +11721,41 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWLmVZR(i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplcHpmVWLmVZR(i2)
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
       Do i2 = 1, 4
  B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplcHpmcVWRmVZR(i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplcHpmVWRmVZR(i2)
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcVWLmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -11116,6 +11767,38 @@ coup2 = cplcVWLmVWLmVZR
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcVWLmVWRmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplcVWRmVWLmVZR
+    SumI = coup1*coup2*B0m2 
+res = res +2._dp* SumI  
+!------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -11126,30 +11809,6 @@ coup2 = cplcVWRmVWRmVZR
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplHpmVWLmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplHpmVWRmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
 ! Ah 
 !------------------------ 
     Do i1 = 1, 4
@@ -11203,1485 +11862,38 @@ res = oo16pi2*res
  
 End Subroutine DerPi1LoopVZVZR 
  
-Subroutine Pi1LoopVZVP(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,               & 
-& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVPVZ,         & 
-& cplAhhhVP,cplAhhhVZ,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVPL,       & 
-& cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
-& cplcFuFuVZR,cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,               & 
-& cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmcVWLmVP,            & 
-& cplcHpmcVWLmVZ,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,         & 
-& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,   & 
-& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplFvFvVPL,cplFvFvVPR,              & 
-& cplFvFvVZL,cplFvFvVZR,cplhhhhVPVZ,cplhhVPVZ,cplhhVPVZR,cplhhVZVZ,cplhhVZVZR,           & 
-& cplHpmcHpmVP,cplHpmcHpmVPVZ,cplHpmcHpmVZ,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,       & 
-& cplHpmVWRmVZ,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
-
-Complex(dp), Intent(in) :: cplAhAhVPVZ(4,4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),     & 
-& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),  & 
-& cplcFeFeVZR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),  & 
-& cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,cplcgWRmgWRmVP,            & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),      & 
-& cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,& 
-& cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,   & 
-& cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),      & 
-& cplFvFvVZR(9,9),cplhhhhVPVZ(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZVZ(4),              & 
-& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVPVZ(4,4),cplHpmcHpmVZ(4,4),cplHpmVPVWLm(4), & 
-& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(VSSloop(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZ(i2,i1)
-coup2 = cplAhhhVP(i2,i1)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVZL(i1,i2)
-coupR1 = cplcFdFdVZR(i1,i2)
-coupL2 = cplcFdFdVPL(i2,i1)
-coupR2 = cplcFdFdVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVZL(i1,i2)
-coupR1 = cplcFeFeVZR(i1,i2)
-coupL2 = cplcFeFeVPL(i2,i1)
-coupR2 = cplcFeFeVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVZL(i1,i2)
-coupR1 = cplcFuFuVZR(i1,i2)
-coupL2 = cplcFuFuVPL(i2,i1)
-coupR2 = cplcFuFuVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- H0m2 = Real(SA_Hloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 4._dp*MFv(i1)*MFv(i2)*Real(SA_B0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVZL(i1,i2)
-coupR1 = cplFvFvVZR(i1,i2)
-coupL2 = cplFvFvVPL(i1,i2)
-coupR2 = cplFvFvVPR(i1,i2)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVZ
-coup2 = cplcgWLmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVZ
-coup2 = cplcgWLpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVZ
-coup2 = cplcgWRmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVZ
-coup2 = cplcgWRpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZ2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZ(i2)
-coup2 = cplhhVPVZ(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZR2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZR(i2)
-coup2 = cplhhVPVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZ(i2,i1)
-coup2 = cplHpmcHpmVP(i1,i2)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWLmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplcHpmcVWRmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWLm2,MVWLm2),dp) 
-coup1 = cplcVWLmVWLmVZ
-coup2 = cplcVWLmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWRm2,MVWRm2),dp) 
-coup1 = cplcVWRmVWRmVZ
-coup2 = cplcVWRmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplHpmVPVWLm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplHpmVPVWRm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(MAh2(i1))
- coup1 = cplAhAhVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(Mhh2(i1))
- coup1 = cplhhhhVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVWLmVZ2
-coup2 = cplcVWLmVPVWLmVZ3
-coup3 = cplcVWLmVPVWLmVZ1
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVWRmVZ2
-coup2 = cplcVWRmVPVWRmVZ3
-coup3 = cplcVWRmVPVWRmVZ1
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVZVP 
- 
-Subroutine DerPi1LoopVZVP(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,            & 
-& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVPVZ,         & 
-& cplAhhhVP,cplAhhhVZ,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVPL,       & 
-& cplcFeFeVPR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZL,               & 
-& cplcFuFuVZR,cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,               & 
-& cplcgWRmgWRmVP,cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmcVWLmVP,            & 
-& cplcHpmcVWLmVZ,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,         & 
-& cplcVWLmVPVWLmVZ2,cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,   & 
-& cplcVWRmVPVWRmVZ2,cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplFvFvVPL,cplFvFvVPR,              & 
-& cplFvFvVZL,cplFvFvVZR,cplhhhhVPVZ,cplhhVPVZ,cplhhVPVZR,cplhhVZVZ,cplhhVZVZR,           & 
-& cplHpmcHpmVP,cplHpmcHpmVPVZ,cplHpmcHpmVZ,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZ,       & 
-& cplHpmVWRmVZ,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
-
-Complex(dp), Intent(in) :: cplAhAhVPVZ(4,4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),     & 
-& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZL(3,3),  & 
-& cplcFeFeVZR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),  & 
-& cplcgWLmgWLmVP,cplcgWLmgWLmVZ,cplcgWLpgWLpVP,cplcgWLpgWLpVZ,cplcgWRmgWRmVP,            & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRpVP,cplcgWRpgWRpVZ,cplcHpmcVWLmVP(4),cplcHpmcVWLmVZ(4),      & 
-& cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcVWLmVPVWLm,cplcVWLmVPVWLmVZ1,cplcVWLmVPVWLmVZ2,& 
-& cplcVWLmVPVWLmVZ3,cplcVWLmVWLmVZ,cplcVWRmVPVWRm,cplcVWRmVPVWRmVZ1,cplcVWRmVPVWRmVZ2,   & 
-& cplcVWRmVPVWRmVZ3,cplcVWRmVWRmVZ,cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZL(9,9),      & 
-& cplFvFvVZR(9,9),cplhhhhVPVZ(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZVZ(4),              & 
-& cplhhVZVZR(4),cplHpmcHpmVP(4,4),cplHpmcHpmVPVZ(4,4),cplHpmcHpmVZ(4,4),cplHpmVPVWLm(4), & 
-& cplHpmVPVWRm(4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(DerVSSloop(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZ(i2,i1)
-coup2 = cplAhhhVP(i2,i1)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 2._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVZL(i1,i2)
-coupR1 = cplcFdFdVZR(i1,i2)
-coupL2 = cplcFdFdVPL(i2,i1)
-coupR2 = cplcFdFdVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 2._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVZL(i1,i2)
-coupR1 = cplcFeFeVZR(i1,i2)
-coupL2 = cplcFeFeVPL(i2,i1)
-coupR2 = cplcFeFeVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 2._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVZL(i1,i2)
-coupR1 = cplcFuFuVZR(i1,i2)
-coupL2 = cplcFuFuVPL(i2,i1)
-coupR2 = cplcFuFuVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- H0m2 = Real(SA_DerHloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 2._dp*MFv(i1)*MFv(i2)*Real(SA_DerB0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVZL(i1,i2)
-coupR1 = cplFvFvVZR(i1,i2)
-coupL2 = cplFvFvVPL(i1,i2)
-coupR2 = cplFvFvVPR(i1,i2)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVZ
-coup2 = cplcgWLmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVZ
-coup2 = cplcgWLpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVZ
-coup2 = cplcgWRmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVZ
-coup2 = cplcgWRpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZ2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZ(i2)
-coup2 = cplhhVPVZ(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZR2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZR(i2)
-coup2 = cplhhVPVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZ(i2,i1)
-coup2 = cplHpmcHpmVP(i1,i2)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWLmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplcHpmcVWRmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWLm2),dp) 
-coup1 = cplcVWLmVWLmVZ
-coup2 = cplcVWLmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWRm2),dp) 
-coup1 = cplcVWRmVWRmVZ
-coup2 = cplcVWRmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplHpmVPVWLm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplHpmVPVWRm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(MAh2(i1))
- coup1 = cplAhAhVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(Mhh2(i1))
- coup1 = cplhhhhVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVZ(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVWLmVZ2
-coup2 = cplcVWLmVPVWLmVZ3
-coup3 = cplcVWLmVPVWLmVZ1
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVWRmVZ2
-coup2 = cplcVWRmVPVWRmVZ3
-coup3 = cplcVWRmVPVWRmVZ1
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVZVP 
- 
-Subroutine Pi1LoopVZRVP(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
-& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVPVZR,        & 
-& cplAhhhVP,cplAhhhVZR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVPL,    & 
-& cplcFeFeVPR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZRL,            & 
-& cplcFuFuVZRR,cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLmgWRmVP,cplcgWLmgWRmVZR,            & 
-& cplcgWLpgWLpVP,cplcgWLpgWLpVZR,cplcgWLpgWRpVP,cplcgWLpgWRpVZR,cplcgWRmgWLmVP,          & 
-& cplcgWRmgWLmVZR,cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWLpVP,cplcgWRpgWLpVZR,         & 
-& cplcgWRpgWRpVP,cplcgWRpgWRpVZR,cplcHpmcVWLmVP,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,          & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,& 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
-& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWLmVZR,              & 
-& cplcVWRmVWRmVZR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVPVZR,            & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVPVZR,              & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZR,cplHpmVWRmVZR,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
-
-Complex(dp), Intent(in) :: cplAhAhVPVZR(4,4),cplAhhhVP(4,4),cplAhhhVZR(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),   & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZRL(3,3),& 
-& cplcFeFeVZRR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),& 
-& cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLmgWRmVP,cplcgWLmgWRmVZR,cplcgWLpgWLpVP,          & 
-& cplcgWLpgWLpVZR,cplcgWLpgWRpVP,cplcgWLpgWRpVZR,cplcgWRmgWLmVP,cplcgWRmgWLmVZR,         & 
-& cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWLpVP,cplcgWRpgWLpVZR,cplcgWRpgWRpVP,          & 
-& cplcgWRpgWRpVZR,cplcHpmcVWLmVP(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,               & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
-& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWLmVZR,              & 
-& cplcVWRmVWRmVZR,cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),     & 
-& cplhhhhVPVZR(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZR(4),             & 
-& cplHpmcHpmVP(4,4),cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),             & 
-& cplHpmVPVWRm(4),cplHpmVWLmVZR(4),cplHpmVWRmVZR(4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(VSSloop(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZR(i2,i1)
-coup2 = cplAhhhVP(i2,i1)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 4._dp*MFd(i1)*MFd(i2)*Real(SA_B0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVZRL(i1,i2)
-coupR1 = cplcFdFdVZRR(i1,i2)
-coupL2 = cplcFdFdVPL(i2,i1)
-coupR2 = cplcFdFdVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 4._dp*MFe(i1)*MFe(i2)*Real(SA_B0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVZRL(i1,i2)
-coupR1 = cplcFeFeVZRR(i1,i2)
-coupL2 = cplcFeFeVPL(i2,i1)
-coupR2 = cplcFeFeVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_Hloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 4._dp*MFu(i1)*MFu(i2)*Real(SA_B0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVZRL(i1,i2)
-coupR1 = cplcFuFuVZRR(i1,i2)
-coupL2 = cplcFuFuVPL(i2,i1)
-coupR2 = cplcFuFuVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- H0m2 = Real(SA_Hloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 4._dp*MFv(i1)*MFv(i2)*Real(SA_B0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVZRL(i1,i2)
-coupR1 = cplFvFvVZRR(i1,i2)
-coupL2 = cplFvFvVPL(i1,i2)
-coupR2 = cplFvFvVPR(i1,i2)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVZR
-coup2 = cplcgWLmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRmgWLmVZR
-coup2 = cplcgWLmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVZR
-coup2 = cplcgWLpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRpgWLpVZR
-coup2 = cplcgWLpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWLm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWLm2),dp)
-coup1 = cplcgWLmgWRmVZR
-coup2 = cplcgWRmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVZR
-coup2 = cplcgWRmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWLm2),dp)
-coup1 = cplcgWLpgWRpVZR
-coup2 = cplcgWRpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVZR
-coup2 = cplcgWRpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZ2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZR(i2)
-coup2 = cplhhVPVZ(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZR2,Mhh2(i2)),dp) 
-coup1 = cplhhVZRVZR(i2)
-coup2 = cplhhVPVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(VSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZR(i2,i1)
-coup2 = cplHpmcHpmVP(i1,i2)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplcHpmcVWLmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplcHpmcVWRmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWLm2,MVWLm2),dp) 
-coup1 = cplcVWLmVWLmVZR
-coup2 = cplcVWLmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWRm2,MVWLm2),dp) 
-coup1 = cplcVWRmVWLmVZR
-coup2 = cplcVWLmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWLm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWLm2,MVWRm2),dp) 
-coup1 = cplcVWLmVWRmVZR
-coup2 = cplcVWRmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWRm2,MVWRm2),dp) 
-coup1 = cplcVWRmVWRmVZR
-coup2 = cplcVWRmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplHpmVPVWLm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplHpmVPVWRm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(MAh2(i1))
- coup1 = cplAhAhVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(Mhh2(i1))
- coup1 = cplhhhhVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_A0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWLm2) +RXi/4._dp*SA_A0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVWLmVZR2
-coup2 = cplcVWLmVPVWLmVZR3
-coup3 = cplcVWLmVPVWLmVZR1
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(MVWRm2) +RXi/4._dp*SA_A0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVWRmVZR2
-coup2 = cplcVWRmVPVWRmVZR3
-coup3 = cplcVWRmVPVWRmVZR1
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVZRVP 
- 
-Subroutine DerPi1LoopVZRVP(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,           & 
-& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhVPVZR,        & 
-& cplAhhhVP,cplAhhhVZR,cplcFdFdVPL,cplcFdFdVPR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVPL,    & 
-& cplcFeFeVPR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuVPL,cplcFuFuVPR,cplcFuFuVZRL,            & 
-& cplcFuFuVZRR,cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLmgWRmVP,cplcgWLmgWRmVZR,            & 
-& cplcgWLpgWLpVP,cplcgWLpgWLpVZR,cplcgWLpgWRpVP,cplcgWLpgWRpVZR,cplcgWRmgWLmVP,          & 
-& cplcgWRmgWLmVZR,cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWLpVP,cplcgWRpgWLpVZR,         & 
-& cplcgWRpgWRpVP,cplcgWRpgWRpVZR,cplcHpmcVWLmVP,cplcHpmcVWLmVZR,cplcHpmcVWRmVP,          & 
-& cplcHpmcVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,& 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
-& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWLmVZR,              & 
-& cplcVWRmVWRmVZR,cplFvFvVPL,cplFvFvVPR,cplFvFvVZRL,cplFvFvVZRR,cplhhhhVPVZR,            & 
-& cplhhVPVZ,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVP,cplHpmcHpmVPVZR,              & 
-& cplHpmcHpmVZR,cplHpmVPVWLm,cplHpmVPVWRm,cplHpmVWLmVZR,cplHpmVWRmVZR,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
-& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
-
-Complex(dp), Intent(in) :: cplAhAhVPVZR(4,4),cplAhhhVP(4,4),cplAhhhVZR(4,4),cplcFdFdVPL(3,3),cplcFdFdVPR(3,3),   & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVPL(3,3),cplcFeFeVPR(3,3),cplcFeFeVZRL(3,3),& 
-& cplcFeFeVZRR(3,3),cplcFuFuVPL(3,3),cplcFuFuVPR(3,3),cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),& 
-& cplcgWLmgWLmVP,cplcgWLmgWLmVZR,cplcgWLmgWRmVP,cplcgWLmgWRmVZR,cplcgWLpgWLpVP,          & 
-& cplcgWLpgWLpVZR,cplcgWLpgWRpVP,cplcgWLpgWRpVZR,cplcgWRmgWLmVP,cplcgWRmgWLmVZR,         & 
-& cplcgWRmgWRmVP,cplcgWRmgWRmVZR,cplcgWRpgWLpVP,cplcgWRpgWLpVZR,cplcgWRpgWRpVP,          & 
-& cplcgWRpgWRpVZR,cplcHpmcVWLmVP(4),cplcHpmcVWLmVZR(4),cplcHpmcVWRmVP(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmVPVWLm,cplcVWLmVPVWLmVZR1,cplcVWLmVPVWLmVZR2,cplcVWLmVPVWLmVZR3,               & 
-& cplcVWLmVPVWRm,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVPVWLm,cplcVWRmVPVWRm,          & 
-& cplcVWRmVPVWRmVZR1,cplcVWRmVPVWRmVZR2,cplcVWRmVPVWRmVZR3,cplcVWRmVWLmVZR,              & 
-& cplcVWRmVWRmVZR,cplFvFvVPL(9,9),cplFvFvVPR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),     & 
-& cplhhhhVPVZR(4,4),cplhhVPVZ(4),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZR(4),             & 
-& cplHpmcHpmVP(4,4),cplHpmcHpmVPVZR(4,4),cplHpmcHpmVZR(4,4),cplHpmVPVWLm(4),             & 
-& cplHpmVPVWRm(4),cplHpmVWLmVZR(4),cplHpmVWRmVZR(4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(DerVSSloop(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZR(i2,i1)
-coup2 = cplAhhhVP(i2,i1)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fd], Fd 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFd2(i1),MFd2(i2)),dp) 
-B0m2 = 2._dp*MFd(i1)*MFd(i2)*Real(SA_DerB0(p2,MFd2(i1),MFd2(i2)),dp) 
-coupL1 = cplcFdFdVZRL(i1,i2)
-coupR1 = cplcFdFdVZRR(i1,i2)
-coupL2 = cplcFdFdVPL(i2,i1)
-coupR2 = cplcFdFdVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fe], Fe 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFe2(i1),MFe2(i2)),dp) 
-B0m2 = 2._dp*MFe(i1)*MFe(i2)*Real(SA_DerB0(p2,MFe2(i1),MFe2(i2)),dp) 
-coupL1 = cplcFeFeVZRL(i1,i2)
-coupR1 = cplcFeFeVZRR(i1,i2)
-coupL2 = cplcFeFeVPL(i2,i1)
-coupR2 = cplcFeFeVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[Fu], Fu 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 3
-       Do i2 = 1, 3
- H0m2 = Real(SA_DerHloop(p2,MFu2(i1),MFu2(i2)),dp) 
-B0m2 = 2._dp*MFu(i1)*MFu(i2)*Real(SA_DerB0(p2,MFu2(i1),MFu2(i2)),dp) 
-coupL1 = cplcFuFuVZRL(i1,i2)
-coupR1 = cplcFuFuVZRR(i1,i2)
-coupL2 = cplcFuFuVPL(i2,i1)
-coupR2 = cplcFuFuVPR(i2,i1)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +3._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! Fv, Fv 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 9
-       Do i2 = 1, 9
- H0m2 = Real(SA_DerHloop(p2,MFv2(i1),MFv2(i2)),dp) 
-B0m2 = 2._dp*MFv(i1)*MFv(i2)*Real(SA_DerB0(p2,MFv2(i1),MFv2(i2)),dp) 
-coupL1 = cplFvFvVZRL(i1,i2)
-coupR1 = cplFvFvVZRR(i1,i2)
-coupL2 = cplFvFvVPL(i1,i2)
-coupR2 = cplFvFvVPR(i1,i2)
-    SumI = (coupL1*coupL2+coupR1*coupR2)*H0m2 & 
-                & + 0.5_dp*(coupL1*coupR2 + coupL2*coupR1)*B0m2 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! bar[gWLm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLmgWLmVZR
-coup2 = cplcgWLmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRmgWLmVZR
-coup2 = cplcgWLmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWLm2),dp)
-coup1 = cplcgWLpgWLpVZR
-coup2 = cplcgWLpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVWRm2),dp)
-coup1 = cplcgWRpgWLpVZR
-coup2 = cplcgWLpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWLm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWLm2),dp)
-coup1 = cplcgWLmgWRmVZR
-coup2 = cplcgWRmgWLmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWRm], gWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRmgWRmVZR
-coup2 = cplcgWRmgWRmVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWLmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWLm2),dp)
-coup1 = cplcgWLpgWRpVZR
-coup2 = cplcgWRpgWLpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! bar[gWRmC], gWRmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVWRm2),dp)
-coup1 = cplcgWRpgWRpVZR
-coup2 = cplcgWRpgWRpVP 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! VZ, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZ2,Mhh2(i2)),dp) 
-coup1 = cplhhVZVZR(i2)
-coup2 = cplhhVPVZ(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! VZR, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZR2,Mhh2(i2)),dp) 
-coup1 = cplhhVZRVZR(i2)
-coup2 = cplhhVPVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(DerVSSloop(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZR(i2,i1)
-coup2 = cplHpmcHpmVP(i1,i2)
-    SumI = coup1*coup2*B22m2 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! VWLm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplcHpmcVWLmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VWRm, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplcHpmcVWRmVP(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWLm2),dp) 
-coup1 = cplcVWLmVWLmVZR
-coup2 = cplcVWLmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWLm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWLm2),dp) 
-coup1 = cplcVWRmVWLmVZR
-coup2 = cplcVWLmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWLm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWLm2,MVWRm2),dp) 
-coup1 = cplcVWLmVWRmVZR
-coup2 = cplcVWRmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWRm], VWRm 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWRm2,MVWRm2),dp) 
-coup1 = cplcVWRmVWRmVZR
-coup2 = cplcVWRmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplHpmVPVWLm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplHpmVPVWRm(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! Ah 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(MAh2(i1))
- coup1 = cplAhAhVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! hh 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(Mhh2(i1))
- coup1 = cplhhhhVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1._dp/2._dp* SumI  
-      End Do 
- !------------------------ 
-! conj[Hpm] 
-!------------------------ 
-    Do i1 = 1, 4
- SumI = 0._dp 
- A0m2 = SA_DerA0(MHpm2(i1))
- coup1 = cplHpmcHpmVPVZR(i1,i1)
- SumI = coup1*A0m2 
-res = res +1* SumI  
-      End Do 
- !------------------------ 
-! conj[VWLm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWLm2) +RXi/4._dp*SA_DerA0(MVWLm2*RXi) 
-coup1 = cplcVWLmVPVWLmVZR2
-coup2 = cplcVWLmVPVWLmVZR3
-coup3 = cplcVWLmVPVWLmVZR1
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWLm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-!------------------------ 
-! conj[VWRm] 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVWRm2) +RXi/4._dp*SA_DerA0(MVWRm2*RXi) 
-coup1 = cplcVWRmVPVWRmVZR2
-coup2 = cplcVWRmVPVWRmVZR3
-coup3 = cplcVWRmVPVWRmVZR1
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1* SumI  
-res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVZRVP 
- 
 Subroutine Pi1LoopVWLmVWRm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,           & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcVWRmVWLm,    & 
-& cplAhcHpmcVWRm,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,   & 
-& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcgPgWLmcVWRm,cplcgPgWLpVWLm,cplcgPgWRmcVWRm,          & 
-& cplcgPgWRpVWLm,cplcgWLmgPVWLm,cplcgWLmgZpVWLm,cplcgWLpgPcVWRm,cplcgWLpgZpcVWRm,        & 
-& cplcgWRmgPVWLm,cplcgWRmgZpVWLm,cplcgWRpgPcVWRm,cplcgWRpgZpcVWRm,cplcgZpgWLmcVWRm,      & 
-& cplcgZpgWLpVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,        & 
-& cplcHpmcVWRmVZR,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,  & 
-& cplcVWLmVPVWLm,cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,          & 
-& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2, & 
-& cplcVWRmVWLmVZRVZR3,cplcVWRmVWRmVZR,cplFvFecVWRmL,cplFvFecVWRmR,cplhhcHpmcVWRm,        & 
-& cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhcVWRmVWLm,cplhhHpmVWLm,            & 
-& cplHpmcHpmcVWRmVWLm,cplHpmVPVWLm,cplHpmVWLmVZ,cplHpmVWLmVZR,kont,res)
+& cplAhcHpmVWLm,cplAhHpmcVWRm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,   & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcgWLmgZpVWLm,cplcgWLmgZVWLm,cplcgWLpgZcVWRm,          & 
+& cplcgWLpgZpcVWRm,cplcgWRmgZpVWLm,cplcgWRmgZVWLm,cplcgWRpgZcVWRm,cplcgWRpgZpcVWRm,      & 
+& cplcgZgWLmcVWRm,cplcgZgWLpVWLm,cplcgZgWRmcVWRm,cplcgZgWRpVWLm,cplcgZpgWLmcVWRm,        & 
+& cplcgZpgWLpVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmVPVWLm,cplcHpmVWLmVZ,          & 
+& cplcHpmVWLmVZR,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,   & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,          & 
+& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,             & 
+& cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
+& cplcVWRmVWLmVZVZ3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWRmL,cplFvFecVWRmR,          & 
+& cplhhcHpmVWLm,cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhcVWRmVWLm,           & 
+& cplhhHpmcVWRm,cplHpmcHpmcVWRmVWLm,cplHpmcVWRmVP,cplHpmcVWRmVZ,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhcVWRmVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhHpmVWLm(4,4),cplcFdFuVWLmL(3,3),       & 
+Complex(dp), Intent(in) :: cplAhAhcVWRmVWLm(4,4),cplAhcHpmVWLm(4,4),cplAhHpmcVWRm(4,4),cplcFdFuVWLmL(3,3),       & 
 & cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFuFdcVWRmL(3,3),          & 
-& cplcFuFdcVWRmR(3,3),cplcgPgWLmcVWRm,cplcgPgWLpVWLm,cplcgPgWRmcVWRm,cplcgPgWRpVWLm,     & 
-& cplcgWLmgPVWLm,cplcgWLmgZpVWLm,cplcgWLpgPcVWRm,cplcgWLpgZpcVWRm,cplcgWRmgPVWLm,        & 
-& cplcgWRmgZpVWLm,cplcgWRpgPcVWRm,cplcgWRpgZpcVWRm,cplcgZpgWLmcVWRm,cplcgZpgWLpVWLm,     & 
-& cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWLmVPVWLm,   & 
+& cplcFuFdcVWRmR(3,3),cplcgWLmgZpVWLm,cplcgWLmgZVWLm,cplcgWLpgZcVWRm,cplcgWLpgZpcVWRm,   & 
+& cplcgWRmgZpVWLm,cplcgWRmgZVWLm,cplcgWRpgZcVWRm,cplcgWRpgZpcVWRm,cplcgZgWLmcVWRm,       & 
+& cplcgZgWLpVWLm,cplcgZgWRmcVWRm,cplcgZgWRpVWLm,cplcgZpgWLmcVWRm,cplcgZpgWLpVWLm,        & 
+& cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmVPVWLm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),  & 
+& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWLmVWLmVZ,   & 
 & cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,  & 
-& cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWRmVPVWLm,cplcVWRmVPVWRm,   & 
-& cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhcHpmcVWRm(4,4),             & 
-& cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcVWRmVWLm(4,4),           & 
-& cplhhHpmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplHpmVPVWLm(4),cplHpmVWLmVZ(4),            & 
-& cplHpmVWLmVZR(4)
+& cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,& 
+& cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhcHpmVWLm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcVWRmVWLm(4,4),cplhhHpmcVWRm(4,4),          & 
+& cplHpmcHpmcVWRmVWLm(4,4),cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -12695,15 +11907,15 @@ Integer :: i1,i2,i3,i4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(VSSloop(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhcHpmcVWRm(i2,i1)
+coup1 = cplAhcHpmVWLm(i2,i1)
+coup2 = cplAhHpmcVWRm(i2,i1)
     SumI = coup1*coup2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -12745,33 +11957,13 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[gWLm], gP 
+! bar[gZ], gWLmC 
 !------------------------ 
 sumI = 0._dp 
  
-B0m2 = Real(VGGloop(p2,0._dp,MVWLm2),dp)
-coup1 = cplcgWLmgPVWLm
-coup2 = cplcgPgWLmcVWRm 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,0._dp,MVWRm2),dp)
-coup1 = cplcgWRmgPVWLm
-coup2 = cplcgPgWRmcVWRm 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gP], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VGGloop(p2,MVWLm2,0._dp),dp)
-coup1 = cplcgPgWLpVWLm
-coup2 = cplcgWLpgPcVWRm 
+B0m2 = Real(VGGloop(p2,MVWLm2,MVZ2),dp)
+coup1 = cplcgZgWLpVWLm
+coup2 = cplcgWLpgZcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -12785,13 +11977,13 @@ coup2 = cplcgWLpgZpcVWRm
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWRmC 
+! bar[gZ], gWRmC 
 !------------------------ 
 sumI = 0._dp 
  
-B0m2 = Real(VGGloop(p2,MVWRm2,0._dp),dp)
-coup1 = cplcgPgWRpVWLm
-coup2 = cplcgWRpgPcVWRm 
+B0m2 = Real(VGGloop(p2,MVWRm2,MVZ2),dp)
+coup1 = cplcgZgWRpVWLm
+coup2 = cplcgWRpgZcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -12802,6 +11994,26 @@ sumI = 0._dp
 B0m2 = Real(VGGloop(p2,MVWRm2,MVZR2),dp)
 coup1 = cplcgZpgWRpVWLm
 coup2 = cplcgWRpgZpcVWRm 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVZ2,MVWLm2),dp)
+coup1 = cplcgWLmgZVWLm
+coup2 = cplcgZgWLmcVWRm 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(VGGloop(p2,MVZ2,MVWRm2),dp)
+coup1 = cplcgWRmgZVWLm
+coup2 = cplcgZgWRmcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -12825,6 +12037,20 @@ coup2 = cplcgZpgWRmcVWRm
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[Hpm], hh 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(VSSloop(p2,Mhh2(i2),MHpm2(i1)),dp) 
+coup1 = cplhhcHpmVWLm(i2,i1)
+coup2 = cplhhHpmcVWRm(i2,i1)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
 ! conj[VWLm], hh 
 !------------------------ 
 sumI = 0._dp 
@@ -12849,72 +12075,58 @@ coup2 = cplhhcVWRmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[Hpm], VP 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(VSSloop(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplhhcHpmcVWRm(i2,i1)
-    SumI = coup1*coup2*B22m2 
+ res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[Hpm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcVWRmVZ(i1)
+    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
       End Do 
-     End Do 
  !------------------------ 
-! VP, Hpm 
+! conj[VWLm], VZ 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
- res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VZ, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZ2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWRmVZ(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! VZR, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplcHpmcVWRmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VP 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(VVVloop(p2,MVWLm2,0._dp),dp) 
-coup1 = cplcVWLmVPVWLm
-coup2 = cplcVWRmVPVWLm
+B0m2 = Real(VVVloop(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWLmVZ
+coup2 = cplcVWRmVWLmVZ
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! conj[VWRm], VP 
+! conj[VWRm], VZ 
 !------------------------ 
 sumI = 0._dp 
  
-B0m2 = Real(VVVloop(p2,MVWRm2,0._dp),dp) 
-coup1 = cplcVWRmVPVWLm
-coup2 = cplcVWRmVPVWRm
+B0m2 = Real(VVVloop(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcVWRmVWRmVZ
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(VVSloop(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
 ! conj[VWLm], VZR 
 !------------------------ 
 sumI = 0._dp 
@@ -12965,16 +12177,6 @@ res = res +1._dp/2._dp* SumI
 res = res +1* SumI  
       End Do 
  !------------------------ 
-! VP 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_A0(0._dp) +RXi/4._dp*SA_A0(0._dp*RXi) 
-coup1 = cplcVWRmVPVPVWLm3
-coup2 = cplcVWRmVPVPVWLm1
-coup3 = cplcVWRmVPVPVWLm2
-SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*0._dp-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1._dp/2._dp* SumI  
-!------------------------ 
 ! conj[VWLm] 
 !------------------------ 
 SumI = 0._dp 
@@ -12995,6 +12197,16 @@ coup3 = cplcVWRmcVWRmVWLmVWRm1
 SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
 res = res +1* SumI  
 !------------------------ 
+! VZ 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_A0(MVZ2) +RXi/4._dp*SA_A0(MVZ2*RXi) 
+coup1 = cplcVWRmVWLmVZVZ1
+coup2 = cplcVWRmVWLmVZVZ2
+coup3 = cplcVWRmVWLmVZVZ3
+SumI = ((2._dp*rMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVZ2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1._dp/2._dp* SumI  
+!------------------------ 
 ! VZR 
 !------------------------ 
 SumI = 0._dp 
@@ -13010,37 +12222,36 @@ End Subroutine Pi1LoopVWLmVWRm
  
 Subroutine DerPi1LoopVWLmVWRm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhcVWRmVWLm,& 
-& cplAhcHpmcVWRm,cplAhHpmVWLm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,   & 
-& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcgPgWLmcVWRm,cplcgPgWLpVWLm,cplcgPgWRmcVWRm,          & 
-& cplcgPgWRpVWLm,cplcgWLmgPVWLm,cplcgWLmgZpVWLm,cplcgWLpgPcVWRm,cplcgWLpgZpcVWRm,        & 
-& cplcgWRmgPVWLm,cplcgWRmgZpVWLm,cplcgWRpgPcVWRm,cplcgWRpgZpcVWRm,cplcgZpgWLmcVWRm,      & 
-& cplcgZpgWLpVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmcVWRmVP,cplcHpmcVWRmVZ,        & 
-& cplcHpmcVWRmVZR,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,  & 
-& cplcVWLmVPVWLm,cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,          & 
-& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,          & 
-& cplcVWRmVPVWLm,cplcVWRmVPVWRm,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2, & 
-& cplcVWRmVWLmVZRVZR3,cplcVWRmVWRmVZR,cplFvFecVWRmL,cplFvFecVWRmR,cplhhcHpmcVWRm,        & 
-& cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhcVWRmVWLm,cplhhHpmVWLm,            & 
-& cplHpmcHpmcVWRmVWLm,cplHpmVPVWLm,cplHpmVWLmVZ,cplHpmVWLmVZR,kont,res)
+& cplAhcHpmVWLm,cplAhHpmcVWRm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,cplcFeFvVWLmR,   & 
+& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcgWLmgZpVWLm,cplcgWLmgZVWLm,cplcgWLpgZcVWRm,          & 
+& cplcgWLpgZpcVWRm,cplcgWRmgZpVWLm,cplcgWRmgZVWLm,cplcgWRpgZcVWRm,cplcgWRpgZpcVWRm,      & 
+& cplcgZgWLmcVWRm,cplcgZgWLpVWLm,cplcgZgWRmcVWRm,cplcgZgWRpVWLm,cplcgZpgWLmcVWRm,        & 
+& cplcgZpgWLpVWLm,cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmVPVWLm,cplcHpmVWLmVZ,          & 
+& cplcHpmVWLmVZR,cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,   & 
+& cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,          & 
+& cplcVWRmcVWRmVWLmVWRm3,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,             & 
+& cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,           & 
+& cplcVWRmVWLmVZVZ3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecVWRmL,cplFvFecVWRmR,          & 
+& cplhhcHpmVWLm,cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhhhcVWRmVWLm,           & 
+& cplhhHpmcVWRm,cplHpmcHpmcVWRmVWLm,cplHpmcVWRmVP,cplHpmcVWRmVZ,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhcVWRmVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhHpmVWLm(4,4),cplcFdFuVWLmL(3,3),       & 
+Complex(dp), Intent(in) :: cplAhAhcVWRmVWLm(4,4),cplAhcHpmVWLm(4,4),cplAhHpmcVWRm(4,4),cplcFdFuVWLmL(3,3),       & 
 & cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFuFdcVWRmL(3,3),          & 
-& cplcFuFdcVWRmR(3,3),cplcgPgWLmcVWRm,cplcgPgWLpVWLm,cplcgPgWRmcVWRm,cplcgPgWRpVWLm,     & 
-& cplcgWLmgPVWLm,cplcgWLmgZpVWLm,cplcgWLpgPcVWRm,cplcgWLpgZpcVWRm,cplcgWRmgPVWLm,        & 
-& cplcgWRmgZpVWLm,cplcgWRpgPcVWRm,cplcgWRpgZpcVWRm,cplcgZpgWLmcVWRm,cplcgZpgWLpVWLm,     & 
-& cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmcVWRmVP(4),cplcHpmcVWRmVZ(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWLmVPVWLm,   & 
+& cplcFuFdcVWRmR(3,3),cplcgWLmgZpVWLm,cplcgWLmgZVWLm,cplcgWLpgZcVWRm,cplcgWLpgZpcVWRm,   & 
+& cplcgWRmgZpVWLm,cplcgWRmgZVWLm,cplcgWRpgZcVWRm,cplcgWRpgZpcVWRm,cplcgZgWLmcVWRm,       & 
+& cplcgZgWLpVWLm,cplcgZgWRmcVWRm,cplcgZgWRpVWLm,cplcgZpgWLmcVWRm,cplcgZpgWLpVWLm,        & 
+& cplcgZpgWRmcVWRm,cplcgZpgWRpVWLm,cplcHpmVPVWLm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),  & 
+& cplcVWLmcVWRmVWLmVWLm1,cplcVWLmcVWRmVWLmVWLm2,cplcVWLmcVWRmVWLmVWLm3,cplcVWLmVWLmVZ,   & 
 & cplcVWLmVWLmVZR,cplcVWRmcVWRmVWLmVWRm1,cplcVWRmcVWRmVWLmVWRm2,cplcVWRmcVWRmVWLmVWRm3,  & 
-& cplcVWRmVPVPVWLm1,cplcVWRmVPVPVWLm2,cplcVWRmVPVPVWLm3,cplcVWRmVPVWLm,cplcVWRmVPVWRm,   & 
-& cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,           & 
-& cplcVWRmVWRmVZR,cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhcHpmcVWRm(4,4),             & 
-& cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcVWRmVWLm(4,4),           & 
-& cplhhHpmVWLm(4,4),cplHpmcHpmcVWRmVWLm(4,4),cplHpmVPVWLm(4),cplHpmVWLmVZ(4),            & 
-& cplHpmVWLmVZR(4)
+& cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWLmVZRVZR1,cplcVWRmVWLmVZRVZR2,cplcVWRmVWLmVZRVZR3,& 
+& cplcVWRmVWLmVZVZ1,cplcVWRmVWLmVZVZ2,cplcVWRmVWLmVZVZ3,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,  & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhcHpmVWLm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhhhcVWRmVWLm(4,4),cplhhHpmcVWRm(4,4),          & 
+& cplHpmcHpmcVWRmVWLm(4,4),cplHpmcVWRmVP(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -13060,15 +12271,15 @@ MVP2 = Mass_Regulator_PhotonGluon**2
 res = 0._dp 
  
 !------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
        Do i2 = 1, 4
  B22m2 = Real(DerVSSloop(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhcHpmcVWRm(i2,i1)
+coup1 = cplAhcHpmVWLm(i2,i1)
+coup2 = cplAhHpmcVWRm(i2,i1)
     SumI = coup1*coup2*B22m2 
 res = res +1._dp* SumI  
       End Do 
@@ -13110,33 +12321,13 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! bar[gWLm], gP 
+! bar[gZ], gWLmC 
 !------------------------ 
 sumI = 0._dp 
  
-B0m2 = Real(DerVGGloop(p2,MVP2,MVWLm2),dp)
-coup1 = cplcgWLmgPVWLm
-coup2 = cplcgPgWLmcVWRm 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gWRm], gP 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVP2,MVWRm2),dp)
-coup1 = cplcgWRmgPVWLm
-coup2 = cplcgPgWRmcVWRm 
-   SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! bar[gP], gWLmC 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVGGloop(p2,MVWLm2,MVP2),dp)
-coup1 = cplcgPgWLpVWLm
-coup2 = cplcgWLpgPcVWRm 
+B0m2 = Real(DerVGGloop(p2,MVWLm2,MVZ2),dp)
+coup1 = cplcgZgWLpVWLm
+coup2 = cplcgWLpgZcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -13150,13 +12341,13 @@ coup2 = cplcgWLpgZpcVWRm
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
-! bar[gP], gWRmC 
+! bar[gZ], gWRmC 
 !------------------------ 
 sumI = 0._dp 
  
-B0m2 = Real(DerVGGloop(p2,MVWRm2,MVP2),dp)
-coup1 = cplcgPgWRpVWLm
-coup2 = cplcgWRpgPcVWRm 
+B0m2 = Real(DerVGGloop(p2,MVWRm2,MVZ2),dp)
+coup1 = cplcgZgWRpVWLm
+coup2 = cplcgWRpgZcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -13167,6 +12358,26 @@ sumI = 0._dp
 B0m2 = Real(DerVGGloop(p2,MVWRm2,MVZR2),dp)
 coup1 = cplcgZpgWRpVWLm
 coup2 = cplcgWRpgZpcVWRm 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVZ2,MVWLm2),dp)
+coup1 = cplcgWLmgZVWLm
+coup2 = cplcgZgWLmcVWRm 
+   SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVGGloop(p2,MVZ2,MVWRm2),dp)
+coup1 = cplcgWRmgZVWLm
+coup2 = cplcgZgWRmcVWRm 
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
@@ -13190,6 +12401,20 @@ coup2 = cplcgZpgWRmcVWRm
    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[Hpm], hh 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+       Do i2 = 1, 4
+ B22m2 = Real(DerVSSloop(p2,Mhh2(i2),MHpm2(i1)),dp) 
+coup1 = cplhhcHpmVWLm(i2,i1)
+coup2 = cplhhHpmcVWRm(i2,i1)
+    SumI = coup1*coup2*B22m2 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
 ! conj[VWLm], hh 
 !------------------------ 
 sumI = 0._dp 
@@ -13214,76 +12439,62 @@ coup2 = cplhhcVWRmVWRm(i2)
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[Hpm], VP 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
-       Do i2 = 1, 4
- B22m2 = Real(DerVSSloop(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplhhcHpmcVWRm(i2,i1)
-    SumI = coup1*coup2*B22m2 
+ B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcVWRmVP(i1)
+    SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
       End Do 
-     End Do 
  !------------------------ 
-! VP, Hpm 
+! conj[Hpm], VZ 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVP2,MHpm2(i2)),dp) 
-coup1 = cplHpmVPVWLm(i2)
-coup2 = cplcHpmcVWRmVP(i2)
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcVWRmVZ(i1)
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
-    End Do 
+      End Do 
  !------------------------ 
-! VZ, Hpm 
+! conj[VWLm], VZ 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZ2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplcHpmcVWRmVZ(i2)
+B0m2 = Real(DerVVVloop(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWLmVZ
+coup2 = cplcVWRmVWLmVZ
     SumI = coup1*coup2*B0m2 
 res = res +1._dp* SumI  
-    End Do 
+!------------------------ 
+! conj[VWRm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+B0m2 = Real(DerVVVloop(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcVWRmVWRmVZ
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplHpmcVWRmVZR(i1)
+    SumI = coup1*coup2*B0m2 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
-! VZR, Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- B0m2 = Real(DerVVSloop(p2,MVZR2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplcHpmcVWRmVZR(i2)
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWLm], VP 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWLm2,MVP2),dp) 
-coup1 = cplcVWLmVPVWLm
-coup2 = cplcVWRmVPVWLm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWRm], VP 
-!------------------------ 
-sumI = 0._dp 
- 
-B0m2 = Real(DerVVVloop(p2,MVWRm2,MVP2),dp) 
-coup1 = cplcVWRmVPVWLm
-coup2 = cplcVWRmVPVWRm
-    SumI = coup1*coup2*B0m2 
-res = res +1._dp* SumI  
-!------------------------ 
 ! conj[VWLm], VZR 
 !------------------------ 
 sumI = 0._dp 
@@ -13334,16 +12545,6 @@ res = res +1._dp/2._dp* SumI
 res = res +1* SumI  
       End Do 
  !------------------------ 
-! VP 
-!------------------------ 
-SumI = 0._dp 
-A0m2 = 3._dp/4._dp*SA_DerA0(MVP2) +RXi/4._dp*SA_DerA0(MVP2*RXi) 
-coup1 = cplcVWRmVPVPVWLm3
-coup2 = cplcVWRmVPVPVWLm1
-coup3 = cplcVWRmVPVPVWLm2
-SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVP2-(4._dp*coup1+coup2+coup3)*A0m2)
-res = res +1._dp/2._dp* SumI  
-!------------------------ 
 ! conj[VWLm] 
 !------------------------ 
 SumI = 0._dp 
@@ -13364,6 +12565,16 @@ coup3 = cplcVWRmcVWRmVWLmVWRm1
 SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVWRm2-(4._dp*coup1+coup2+coup3)*A0m2)
 res = res +1* SumI  
 !------------------------ 
+! VZ 
+!------------------------ 
+SumI = 0._dp 
+A0m2 = 3._dp/4._dp*SA_DerA0(MVZ2) +RXi/4._dp*SA_DerA0(MVZ2*RXi) 
+coup1 = cplcVWRmVWLmVZVZ1
+coup2 = cplcVWRmVWLmVZVZ2
+coup3 = cplcVWRmVWLmVZVZ3
+SumI = ((2._dp*DerrMS*coup1+(1-RXi**2)/8._dp*(coup2+coup3))*MVZ2-(4._dp*coup1+coup2+coup3)*A0m2)
+res = res +1._dp/2._dp* SumI  
+!------------------------ 
 ! VZR 
 !------------------------ 
 SumI = 0._dp 
@@ -13380,11 +12591,14 @@ End Subroutine DerPi1LoopVWLmVWRm
 Subroutine Pi1LoopVZhh(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,             & 
 & MVWLm,MVWLm2,MVWRm,MVWRm2,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,             & 
 & cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuhhL,cplcFuFuhhR,               & 
-& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmhh,cplcgWLmgWLmVZ,cplcgWLpgWLphh,cplcgWLpgWLpVZ,   & 
-& cplcgWRmgWRmhh,cplcgWRmgWRmVZ,cplcgWRpgWRphh,cplcgWRpgWRpVZ,cplcHpmcVWLmVZ,            & 
-& cplcHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,         & 
-& cplFvFvVZR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,   & 
-& cplhhHpmVWLm,cplhhHpmVWRm,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,kont,res)
+& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmhh,cplcgWLmgWLmVZ,cplcgWLmgWRmhh,cplcgWLmgWRmVZ,   & 
+& cplcgWLpgWLphh,cplcgWLpgWLpVZ,cplcgWLpgWRphh,cplcgWLpgWRpVZ,cplcgWRmgWLmhh,            & 
+& cplcgWRmgWLmVZ,cplcgWRmgWRmhh,cplcgWRmgWRmVZ,cplcgWRpgWLphh,cplcgWRpgWLpVZ,            & 
+& cplcgWRpgWRphh,cplcgWRpgWRpVZ,cplcHpmVWLmVZ,cplcHpmVWRmVZ,cplcVWLmVWLmVZ,              & 
+& cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,         & 
+& cplFvFvVZR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,   & 
+& cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmcVWLm,cplhhHpmcVWRm,cplHpmcHpmVZ,cplHpmcVWLmVZ,    & 
+& cplHpmcVWRmVZ,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),MHpm(4),MHpm2(4),         & 
@@ -13393,12 +12607,15 @@ Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2
 Complex(dp), Intent(in) :: cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),              & 
 & cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
 & cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcgWLmgWLmhh(4),cplcgWLmgWLmVZ,cplcgWLpgWLphh(4),cplcgWLpgWLpVZ,cplcgWRmgWRmhh(4),   & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRphh(4),cplcgWRpgWRpVZ,cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),   & 
-& cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),     & 
-& cplFvFvVZR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),             & 
-& cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),             & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
+& cplcgWLmgWLmhh(4),cplcgWLmgWLmVZ,cplcgWLmgWRmhh(4),cplcgWLmgWRmVZ,cplcgWLpgWLphh(4),   & 
+& cplcgWLpgWLpVZ,cplcgWLpgWRphh(4),cplcgWLpgWRpVZ,cplcgWRmgWLmhh(4),cplcgWRmgWLmVZ,      & 
+& cplcgWRmgWRmhh(4),cplcgWRmgWRmVZ,cplcgWRpgWLphh(4),cplcgWRpgWLpVZ,cplcgWRpgWRphh(4),   & 
+& cplcgWRpgWRpVZ,cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWLmVWRmVZ,        & 
+& cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),     & 
+& cplFvFvVZR(9,9),cplhhcHpmVWLm(4,4),cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),               & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),             & 
+& cplhhHpmcVWLm(4,4),cplhhHpmcVWRm(4,4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),              & 
+& cplHpmcVWRmVZ(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -13505,6 +12722,19 @@ coup2 = cplcgWLmgWLmhh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmhh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -13518,6 +12748,32 @@ coup2 = cplcgWLpgWLphh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRphh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmhh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -13530,6 +12786,19 @@ coup2 = cplcgWRmgWRmhh(gO2)
    SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
 End do 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLphh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
@@ -13561,7 +12830,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -13569,14 +12838,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplhhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplhhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -13584,12 +12853,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplhhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplhhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplhhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -13604,6 +12888,47 @@ coup2 = cplhhcVWLmVWLm(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplhhcVWLmVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplhhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplhhcVWRmVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -13616,48 +12941,21 @@ coup2 = cplhhcVWRmVWRm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplhhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplhhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine Pi1LoopVZhh 
  
 Subroutine DerPi1LoopVZhh(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,          & 
 & MVWLm,MVWLm2,MVWRm,MVWRm2,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,             & 
 & cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuhhL,cplcFuFuhhR,               & 
-& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmhh,cplcgWLmgWLmVZ,cplcgWLpgWLphh,cplcgWLpgWLpVZ,   & 
-& cplcgWRmgWRmhh,cplcgWRmgWRmVZ,cplcgWRpgWRphh,cplcgWRpgWRpVZ,cplcHpmcVWLmVZ,            & 
-& cplcHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,         & 
-& cplFvFvVZR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,   & 
-& cplhhHpmVWLm,cplhhHpmVWRm,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,kont,res)
+& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmhh,cplcgWLmgWLmVZ,cplcgWLmgWRmhh,cplcgWLmgWRmVZ,   & 
+& cplcgWLpgWLphh,cplcgWLpgWLpVZ,cplcgWLpgWRphh,cplcgWLpgWRpVZ,cplcgWRmgWLmhh,            & 
+& cplcgWRmgWLmVZ,cplcgWRmgWRmhh,cplcgWRmgWRmVZ,cplcgWRpgWLphh,cplcgWRpgWLpVZ,            & 
+& cplcgWRpgWRphh,cplcgWRpgWRpVZ,cplcHpmVWLmVZ,cplcHpmVWRmVZ,cplcVWLmVWLmVZ,              & 
+& cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,         & 
+& cplFvFvVZR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcVWRmVWLm,   & 
+& cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmcVWLm,cplhhHpmcVWRm,cplHpmcHpmVZ,cplHpmcVWLmVZ,    & 
+& cplHpmcVWRmVZ,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),MHpm(4),MHpm2(4),         & 
@@ -13666,12 +12964,15 @@ Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2
 Complex(dp), Intent(in) :: cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),              & 
 & cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
 & cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcgWLmgWLmhh(4),cplcgWLmgWLmVZ,cplcgWLpgWLphh(4),cplcgWLpgWLpVZ,cplcgWRmgWRmhh(4),   & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRphh(4),cplcgWRpgWRpVZ,cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),   & 
-& cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),     & 
-& cplFvFvVZR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),             & 
-& cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),             & 
-& cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
+& cplcgWLmgWLmhh(4),cplcgWLmgWLmVZ,cplcgWLmgWRmhh(4),cplcgWLmgWRmVZ,cplcgWLpgWLphh(4),   & 
+& cplcgWLpgWLpVZ,cplcgWLpgWRphh(4),cplcgWLpgWRpVZ,cplcgWRmgWLmhh(4),cplcgWRmgWLmVZ,      & 
+& cplcgWRmgWRmhh(4),cplcgWRmgWRmVZ,cplcgWRpgWLphh(4),cplcgWRpgWLpVZ,cplcgWRpgWRphh(4),   & 
+& cplcgWRpgWRpVZ,cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVWLmVZ,cplcVWLmVWRmVZ,        & 
+& cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),     & 
+& cplFvFvVZR(9,9),cplhhcHpmVWLm(4,4),cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),               & 
+& cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),             & 
+& cplhhHpmcVWLm(4,4),cplhhHpmcVWRm(4,4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),              & 
+& cplHpmcVWRmVZ(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -13784,6 +13085,19 @@ coup2 = cplcgWLmgWLmhh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmhh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -13797,6 +13111,32 @@ coup2 = cplcgWLpgWLphh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRphh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmhh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -13809,6 +13149,19 @@ coup2 = cplcgWRmgWRmhh(gO2)
    SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
 End do 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLphh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
@@ -13840,7 +13193,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -13848,14 +13201,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplhhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplhhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -13863,12 +13216,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplhhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplhhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplhhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -13883,6 +13251,47 @@ coup2 = cplhhcVWLmVWLm(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! conj[VWRm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplhhcVWLmVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplhhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplhhcVWRmVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! conj[VWRm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -13895,63 +13304,37 @@ coup2 = cplhhcVWRmVWRm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplhhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplhhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine DerPi1LoopVZhh 
  
 Subroutine Pi1LoopVZAh(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,               & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,           & 
-& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,             & 
-& cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZL,cplcFdFdVZR,             & 
-& cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuAhL,cplcFuFuAhR,               & 
-& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmAh,cplcgWLmgWLmVZ,cplcgWLpgWLpAh,cplcgWLpgWLpVZ,   & 
-& cplcgWRmgWRmAh,cplcgWRmgWRmVZ,cplcgWRpgWRpAh,cplcgWRpgWRpVZ,cplcHpmcVWLmVZ,            & 
-& cplcHpmcVWRmVZ,cplFvFvAhL,cplFvFvAhR,cplFvFvVZL,cplFvFvVZR,cplhhVPVZ,cplhhVZVZ,        & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,kont,res)
+& cplAhcHpmVWLm,cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,        & 
+& cplAhHpmcHpm,cplAhHpmcVWLm,cplAhHpmcVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZL,          & 
+& cplcFdFdVZR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuAhL,               & 
+& cplcFuFuAhR,cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmAh,cplcgWLmgWLmVZ,cplcgWLmgWRmAh,      & 
+& cplcgWLmgWRmVZ,cplcgWLpgWLpAh,cplcgWLpgWLpVZ,cplcgWLpgWRpAh,cplcgWLpgWRpVZ,            & 
+& cplcgWRmgWLmAh,cplcgWRmgWLmVZ,cplcgWRmgWRmAh,cplcgWRmgWRmVZ,cplcgWRpgWLpAh,            & 
+& cplcgWRpgWLpVZ,cplcgWRpgWRpAh,cplcgWRpgWRpVZ,cplcHpmVWLmVZ,cplcHpmVWRmVZ,              & 
+& cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplFvFvAhL,cplFvFvAhR,cplFvFvVZL,cplFvFvVZR,             & 
+& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhhhVP(4,4),              & 
-& cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),& 
-& cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),               & 
-& cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcgWLmgWLmAh(4),cplcgWLmgWLmVZ,cplcgWLpgWLpAh(4),cplcgWLpgWLpVZ,cplcgWRmgWRmAh(4),   & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRpAh(4),cplcgWRpgWRpVZ,cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),   & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplhhVPVZ(4),      & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
+Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),             & 
+& cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmcVWLm(4,4),& 
+& cplAhHpmcVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZL(3,3),             & 
+& cplcFdFdVZR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZL(3,3),               & 
+& cplcFeFeVZR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZL(3,3),               & 
+& cplcFuFuVZR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZ,cplcgWLmgWRmAh(4),cplcgWLmgWRmVZ,    & 
+& cplcgWLpgWLpAh(4),cplcgWLpgWLpVZ,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZ,cplcgWRmgWLmAh(4),   & 
+& cplcgWRmgWLmVZ,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZ,cplcgWRpgWLpAh(4),cplcgWRpgWLpVZ,      & 
+& cplcgWRpgWRpAh(4),cplcgWRpgWRpVZ,cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVWRmVZ,     & 
+& cplcVWRmVWLmVZ,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),    & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -14075,6 +13458,19 @@ coup2 = cplcgWLmgWLmAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -14087,6 +13483,32 @@ coup2 = cplcgWLpgWLpAh(gO2)
    SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
 End do 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRpAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -14101,6 +13523,19 @@ coup2 = cplcgWRmgWRmAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLpAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
 sumI = 0._dp 
@@ -14114,21 +13549,6 @@ coup2 = cplcgWRpgWRpAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,0._dp,Mhh2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,0._dp,Mhh2(i2)),dp) 
-coup1 = cplhhVPVZ(i2)
-coup2 = cplAhhhVP(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -14176,7 +13596,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14184,14 +13604,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplAhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplAhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14199,69 +13619,99 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplAhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplAhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[VWLm], conj[Hpm] 
+! conj[Hpm], VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
+    Do i1 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplAhHpmVWLm(gO2,i2)
+B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplAhHpmcVWLm(gO2,i1)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-    End Do 
+      End Do 
  !------------------------ 
-! conj[VWRm], conj[Hpm] 
+! conj[VWRm], VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVWLm2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplAhcVWLmVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplAhHpmVWRm(gO2,i2)
+B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplAhHpmcVWRm(gO2,i1)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVWRm2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplAhcVWRmVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+res = oo16pi2*res 
  
 End Subroutine Pi1LoopVZAh 
  
 Subroutine DerPi1LoopVZAh(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,            & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,           & 
-& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhhhVP,cplAhhhVZ,cplAhhhVZR,cplAhHpmcHpm,             & 
-& cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZL,cplcFdFdVZR,             & 
-& cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuAhL,cplcFuFuAhR,               & 
-& cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmAh,cplcgWLmgWLmVZ,cplcgWLpgWLpAh,cplcgWLpgWLpVZ,   & 
-& cplcgWRmgWRmAh,cplcgWRmgWRmVZ,cplcgWRpgWRpAh,cplcgWRpgWRpVZ,cplcHpmcVWLmVZ,            & 
-& cplcHpmcVWRmVZ,cplFvFvAhL,cplFvFvAhR,cplFvFvVZL,cplFvFvVZR,cplhhVPVZ,cplhhVZVZ,        & 
-& cplhhVZVZR,cplHpmcHpmVZ,cplHpmVWLmVZ,cplHpmVWRmVZ,kont,res)
+& cplAhcHpmVWLm,cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,        & 
+& cplAhHpmcHpm,cplAhHpmcVWLm,cplAhHpmcVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZL,          & 
+& cplcFdFdVZR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuAhL,               & 
+& cplcFuFuAhR,cplcFuFuVZL,cplcFuFuVZR,cplcgWLmgWLmAh,cplcgWLmgWLmVZ,cplcgWLmgWRmAh,      & 
+& cplcgWLmgWRmVZ,cplcgWLpgWLpAh,cplcgWLpgWLpVZ,cplcgWLpgWRpAh,cplcgWLpgWRpVZ,            & 
+& cplcgWRmgWLmAh,cplcgWRmgWLmVZ,cplcgWRmgWRmAh,cplcgWRmgWRmVZ,cplcgWRpgWLpAh,            & 
+& cplcgWRpgWLpVZ,cplcgWRpgWRpAh,cplcgWRpgWRpVZ,cplcHpmVWLmVZ,cplcHpmVWRmVZ,              & 
+& cplcVWLmVWRmVZ,cplcVWRmVWLmVZ,cplFvFvAhL,cplFvFvAhR,cplFvFvVZL,cplFvFvVZR,             & 
+& cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,cplHpmcVWRmVZ,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhhhVP(4,4),              & 
-& cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),& 
-& cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),               & 
-& cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),               & 
-& cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcgWLmgWLmAh(4),cplcgWLmgWLmVZ,cplcgWLpgWLpAh(4),cplcgWLpgWLpVZ,cplcgWRmgWRmAh(4),   & 
-& cplcgWRmgWRmVZ,cplcgWRpgWRpAh(4),cplcgWRpgWRpVZ,cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),   & 
-& cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplhhVPVZ(4),      & 
-& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4)
+Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),             & 
+& cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmcVWLm(4,4),& 
+& cplAhHpmcVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZL(3,3),             & 
+& cplcFdFdVZR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZL(3,3),               & 
+& cplcFeFeVZR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZL(3,3),               & 
+& cplcFuFuVZR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZ,cplcgWLmgWRmAh(4),cplcgWLmgWRmVZ,    & 
+& cplcgWLpgWLpAh(4),cplcgWLpgWLpVZ,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZ,cplcgWRmgWLmAh(4),   & 
+& cplcgWRmgWLmVZ,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZ,cplcgWRpgWLpAh(4),cplcgWRpgWLpVZ,      & 
+& cplcgWRpgWRpAh(4),cplcgWRpgWRpVZ,cplcHpmVWLmVZ(4),cplcHpmVWRmVZ(4),cplcVWLmVWRmVZ,     & 
+& cplcVWRmVWLmVZ,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),    & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -14391,6 +13841,19 @@ coup2 = cplcgWLmgWLmAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWRm], gWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRmgWLmVZ
+coup2 = cplcgWLmgWRmAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWLmC], gWLmC 
 !------------------------ 
 sumI = 0._dp 
@@ -14403,6 +13866,32 @@ coup2 = cplcgWLpgWLpAh(gO2)
    SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
 End do 
 res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRmC], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcgWRpgWLpVZ
+coup2 = cplcgWLpgWRpAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! bar[gWLm], gWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLmgWRmVZ
+coup2 = cplcgWRmgWLmAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
 !------------------------ 
 ! bar[gWRm], gWRm 
 !------------------------ 
@@ -14417,6 +13906,19 @@ coup2 = cplcgWRmgWRmAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
+! bar[gWLmC], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcgWLpgWRpVZ
+coup2 = cplcgWRpgWLpAh(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
 ! bar[gWRmC], gWRmC 
 !------------------------ 
 sumI = 0._dp 
@@ -14430,21 +13932,6 @@ coup2 = cplcgWRpgWRpAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVP2,Mhh2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVP2,Mhh2(i2)),dp) 
-coup1 = cplhhVPVZ(i2)
-coup2 = cplAhhhVP(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -14492,7 +13979,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14500,14 +13987,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZ(i2)
-coup2 = cplAhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZ(i2)
+coup2 = cplAhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14515,165 +14002,71 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZ(i2)
-coup2 = cplAhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZ(i2)
+coup2 = cplAhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! conj[VWLm], conj[Hpm] 
+! conj[Hpm], VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
+    Do i1 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZ(i2)
-coup2 = cplAhHpmVWLm(gO2,i2)
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplAhHpmcVWLm(gO2,i1)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-    End Do 
+      End Do 
  !------------------------ 
-! conj[VWRm], conj[Hpm] 
+! conj[VWRm], VWLm 
 !------------------------ 
 sumI = 0._dp 
  
-      Do i2 = 1, 4
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVWLm2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVWLm2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplAhcVWLmVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+!------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZ(i2)
-coup2 = cplAhHpmVWRm(gO2,i2)
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplAhHpmcVWRm(gO2,i1)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+      End Do 
+ !------------------------ 
+! conj[VWLm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVWRm2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVWRm2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplAhcVWRmVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +2._dp* SumI  
+res = oo16pi2*res 
  
 End Subroutine DerPi1LoopVZAh 
- 
-Subroutine Pi1LoopVZHpm(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,cplAhhhVZ,        & 
-& cplHpmcHpmcHpm,cplHpmcHpmVZ,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhhhVZ(4,4),cplHpmcHpmcHpm(4,4,4),cplHpmcHpmVZ(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MAh2(i2),Mhh2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZ(i2,i1)
-coup2 = cplAhhhcHpm(i2,i1,gO2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MHpm2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZ(i2,i1)
-coup2 = cplHpmcHpmcHpm(i1,gO2,i2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVZHpm 
- 
-Subroutine DerPi1LoopVZHpm(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,               & 
-& cplAhhhVZ,cplHpmcHpmcHpm,cplHpmcHpmVZ,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhhhVZ(4,4),cplHpmcHpmcHpm(4,4,4),cplHpmcHpmVZ(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MAh2(i2),Mhh2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZ(i2,i1)
-coup2 = cplAhhhcHpm(i2,i1,gO2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MHpm2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZ(i2,i1)
-coup2 = cplHpmcHpmcHpm(i1,gO2,i2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVZHpm 
  
 Subroutine Pi1LoopVZRhh(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,            & 
 & MVWLm,MVWLm2,MVWRm,MVWRm2,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZRL,cplcFdFdVZRR,           & 
@@ -14681,11 +14074,11 @@ Subroutine Pi1LoopVZRhh(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,MHpm2,      
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmhh,cplcgWLmgWLmVZR,cplcgWLmgWRmhh,               & 
 & cplcgWLmgWRmVZR,cplcgWLpgWLphh,cplcgWLpgWLpVZR,cplcgWLpgWRphh,cplcgWLpgWRpVZR,         & 
 & cplcgWRmgWLmhh,cplcgWRmgWLmVZR,cplcgWRmgWRmhh,cplcgWRmgWRmVZR,cplcgWRpgWLphh,          & 
-& cplcgWRpgWLpVZR,cplcgWRpgWRphh,cplcgWRpgWRpVZR,cplcHpmcVWLmVZR,cplcHpmcVWRmVZR,        & 
+& cplcgWRpgWLpVZR,cplcgWRpgWRphh,cplcgWRpgWRpVZR,cplcHpmVWLmVZR,cplcHpmVWRmVZR,          & 
 & cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplFvFvhhL,            & 
-& cplFvFvhhR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,   & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,kont,res)
+& cplFvFvhhR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,         & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmcVWLm,               & 
+& cplhhHpmcVWRm,cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),MHpm(4),MHpm2(4),         & 
@@ -14697,12 +14090,12 @@ Complex(dp), Intent(in) :: cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZRL(3,
 & cplcgWLmgWLmhh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmhh(4),cplcgWLmgWRmVZR,cplcgWLpgWLphh(4), & 
 & cplcgWLpgWLpVZR,cplcgWLpgWRphh(4),cplcgWLpgWRpVZR,cplcgWRmgWLmhh(4),cplcgWRmgWLmVZR,   & 
 & cplcgWRmgWRmhh(4),cplcgWRmgWRmVZR,cplcgWRpgWLphh(4),cplcgWRpgWLpVZR,cplcgWRpgWRphh(4), & 
-& cplcgWRpgWRpVZR,cplcHpmcVWLmVZR(4),cplcHpmcVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWLmVWRmVZR, & 
+& cplcgWRpgWRpVZR,cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,   & 
 & cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZRL(9,9),  & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplFvFvVZRR(9,9),cplhhcHpmVWLm(4,4),cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),              & 
 & cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),             & 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),               & 
-& cplHpmVWRmVZR(4)
+& cplhhHpmcVWLm(4,4),cplhhHpmcVWRm(4,4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),            & 
+& cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -14917,7 +14310,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14925,14 +14318,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplhhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZR(i2)
+coup2 = cplhhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -14940,12 +14333,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplhhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZR(i2)
+coup2 = cplhhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplhhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -14973,6 +14381,21 @@ coup2 = cplhhcVWLmVWRm(gO2)
 End do 
 res = res +2._dp* SumI  
 !------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplhhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
 ! conj[VWLm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -14998,37 +14421,7 @@ coup2 = cplhhcVWRmVWRm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplhhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplhhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine Pi1LoopVZRhh 
  
@@ -15038,11 +14431,11 @@ Subroutine DerPi1LoopVZRhh(p2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,MHpm,         
 & cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmhh,cplcgWLmgWLmVZR,cplcgWLmgWRmhh,               & 
 & cplcgWLmgWRmVZR,cplcgWLpgWLphh,cplcgWLpgWLpVZR,cplcgWLpgWRphh,cplcgWLpgWRpVZR,         & 
 & cplcgWRmgWLmhh,cplcgWRmgWLmVZR,cplcgWRmgWRmhh,cplcgWRmgWRmVZR,cplcgWRpgWLphh,          & 
-& cplcgWRpgWLpVZR,cplcgWRpgWRphh,cplcgWRpgWRpVZR,cplcHpmcVWLmVZR,cplcHpmcVWRmVZR,        & 
+& cplcgWRpgWLpVZR,cplcgWRpgWRphh,cplcgWRpgWRpVZR,cplcHpmVWLmVZR,cplcHpmVWRmVZR,          & 
 & cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplFvFvhhL,            & 
-& cplFvFvhhR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplhhcVWLmVWLm,       & 
-& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmVWLm,cplhhHpmVWRm,   & 
-& cplHpmcHpmVZR,cplHpmVWLmVZR,cplHpmVWRmVZR,kont,res)
+& cplFvFvhhR,cplFvFvVZRL,cplFvFvVZRR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,         & 
+& cplhhcVWLmVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhHpmcHpm,cplhhHpmcVWLm,               & 
+& cplhhHpmcVWRm,cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),MHpm(4),MHpm2(4),         & 
@@ -15054,12 +14447,12 @@ Complex(dp), Intent(in) :: cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFdFdVZRL(3,
 & cplcgWLmgWLmhh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmhh(4),cplcgWLmgWRmVZR,cplcgWLpgWLphh(4), & 
 & cplcgWLpgWLpVZR,cplcgWLpgWRphh(4),cplcgWLpgWRpVZR,cplcgWRmgWLmhh(4),cplcgWRmgWLmVZR,   & 
 & cplcgWRmgWRmhh(4),cplcgWRmgWRmVZR,cplcgWRpgWLphh(4),cplcgWRpgWLpVZR,cplcgWRpgWRphh(4), & 
-& cplcgWRpgWRpVZR,cplcHpmcVWLmVZR(4),cplcHpmcVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWLmVWRmVZR, & 
+& cplcgWRpgWRpVZR,cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,   & 
 & cplcVWRmVWLmVZR,cplcVWRmVWRmVZR,cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZRL(9,9),  & 
-& cplFvFvVZRR(9,9),cplhhcHpmcVWLm(4,4),cplhhcHpmcVWRm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplFvFvVZRR(9,9),cplhhcHpmVWLm(4,4),cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),              & 
 & cplhhcVWLmVWRm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),             & 
-& cplhhHpmVWLm(4,4),cplhhHpmVWRm(4,4),cplHpmcHpmVZR(4,4),cplHpmVWLmVZR(4),               & 
-& cplHpmVWRmVZR(4)
+& cplhhHpmcVWLm(4,4),cplhhHpmcVWRm(4,4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),            & 
+& cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -15280,7 +14673,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -15288,14 +14681,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplhhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZR(i2)
+coup2 = cplhhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -15303,12 +14696,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplhhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZR(i2)
+coup2 = cplhhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplhhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWLm], VWLm 
 !------------------------ 
@@ -15336,6 +14744,21 @@ coup2 = cplhhcVWLmVWRm(gO2)
 End do 
 res = res +2._dp* SumI  
 !------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplhhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
 ! conj[VWLm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -15361,69 +14784,37 @@ coup2 = cplhhcVWRmVWRm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +1._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplhhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplhhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine DerPi1LoopVZRhh 
  
 Subroutine Pi1LoopVZRAh(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,              & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,           & 
-& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,       & 
-& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,             & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZRL,cplcFeFeVZRR,           & 
-& cplcFuFuAhL,cplcFuFuAhR,cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmAh,cplcgWLmgWLmVZR,      & 
-& cplcgWLmgWRmAh,cplcgWLmgWRmVZR,cplcgWLpgWLpAh,cplcgWLpgWLpVZR,cplcgWLpgWRpAh,          & 
-& cplcgWLpgWRpVZR,cplcgWRmgWLmAh,cplcgWRmgWLmVZR,cplcgWRmgWRmAh,cplcgWRmgWRmVZR,         & 
-& cplcgWRpgWLpAh,cplcgWRpgWLpVZR,cplcgWRpgWRpAh,cplcgWRpgWRpVZR,cplcHpmcVWLmVZR,         & 
-& cplcHpmcVWRmVZR,cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL,cplFvFvAhR,cplFvFvVZRL,     & 
-& cplFvFvVZRR,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVZR,cplHpmVWLmVZR,             & 
-& cplHpmVWRmVZR,kont,res)
+& cplAhcHpmVWLm,cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,        & 
+& cplAhHpmcHpm,cplAhHpmcVWLm,cplAhHpmcVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZRL,         & 
+& cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuAhL,            & 
+& cplcFuFuAhR,cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmAh,cplcgWLmgWLmVZR,cplcgWLmgWRmAh,   & 
+& cplcgWLmgWRmVZR,cplcgWLpgWLpAh,cplcgWLpgWLpVZR,cplcgWLpgWRpAh,cplcgWLpgWRpVZR,         & 
+& cplcgWRmgWLmAh,cplcgWRmgWLmVZR,cplcgWRmgWRmAh,cplcgWRmgWRmVZR,cplcgWRpgWLpAh,          & 
+& cplcgWRpgWLpVZR,cplcgWRpgWRpAh,cplcgWRpgWRpVZR,cplcHpmVWLmVZR,cplcHpmVWRmVZR,          & 
+& cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL,cplFvFvAhR,cplFvFvVZRL,cplFvFvVZRR,         & 
+& cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
-& cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
-& cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),             & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),             & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),             & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmAh(4),& 
-& cplcgWLmgWRmVZR,cplcgWLpgWLpAh(4),cplcgWLpgWLpVZR,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZR,   & 
-& cplcgWRmgWLmAh(4),cplcgWRmgWLmVZR,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZR,cplcgWRpgWLpAh(4), & 
-& cplcgWRpgWLpVZR,cplcgWRpgWRpAh(4),cplcgWRpgWRpVZR,cplcHpmcVWLmVZR(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZRL(9,9),  & 
-& cplFvFvVZRR(9,9),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZR(4),cplHpmcHpmVZR(4,4),        & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZR(4)
+Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),             & 
+& cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmcVWLm(4,4),& 
+& cplAhHpmcVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZRL(3,3),            & 
+& cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZRL(3,3),             & 
+& cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZRL(3,3),             & 
+& cplcFuFuVZRR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmAh(4),cplcgWLmgWRmVZR, & 
+& cplcgWLpgWLpAh(4),cplcgWLpgWLpVZR,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZR,cplcgWRmgWLmAh(4), & 
+& cplcgWRmgWLmVZR,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZR,cplcgWRpgWLpAh(4),cplcgWRpgWLpVZR,   & 
+& cplcgWRpgWRpAh(4),cplcgWRpgWRpVZR,cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVWRmVZR, & 
+& cplcVWRmVWLmVZR,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9), & 
+& cplhhVZRVZR(4),cplhhVZVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -15638,21 +15029,6 @@ coup2 = cplcgWRpgWRpAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,0._dp,Mhh2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,0._dp,Mhh2(i2)),dp) 
-coup1 = cplhhVPVZR(i2)
-coup2 = cplAhhhVP(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -15700,7 +15076,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -15708,14 +15084,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplAhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZR(i2)
+coup2 = cplAhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -15723,12 +15099,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplAhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZR(i2)
+coup2 = cplAhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplAhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWRm], VWLm 
 !------------------------ 
@@ -15743,6 +15134,21 @@ coup2 = cplAhcVWLmVWRm(gO2)
 End do 
 res = res +2._dp* SumI  
 !------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplAhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
 ! conj[VWLm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -15755,69 +15161,37 @@ coup2 = cplAhcVWRmVWLm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplAhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_B1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplAhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine Pi1LoopVZRAh 
  
 Subroutine DerPi1LoopVZRAh(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,           & 
 & Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhAhhh,           & 
-& cplAhcHpmcVWLm,cplAhcHpmcVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVP,cplAhhhVZ,       & 
-& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmVWLm,cplAhHpmVWRm,cplcFdFdAhL,cplcFdFdAhR,             & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZRL,cplcFeFeVZRR,           & 
-& cplcFuFuAhL,cplcFuFuAhR,cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmAh,cplcgWLmgWLmVZR,      & 
-& cplcgWLmgWRmAh,cplcgWLmgWRmVZR,cplcgWLpgWLpAh,cplcgWLpgWLpVZR,cplcgWLpgWRpAh,          & 
-& cplcgWLpgWRpVZR,cplcgWRmgWLmAh,cplcgWRmgWLmVZR,cplcgWRmgWRmAh,cplcgWRmgWRmVZR,         & 
-& cplcgWRpgWLpAh,cplcgWRpgWLpVZR,cplcgWRpgWRpAh,cplcgWRpgWRpVZR,cplcHpmcVWLmVZR,         & 
-& cplcHpmcVWRmVZR,cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL,cplFvFvAhR,cplFvFvVZRL,     & 
-& cplFvFvVZRR,cplhhVPVZR,cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVZR,cplHpmVWLmVZR,             & 
-& cplHpmVWRmVZR,kont,res)
+& cplAhcHpmVWLm,cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhcVWRmVWLm,cplAhhhVZ,cplAhhhVZR,        & 
+& cplAhHpmcHpm,cplAhHpmcVWLm,cplAhHpmcVWRm,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdVZRL,         & 
+& cplcFdFdVZRR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFuFuAhL,            & 
+& cplcFuFuAhR,cplcFuFuVZRL,cplcFuFuVZRR,cplcgWLmgWLmAh,cplcgWLmgWLmVZR,cplcgWLmgWRmAh,   & 
+& cplcgWLmgWRmVZR,cplcgWLpgWLpAh,cplcgWLpgWLpVZR,cplcgWLpgWRpAh,cplcgWLpgWRpVZR,         & 
+& cplcgWRmgWLmAh,cplcgWRmgWLmVZR,cplcgWRmgWRmAh,cplcgWRmgWRmVZR,cplcgWRpgWLpAh,          & 
+& cplcgWRpgWLpVZR,cplcgWRpgWRpAh,cplcgWRpgWRpVZR,cplcHpmVWLmVZR,cplcHpmVWRmVZR,          & 
+& cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL,cplFvFvAhR,cplFvFvVZRL,cplFvFvVZRR,         & 
+& cplhhVZRVZR,cplhhVZVZR,cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,kont,res)
 
 Implicit None 
 Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
 & Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmcVWLm(4,4),cplAhcHpmcVWRm(4,4),cplAhcVWLmVWRm(4),           & 
-& cplAhcVWRmVWLm(4),cplAhhhVP(4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),   & 
-& cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),             & 
-& cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),             & 
-& cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),             & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmAh(4),& 
-& cplcgWLmgWRmVZR,cplcgWLpgWLpAh(4),cplcgWLpgWLpVZR,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZR,   & 
-& cplcgWRmgWLmAh(4),cplcgWRmgWLmVZR,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZR,cplcgWRpgWLpAh(4), & 
-& cplcgWRpgWLpVZR,cplcgWRpgWRpAh(4),cplcgWRpgWRpVZR,cplcHpmcVWLmVZR(4),cplcHpmcVWRmVZR(4),& 
-& cplcVWLmVWRmVZR,cplcVWRmVWLmVZR,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZRL(9,9),  & 
-& cplFvFvVZRR(9,9),cplhhVPVZR(4),cplhhVZRVZR(4),cplhhVZVZR(4),cplHpmcHpmVZR(4,4),        & 
-& cplHpmVWLmVZR(4),cplHpmVWRmVZR(4)
+Complex(dp), Intent(in) :: cplAhAhhh(4,4,4),cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),             & 
+& cplAhcVWRmVWLm(4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmcHpm(4,4,4),cplAhHpmcVWLm(4,4),& 
+& cplAhHpmcVWRm(4,4),cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdVZRL(3,3),            & 
+& cplcFdFdVZRR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFeVZRL(3,3),             & 
+& cplcFeFeVZRR(3,3),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFuVZRL(3,3),             & 
+& cplcFuFuVZRR(3,3),cplcgWLmgWLmAh(4),cplcgWLmgWLmVZR,cplcgWLmgWRmAh(4),cplcgWLmgWRmVZR, & 
+& cplcgWLpgWLpAh(4),cplcgWLpgWLpVZR,cplcgWLpgWRpAh(4),cplcgWLpgWRpVZR,cplcgWRmgWLmAh(4), & 
+& cplcgWRmgWLmVZR,cplcgWRmgWRmAh(4),cplcgWRmgWRmVZR,cplcgWRpgWLpAh(4),cplcgWRpgWLpVZR,   & 
+& cplcgWRpgWRpAh(4),cplcgWRpgWRpVZR,cplcHpmVWLmVZR(4),cplcHpmVWRmVZR(4),cplcVWLmVWRmVZR, & 
+& cplcVWRmVWLmVZR,cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9), & 
+& cplhhVZRVZR(4),cplhhVZVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -16038,21 +15412,6 @@ coup2 = cplcgWRpgWRpAh(gO2)
 End do 
 res = res +1._dp* SumI  
 !------------------------ 
-! VP, hh 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVP2,Mhh2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVP2,Mhh2(i2)),dp) 
-coup1 = cplhhVPVZR(i2)
-coup2 = cplAhhhVP(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +0.5_dp* SumI  
-    End Do 
- !------------------------ 
 ! VZ, hh 
 !------------------------ 
 sumI = 0._dp 
@@ -16100,7 +15459,7 @@ res = res +1._dp* SumI
       End Do 
      End Do 
  !------------------------ 
-! VWLm, Hpm 
+! conj[VWLm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16108,14 +15467,14 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWLmVZR(i2)
-coup2 = cplAhcHpmcVWLm(gO2,i2)
+coup1 = cplHpmcVWLmVZR(i2)
+coup2 = cplAhcHpmVWLm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
  !------------------------ 
-! VWRm, Hpm 
+! conj[VWRm], Hpm 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16123,12 +15482,27 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
 B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplHpmVWRmVZR(i2)
-coup2 = cplAhcHpmcVWRm(gO2,i2)
+coup1 = cplHpmcVWRmVZR(i2)
+coup2 = cplAhcHpmVWRm(gO2,i2)
     SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
     End Do 
+ !------------------------ 
+! conj[Hpm], VWLm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplAhHpmcVWLm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
  !------------------------ 
 ! conj[VWRm], VWLm 
 !------------------------ 
@@ -16143,6 +15517,21 @@ coup2 = cplAhcVWLmVWRm(gO2)
 End do 
 res = res +2._dp* SumI  
 !------------------------ 
+! conj[Hpm], VWRm 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplAhHpmcVWRm(gO2,i1)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
 ! conj[VWLm], VWRm 
 !------------------------ 
 sumI = 0._dp 
@@ -16155,47 +15544,37 @@ coup2 = cplAhcVWRmVWLm(gO2)
     SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
 End do 
 res = res +2._dp* SumI  
-!------------------------ 
-! conj[VWLm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWLm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWLm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWLmVZR(i2)
-coup2 = cplAhHpmVWLm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- !------------------------ 
-! conj[VWRm], conj[Hpm] 
-!------------------------ 
-sumI = 0._dp 
- 
-      Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MVWRm2,MHpm2(i2)),dp) 
-B1m2 = Real(SA_DerB1(p2,MVWRm2,MHpm2(i2)),dp) 
-coup1 = cplcHpmcVWRmVZR(i2)
-coup2 = cplAhHpmVWRm(gO2,i2)
-    SumI = coup1*coup2*(B1m2-B0m2) 
-End do 
-res = res +1._dp* SumI  
-    End Do 
- res = oo16pi2*res 
+res = oo16pi2*res 
  
 End Subroutine DerPi1LoopVZRAh 
  
-Subroutine Pi1LoopVZRHpm(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,cplAhhhVZR,      & 
-& cplHpmcHpmcHpm,cplHpmcHpmVZR,kont,res)
+Subroutine Pi1LoopVWLmHpm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,            & 
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmVWLm,       & 
+& cplAhcHpmVWRm,cplAhcVWRmVWLm,cplAhHpmcHpm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,   & 
+& cplcFeFvVWLmR,cplcFuFdcHpmL,cplcFuFdcHpmR,cplcgPgWLpVWLm,cplcgWLmgZpVWLm,              & 
+& cplcgWLmgZVWLm,cplcgWLpgPcHpm,cplcgWLpgZcHpm,cplcgWLpgZpcHpm,cplcgWRmgZpVWLm,          & 
+& cplcgWRmgZVWLm,cplcgWRpgZcHpm,cplcgWRpgZpcHpm,cplcgZgWLmcHpm,cplcgZgWLpVWLm,           & 
+& cplcgZgWRmcHpm,cplcgZgWRpVWLm,cplcgZpgWLmcHpm,cplcgZpgWLpVWLm,cplcgZpgWRmcHpm,         & 
+& cplcgZpgWRpVWLm,cplcHpmVPVWLm,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,              & 
+& cplcHpmVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZ,           & 
+& cplcVWRmVWLmVZR,cplFvFecHpmL,cplFvFecHpmR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,  & 
+& cplhhcVWRmVWLm,cplhhHpmcHpm,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhhhVZR(4,4),cplHpmcHpmcHpm(4,4,4),cplHpmcHpmVZR(4,4)
+Complex(dp), Intent(in) :: cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWRmVWLm(4),cplAhHpmcHpm(4,4,4),          & 
+& cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),           & 
+& cplcFuFdcHpmL(3,3,4),cplcFuFdcHpmR(3,3,4),cplcgPgWLpVWLm,cplcgWLmgZpVWLm,              & 
+& cplcgWLmgZVWLm,cplcgWLpgPcHpm(4),cplcgWLpgZcHpm(4),cplcgWLpgZpcHpm(4),cplcgWRmgZpVWLm, & 
+& cplcgWRmgZVWLm,cplcgWRpgZcHpm(4),cplcgWRpgZpcHpm(4),cplcgZgWLmcHpm(4),cplcgZgWLpVWLm,  & 
+& cplcgZgWRmcHpm(4),cplcgZgWRpVWLm,cplcgZpgWLmcHpm(4),cplcgZpgWLpVWLm,cplcgZpgWRmcHpm(4),& 
+& cplcgZpgWRpVWLm,cplcHpmVPVWLm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),  & 
+& cplcHpmVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZ,        & 
+& cplcVWRmVWLmVZR,cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplhhcHpmVWLm(4,4),            & 
+& cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),cplhhHpmcHpm(4,4,4),            & 
+& cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -16209,127 +15588,7 @@ Integer :: i1,i2,i3,i4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MAh2(i2),Mhh2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZR(i2,i1)
-coup2 = cplAhhhcHpm(i2,i1,gO2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MHpm2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZR(i2,i1)
-coup2 = cplHpmcHpmcHpm(i1,gO2,i2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVZRHpm 
- 
-Subroutine DerPi1LoopVZRHpm(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,              & 
-& cplAhhhVZR,cplHpmcHpmcHpm,cplHpmcHpmVZR,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhhhVZR(4,4),cplHpmcHpmcHpm(4,4,4),cplHpmcHpmVZR(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! hh, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MAh2(i2),Mhh2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MAh2(i2),Mhh2(i1)),dp) 
-coup1 = cplAhhhVZR(i2,i1)
-coup2 = cplAhhhcHpm(i2,i1,gO2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- !------------------------ 
-! conj[Hpm], Hpm 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MHpm2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MHpm2(i2),MHpm2(i1)),dp) 
-coup1 = cplHpmcHpmVZR(i2,i1)
-coup2 = cplHpmcHpmcHpm(i1,gO2,i2)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +0.5_dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVZRHpm 
- 
-Subroutine Pi1LoopVWLmhh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,cplAhHpmVWLm,    & 
-& cplhhhhcHpm,cplhhHpmVWLm,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhHpmVWLm(4,4),cplhhhhcHpm(4,4,4),cplhhHpmVWLm(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16338,15 +15597,187 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MAh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_B1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhhhcHpm(i2,gO2,i1)
+coup1 = cplAhcHpmVWLm(i2,i1)
+coup2 = cplAhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWRm], Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MAh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MAh2(i2)),dp) 
+coup1 = cplAhcVWRmVWLm(i2)
+coup2 = cplAhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! bar[Fd], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MFd2(i1),MFu2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MFd2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFdFuVWLmL(i1,i2)
+coupR1 = cplcFdFuVWLmR(i1,i2)
+coupL2 = cplcFuFdcHpmL(i2,i1,gO2)
+coupR2 = cplcFuFdcHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFd(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFu(i2)*B1m2  
+End do 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fv 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 9
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MFe2(i1),MFv2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MFe2(i1),MFv2(i2)),dp) 
+coupL1 = cplcFeFvVWLmL(i1,i2)
+coupR1 = cplcFeFvVWLmR(i1,i2)
+coupL2 = cplFvFecHpmL(i2,i1,gO2)
+coupR2 = cplFvFecHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFe(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFv(i2)*B1m2  
+End do 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gP], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,0._dp),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,0._dp),dp) 
+coup1 = cplcgPgWLpVWLm
+coup2 = cplcgWLpgPcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZ2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcgZgWLpVWLm
+coup2 = cplcgWLpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZR2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcgZpgWLpVWLm
+coup2 = cplcgWLpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZ2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcgZgWRpVWLm
+coup2 = cplcgWRpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZR2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcgZpgWRpVWLm
+coup2 = cplcgWRpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MVWLm2),dp) 
+coup1 = cplcgWLmgZVWLm
+coup2 = cplcgZgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MVWRm2),dp) 
+coup1 = cplcgWRmgZVWLm
+coup2 = cplcgZgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MVWLm2),dp) 
+coup1 = cplcgWLmgZpVWLm
+coup2 = cplcgZpgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MVWRm2),dp) 
+coup1 = cplcgWRmgZpVWLm
+coup2 = cplcgZpgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], hh 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16355,24 +15786,184 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,Mhh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_B1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplhhhhcHpm(gO2,i2,i1)
+coup1 = cplhhcHpmVWLm(i2,i1)
+coup2 = cplhhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
- res = oo16pi2*res 
+ !------------------------ 
+! conj[VWLm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-End Subroutine Pi1LoopVWLmhh 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWLmVWLm(i2)
+coup2 = cplhhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-Subroutine DerPi1LoopVWLmhh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,              & 
-& cplAhHpmVWLm,cplhhhhcHpm,cplhhHpmVWLm,kont,res)
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWRmVWLm(i2)
+coup2 = cplhhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,0._dp,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,0._dp,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcHpmVP(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,0._dp),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,0._dp),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcHpmVPVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcHpmVZ(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZ2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWLmVZ
+coup2 = cplcHpmVWLmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZ2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcHpmVWRmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplHpmcHpmVZR(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZR2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcVWLmVWLmVZR
+coup2 = cplcHpmVWLmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZR2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcVWRmVWLmVZR
+coup2 = cplcHpmVWRmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine Pi1LoopVWLmHpm 
+ 
+Subroutine DerPi1LoopVWLmHpm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
+& MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmVWLm,  & 
+& cplAhcHpmVWRm,cplAhcVWRmVWLm,cplAhHpmcHpm,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFeFvVWLmL,   & 
+& cplcFeFvVWLmR,cplcFuFdcHpmL,cplcFuFdcHpmR,cplcgPgWLpVWLm,cplcgWLmgZpVWLm,              & 
+& cplcgWLmgZVWLm,cplcgWLpgPcHpm,cplcgWLpgZcHpm,cplcgWLpgZpcHpm,cplcgWRmgZpVWLm,          & 
+& cplcgWRmgZVWLm,cplcgWRpgZcHpm,cplcgWRpgZpcHpm,cplcgZgWLmcHpm,cplcgZgWLpVWLm,           & 
+& cplcgZgWRmcHpm,cplcgZgWRpVWLm,cplcgZpgWLmcHpm,cplcgZpgWLpVWLm,cplcgZpgWRmcHpm,         & 
+& cplcgZpgWRpVWLm,cplcHpmVPVWLm,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,              & 
+& cplcHpmVWRmVZR,cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZ,           & 
+& cplcVWRmVWLmVZR,cplFvFecHpmL,cplFvFecHpmR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWLm,  & 
+& cplhhcVWRmVWLm,cplhhHpmcHpm,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhHpmVWLm(4,4),cplhhhhcHpm(4,4,4),cplhhHpmVWLm(4,4)
+Complex(dp), Intent(in) :: cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWRmVWLm(4),cplAhHpmcHpm(4,4,4),          & 
+& cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),           & 
+& cplcFuFdcHpmL(3,3,4),cplcFuFdcHpmR(3,3,4),cplcgPgWLpVWLm,cplcgWLmgZpVWLm,              & 
+& cplcgWLmgZVWLm,cplcgWLpgPcHpm(4),cplcgWLpgZcHpm(4),cplcgWLpgZpcHpm(4),cplcgWRmgZpVWLm, & 
+& cplcgWRmgZVWLm,cplcgWRpgZcHpm(4),cplcgWRpgZpcHpm(4),cplcgZgWLmcHpm(4),cplcgZgWLpVWLm,  & 
+& cplcgZgWRmcHpm(4),cplcgZgWRpVWLm,cplcgZpgWLmcHpm(4),cplcgZpgWLpVWLm,cplcgZpgWRmcHpm(4),& 
+& cplcgZpgWRpVWLm,cplcHpmVPVWLm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),  & 
+& cplcHpmVWRmVZR(4),cplcVWLmVPVWLm,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWRmVWLmVZ,        & 
+& cplcVWRmVWLmVZR,cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplhhcHpmVWLm(4,4),            & 
+& cplhhcHpmVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),cplhhHpmcHpm(4,4,4),            & 
+& cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -16392,7 +15983,7 @@ MVP2 = Mass_Regulator_PhotonGluon**2
 res = 0._dp 
  
 !------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16401,15 +15992,187 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MAh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_DerB1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhhhcHpm(i2,gO2,i1)
+coup1 = cplAhcHpmVWLm(i2,i1)
+coup2 = cplAhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWRm], Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MAh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MAh2(i2)),dp) 
+coup1 = cplAhcVWRmVWLm(i2)
+coup2 = cplAhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! bar[Fd], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MFd2(i1),MFu2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MFd2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFdFuVWLmL(i1,i2)
+coupR1 = cplcFdFuVWLmR(i1,i2)
+coupL2 = cplcFuFdcHpmL(i2,i1,gO2)
+coupR2 = cplcFuFdcHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFd(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFu(i2)*B1m2  
+End do 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fv 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 9
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MFe2(i1),MFv2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MFe2(i1),MFv2(i2)),dp) 
+coupL1 = cplcFeFvVWLmL(i1,i2)
+coupR1 = cplcFeFvVWLmR(i1,i2)
+coupL2 = cplFvFecHpmL(i2,i1,gO2)
+coupR2 = cplFvFecHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFe(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFv(i2)*B1m2  
+End do 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gP], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVP2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVP2),dp) 
+coup1 = cplcgPgWLpVWLm
+coup2 = cplcgWLpgPcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZ2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcgZgWLpVWLm
+coup2 = cplcgWLpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZR2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcgZpgWLpVWLm
+coup2 = cplcgWLpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZ2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcgZgWRpVWLm
+coup2 = cplcgWRpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZR2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcgZpgWRpVWLm
+coup2 = cplcgWRpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZ2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MVWLm2),dp) 
+coup1 = cplcgWLmgZVWLm
+coup2 = cplcgZgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZ2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MVWRm2),dp) 
+coup1 = cplcgWRmgZVWLm
+coup2 = cplcgZgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MVWLm2),dp) 
+coup1 = cplcgWLmgZpVWLm
+coup2 = cplcgZpgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MVWRm2),dp) 
+coup1 = cplcgWRmgZpVWLm
+coup2 = cplcgZpgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], hh 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16418,24 +16181,184 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,Mhh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_DerB1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplhhhhcHpm(gO2,i2,i1)
+coup1 = cplhhcHpmVWLm(i2,i1)
+coup2 = cplhhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
- res = oo16pi2*res 
+ !------------------------ 
+! conj[VWLm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-End Subroutine DerPi1LoopVWLmhh 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWLmVWLm(i2)
+coup2 = cplhhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-Subroutine Pi1LoopVWLmAh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhAhcHpm,cplAhhhcHpm,     & 
-& cplAhHpmVWLm,cplhhHpmVWLm,kont,res)
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWRmVWLm(i2)
+coup2 = cplhhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVP2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVP2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWLm(i1)
+coup2 = cplHpmcHpmVP(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVP2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVP2),dp) 
+coup1 = cplcVWLmVPVWLm
+coup2 = cplcHpmVPVWLm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZ2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZ(i1)
+coup2 = cplHpmcHpmVZ(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZ2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWLmVZ
+coup2 = cplcHpmVWLmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZ2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWLmVZ
+coup2 = cplcHpmVWRmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWLmVZR(i1)
+coup2 = cplHpmcHpmVZR(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZR2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcVWLmVWLmVZR
+coup2 = cplcHpmVWLmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZR2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcVWRmVWLmVZR
+coup2 = cplcHpmVWRmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine DerPi1LoopVWLmHpm 
+ 
+Subroutine Pi1LoopVWRmHpm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,            & 
+& Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmVWLm,       & 
+& cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhHpmcHpm,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFvVWRmL,   & 
+& cplcFeFvVWRmR,cplcFuFdcHpmL,cplcFuFdcHpmR,cplcgPgWRpVWRm,cplcgWLmgZpVWRm,              & 
+& cplcgWLmgZVWRm,cplcgWLpgZcHpm,cplcgWLpgZpcHpm,cplcgWRmgZpVWRm,cplcgWRmgZVWRm,          & 
+& cplcgWRpgPcHpm,cplcgWRpgZcHpm,cplcgWRpgZpcHpm,cplcgZgWLmcHpm,cplcgZgWLpVWRm,           & 
+& cplcgZgWRmcHpm,cplcgZgWRpVWRm,cplcgZpgWLmcHpm,cplcgZpgWLpVWRm,cplcgZpgWRmcHpm,         & 
+& cplcgZpgWRpVWRm,cplcHpmVPVWRm,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,              & 
+& cplcHpmVWRmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplFvFecHpmL,cplFvFecHpmR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWRm,  & 
+& cplhhcVWRmVWRm,cplhhHpmcHpm,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmVWLm(4,4),cplhhHpmVWLm(4,4)
+Complex(dp), Intent(in) :: cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),cplAhHpmcHpm(4,4,4),          & 
+& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),           & 
+& cplcFuFdcHpmL(3,3,4),cplcFuFdcHpmR(3,3,4),cplcgPgWRpVWRm,cplcgWLmgZpVWRm,              & 
+& cplcgWLmgZVWRm,cplcgWLpgZcHpm(4),cplcgWLpgZpcHpm(4),cplcgWRmgZpVWRm,cplcgWRmgZVWRm,    & 
+& cplcgWRpgPcHpm(4),cplcgWRpgZcHpm(4),cplcgWRpgZpcHpm(4),cplcgZgWLmcHpm(4),              & 
+& cplcgZgWLpVWRm,cplcgZgWRmcHpm(4),cplcgZgWRpVWRm,cplcgZpgWLmcHpm(4),cplcgZpgWLpVWRm,    & 
+& cplcgZpgWRmcHpm(4),cplcgZpgWRpVWRm,cplcHpmVPVWRm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),& 
+& cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4),cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWRm,      & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplhhcHpmVWLm(4,4),& 
+& cplhhcHpmVWRm(4,4),cplhhcVWLmVWRm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),            & 
+& cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -16449,7 +16372,7 @@ Integer :: i1,i2,i3,i4, gO1, gO2, ierr
 res = 0._dp 
  
 !------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16458,15 +16381,187 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,MAh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_B1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhAhcHpm(gO2,i2,i1)
+coup1 = cplAhcHpmVWRm(i2,i1)
+coup2 = cplAhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWLm], Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MAh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MAh2(i2)),dp) 
+coup1 = cplAhcVWLmVWRm(i2)
+coup2 = cplAhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! bar[Fd], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MFd2(i1),MFu2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MFd2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFdFuVWRmL(i1,i2)
+coupR1 = cplcFdFuVWRmR(i1,i2)
+coupL2 = cplcFuFdcHpmL(i2,i1,gO2)
+coupR2 = cplcFuFdcHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFd(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFu(i2)*B1m2  
+End do 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fv 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 9
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MFe2(i1),MFv2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MFe2(i1),MFv2(i2)),dp) 
+coupL1 = cplcFeFvVWRmL(i1,i2)
+coupR1 = cplcFeFvVWRmR(i1,i2)
+coupL2 = cplFvFecHpmL(i2,i1,gO2)
+coupR2 = cplFvFecHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFe(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFv(i2)*B1m2  
+End do 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gZ], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZ2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcgZgWLpVWRm
+coup2 = cplcgWLpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZR2),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcgZpgWLpVWRm
+coup2 = cplcgWLpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gP], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,0._dp),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,0._dp),dp) 
+coup1 = cplcgPgWRpVWRm
+coup2 = cplcgWRpgPcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZ2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcgZgWRpVWRm
+coup2 = cplcgWRpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZR2),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcgZpgWRpVWRm
+coup2 = cplcgWRpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MVWLm2),dp) 
+coup1 = cplcgWLmgZVWRm
+coup2 = cplcgZgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MVWRm2),dp) 
+coup1 = cplcgWRmgZVWRm
+coup2 = cplcgZgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MVWLm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MVWLm2),dp) 
+coup1 = cplcgWLmgZpVWRm
+coup2 = cplcgZpgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MVWRm2),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MVWRm2),dp) 
+coup1 = cplcgWRmgZpVWRm
+coup2 = cplcgZpgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], hh 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16475,24 +16570,184 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_B0(p2,Mhh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_B1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplAhhhcHpm(gO2,i2,i1)
+coup1 = cplhhcHpmVWRm(i2,i1)
+coup2 = cplhhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
- res = oo16pi2*res 
+ !------------------------ 
+! conj[VWLm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-End Subroutine Pi1LoopVWLmAh 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWLm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWLmVWRm(i2)
+coup2 = cplhhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[VWRm], hh 
+!------------------------ 
+sumI = 0._dp 
  
-Subroutine DerPi1LoopVWLmAh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhAhcHpm,              & 
-& cplAhhhcHpm,cplAhHpmVWLm,cplhhHpmVWLm,kont,res)
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_B1(p2,MVWRm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWRmVWRm(i2)
+coup2 = cplhhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! conj[Hpm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,0._dp,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,0._dp,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcHpmVP(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWRm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,0._dp),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,0._dp),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcHpmVPVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZ2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplHpmcHpmVZ(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZ2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplcHpmVWLmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZ2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWRmVZ
+coup2 = cplcHpmVWRmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVZR2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_B1(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplHpmcHpmVZR(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWLm2,MVZR2),dp)
+B1m2 = Real(SA_B1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcVWLmVWRmVZR
+coup2 = cplcHpmVWLmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_B0(p2,MVWRm2,MVZR2),dp)
+B1m2 = Real(SA_B1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcVWRmVWRmVZR
+coup2 = cplcHpmVWRmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine Pi1LoopVWRmHpm 
+ 
+Subroutine DerPi1LoopVWRmHpm(p2,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,              & 
+& MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,cplAhcHpmVWLm,  & 
+& cplAhcHpmVWRm,cplAhcVWLmVWRm,cplAhHpmcHpm,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFvVWRmL,   & 
+& cplcFeFvVWRmR,cplcFuFdcHpmL,cplcFuFdcHpmR,cplcgPgWRpVWRm,cplcgWLmgZpVWRm,              & 
+& cplcgWLmgZVWRm,cplcgWLpgZcHpm,cplcgWLpgZpcHpm,cplcgWRmgZpVWRm,cplcgWRmgZVWRm,          & 
+& cplcgWRpgPcHpm,cplcgWRpgZcHpm,cplcgWRpgZpcHpm,cplcgZgWLmcHpm,cplcgZgWLpVWRm,           & 
+& cplcgZgWRmcHpm,cplcgZgWRpVWRm,cplcgZpgWLmcHpm,cplcgZpgWLpVWRm,cplcgZpgWRmcHpm,         & 
+& cplcgZpgWRpVWRm,cplcHpmVPVWRm,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,              & 
+& cplcHpmVWRmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWRm,cplcVWRmVWRmVZ,           & 
+& cplcVWRmVWRmVZR,cplFvFecHpmL,cplFvFecHpmR,cplhhcHpmVWLm,cplhhcHpmVWRm,cplhhcVWLmVWRm,  & 
+& cplhhcVWRmVWRm,cplhhHpmcHpm,cplHpmcHpmVP,cplHpmcHpmVZ,cplHpmcHpmVZR,kont,res)
 
 Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
+Real(dp), Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),MFv2(9),           & 
+& Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2
 
-Complex(dp), Intent(in) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmVWLm(4,4),cplhhHpmVWLm(4,4)
+Complex(dp), Intent(in) :: cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplAhcVWLmVWRm(4),cplAhHpmcHpm(4,4,4),          & 
+& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),           & 
+& cplcFuFdcHpmL(3,3,4),cplcFuFdcHpmR(3,3,4),cplcgPgWRpVWRm,cplcgWLmgZpVWRm,              & 
+& cplcgWLmgZVWRm,cplcgWLpgZcHpm(4),cplcgWLpgZpcHpm(4),cplcgWRmgZpVWRm,cplcgWRmgZVWRm,    & 
+& cplcgWRpgPcHpm(4),cplcgWRpgZcHpm(4),cplcgWRpgZpcHpm(4),cplcgZgWLmcHpm(4),              & 
+& cplcgZgWLpVWRm,cplcgZgWRmcHpm(4),cplcgZgWRpVWRm,cplcgZpgWLmcHpm(4),cplcgZpgWLpVWRm,    & 
+& cplcgZpgWRmcHpm(4),cplcgZpgWRpVWRm,cplcHpmVPVWRm(4),cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),& 
+& cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4),cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,cplcVWRmVPVWRm,      & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplhhcHpmVWLm(4,4),& 
+& cplhhcHpmVWRm(4,4),cplhhcVWLmVWRm(4),cplhhcVWRmVWRm(4),cplhhHpmcHpm(4,4,4),            & 
+& cplHpmcHpmVP(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4)
 
 Integer, Intent(inout) :: kont 
 Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
@@ -16512,7 +16767,7 @@ MVP2 = Mass_Regulator_PhotonGluon**2
 res = 0._dp 
  
 !------------------------ 
-! Hpm, Ah 
+! conj[Hpm], Ah 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16521,15 +16776,187 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,MAh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_DerB1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWLm(i2,i1)
-coup2 = cplAhAhcHpm(gO2,i2,i1)
+coup1 = cplAhcHpmVWRm(i2,i1)
+coup2 = cplAhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWLm], Ah 
+!------------------------ 
+sumI = 0._dp 
+ 
+      Do i2 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MAh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MAh2(i2)),dp) 
+coup1 = cplAhcVWLmVWRm(i2)
+coup2 = cplAhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+    End Do 
+ !------------------------ 
+! bar[Fd], Fu 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 3
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MFd2(i1),MFu2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MFd2(i1),MFu2(i2)),dp) 
+coupL1 = cplcFdFuVWRmL(i1,i2)
+coupR1 = cplcFdFuVWRmR(i1,i2)
+coupL2 = cplcFuFdcHpmL(i2,i1,gO2)
+coupR2 = cplcFuFdcHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFd(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFu(i2)*B1m2  
+End do 
+res = res +3._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[Fe], Fv 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 3
+       Do i2 = 1, 9
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MFe2(i1),MFv2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MFe2(i1),MFv2(i2)),dp) 
+coupL1 = cplcFeFvVWRmL(i1,i2)
+coupR1 = cplcFeFvVWRmR(i1,i2)
+coupL2 = cplFvFecHpmL(i2,i1,gO2)
+coupR2 = cplFvFecHpmR(i2,i1,gO2)
+    SumI = (coupL1*coupL2+coupR1*coupR2)*MFe(i1)*(B0m2+B1m2) & 
+  & + (coupL1*coupR2+coupR1*coupL2)*MFv(i2)*B1m2  
+End do 
+res = res +1._dp* SumI  
+      End Do 
+     End Do 
+ !------------------------ 
+! bar[gZ], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZ2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcgZgWLpVWRm
+coup2 = cplcgWLpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWLmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZR2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcgZpgWLpVWRm
+coup2 = cplcgWLpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gP], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVP2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVP2),dp) 
+coup1 = cplcgPgWRpVWRm
+coup2 = cplcgWRpgPcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZ], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZ2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcgZgWRpVWRm
+coup2 = cplcgWRpgZcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gZR], gWRmC 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZR2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcgZpgWRpVWRm
+coup2 = cplcgWRpgZpcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZ2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MVWLm2),dp) 
+coup1 = cplcgWLmgZVWRm
+coup2 = cplcgZgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZ2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MVWRm2),dp) 
+coup1 = cplcgWRmgZVWRm
+coup2 = cplcgZgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWLm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MVWLm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MVWLm2),dp) 
+coup1 = cplcgWLmgZpVWRm
+coup2 = cplcgZpgWLmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! bar[gWRm], gZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MVWRm2),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MVWRm2),dp) 
+coup1 = cplcgWRmgZpVWRm
+coup2 = cplcgZpgWRmcHpm(gO2) 
+   SumI = -0.5_dp*coup1*coup2*(B0m2+B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], hh 
 !------------------------ 
 sumI = 0._dp 
  
@@ -16538,255 +16965,155 @@ sumI = 0._dp
  Do gO2=1,4 
 B0m2 = Real(SA_DerB0(p2,Mhh2(i2),MHpm2(i1)),dp) 
 B1m2 = Real(SA_DerB1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWLm(i2,i1)
-coup2 = cplAhhhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVWLmAh 
- 
-Subroutine Pi1LoopVWRmhh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,cplAhHpmVWRm,    & 
-& cplhhhhcHpm,cplhhHpmVWRm,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhHpmVWRm(4,4),cplhhhhcHpm(4,4,4),cplhhHpmVWRm(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! Hpm, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MAh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWRm(i2,i1)
-coup2 = cplAhhhcHpm(i2,gO2,i1)
+coup1 = cplhhcHpmVWRm(i2,i1)
+coup2 = cplhhHpmcHpm(i2,i1,gO2)
     SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
 End do 
 res = res +1._dp* SumI  
       End Do 
      End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWLm], hh 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
-       Do i2 = 1, 4
+      Do i2 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,Mhh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWRm(i2,i1)
-coup2 = cplhhhhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
+B0m2 = Real(SA_DerB0(p2,MVWLm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWLm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWLmVWRm(i2)
+coup2 = cplhhcHpmVWLm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVWRmhh 
- 
-Subroutine DerPi1LoopVWRmhh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhhhcHpm,              & 
-& cplAhHpmVWRm,cplhhhhcHpm,cplhhHpmVWRm,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhhhcHpm(4,4,4),cplAhHpmVWRm(4,4),cplhhhhcHpm(4,4,4),cplhhHpmVWRm(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! Hpm, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MAh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWRm(i2,i1)
-coup2 = cplAhhhcHpm(i2,gO2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
+    End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWRm], hh 
 !------------------------ 
 sumI = 0._dp 
  
-    Do i1 = 1, 4
-       Do i2 = 1, 4
+      Do i2 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,Mhh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWRm(i2,i1)
-coup2 = cplhhhhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
+B0m2 = Real(SA_DerB0(p2,MVWRm2,Mhh2(i2)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVWRm2,Mhh2(i2)),dp) 
+coup1 = cplhhcVWRmVWRm(i2)
+coup2 = cplhhcHpmVWRm(i2,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
-      End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine DerPi1LoopVWRmhh 
- 
-Subroutine Pi1LoopVWRmAh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhAhcHpm,cplAhhhcHpm,     & 
-& cplAhHpmVWRm,cplhhHpmVWRm,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmVWRm(4,4),cplhhHpmVWRm(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-res = 0._dp 
- 
-!------------------------ 
-! Hpm, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,MAh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWRm(i2,i1)
-coup2 = cplAhAhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
+    End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[Hpm], VP 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
-       Do i2 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_B0(p2,Mhh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_B1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWRm(i2,i1)
-coup2 = cplAhhhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
+B0m2 = Real(SA_DerB0(p2,MVP2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVP2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVPVWRm(i1)
+coup2 = cplHpmcHpmVP(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
       End Do 
-     End Do 
- res = oo16pi2*res 
- 
-End Subroutine Pi1LoopVWRmAh 
- 
-Subroutine DerPi1LoopVWRmAh(p2,MAh,MAh2,Mhh,Mhh2,MHpm,MHpm2,cplAhAhcHpm,              & 
-& cplAhhhcHpm,cplAhHpmVWRm,cplhhHpmVWRm,kont,res)
-
-Implicit None 
-Real(dp), Intent(in) :: MAh(4),MAh2(4),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4)
-
-Complex(dp), Intent(in) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmVWRm(4,4),cplhhHpmVWRm(4,4)
-
-Integer, Intent(inout) :: kont 
-Real(dp) :: B0m2, F0m2, G0m2, B1m2, H0m2, B22m2, m1, m2 
-Real(dp), Intent(in) :: p2 
-Complex(dp) :: A0m2 
-Complex(dp), Intent(inout) :: res(4) 
-Complex(dp) :: coupL1, coupR1, coupL2,coupR2, coup1,coup2, coup3, temp, sumI 
-Integer :: i1,i2,i3,i4, gO1, gO2, ierr 
- 
- 
-Real(dp) ::MVG,MVP,MVG2,MVP2
-MVG = Mass_Regulator_PhotonGluon 
-MVP = Mass_Regulator_PhotonGluon 
-MVG2 = Mass_Regulator_PhotonGluon**2 
-MVP2 = Mass_Regulator_PhotonGluon**2 
-
-res = 0._dp 
- 
-!------------------------ 
-! Hpm, Ah 
-!------------------------ 
-sumI = 0._dp 
- 
-    Do i1 = 1, 4
-       Do i2 = 1, 4
- Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,MAh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,MAh2(i2),MHpm2(i1)),dp) 
-coup1 = cplAhHpmVWRm(i2,i1)
-coup2 = cplAhAhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
-End do 
-res = res +1._dp* SumI  
-      End Do 
-     End Do 
  !------------------------ 
-! Hpm, hh 
+! conj[VWRm], VP 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVP2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVP2),dp) 
+coup1 = cplcVWRmVPVWRm
+coup2 = cplcHpmVPVWRm(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZ 
 !------------------------ 
 sumI = 0._dp 
  
     Do i1 = 1, 4
-       Do i2 = 1, 4
  Do gO2=1,4 
-B0m2 = Real(SA_DerB0(p2,Mhh2(i2),MHpm2(i1)),dp) 
-B1m2 = Real(SA_DerB1(p2,Mhh2(i2),MHpm2(i1)),dp) 
-coup1 = cplhhHpmVWRm(i2,i1)
-coup2 = cplAhhhcHpm(gO2,i2,i1)
-    SumI = -coup1*coup2*(B1m2+0.5_dp*B0m2)
+B0m2 = Real(SA_DerB0(p2,MVZ2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZ2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZ(i1)
+coup2 = cplHpmcHpmVZ(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
 End do 
 res = res +1._dp* SumI  
       End Do 
-     End Do 
- res = oo16pi2*res 
+ !------------------------ 
+! conj[VWLm], VZ 
+!------------------------ 
+sumI = 0._dp 
  
-End Subroutine DerPi1LoopVWRmAh 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZ2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZ2),dp) 
+coup1 = cplcVWLmVWRmVZ
+coup2 = cplcHpmVWLmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZ 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZ2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZ2),dp) 
+coup1 = cplcVWRmVWRmVZ
+coup2 = cplcHpmVWRmVZ(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[Hpm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+    Do i1 = 1, 4
+ Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVZR2,MHpm2(i1)),dp) 
+B1m2 = Real(SA_DerB1(p2,MVZR2,MHpm2(i1)),dp) 
+coup1 = cplcHpmVWRmVZR(i1)
+coup2 = cplHpmcHpmVZR(i1,gO2)
+    SumI = coup1*coup2*(B1m2-B0m2) 
+End do 
+res = res +1._dp* SumI  
+      End Do 
+ !------------------------ 
+! conj[VWLm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWLm2,MVZR2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWLm2,MVZR2),dp) 
+coup1 = cplcVWLmVWRmVZR
+coup2 = cplcHpmVWLmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+!------------------------ 
+! conj[VWRm], VZR 
+!------------------------ 
+sumI = 0._dp 
+ 
+Do gO2=1,4 
+B0m2 = Real(SA_DerB0(p2,MVWRm2,MVZR2),dp)
+B1m2 = Real(SA_DerB1(p2,MVWRm2,MVZR2),dp) 
+coup1 = cplcVWRmVWRmVZR
+coup2 = cplcHpmVWRmVZR(gO2)
+    SumI = coup1*coup2*(3._dp/2._dp*B0m2+3._dp*B1m2) 
+End do 
+res = res +1._dp* SumI  
+res = oo16pi2*res 
+ 
+End Subroutine DerPi1LoopVWRmHpm 
  
 End Module LoopMasses_DLRSM 

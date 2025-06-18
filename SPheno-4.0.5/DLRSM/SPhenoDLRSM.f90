@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:11 on 11.6.2025   
+! File created at 21:34 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -207,10 +207,10 @@ If (MatchingOrder.eq.-1) Then
  g3 = g3IN 
  LAM2 = LAM2IN 
  LAM1 = LAM1IN 
- ALP1 = ALP1IN 
  RHO1 = RHO1IN 
  RHO2 = RHO2IN 
  ALP2 = ALP2IN 
+ ALP1 = ALP1IN 
  ALP3 = ALP3IN 
  LAM5 = LAM5IN 
  LAM6 = LAM6IN 
@@ -261,7 +261,7 @@ YeSM= Transpose(YeSM)
 
  ! Setting Boundary conditions 
  Call SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,gBL,               & 
-& g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
+& g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
 & YL,YR,Mux,MU12,MU22,.False.)
 
 LAM1 = lam1input
@@ -275,13 +275,13 @@ RHO2 = rho2input
 ALP1 = alp1input
 ALP2 = alp2input
 ALP3 = alp3input
-Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
+Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
 & MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
-& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
-& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,           & 
+& ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 
  If (SignOfMassChanged) Then  
@@ -322,7 +322,7 @@ End if
 Call CalculateSpectrum(n_run,delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,              & 
 & MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
 & MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
-& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
 & YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
 n_tot =1
@@ -348,14 +348,14 @@ End if
  Call CalculateSpectrum(n_run,delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,              & 
 & MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
 & MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
-& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
 & YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
   If (GetMassUncertainty) Then 
  Call GetScaleUncertainty(delta_mass,WriteOut,kont,MAh,MAh2,MFd,MFd2,MFe,              & 
 & MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
 & MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,               & 
-& gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
+& gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
 & Yt,YL,YR,Mux,MU12,MU22,mass_uncertainty_Q)
 
   End if 
@@ -367,12 +367,12 @@ MAhL = MAh
 MAh2L = MAhL**2 
  
 PhiW = ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-TW = ASin(Abs(ZZ(1,1)))
+TW = ASin(Abs(Part(ZZ,1,1)))
 If ((L_BR).And.(kont.Eq.0)) Then 
  Call CalculateBR(CalcTBD,ratioWoM,epsI,deltaM,kont,MAh,MAh2,MFd,MFd2,MFe,             & 
 & MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,              & 
 & MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,               & 
-& gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
+& gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,            & 
 & Yt,YL,YR,Mux,MU12,MU22,gPFu,gTFu,BRFu,gPFe,gTFe,BRFe,gPFd,gTFd,BRFd,gPhh,              & 
 & gThh,BRhh,gPFv,gTFv,BRFv,gPVZ,gTVZ,BRVZ,gPVZR,gTVZR,BRVZR,gPHpm,gTHpm,BRHpm,           & 
 & gPAh,gTAh,BRAh,gPVWLm,gTVWLm,BRVWLm,gPVWRm,gTVWRm,BRVWRm)
@@ -387,7 +387,7 @@ End If
  
  If (CalculateLowEnergy) then 
 nuMasses = MFv 
-Call CalculateLowEnergyConstraints(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,           & 
+Call CalculateLowEnergyConstraints(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,           & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,Tpar,Spar,             & 
 & Upar,ae,amu,atau,EDMe,EDMmu,EDMtau,dRho,BrBsGamma,ratioBsGamma,BrDmunu,ratioDmunu,     & 
 & BrDsmunu,ratioDsmunu,BrDstaunu,ratioDstaunu,BrBmunu,ratioBmunu,BrBtaunu,               & 
@@ -409,7 +409,7 @@ MVWLm2 = mW2
 If (WriteParametersAtQ) Then 
 Call TreeMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
 & MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,             & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,GenerationMixing,kont)
 
 End If 
@@ -420,7 +420,7 @@ End if
 If ((FoundIterativeSolution).or.(WriteOutputForNonConvergence)) Then 
 If (OutputForMO) Then 
 Call RunningFermionMasses(MFe,MFe2,MFd,MFd2,MFu,MFu2,k1,vR,gBL,g2,g3,LAM2,            & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
+& LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
 & MU12,MU22,kont)
 
 End if 
@@ -446,7 +446,7 @@ Contains
 Subroutine CalculateSpectrum(n_run,delta,WriteOut,kont,MAh,MAh2,MFd,MFd2,             & 
 & MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,              & 
 & MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,              & 
-& vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
+& vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,             & 
 & YQ2,Yt,YL,YR,Mux,MU12,MU22,mGUT)
 
 Implicit None 
@@ -455,7 +455,7 @@ Integer, Intent(inout) :: kont
 Logical, Intent(in) :: WriteOut 
 Real(dp), Intent(in) :: delta 
 Real(dp), Intent(inout) :: mGUT 
-Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
+Real(dp),Intent(inout) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
 Complex(dp),Intent(inout) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -470,7 +470,7 @@ Real(dp),Intent(inout) :: k1,vR
 kont = 0 
 Call FirstGuess(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,           & 
 & MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,             & 
-& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,             & 
+& ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,             & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 !If (kont.ne.0) Call TerminateProgram 
@@ -482,8 +482,8 @@ If (.Not.UseFixedScale) Then
 End If
 Call Match_and_Run(delta,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,            & 
 & Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,              & 
-& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,             & 
-& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGut,kont,              & 
+& ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,             & 
+& ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,mGut,kont,              & 
 & WriteOut,n_run)
 
 If (kont.ne.0) Then 
@@ -519,8 +519,8 @@ Subroutine GetScaleUncertainty(delta,WriteOut,kont,MAhinput,MAh2input,MFdinput, 
 & Mhh2input,MHpminput,MHpm2input,MVWLminput,MVWLm2input,MVWRminput,MVWRm2input,          & 
 & MVZinput,MVZ2input,MVZRinput,MVZR2input,PhiWinput,TWinput,UCinput,ZDRinput,            & 
 & ZERinput,UPinput,ZURinput,ZDLinput,ZELinput,ZULinput,ZHinput,ZMinput,ZWinput,          & 
-& ZZinput,k1input,vRinput,gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,        & 
-& RHO1input,RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,       & 
+& ZZinput,k1input,vRinput,gBLinput,g2input,g3input,LAM2input,LAM1input,RHO1input,        & 
+& RHO2input,ALP2input,ALP1input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,       & 
 & Yinput,YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,         & 
 & mass_Qerror)
 
@@ -532,8 +532,8 @@ Real(dp) :: mass_in(30), mass_new(30)
 Real(dp), Intent(out) :: mass_Qerror(30) 
 Real(dp) :: gD(144), Q, Qsave, Qstep, Qt, g_SM(62), mh_SM 
 Integer :: i1, i2, iupdown, ntot 
-Real(dp),Intent(in) :: gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,RHO2input,           & 
-& ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,MU12input,MU22input
+Real(dp),Intent(in) :: gBLinput,g2input,g3input,LAM2input,LAM1input,RHO1input,RHO2input,ALP2input,           & 
+& ALP1input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,MU12input,MU22input
 
 Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),YLinput(3,3),YRinput(3,3),       & 
 & Muxinput(3,3)
@@ -549,7 +549,7 @@ Complex(dp),Intent(in) :: ZDRinput(3,3),ZERinput(3,3),ZURinput(3,3),ZDLinput(3,3
 
 Real(dp),Intent(in) :: k1input,vRinput
 
-Real(dp) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
+Real(dp) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
 Complex(dp) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -585,10 +585,10 @@ g2 = g2input
 g3 = g3input
 LAM2 = LAM2input
 LAM1 = LAM1input
-ALP1 = ALP1input
 RHO1 = RHO1input
 RHO2 = RHO2input
 ALP2 = ALP2input
+ALP1 = ALP1input
 ALP3 = ALP3input
 LAM5 = LAM5input
 LAM6 = LAM6input
@@ -611,7 +611,7 @@ vR = vRinput
 gBL = Sqrt(2._dp/3._dp)*gBL 
 ! ----------------------- 
  
-Call ParametersToG144(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,              & 
+Call ParametersToG144(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,              & 
 & LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,gD)
 
 If (iupdown.eq.1) Then 
@@ -623,7 +623,7 @@ Else
  dt=tz/50._dp
  Call odeint(gD,144,tz,0._dp,0.1_dp*delta,dt,0._dp,rge144,kont)
 End if 
-Call GToParameters144(gD,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,           & 
+Call GToParameters144(gD,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,           & 
 & LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR)
 
 
@@ -632,13 +632,13 @@ Call GToParameters144(gD,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,     
 gBL = Sqrt(3._dp/2._dp)*gBL 
 ! ----------------------- 
  
-Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,              & 
+Call SolveTadpoleEquations(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,              & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,(/ ZeroC, ZeroC, ZeroC, ZeroC /))
 
 Call OneLoopMasses(MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,MFv2,Mhh,Mhh2,             & 
 & MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,TW,UC,ZDR,               & 
-& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,           & 
-& ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
+& ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,k1,vR,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,           & 
+& ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,kont)
 
 If (((Calculate_mh_within_SM).and.(Mhh(2).gt.300._dp)).OR.(Force_mh_within_SM))Then
 g_SM=g_SM_save 

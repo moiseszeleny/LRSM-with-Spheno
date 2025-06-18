@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:01 on 11.6.2025   
+! File created at 21:29 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -23,13 +23,13 @@ Use Mathematics, Only: Li2
   
 Subroutine FuTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -37,7 +37,7 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFdHpmL(3,3,4),cplcFuFdHpmR(3,3,4),        & 
+Complex(dp) :: cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplcFuFdcHpmL(3,3,4),cplcFuFdcHpmR(3,3,4),      & 
 & cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),       & 
 & cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
 & cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3)
@@ -83,11 +83,11 @@ m_in = MFu(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_Fu_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
-& k1,vR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFdHpmL,cplcFuFdHpmR,cplcFuFdcVWLmL,cplcFuFdcVWLmR, & 
-& cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,         & 
-& cplcFuFuVZRL,cplcFuFuVZRR,deltaM)
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& k1,vR,cplcFuFuAhL,cplcFuFuAhR,cplcFuFdcHpmL,cplcFuFdcHpmR,cplcFuFdcVWLmL,              & 
+& cplcFuFdcVWLmR,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,      & 
+& cplcFuFuVZR,cplcFuFuVZRL,cplcFuFuVZRR,deltaM)
 
 i_count = 1 
 
@@ -113,7 +113,7 @@ End Do
 
  
 ! ----------------------------------------------
-! Fd, Hpm
+! Fd, conj[Hpm]
 ! ----------------------------------------------
 
  
@@ -121,8 +121,8 @@ Do gt1= 1, 3
   Do gt2=3, 4
 m1out = MFd(gt1)
 m2out = MHpm(gt2)
-coupL = cplcFuFdHpmL(i1,gt1,gt2)
-coupR = cplcFuFdHpmR(i1,gt1,gt2)
+coupL = cplcFuFdcHpmL(i1,gt1,gt2)
+coupR = cplcFuFdcHpmR(i1,gt1,gt2)
 Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -239,13 +239,13 @@ End Subroutine FuTwoBodyDecay
  
 Subroutine FeTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -254,9 +254,9 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Complex(dp) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),          & 
-& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvVWLmL(3,9),& 
-& cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplcFeFvcHpmL(3,9,4),         & 
-& cplcFeFvcHpmR(3,9,4)
+& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvHpmL(3,9,4),& 
+& cplcFeFvHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),          & 
+& cplcFeFvVWRmR(3,9)
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT(:) 
@@ -299,11 +299,11 @@ m_in = MFe(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_Fe_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,         & 
-& cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,     & 
-& cplcFeFvcHpmL,cplcFeFvcHpmR,deltaM)
+& cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvHpmL,cplcFeFvHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,       & 
+& cplcFeFvVWRmL,cplcFeFvVWRmR,deltaM)
 
 i_count = 1 
 
@@ -383,6 +383,26 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
+! Fv, Hpm
+! ----------------------------------------------
+
+ 
+Do gt1= 1, 9
+  Do gt2=3, 4
+m1out = MFv(gt1)
+m2out = MHpm(gt2)
+coupL = cplcFeFvHpmL(i1,gt1,gt2)
+coupR = cplcFeFvHpmR(i1,gt1,gt2)
+Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
+gPartial(i1,i_count) = 1*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
+
+ 
+! ----------------------------------------------
 ! Fv, VWLm
 ! ----------------------------------------------
 
@@ -414,26 +434,6 @@ gPartial(i1,i_count) = 1*gam
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
 i_count = i_count +1 
   End Do 
-
- 
-! ----------------------------------------------
-! Fv, conj[Hpm]
-! ----------------------------------------------
-
- 
-Do gt1= 1, 9
-  Do gt2=3, 4
-m1out = MFv(gt1)
-m2out = MHpm(gt2)
-coupL = cplcFeFvcHpmL(i1,gt1,gt2)
-coupR = cplcFeFvcHpmR(i1,gt1,gt2)
-Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
-gPartial(i1,i_count) = 1*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 If ((Present(BR)).And.(gT(i1).Eq.0)) Then 
   BR(i1,:) = 0._dp 
 Else If (Present(BR)) Then 
@@ -449,13 +449,13 @@ End Subroutine FeTwoBodyDecay
  
 Subroutine FdTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -464,9 +464,9 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Complex(dp) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),          & 
-& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFdFuVWLmL(3,3),& 
-& cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplcFdFucHpmL(3,3,4),         & 
-& cplcFdFucHpmR(3,3,4)
+& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFdFuHpmL(3,3,4),& 
+& cplcFdFuHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),          & 
+& cplcFdFuVWRmR(3,3)
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT(:) 
@@ -509,11 +509,11 @@ m_in = MFd(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_Fd_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,cplcFdFdVZR,         & 
-& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,     & 
-& cplcFdFucHpmL,cplcFdFucHpmR,deltaM)
+& cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFuHpmL,cplcFdFuHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,       & 
+& cplcFdFuVWRmL,cplcFdFuVWRmR,deltaM)
 
 i_count = 1 
 
@@ -593,6 +593,26 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
+! Fu, Hpm
+! ----------------------------------------------
+
+ 
+Do gt1= 1, 3
+  Do gt2=3, 4
+m1out = MFu(gt1)
+m2out = MHpm(gt2)
+coupL = cplcFdFuHpmL(i1,gt1,gt2)
+coupR = cplcFdFuHpmR(i1,gt1,gt2)
+Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
+gPartial(i1,i_count) = 1*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
+
+ 
+! ----------------------------------------------
 ! Fu, VWLm
 ! ----------------------------------------------
 
@@ -624,26 +644,6 @@ gPartial(i1,i_count) = 1*gam
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
 i_count = i_count +1 
   End Do 
-
- 
-! ----------------------------------------------
-! Fu, conj[Hpm]
-! ----------------------------------------------
-
- 
-Do gt1= 1, 3
-  Do gt2=3, 4
-m1out = MFu(gt1)
-m2out = MHpm(gt2)
-coupL = cplcFdFucHpmL(i1,gt1,gt2)
-coupR = cplcFdFucHpmR(i1,gt1,gt2)
-Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
-gPartial(i1,i_count) = 1*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 If ((Present(BR)).And.(gT(i1).Eq.0)) Then 
   BR(i1,:) = 0._dp 
 Else If (Present(BR)) Then 
@@ -659,13 +659,13 @@ End Subroutine FdTwoBodyDecay
  
 Subroutine hhTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -674,11 +674,11 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Complex(dp) :: cplHiggsPP(4),cplHiggsGG(4),cplHiggsZZvirt(4),cplHiggsWWvirt(4),cplAhAhhh(4,4,4),     & 
-& cplAhhhHpm(4,4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),& 
-& cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),           & 
-& cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplhhhhhh(4,4,4),cplhhhhHpm(4,4,4),cplhhHpmVWLm(4,4),& 
-& cplhhHpmVWRm(4,4),cplhhHpmcHpm(4,4,4),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),             & 
-& cplhhcVWRmVWRm(4),cplhhVZVZ(4),cplhhVZVZR(4),cplhhVZRVZR(4)
+& cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),cplcFeFehhL(3,3,4),& 
+& cplcFeFehhR(3,3,4),cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplFvFvhhL(9,9,4),            & 
+& cplFvFvhhR(9,9,4),cplhhhhhh(4,4,4),cplhhHpmcHpm(4,4,4),cplhhHpmcVWLm(4,4),             & 
+& cplhhHpmcVWRm(4,4),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),              & 
+& cplhhVZVZ(4),cplhhVZVZR(4),cplhhVZRVZR(4)
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT(:) 
@@ -722,13 +722,12 @@ m_in = Mhh(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_hh_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
-& k1,vR,cplHiggsPP,cplHiggsGG,cplHiggsZZvirt,cplHiggsWWvirt,cplAhAhhh,cplAhhhHpm,        & 
-& cplAhhhVZ,cplAhhhVZR,cplcFdFdhhL,cplcFdFdhhR,cplcFeFehhL,cplcFeFehhR,cplcFuFuhhL,      & 
-& cplcFuFuhhR,cplFvFvhhL,cplFvFvhhR,cplhhhhhh,cplhhhhHpm,cplhhHpmVWLm,cplhhHpmVWRm,      & 
-& cplhhHpmcHpm,cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhVZVZ,cplhhVZVZR,        & 
-& cplhhVZRVZR,deltaM)
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& k1,vR,cplHiggsPP,cplHiggsGG,cplHiggsZZvirt,cplHiggsWWvirt,cplAhAhhh,cplAhhhVZ,         & 
+& cplAhhhVZR,cplcFdFdhhL,cplcFdFdhhR,cplcFeFehhL,cplcFeFehhR,cplcFuFuhhL,cplcFuFuhhR,    & 
+& cplFvFvhhL,cplFvFvhhR,cplhhhhhh,cplhhHpmcHpm,cplhhHpmcVWLm,cplhhHpmcVWRm,              & 
+& cplhhcVWLmVWLm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhVZVZ,cplhhVZVZR,cplhhVZRVZR,deltaM)
 
 i_count = 1 
 
@@ -813,25 +812,6 @@ If (gt1.eq.gt2) Then
   BRHAA(i1,gt1) = gPartial(i1,i_count) 
 End if 
   BRHAAijk(i1,gt1,gt2) = gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! Hpm, Ah
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-m1out = MHpm(gt1)
-m2out = MAh(gt2)
-coup = cplAhhhHpm(gt2,i1,gt1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
 i_count = i_count +1 
   End Do 
 End Do 
@@ -977,58 +957,6 @@ End Do
 
  
 ! ----------------------------------------------
-! Hpm, hh
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=1, 4
-m1out = MHpm(gt1)
-m2out = Mhh(gt2)
-coup = cplhhhhHpm(i1,gt2,gt1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! Hpm, VWLm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWLm
-coup = cplhhHpmVWLm(i1,gt1)
-Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-  BRHHpW(i1,gt2) = gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! Hpm, VWRm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWRm
-coup = cplhhHpmVWRm(i1,gt1)
-Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
 ! conj[Hpm], Hpm
 ! ----------------------------------------------
 
@@ -1045,6 +973,39 @@ i_count = i_count +1
   End Do 
 End Do 
  
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWLm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWLm
+coup = cplhhHpmcVWLm(i1,gt1)
+Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(i1,i_count) = 2*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+  BRHHpW(i1,gt2) = gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWRm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWRm
+coup = cplhhHpmcVWRm(i1,gt1)
+Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(i1,i_count) = 2*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
 
  
 ! ----------------------------------------------
@@ -1178,13 +1139,13 @@ End Subroutine hhTwoBodyDecay
  
 Subroutine FvTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -1192,7 +1153,7 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),            & 
+Complex(dp) :: cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),          & 
 & cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
 & cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),  & 
 & cplFvFvVZRR(9,9)
@@ -1238,9 +1199,9 @@ m_in = MFv(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_Fv_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
-& k1,vR,cplFvFvAhL,cplFvFvAhR,cplFvFeHpmL,cplFvFeHpmR,cplFvFecVWLmL,cplFvFecVWLmR,       & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& k1,vR,cplFvFvAhL,cplFvFvAhR,cplFvFecHpmL,cplFvFecHpmR,cplFvFecVWLmL,cplFvFecVWLmR,     & 
 & cplFvFecVWRmL,cplFvFecVWRmR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,               & 
 & cplFvFvVZRL,cplFvFvVZRR,deltaM)
 
@@ -1268,7 +1229,7 @@ End Do
 
  
 ! ----------------------------------------------
-! Fe, Hpm
+! Fe, conj[Hpm]
 ! ----------------------------------------------
 
  
@@ -1276,8 +1237,8 @@ Do gt1= 1, 3
   Do gt2=3, 4
 m1out = MFe(gt1)
 m2out = MHpm(gt2)
-coupL = cplFvFeHpmL(i1,gt1,gt2)
-coupR = cplFvFeHpmR(i1,gt1,gt2)
+coupL = cplFvFecHpmL(i1,gt1,gt2)
+coupR = cplFvFecHpmR(i1,gt1,gt2)
 Call FermionToFermionScalar(m_in,m1out,m2out,coupL,coupR,gam) 
 gPartial(i1,i_count) = 2*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -1388,13 +1349,13 @@ End Subroutine FvTwoBodyDecay
  
 Subroutine VZTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -1404,8 +1365,8 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 
 Complex(dp) :: cplAhhhVZ(4,4),cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),   & 
 & cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplhhVZVZ(4),        & 
-& cplhhVZVZR(4),cplHpmVWLmVZ(4),cplHpmVWRmVZ(4),cplHpmcHpmVZ(4,4),cplcVWLmVWLmVZ,        & 
-& cplcVWRmVWRmVZ
+& cplhhVZVZR(4),cplHpmcHpmVZ(4,4),cplHpmcVWLmVZ(4),cplHpmcVWRmVZ(4),cplcVWLmVWLmVZ,      & 
+& cplcVWRmVWLmVZ,cplcVWRmVWRmVZ
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT 
@@ -1442,11 +1403,11 @@ i1=1
 m_in = MVZ 
 Call CouplingsFor_VZ_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,cplAhhhVZ,cplcFdFdVZL,cplcFdFdVZR,cplcFeFeVZL,cplcFeFeVZR,cplcFuFuVZL,           & 
-& cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplhhVZVZ,cplhhVZVZR,cplHpmVWLmVZ,cplHpmVWRmVZ,      & 
-& cplHpmcHpmVZ,cplcVWLmVWLmVZ,cplcVWRmVWRmVZ,deltaM)
+& cplcFuFuVZR,cplFvFvVZL,cplFvFvVZR,cplhhVZVZ,cplhhVZVZR,cplHpmcHpmVZ,cplHpmcVWLmVZ,     & 
+& cplHpmcVWRmVZ,cplcVWLmVWLmVZ,cplcVWRmVWLmVZ,cplcVWRmVWRmVZ,deltaM)
 
 i_count = 1 
 
@@ -1584,38 +1545,6 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! Hpm, VWLm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWLm
-coup = cplHpmVWLmVZ(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 2*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! Hpm, VWRm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWRm
-coup = cplHpmVWRmVZ(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 2*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
 ! conj[Hpm], Hpm
 ! ----------------------------------------------
 
@@ -1635,6 +1564,38 @@ End Do
 
  
 ! ----------------------------------------------
+! Hpm, conj[VWLm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWLm
+coup = cplHpmcVWLmVZ(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 2*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWRm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWRm
+coup = cplHpmcVWRmVZ(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 2*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
 ! VWLm, conj[VWLm]
 ! ----------------------------------------------
 
@@ -1644,6 +1605,20 @@ m2out = MVWLm
 coup = cplcVWLmVWLmVZ
 Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
 gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+
+ 
+! ----------------------------------------------
+! VWLm, conj[VWRm]
+! ----------------------------------------------
+
+ 
+m1out = MVWLm
+m2out = MVWRm
+coup = cplcVWRmVWLmVZ
+Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 2*gam 
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
 
@@ -1673,13 +1648,13 @@ End Subroutine VZTwoBodyDecay
  
 Subroutine VZRTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -1689,7 +1664,7 @@ Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3
 
 Complex(dp) :: cplAhhhVZR(4,4),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
 & cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhVZVZR(4),   & 
-& cplhhVZRVZR(4),cplHpmVWLmVZR(4),cplHpmVWRmVZR(4),cplHpmcHpmVZR(4,4),cplcVWLmVWLmVZR,   & 
+& cplhhVZRVZR(4),cplHpmcHpmVZR(4,4),cplHpmcVWLmVZR(4),cplHpmcVWRmVZR(4),cplcVWLmVWLmVZR, & 
 & cplcVWRmVWLmVZR,cplcVWRmVWRmVZR
 
 Integer, Intent(in) :: i_in 
@@ -1728,10 +1703,10 @@ m_in = MVZR
 Call CouplingsFor_VZR_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,               & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
 & MU22,k1,vR,cplAhhhVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFeFeVZRL,cplcFeFeVZRR,             & 
 & cplcFuFuVZRL,cplcFuFuVZRR,cplFvFvVZRL,cplFvFvVZRR,cplhhVZVZR,cplhhVZRVZR,              & 
-& cplHpmVWLmVZR,cplHpmVWRmVZR,cplHpmcHpmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,             & 
+& cplHpmcHpmVZR,cplHpmcVWLmVZR,cplHpmcVWRmVZR,cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,           & 
 & cplcVWRmVWRmVZR,deltaM)
 
 i_count = 1 
@@ -1870,38 +1845,6 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! Hpm, VWLm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWLm
-coup = cplHpmVWLmVZR(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 2*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! Hpm, VWRm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWRm
-coup = cplHpmVWRmVZR(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 2*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
 ! conj[Hpm], Hpm
 ! ----------------------------------------------
 
@@ -1918,6 +1861,38 @@ i_count = i_count +1
   End Do 
 End Do 
  
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWLm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWLm
+coup = cplHpmcVWLmVZR(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 2*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWRm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWRm
+coup = cplHpmcVWRmVZR(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 2*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
 
  
 ! ----------------------------------------------
@@ -1973,13 +1948,13 @@ End Subroutine VZRTwoBodyDecay
  
 Subroutine HpmTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -1987,12 +1962,10 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplAhAhcHpm(4,4,4),cplAhhhcHpm(4,4,4),cplAhHpmcHpm(4,4,4),cplAhcHpmcVWLm(4,4),        & 
-& cplAhcHpmcVWRm(4,4),cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplcFeFvcHpmL(3,9,4),    & 
-& cplcFeFvcHpmR(3,9,4),cplhhhhcHpm(4,4,4),cplhhHpmcHpm(4,4,4),cplhhcHpmcVWLm(4,4),       & 
-& cplhhcHpmcVWRm(4,4),cplHpmHpmcHpm(4,4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),         & 
-& cplHpmcHpmcHpm(4,4,4),cplcHpmcVWLmVZ(4),cplcHpmcVWRmVZ(4),cplcHpmcVWLmVZR(4),          & 
-& cplcHpmcVWRmVZR(4)
+Complex(dp) :: cplAhHpmcHpm(4,4,4),cplAhcHpmVWLm(4,4),cplAhcHpmVWRm(4,4),cplcFuFdcHpmL(3,3,4),       & 
+& cplcFuFdcHpmR(3,3,4),cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplhhHpmcHpm(4,4,4),      & 
+& cplhhcHpmVWLm(4,4),cplhhcHpmVWRm(4,4),cplHpmcHpmVZ(4,4),cplHpmcHpmVZR(4,4),            & 
+& cplcHpmVWLmVZ(4),cplcHpmVWLmVZR(4),cplcHpmVWRmVZ(4),cplcHpmVWRmVZR(4)
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT(:) 
@@ -2036,52 +2009,12 @@ If (m_in.Eq.0._dp) Cycle
 Call CouplingsFor_Hpm_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,               & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,k1,vR,cplAhAhcHpm,cplAhhhcHpm,cplAhHpmcHpm,cplAhcHpmcVWLm,cplAhcHpmcVWRm,         & 
-& cplcFdFucHpmL,cplcFdFucHpmR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplhhhhcHpm,cplhhHpmcHpm,      & 
-& cplhhcHpmcVWLm,cplhhcHpmcVWRm,cplHpmHpmcHpm,cplHpmcHpmVZ,cplHpmcHpmVZR,cplHpmcHpmcHpm, & 
-& cplcHpmcVWLmVZ,cplcHpmcVWRmVZ,cplcHpmcVWLmVZR,cplcHpmcVWRmVZR,deltaM)
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& MU22,k1,vR,cplAhHpmcHpm,cplAhcHpmVWLm,cplAhcHpmVWRm,cplcFuFdcHpmL,cplcFuFdcHpmR,       & 
+& cplFvFecHpmL,cplFvFecHpmR,cplhhHpmcHpm,cplhhcHpmVWLm,cplhhcHpmVWRm,cplHpmcHpmVZ,       & 
+& cplHpmcHpmVZR,cplcHpmVWLmVZ,cplcHpmVWLmVZR,cplcHpmVWRmVZ,cplcHpmVWRmVZR,deltaM)
 
 i_count = 1 
-
- 
-! ----------------------------------------------
-! Ah, Ah
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-m1out = MAh(gt1)
-m2out = MAh(gt2)
-coup = cplAhAhcHpm(gt1,gt2,i1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-If (gt1.ne.gt2) gam = 2._dp*gam 
-gPartial(i1,i_count) = 1._dp/2._dp*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! hh, Ah
-! ----------------------------------------------
-
- 
-Do gt1= 1, 4
-  Do gt2=3, 4
-m1out = Mhh(gt1)
-m2out = MAh(gt2)
-coup = cplAhhhcHpm(gt2,gt1,i1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 1*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 
  
 ! ----------------------------------------------
@@ -2104,14 +2037,14 @@ End Do
 
  
 ! ----------------------------------------------
-! Ah, conj[VWLm]
+! Ah, VWLm
 ! ----------------------------------------------
 
  
 Do gt1= 3, 4
 m1out = MAh(gt1)
 m2out = MVWLm
-coup = cplAhcHpmcVWLm(gt1,i1)
+coup = cplAhcHpmVWLm(gt1,i1)
 Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2121,14 +2054,14 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! Ah, conj[VWRm]
+! Ah, VWRm
 ! ----------------------------------------------
 
  
 Do gt1= 3, 4
 m1out = MAh(gt1)
 m2out = MVWRm
-coup = cplAhcHpmcVWRm(gt1,i1)
+coup = cplAhcHpmVWRm(gt1,i1)
 Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2137,20 +2070,20 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! bar[Fd], Fu
+! bar[Fu], Fd
 ! ----------------------------------------------
 
  
 Do gt1= 1, 3
   Do gt2=1, 3
-m1out = MFd(gt1)
-m2out = MFu(gt2)
-coupL = cplcFdFucHpmL(gt1,gt2,i1)
-coupR = cplcFdFucHpmR(gt1,gt2,i1)
+m1out = MFu(gt1)
+m2out = MFd(gt2)
+coupL = cplcFuFdcHpmL(gt1,gt2,i1)
+coupR = cplcFuFdcHpmR(gt1,gt2,i1)
 Call ScalarToTwoFermions(m_in,m1out,m2out,coupL,coupR,gam) 
 gPartial(i1,i_count) = 3*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
-If ((gt1.eq.3).and.(gt2.eq.2)) Then 
+If ((gt1.eq.2).and.(gt2.eq.3)) Then 
   BR_Hcb(i1) = gPartial(i1,i_count) 
 End if 
 If ((gt1.eq.2).and.(gt2.eq.2)) Then 
@@ -2166,39 +2099,22 @@ End Do
 
  
 ! ----------------------------------------------
-! bar[Fe], Fv
+! Fv, Fe
 ! ----------------------------------------------
 
  
-Do gt1= 1, 3
-  Do gt2=1, 9
-m1out = MFe(gt1)
-m2out = MFv(gt2)
-coupL = cplcFeFvcHpmL(gt1,gt2,i1)
-coupR = cplcFeFvcHpmR(gt1,gt2,i1)
+Do gt1= 1, 9
+  Do gt2=1, 3
+m1out = MFv(gt1)
+m2out = MFe(gt2)
+coupL = cplFvFecHpmL(gt1,gt2,i1)
+coupR = cplFvFecHpmR(gt1,gt2,i1)
 Call ScalarToTwoFermions(m_in,m1out,m2out,coupL,coupR,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! hh, hh
-! ----------------------------------------------
-
- 
-Do gt1= 1, 4
-  Do gt2= gt1, 4
-m1out = Mhh(gt1)
-m2out = Mhh(gt2)
-coup = cplhhhhcHpm(gt1,gt2,i1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-If (gt1.ne.gt2) gam = 2._dp*gam 
-gPartial(i1,i_count) = 1._dp/2._dp*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
+If ((gt1.eq.gt2).and.(gt1.eq.3)) Then 
+  BR_Htaunu(i1) = gPartial(i1,i_count) 
+End if 
 i_count = i_count +1 
   End Do 
 End Do 
@@ -2225,14 +2141,14 @@ End Do
 
  
 ! ----------------------------------------------
-! hh, conj[VWLm]
+! hh, VWLm
 ! ----------------------------------------------
 
  
 Do gt1= 1, 4
 m1out = Mhh(gt1)
 m2out = MVWLm
-coup = cplhhcHpmcVWLm(gt1,i1)
+coup = cplhhcHpmVWLm(gt1,i1)
 Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2242,39 +2158,19 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! hh, conj[VWRm]
+! hh, VWRm
 ! ----------------------------------------------
 
  
 Do gt1= 1, 4
 m1out = Mhh(gt1)
 m2out = MVWRm
-coup = cplhhcHpmcVWRm(gt1,i1)
+coup = cplhhcHpmVWRm(gt1,i1)
 Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
 i_count = i_count +1 
   End Do 
-
- 
-! ----------------------------------------------
-! Hpm, Hpm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-m1out = MHpm(gt1)
-m2out = MHpm(gt2)
-coup = cplHpmHpmcHpm(gt1,gt2,i1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-If (gt1.ne.gt2) gam = 2._dp*gam 
-gPartial(i1,i_count) = 1._dp/2._dp*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 
  
 ! ----------------------------------------------
@@ -2310,32 +2206,13 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! conj[Hpm], Hpm
+! VWLm, VZ
 ! ----------------------------------------------
 
  
-Do gt1= 3, 4
-  Do gt2=3, 4
-m1out = MHpm(gt1)
-m2out = MHpm(gt2)
-coup = cplHpmcHpmcHpm(gt2,i1,gt1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 1*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! VZ, conj[VWLm]
-! ----------------------------------------------
-
- 
-m1out = MVZ
-m2out = MVWLm
-coup = cplcHpmcVWLmVZ(i1)
+m1out = MVWLm
+m2out = MVZ
+coup = cplcHpmVWLmVZ(i1)
 Call ScalarToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2344,13 +2221,13 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! VZ, conj[VWRm]
+! VWLm, VZR
 ! ----------------------------------------------
 
  
-m1out = MVZ
-m2out = MVWRm
-coup = cplcHpmcVWRmVZ(i1)
+m1out = MVWLm
+m2out = MVZR
+coup = cplcHpmVWLmVZR(i1)
 Call ScalarToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2358,13 +2235,13 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! VZR, conj[VWLm]
+! VWRm, VZ
 ! ----------------------------------------------
 
  
-m1out = MVZR
-m2out = MVWLm
-coup = cplcHpmcVWLmVZR(i1)
+m1out = MVWRm
+m2out = MVZ
+coup = cplcHpmVWRmVZ(i1)
 Call ScalarToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2372,13 +2249,13 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! VZR, conj[VWRm]
+! VWRm, VZR
 ! ----------------------------------------------
 
  
-m1out = MVZR
-m2out = MVWRm
-coup = cplcHpmcVWRmVZR(i1)
+m1out = MVWRm
+m2out = MVZR
+coup = cplcHpmVWRmVZR(i1)
 Call ScalarToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
@@ -2398,13 +2275,13 @@ End Subroutine HpmTwoBodyDecay
  
 Subroutine AhTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,            & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
 & k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -2412,11 +2289,10 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplPseudoHiggsPP(4),cplPseudoHiggsGG(4),cplAhAhhh(4,4,4),cplAhAhHpm(4,4,4),           & 
-& cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),           & 
-& cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),             & 
-& cplAhhhHpm(4,4,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4),cplAhHpmVWLm(4,4),cplAhHpmVWRm(4,4),  & 
-& cplAhHpmcHpm(4,4,4),cplAhcVWRmVWLm(4)
+Complex(dp) :: cplPseudoHiggsPP(4),cplPseudoHiggsGG(4),cplAhAhhh(4,4,4),cplcFdFdAhL(3,3,4),          & 
+& cplcFdFdAhR(3,3,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFuFuAhL(3,3,4),           & 
+& cplcFuFuAhR(3,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplAhhhVZ(4,4),cplAhhhVZR(4,4), & 
+& cplAhHpmcHpm(4,4,4),cplAhHpmcVWLm(4,4),cplAhHpmcVWRm(4,4),cplAhcVWRmVWLm(4)
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT(:) 
@@ -2460,11 +2336,11 @@ m_in = MAh(i1)
 If (m_in.Eq.0._dp) Cycle 
 Call CouplingsFor_Ah_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,           & 
 & MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,            & 
-& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,            & 
-& RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
-& k1,vR,cplPseudoHiggsPP,cplPseudoHiggsGG,cplAhAhhh,cplAhAhHpm,cplcFdFdAhL,              & 
-& cplcFdFdAhR,cplcFeFeAhL,cplcFeFeAhR,cplcFuFuAhL,cplcFuFuAhR,cplFvFvAhL,cplFvFvAhR,     & 
-& cplAhhhHpm,cplAhhhVZ,cplAhhhVZR,cplAhHpmVWLm,cplAhHpmVWRm,cplAhHpmcHpm,cplAhcVWRmVWLm,deltaM)
+& PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,            & 
+& RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,              & 
+& k1,vR,cplPseudoHiggsPP,cplPseudoHiggsGG,cplAhAhhh,cplcFdFdAhL,cplcFdFdAhR,             & 
+& cplcFeFeAhL,cplcFeFeAhR,cplcFuFuAhL,cplcFuFuAhR,cplFvFvAhL,cplFvFvAhR,cplAhhhVZ,       & 
+& cplAhhhVZR,cplAhHpmcHpm,cplAhHpmcVWLm,cplAhHpmcVWRm,cplAhcVWRmVWLm,deltaM)
 
 i_count = 1 
 
@@ -2509,25 +2385,6 @@ Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam)
 gPartial(i1,i_count) = 1*gam 
 gT(i1) = gT(i1) + gPartial(i1,i_count) 
   BRAHAijk(i1,gt1,gt2) = gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
-! Hpm, Ah
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-m1out = MHpm(gt1)
-m2out = MAh(gt2)
-coup = cplAhAhHpm(i1,gt2,gt1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
 i_count = i_count +1 
   End Do 
 End Do 
@@ -2616,25 +2473,6 @@ End Do
 
  
 ! ----------------------------------------------
-! Hpm, hh
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=1, 4
-m1out = MHpm(gt1)
-m2out = Mhh(gt2)
-coup = cplAhhhHpm(i1,gt2,gt1)
-Call ScalarToTwoScalars(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
-
- 
-! ----------------------------------------------
 ! hh, VZ
 ! ----------------------------------------------
 
@@ -2668,39 +2506,6 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! Hpm, VWLm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWLm
-coup = cplAhHpmVWLm(i1,gt1)
-Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-  BRAHpW(i1,gt2) = gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! Hpm, VWRm
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVWRm
-coup = cplAhHpmVWRm(i1,gt1)
-Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(i1,i_count) = 2*gam 
-gT(i1) = gT(i1) + gPartial(i1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
 ! conj[Hpm], Hpm
 ! ----------------------------------------------
 
@@ -2717,6 +2522,39 @@ i_count = i_count +1
   End Do 
 End Do 
  
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWLm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWLm
+coup = cplAhHpmcVWLm(i1,gt1)
+Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(i1,i_count) = 2*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+  BRAHpW(i1,gt2) = gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
+! Hpm, conj[VWRm]
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVWRm
+coup = cplAhHpmcVWRm(i1,gt1)
+Call ScalarToScalarVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(i1,i_count) = 2*gam 
+gT(i1) = gT(i1) + gPartial(i1,i_count) 
+i_count = i_count +1 
+  End Do 
 
  
 ! ----------------------------------------------
@@ -2780,12 +2618,12 @@ End Subroutine AhTwoBodyDecay
 Subroutine VWLmTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,               & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
 & MU22,k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -2793,10 +2631,10 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplAhcVWLmVWRm(4),cplAhcHpmcVWLm(4,4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),        & 
-& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplhhcVWLmVWLm(4),cplhhcVWLmVWRm(4),             & 
-& cplhhcHpmcVWLm(4,4),cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ(4),  & 
-& cplcHpmcVWLmVZR(4)
+Complex(dp) :: cplAhHpmcVWLm(4,4),cplAhcVWLmVWRm(4),cplcFuFdcVWLmL(3,3),cplcFuFdcVWLmR(3,3),         & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplhhHpmcVWLm(4,4),cplhhcVWLmVWLm(4),            & 
+& cplhhcVWLmVWRm(4),cplHpmcVWLmVZ(4),cplHpmcVWLmVZR(4),cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,   & 
+& cplcVWLmVWRmVZ,cplcVWLmVWRmVZR
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT 
@@ -2834,12 +2672,31 @@ m_in = MVWLm
 Call CouplingsFor_VWLm_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,              & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,k1,vR,cplAhcVWLmVWRm,cplAhcHpmcVWLm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,  & 
-& cplFvFecVWLmR,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplhhcHpmcVWLm,cplcVWLmVWLmVZ,             & 
-& cplcVWLmVWLmVZR,cplcVWLmVWRmVZR,cplcHpmcVWLmVZ,cplcHpmcVWLmVZR,deltaM)
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& MU22,k1,vR,cplAhHpmcVWLm,cplAhcVWLmVWRm,cplcFuFdcVWLmL,cplcFuFdcVWLmR,cplFvFecVWLmL,   & 
+& cplFvFecVWLmR,cplhhHpmcVWLm,cplhhcVWLmVWLm,cplhhcVWLmVWRm,cplHpmcVWLmVZ,               & 
+& cplHpmcVWLmVZR,cplcVWLmVWLmVZ,cplcVWLmVWLmVZR,cplcVWLmVWRmVZ,cplcVWLmVWRmVZR,deltaM)
 
 i_count = 1 
+
+ 
+! ----------------------------------------------
+! Hpm, Ah
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+  Do gt2=3, 4
+m1out = MHpm(gt1)
+m2out = MAh(gt2)
+coup = cplAhHpmcVWLm(gt2,gt1)
+Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
 
  
 ! ----------------------------------------------
@@ -2856,25 +2713,6 @@ gPartial(1,i_count) = 1*gam
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
   End Do 
-
- 
-! ----------------------------------------------
-! conj[Hpm], Ah
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-m1out = MHpm(gt1)
-m2out = MAh(gt2)
-coup = cplAhcHpmcVWLm(gt2,gt1)
-Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 
  
 ! ----------------------------------------------
@@ -2918,6 +2756,25 @@ End Do
 
  
 ! ----------------------------------------------
+! Hpm, hh
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+  Do gt2=1, 4
+m1out = MHpm(gt1)
+m2out = Mhh(gt2)
+coup = cplhhHpmcVWLm(gt2,gt1)
+Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
+
+ 
+! ----------------------------------------------
 ! hh, VWLm
 ! ----------------------------------------------
 
@@ -2950,22 +2807,35 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! conj[Hpm], hh
+! Hpm, VZ
 ! ----------------------------------------------
 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
 m1out = MHpm(gt1)
-m2out = Mhh(gt2)
-coup = cplhhcHpmcVWLm(gt2,gt1)
-Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+m2out = MVZ
+coup = cplHpmcVWLmVZ(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(1,i_count) = 1*gam 
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
   End Do 
-End Do 
+
  
+! ----------------------------------------------
+! Hpm, VZR
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVZR
+coup = cplHpmcVWLmVZR(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
 
  
 ! ----------------------------------------------
@@ -2997,6 +2867,20 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
+! VWRm, VZ
+! ----------------------------------------------
+
+ 
+m1out = MVWRm
+m2out = MVZ
+coup = cplcVWLmVWRmVZ
+Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+
+ 
+! ----------------------------------------------
 ! VWRm, VZR
 ! ----------------------------------------------
 
@@ -3008,38 +2892,6 @@ Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam)
 gPartial(1,i_count) = 1*gam 
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
-
- 
-! ----------------------------------------------
-! conj[Hpm], VZ
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVZ
-coup = cplcHpmcVWLmVZ(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! conj[Hpm], VZR
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVZR
-coup = cplcHpmcVWLmVZR(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
 If ((Present(BR)).And.(gT.Eq.0)) Then 
   BR(1,:) = 0._dp 
 Else If (Present(BR)) Then 
@@ -3054,12 +2906,12 @@ End Subroutine VWLmTwoBodyDecay
 Subroutine VWRmTwoBodyDecay(i_in,deltaM,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,               & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
 & MU22,k1,vR,gPartial,gT,BR)
 
 Implicit None 
  
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,           & 
 & k1,vR,MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(3),MFv(9),              & 
 & MFv2(9),Mhh(4),Mhh2(4),MHpm(4),MHpm2(4),MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,            & 
 & MVZR,MVZR2,PhiW,TW,UC(4,4),UP(4,4),ZH(4,4),ZZ(3,3)
@@ -3067,10 +2919,10 @@ Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LA
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3),ZDR(3,3),ZER(3,3),          & 
 & ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
-Complex(dp) :: cplAhcVWRmVWLm(4),cplAhcHpmcVWRm(4,4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),        & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhcVWRmVWLm(4),cplhhcVWRmVWRm(4),             & 
-& cplhhcHpmcVWRm(4,4),cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ(4),  & 
-& cplcHpmcVWRmVZR(4)
+Complex(dp) :: cplAhHpmcVWRm(4,4),cplAhcVWRmVWLm(4),cplcFuFdcVWRmL(3,3),cplcFuFdcVWRmR(3,3),         & 
+& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplhhHpmcVWRm(4,4),cplhhcVWRmVWLm(4),            & 
+& cplhhcVWRmVWRm(4),cplHpmcVWRmVZ(4),cplHpmcVWRmVZR(4),cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,   & 
+& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR
 
 Integer, Intent(in) :: i_in 
 Real(dp), Intent(inout) :: gPartial(:,:), gT 
@@ -3108,12 +2960,31 @@ m_in = MVWRm
 Call CouplingsFor_VWRm_decays_2B(m_in,i1,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,              & 
 & MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,             & 
 & MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,           & 
-& ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
-& MU22,k1,vR,cplAhcVWRmVWLm,cplAhcHpmcVWRm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,  & 
-& cplFvFecVWRmR,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplhhcHpmcVWRm,cplcVWRmVWLmVZR,            & 
-& cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,cplcHpmcVWRmVZ,cplcHpmcVWRmVZR,deltaM)
+& RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,              & 
+& MU22,k1,vR,cplAhHpmcVWRm,cplAhcVWRmVWLm,cplcFuFdcVWRmL,cplcFuFdcVWRmR,cplFvFecVWRmL,   & 
+& cplFvFecVWRmR,cplhhHpmcVWRm,cplhhcVWRmVWLm,cplhhcVWRmVWRm,cplHpmcVWRmVZ,               & 
+& cplHpmcVWRmVZR,cplcVWRmVWLmVZ,cplcVWRmVWLmVZR,cplcVWRmVWRmVZ,cplcVWRmVWRmVZR,deltaM)
 
 i_count = 1 
+
+ 
+! ----------------------------------------------
+! Hpm, Ah
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+  Do gt2=3, 4
+m1out = MHpm(gt1)
+m2out = MAh(gt2)
+coup = cplAhHpmcVWRm(gt2,gt1)
+Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
 
  
 ! ----------------------------------------------
@@ -3130,25 +3001,6 @@ gPartial(1,i_count) = 1*gam
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
   End Do 
-
- 
-! ----------------------------------------------
-! conj[Hpm], Ah
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-m1out = MHpm(gt1)
-m2out = MAh(gt2)
-coup = cplAhcHpmcVWRm(gt2,gt1)
-Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-End Do 
- 
 
  
 ! ----------------------------------------------
@@ -3192,6 +3044,25 @@ End Do
 
  
 ! ----------------------------------------------
+! Hpm, hh
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+  Do gt2=1, 4
+m1out = MHpm(gt1)
+m2out = Mhh(gt2)
+coup = cplhhHpmcVWRm(gt2,gt1)
+Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+End Do 
+ 
+
+ 
+! ----------------------------------------------
 ! hh, VWLm
 ! ----------------------------------------------
 
@@ -3224,22 +3095,49 @@ i_count = i_count +1
 
  
 ! ----------------------------------------------
-! conj[Hpm], hh
+! Hpm, VZ
 ! ----------------------------------------------
 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
 m1out = MHpm(gt1)
-m2out = Mhh(gt2)
-coup = cplhhcHpmcVWRm(gt2,gt1)
-Call VectorBosonToTwoScalars(m_in,m1out,m2out,1,coup,gam) 
+m2out = MVZ
+coup = cplHpmcVWRmVZ(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
 gPartial(1,i_count) = 1*gam 
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
   End Do 
-End Do 
+
  
+! ----------------------------------------------
+! Hpm, VZR
+! ----------------------------------------------
+
+ 
+Do gt1= 3, 4
+m1out = MHpm(gt1)
+m2out = MVZR
+coup = cplHpmcVWRmVZR(gt1)
+Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
+  End Do 
+
+ 
+! ----------------------------------------------
+! VWLm, VZ
+! ----------------------------------------------
+
+ 
+m1out = MVWLm
+m2out = MVZ
+coup = cplcVWRmVWLmVZ
+Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam) 
+gPartial(1,i_count) = 1*gam 
+gT = gT + gPartial(1,i_count) 
+i_count = i_count +1 
 
  
 ! ----------------------------------------------
@@ -3282,38 +3180,6 @@ Call VectorBosonToTwoVectorBosons(m_in,m1out,m2out,coup,gam)
 gPartial(1,i_count) = 1*gam 
 gT = gT + gPartial(1,i_count) 
 i_count = i_count +1 
-
- 
-! ----------------------------------------------
-! conj[Hpm], VZ
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVZ
-coup = cplcHpmcVWRmVZ(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
-
- 
-! ----------------------------------------------
-! conj[Hpm], VZR
-! ----------------------------------------------
-
- 
-Do gt1= 3, 4
-m1out = MHpm(gt1)
-m2out = MVZR
-coup = cplcHpmcVWRmVZR(gt1)
-Call VectorBosonToScalarAndVectorBoson(m_in,m1out,m2out,coup,gam) 
-gPartial(1,i_count) = 1*gam 
-gT = gT + gPartial(1,i_count) 
-i_count = i_count +1 
-  End Do 
 If ((Present(BR)).And.(gT.Eq.0)) Then 
   BR(1,:) = 0._dp 
 Else If (Present(BR)) Then 

@@ -91,8 +91,8 @@ ParameterDefinitions = {
 {gBL,{ 
      Description -> "B-L-Coupling", 
      Dependence -> None, 
-     DependenceNum -> None, 
-     DependenceOptional -> None, 
+     DependenceNum -> e/Sqrt[Cos[2 ThetaW]], 
+     DependenceOptional -> e/Sqrt[Cos[2 ThetaW]], 
      DependenceSPheno -> None, 
      GUTnormalization -> Sqrt[3/2], 
      Real -> True, 
@@ -250,7 +250,7 @@ ParameterDefinitions = {
      Dependence -> None, 
      DependenceNum -> None, (*ArcCos[(Sqrt[g2^2 + gBL^2])/Sqrt[g2^2 + 2*gBL^2]], *)
      DependenceOptional -> None, 
-     DependenceSPheno -> ArcSin[Abs[ZZ[1, 1]]], 
+     DependenceSPheno -> ArcSin[Abs[ZZ[[1, 1]]]], 
      Real -> True, 
      LesHouches -> ThetaW, 
      LaTeX -> "\\Theta_W", 
@@ -533,7 +533,12 @@ ParameterDefinitions = {
 
 {ZW,{
      Description -> "W Mixing Matrix",
-     Dependence -> {{Cos[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2], -(Sin[PhiW]/Sqrt[2]), -(Sin[PhiW]/Sqrt[2])}, {((-I)*Cos[PhiW])/Sqrt[2], (I*Cos[PhiW])/Sqrt[2], (I*Sin[PhiW])/Sqrt[2], ((-I)*Sin[PhiW])/Sqrt[2]}, {Sin[PhiW]/Sqrt[2], Sin[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2]}, {((-I)*Sin[PhiW])/Sqrt[2], (I*Sin[PhiW])/Sqrt[2], ((-I)*Cos[PhiW])/Sqrt[2], (I*Cos[PhiW])/Sqrt[2]}},
+     Dependence -> {
+          {Cos[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2], -(Sin[PhiW]/Sqrt[2]), -(Sin[PhiW]/Sqrt[2])},
+          {((-I)*Cos[PhiW])/Sqrt[2], (I*Cos[PhiW])/Sqrt[2], (I*Sin[PhiW])/Sqrt[2], ((-I)*Sin[PhiW])/Sqrt[2]}, 
+          {Sin[PhiW]/Sqrt[2], Sin[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2], Cos[PhiW]/Sqrt[2]}, 
+          {((-I)*Sin[PhiW])/Sqrt[2], (I*Sin[PhiW])/Sqrt[2], ((-I)*Cos[PhiW])/Sqrt[2], (I*Cos[PhiW])/Sqrt[2]}
+          },
      DependenceNum -> None,
      DependenceOptional -> None,
      DependenceSPheno -> None,

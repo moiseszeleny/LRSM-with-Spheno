@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:00 on 11.6.2025   
+! File created at 21:28 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -26,12 +26,12 @@ Real(dp),Parameter::id3R(3,3)=&
 Contains 
 
 
-Subroutine GToParameters142(g,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,           & 
+Subroutine GToParameters142(g,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,           & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22)
 
 Implicit None 
 Real(dp), Intent(in) :: g(142) 
-Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
+Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
 Complex(dp),Intent(out) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -45,10 +45,10 @@ g2= g(2)
 g3= g(3) 
 LAM2= g(4) 
 LAM1= g(5) 
-ALP1= g(6) 
-RHO1= g(7) 
-RHO2= g(8) 
-ALP2= g(9) 
+RHO1= g(6) 
+RHO2= g(7) 
+ALP2= g(8) 
+ALP1= g(9) 
 ALP3= g(10) 
 LAM5= g(11) 
 LAM6= g(12) 
@@ -123,12 +123,12 @@ Iname = Iname - 1
  
 End Subroutine GToParameters142
 
-Subroutine ParametersToG142(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,             & 
+Subroutine ParametersToG142(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,             & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,g)
 
 Implicit None 
 Real(dp), Intent(out) :: g(142) 
-Real(dp), Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
+Real(dp), Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22
 
 Complex(dp), Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -142,10 +142,10 @@ g(2) = g2
 g(3) = g3  
 g(4) = LAM2  
 g(5) = LAM1  
-g(6) = ALP1  
-g(7) = RHO1  
-g(8) = RHO2  
-g(9) = ALP2  
+g(6) = RHO1  
+g(7) = RHO2  
+g(8) = ALP2  
+g(9) = ALP1  
 g(10) = ALP3  
 g(11) = LAM5  
 g(12) = LAM6  
@@ -230,8 +230,8 @@ Integer :: j1,j2,j3,j4,j5,j6,j7
 Real(dp) :: q 
 Real(dp) :: gBL,betagBL1,betagBL2,DgBL,g2,betag21,betag22,Dg2,g3,betag31,             & 
 & betag32,Dg3,LAM2,betaLAM21,betaLAM22,DLAM2,LAM1,betaLAM11,betaLAM12,DLAM1,             & 
-& ALP1,betaALP11,betaALP12,DALP1,RHO1,betaRHO11,betaRHO12,DRHO1,RHO2,betaRHO21,          & 
-& betaRHO22,DRHO2,ALP2,betaALP21,betaALP22,DALP2,ALP3,betaALP31,betaALP32,               & 
+& RHO1,betaRHO11,betaRHO12,DRHO1,RHO2,betaRHO21,betaRHO22,DRHO2,ALP2,betaALP21,          & 
+& betaALP22,DALP2,ALP1,betaALP11,betaALP12,DALP1,ALP3,betaALP31,betaALP32,               & 
 & DALP3,LAM5,betaLAM51,betaLAM52,DLAM5,LAM6,betaLAM61,betaLAM62,DLAM6,LAM3,              & 
 & betaLAM31,betaLAM32,DLAM3,LAM4,betaLAM41,betaLAM42,DLAM4,MU12,betaMU121,               & 
 & betaMU122,DMU12,MU22,betaMU221,betaMU222,DMU22
@@ -247,7 +247,7 @@ NameOfUnit(Iname) = 'rge142'
 OnlyDiagonal = .Not.GenerationMixing 
 q = t 
  
-Call GToParameters142(gy,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,           & 
+Call GToParameters142(gy,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,           & 
 & LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22)
 
 Call Adjungate(Y,adjY)
@@ -364,26 +364,6 @@ End If
  
  
 !-------------------- 
-! ALP1 
-!-------------------- 
- 
-betaALP11  = 0
-
- 
- 
-If (TwoLoopRGE) Then 
-betaALP12 = 0
-
- 
-DALP1 = oo16pi2*( betaALP11 + oo16pi2 * betaALP12 ) 
-
- 
-Else 
-DALP1 = oo16pi2* betaALP11 
-End If 
- 
- 
-!-------------------- 
 ! RHO1 
 !-------------------- 
  
@@ -440,6 +420,26 @@ DALP2 = oo16pi2*( betaALP21 + oo16pi2 * betaALP22 )
  
 Else 
 DALP2 = oo16pi2* betaALP21 
+End If 
+ 
+ 
+!-------------------- 
+! ALP1 
+!-------------------- 
+ 
+betaALP11  = 0
+
+ 
+ 
+If (TwoLoopRGE) Then 
+betaALP12 = 0
+
+ 
+DALP1 = oo16pi2*( betaALP11 + oo16pi2 * betaALP12 ) 
+
+ 
+Else 
+DALP1 = oo16pi2* betaALP11 
 End If 
  
  
@@ -737,19 +737,19 @@ DMU22 = oo16pi2* betaMU221
 End If 
  
  
-Call ParametersToG142(DgBL,Dg2,Dg3,DLAM2,DLAM1,DALP1,DRHO1,DRHO2,DALP2,               & 
+Call ParametersToG142(DgBL,Dg2,Dg3,DLAM2,DLAM1,DRHO1,DRHO2,DALP2,DALP1,               & 
 & DALP3,DLAM5,DLAM6,DLAM3,DLAM4,DY,DYQ1,DYQ2,DYt,DYL,DYR,DMux,DMU12,DMU22,f)
 
 Iname = Iname - 1 
  
 End Subroutine rge142  
 
-Subroutine GToParameters144(g,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,           & 
+Subroutine GToParameters144(g,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,           & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR)
 
 Implicit None 
 Real(dp), Intent(in) :: g(144) 
-Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp),Intent(out) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -763,10 +763,10 @@ g2= g(2)
 g3= g(3) 
 LAM2= g(4) 
 LAM1= g(5) 
-ALP1= g(6) 
-RHO1= g(7) 
-RHO2= g(8) 
-ALP2= g(9) 
+RHO1= g(6) 
+RHO2= g(7) 
+ALP2= g(8) 
+ALP1= g(9) 
 ALP3= g(10) 
 LAM5= g(11) 
 LAM6= g(12) 
@@ -843,12 +843,12 @@ Iname = Iname - 1
  
 End Subroutine GToParameters144
 
-Subroutine ParametersToG144(gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,             & 
+Subroutine ParametersToG144(gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,             & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,g)
 
 Implicit None 
 Real(dp), Intent(out) :: g(144) 
-Real(dp), Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp), Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp), Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -862,10 +862,10 @@ g(2) = g2
 g(3) = g3  
 g(4) = LAM2  
 g(5) = LAM1  
-g(6) = ALP1  
-g(7) = RHO1  
-g(8) = RHO2  
-g(9) = ALP2  
+g(6) = RHO1  
+g(7) = RHO2  
+g(8) = ALP2  
+g(9) = ALP1  
 g(10) = ALP3  
 g(11) = LAM5  
 g(12) = LAM6  
@@ -952,8 +952,8 @@ Integer :: j1,j2,j3,j4,j5,j6,j7
 Real(dp) :: q 
 Real(dp) :: gBL,betagBL1,betagBL2,DgBL,g2,betag21,betag22,Dg2,g3,betag31,             & 
 & betag32,Dg3,LAM2,betaLAM21,betaLAM22,DLAM2,LAM1,betaLAM11,betaLAM12,DLAM1,             & 
-& ALP1,betaALP11,betaALP12,DALP1,RHO1,betaRHO11,betaRHO12,DRHO1,RHO2,betaRHO21,          & 
-& betaRHO22,DRHO2,ALP2,betaALP21,betaALP22,DALP2,ALP3,betaALP31,betaALP32,               & 
+& RHO1,betaRHO11,betaRHO12,DRHO1,RHO2,betaRHO21,betaRHO22,DRHO2,ALP2,betaALP21,          & 
+& betaALP22,DALP2,ALP1,betaALP11,betaALP12,DALP1,ALP3,betaALP31,betaALP32,               & 
 & DALP3,LAM5,betaLAM51,betaLAM52,DLAM5,LAM6,betaLAM61,betaLAM62,DLAM6,LAM3,              & 
 & betaLAM31,betaLAM32,DLAM3,LAM4,betaLAM41,betaLAM42,DLAM4,MU12,betaMU121,               & 
 & betaMU122,DMU12,MU22,betaMU221,betaMU222,DMU22,k1,betak11,betak12,Dk1,vR,              & 
@@ -970,7 +970,7 @@ NameOfUnit(Iname) = 'rge144'
 OnlyDiagonal = .Not.GenerationMixing 
 q = t 
  
-Call GToParameters144(gy,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,           & 
+Call GToParameters144(gy,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,           & 
 & LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR)
 
 Call Adjungate(Y,adjY)
@@ -1087,26 +1087,6 @@ End If
  
  
 !-------------------- 
-! ALP1 
-!-------------------- 
- 
-betaALP11  = 0
-
- 
- 
-If (TwoLoopRGE) Then 
-betaALP12 = 0
-
- 
-DALP1 = oo16pi2*( betaALP11 + oo16pi2 * betaALP12 ) 
-
- 
-Else 
-DALP1 = oo16pi2* betaALP11 
-End If 
- 
- 
-!-------------------- 
 ! RHO1 
 !-------------------- 
  
@@ -1163,6 +1143,26 @@ DALP2 = oo16pi2*( betaALP21 + oo16pi2 * betaALP22 )
  
 Else 
 DALP2 = oo16pi2* betaALP21 
+End If 
+ 
+ 
+!-------------------- 
+! ALP1 
+!-------------------- 
+ 
+betaALP11  = 0
+
+ 
+ 
+If (TwoLoopRGE) Then 
+betaALP12 = 0
+
+ 
+DALP1 = oo16pi2*( betaALP11 + oo16pi2 * betaALP12 ) 
+
+ 
+Else 
+DALP1 = oo16pi2* betaALP11 
 End If 
  
  
@@ -1500,7 +1500,7 @@ DvR = oo16pi2* betavR1
 End If 
  
  
-Call ParametersToG144(DgBL,Dg2,Dg3,DLAM2,DLAM1,DALP1,DRHO1,DRHO2,DALP2,               & 
+Call ParametersToG144(DgBL,Dg2,Dg3,DLAM2,DLAM1,DRHO1,DRHO2,DALP2,DALP1,               & 
 & DALP3,DLAM5,DLAM6,DLAM3,DLAM4,DY,DYQ1,DYQ2,DYt,DYL,DYR,DMux,DMU12,DMU22,               & 
 & Dk1,DvR,f)
 

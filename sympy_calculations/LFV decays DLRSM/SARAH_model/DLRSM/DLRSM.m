@@ -75,8 +75,10 @@ LagNoHC = (
   - mu22 (conj[chiL].chiL + conj[chiR].chiR)
   + rho1 conj[chiL].chiL.conj[chiL].chiL + rho1 conj[chiR].chiR.conj[chiR].chiR             (* ρ₁ (χ_L†χ_L)² + (χ_R†χ_R)² *)
   + rho2 conj[chiL].chiL.conj[chiR].chiR                                                   (* ρ₂ χ_L†χ_L χ_R†χ_R *)
-  + alp1 Delta[rig1,rig2] Delta[lef1,lef2] Phi.conj[Phi].conj[chiL].chiL
-  + alp1 Delta[rig1,rig2] Delta[lef1,lef2] Phi.conj[Phi].conj[chiR].chiR
+  + alp1(
+    Delta[rig1,rig2] Delta[lef1,lef2] Delta[lef3, lef4] conj[Phi].Phi.conj[chiL].chiL
+    + Delta[rig1,rig2] Delta[lef1,lef2] Delta[rig3, rig4] conj[Phi].Phi.conj[chiR].chiR
+  )
   + alp2 (
       Delta[lef1, lef2] Delta[rig2, rig3] Delta[lef3, lef4] conj[chiL].Phi.conj[Phi].chiL 
       + Delta[rig1, rig2] Delta[lef2, lef3] Delta[rig3, rig4] conj[chiR].conj[Phi].Phi.chiR
@@ -98,7 +100,7 @@ LagHC = - ( Y Phi.LLbar.LR
 
 (* Gauge Sector *)
 DEFINITION[EWSB][GaugeSector] =
-{ {{VWL[3],VWR[3],VB},{VZ,VZR,VP},ZZ},
+{ {{VWL[3],VWR[3],VB},{VP,VZ,VZR},ZZ},
   {{VWL[1],VWL[2],VWR[1],VWR[2]},{VWLm,conj[VWLm],VWRm,conj[VWRm]},ZW} };     
         
 (* ----- VEVs ---- *)
@@ -118,7 +120,7 @@ DEFINITION[EWSB][MatterSector]=
       (*Pseudoscalars*)
     {{sigmaH20,sigmaL0,sigmaH10,sigmaR0},{Ah,UP}},
       (*Singly charged scalars*)
-    {{conj[Hm], chiLp , Hp, chiRp},{Hpm,UC}},
+    {{Hm, conj[chiLp] , conj[Hp], conj[chiRp]},{Hpm,UC}},
       (*Fermions*)
     {{{dL}, {conj[dR]}}, {{DL,Vd}, {DR,Ud}}},
     {{{uL}, {conj[uR]}}, {{UL,Vu}, {UR,Uu}}},

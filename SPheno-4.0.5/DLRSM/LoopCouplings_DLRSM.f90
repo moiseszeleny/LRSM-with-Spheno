@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:01 on 11.6.2025   
+! File created at 21:28 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -196,14 +196,14 @@ Complex(dp),Intent(in) :: ZER(3,3),ZEL(3,3),Y(3,3),YR(3,3),Yt(3,3),ZM(9,9)
 
 Real(dp) :: MAh2(4),MFe2(3),MFv2(9),Mhh2(4),MHpm2(4),MVWLm2,MVWRm2,MVZR2
 
-Complex(dp) :: cplAhcVWRmVWLm(4),cplAhHpmVWLm(4,4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),            & 
+Complex(dp) :: cplAhcHpmVWLm(4,4),cplAhcVWRmVWLm(4),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),           & 
 & cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),             & 
-& cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),       & 
-& cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplcVWLmVWLmVZR,cplcVWRmVWLmVZR,cplFvFecVWLmL(9,3),& 
-& cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),           & 
-& cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),              & 
-& cplFvFvhhR(9,9,4),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4),& 
-& cplhhHpmVWLm(4,4),cplHpmVWLmVZR(4)
+& cplcFeFvHpmL(3,9,4),cplcFeFvHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),         & 
+& cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplcHpmVWLmVZR(4),cplcVWLmVWLmVZR,               & 
+& cplcVWRmVWLmVZR,cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplFvFecVWLmL(9,3),            & 
+& cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFvAhL(9,9,4),            & 
+& cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9),& 
+& cplhhcHpmVWLm(4,4),cplhhcVWLmVWLm(4),cplhhcVWRmVWLm(4)
 
 Integer :: i1,i2,i3,i4,gt1,gt2,gt3,gt4 
 Real(dp), Intent(in) :: sinW2,sinW2_Dr, rho 
@@ -252,10 +252,10 @@ Call CouplingFvFvAhT(gt1,gt2,gt3,Y,Yt,YR,UP,ZM,cplFvFvAhL(gt1,gt2,gt3),         
 End Do 
 
 
-cplAhHpmVWLm = 0._dp 
+cplAhcHpmVWLm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplingAhHpmVWLmT(gt1,gt2,g2,UP,UC,PhiW,cplAhHpmVWLm(gt1,gt2))
+Call CouplingAhcHpmVWLmT(gt1,gt2,g2,UP,UC,PhiW,cplAhcHpmVWLm(gt1,gt2))
 
  End Do 
 End Do 
@@ -268,13 +268,13 @@ Call CouplingAhcVWRmVWLmT(gt1,g2,k1,UP,cplAhcVWRmVWLm(gt1))
 End Do 
 
 
-cplFvFeHpmL = 0._dp 
-cplFvFeHpmR = 0._dp 
+cplFvFecHpmL = 0._dp 
+cplFvFecHpmR = 0._dp 
 Do gt1 = 1, 9
  Do gt2 = 1, 3
   Do gt3 = 1, 4
-Call CouplingFvFeHpmT(gt1,gt2,gt3,Y,Yt,YR,UC,ZEL,ZER,ZM,cplFvFeHpmL(gt1,gt2,gt3)      & 
-& ,cplFvFeHpmR(gt1,gt2,gt3))
+Call CouplingFvFecHpmT(gt1,gt2,gt3,Y,Yt,YR,UC,ZEL,ZER,ZM,cplFvFecHpmL(gt1,gt2,gt3)    & 
+& ,cplFvFecHpmR(gt1,gt2,gt3))
 
   End Do 
  End Do 
@@ -349,6 +349,19 @@ Call CouplingFvFvVZRT(gt1,gt2,gBL,g2,ZM,TW,cplFvFvVZRL(gt1,gt2),cplFvFvVZRR(gt1,
 End Do 
 
 
+cplcFeFvHpmL = 0._dp 
+cplcFeFvHpmR = 0._dp 
+Do gt1 = 1, 3
+ Do gt2 = 1, 9
+  Do gt3 = 1, 4
+Call CouplingcFeFvHpmT(gt1,gt2,gt3,Y,Yt,YR,UC,ZEL,ZER,ZM,cplcFeFvHpmL(gt1,gt2,gt3)    & 
+& ,cplcFeFvHpmR(gt1,gt2,gt3))
+
+  End Do 
+ End Do 
+End Do 
+
+
 cplcFeFvVWLmL = 0._dp 
 cplcFeFvVWLmR = 0._dp 
 Do gt1 = 1, 3
@@ -371,23 +384,10 @@ Call CouplingcFeFvVWRmT(gt1,gt2,g2,ZEL,ZER,ZM,PhiW,cplcFeFvVWRmL(gt1,gt2)       
 End Do 
 
 
-cplcFeFvcHpmL = 0._dp 
-cplcFeFvcHpmR = 0._dp 
-Do gt1 = 1, 3
- Do gt2 = 1, 9
-  Do gt3 = 1, 4
-Call CouplingcFeFvcHpmT(gt1,gt2,gt3,Y,Yt,YR,UC,ZEL,ZER,ZM,cplcFeFvcHpmL(gt1,gt2,gt3)  & 
-& ,cplcFeFvcHpmR(gt1,gt2,gt3))
-
-  End Do 
- End Do 
-End Do 
-
-
-cplhhHpmVWLm = 0._dp 
+cplhhcHpmVWLm = 0._dp 
 Do gt1 = 1, 4
  Do gt2 = 1, 4
-Call CouplinghhHpmVWLmT(gt1,gt2,g2,ZH,UC,PhiW,cplhhHpmVWLm(gt1,gt2))
+Call CouplinghhcHpmVWLmT(gt1,gt2,g2,ZH,UC,PhiW,cplhhcHpmVWLm(gt1,gt2))
 
  End Do 
 End Do 
@@ -407,9 +407,9 @@ Call CouplinghhcVWRmVWLmT(gt1,g2,k1,vR,ZH,PhiW,cplhhcVWRmVWLm(gt1))
 End Do 
 
 
-cplHpmVWLmVZR = 0._dp 
+cplcHpmVWLmVZR = 0._dp 
 Do gt1 = 1, 4
-Call CouplingHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplHpmVWLmVZR(gt1))
+Call CouplingcHpmVWLmVZRT(gt1,gBL,g2,k1,vR,UC,TW,PhiW,cplcHpmVWLmVZR(gt1))
 
 End Do 
 
@@ -466,10 +466,10 @@ chargefactor = 1
 Do i1=1,3
   Do i2=1,4
 If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i1,i2)
-coup1R = cplFvFeHpmR(gt1,i1,i2)
-coup2R = Conjg(cplFvFeHpmL(gt2,i1,i2))
-coup2L = Conjg(cplFvFeHpmR(gt2,i1,i2))
+coup1L = cplFvFecHpmL(gt1,i1,i2)
+coup1R = cplFvFecHpmR(gt1,i1,i2)
+coup2R = Conjg(cplFvFecHpmL(gt2,i1,i2))
+coup2L = Conjg(cplFvFecHpmR(gt2,i1,i2))
 sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFe2(i1),MHpm2(i2))  
 End if 
    End Do
@@ -521,6 +521,22 @@ End if
 
 
 chargefactor = 1 
+Do i1=1,4
+  Do i2=1,3
+If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2))) Then
+coup1L = cplcFeFvHpmL(i2,gt1,i1)
+coup1R = cplcFeFvHpmR(i2,gt1,i1)
+coup2R = Conjg(cplcFeFvHpmL(i2,gt2,i1))
+coup2L = Conjg(cplcFeFvHpmR(i2,gt2,i1))
+sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFe2(i2),MHpm2(i1))  
+End if 
+   End Do
+  End Do
+
+
+
+
+chargefactor = 1 
   Do i2=1,3
 If ((MVWRm2.gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2))) Then
 coup1L = cplcFeFvVWRmL(i2,gt1)
@@ -528,22 +544,6 @@ coup1R = cplcFeFvVWRmR(i2,gt1)
 coup2L = Conjg(cplcFeFvVWRmL(i2,gt2))
 coup2R = Conjg(cplcFeFvVWRmR(i2,gt2))
 End if 
-  End Do
-
-
-
-
-chargefactor = 1 
-Do i1=1,3
-  Do i2=1,4
-If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2))) Then
-coup1L = cplcFeFvcHpmL(i1,gt1,i2)
-coup1R = cplcFeFvcHpmR(i1,gt1,i2)
-coup2R = Conjg(cplcFeFvcHpmL(i1,gt2,i2))
-coup2L = Conjg(cplcFeFvcHpmR(i1,gt2,i2))
-sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFe2(i1),MHpm2(i2))  
-End if 
-   End Do
   End Do
 
 
@@ -579,10 +579,10 @@ chargefactor = 1
 Do i1=1,9
   Do i2=1,4
 If ((MFv2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(i1,gt1,i2)
-coup1R = cplFvFeHpmR(i1,gt1,i2)
-coup2R = Conjg(cplFvFeHpmL(i1,gt2,i2))
-coup2L = Conjg(cplFvFeHpmR(i1,gt2,i2))
+coup1L = cplFvFecHpmL(i1,gt1,i2)
+coup1R = cplFvFecHpmR(i1,gt1,i2)
+coup2R = Conjg(cplFvFecHpmL(i1,gt2,i2))
+coup2L = Conjg(cplFvFecHpmR(i1,gt2,i2))
 sumI = sumI + chargefactor*0.5_dp*coup1L*coup2R*B1(0._dp,MFv2(i1),MHpm2(i2))  
 End if 
    End Do
@@ -665,6 +665,55 @@ End Do
 chargefactor = 1 
 Do i1= 1,9
   Do i2= 1,4
+   Do i3= 1,4
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(MAh2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
+coup1L = cplFvFvAhL(gt1,i1,i2)
+coup1R = cplFvFvAhR(gt1,i1,i2)
+coup2L = cplcFeFvHpmL(gt2,i1,i3)
+coup2R = cplcFeFvHpmR(gt2,i1,i3)
+coup3 = cplAhcHpmVWLm(i2,i3)
+vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),MAh2(i2),MHpm2(i3)) + B0(0._dp,MAh2(i2),MHpm2(i3)) +0.5_dp)) 
+End if 
+   End Do
+  End Do
+End Do
+
+
+chargefactor = 1 
+Do i1= 1,9
+  Do i2= 1,4
+   Do i3= 1,4
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
+coup1L = cplFvFvhhL(gt1,i1,i2)
+coup1R = cplFvFvhhR(gt1,i1,i2)
+coup2L = cplcFeFvHpmL(gt2,i1,i3)
+coup2R = cplcFeFvHpmR(gt2,i1,i3)
+coup3 = cplhhcHpmVWLm(i2,i3)
+vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),Mhh2(i2),MHpm2(i3)) + B0(0._dp,Mhh2(i2),MHpm2(i3)) +0.5_dp)) 
+End if 
+   End Do
+  End Do
+End Do
+
+
+chargefactor = 1 
+Do i1= 1,9
+  i2= 1
+   Do i3= 1,4
+  If ((MFv2(i1).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
+coup1L = cplFvFvVZRL(gt1,i1)
+coup1R = cplFvFvVZRR(gt1,i1)
+coup2L = cplcFeFvHpmL(gt2,i1,i3)
+coup2R = cplcFeFvHpmR(gt2,i1,i3)
+coup3 = cplcHpmVWLmVZR(i3)
+End if 
+   End Do
+End Do
+
+
+chargefactor = 1 
+Do i1= 1,9
+  Do i2= 1,4
   If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MVWLm2.gt.mf_l2(2))) Then
 coup1L = cplFvFvhhL(gt1,i1,i2)
 coup1R = cplFvFvhhR(gt1,i1,i2)
@@ -731,55 +780,6 @@ End if
 
 
 chargefactor = 1 
-Do i1= 1,9
-  Do i2= 1,4
-   Do i3= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(MAh2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
-coup1L = cplFvFvAhL(gt1,i1,i2)
-coup1R = cplFvFvAhR(gt1,i1,i2)
-coup2L = cplcFeFvcHpmL(gt2,i1,i3)
-coup2R = cplcFeFvcHpmR(gt2,i1,i3)
-coup3 = cplAhHpmVWLm(i2,i3)
-vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),MAh2(i2),MHpm2(i3)) + B0(0._dp,MAh2(i2),MHpm2(i3)) +0.5_dp)) 
-End if 
-   End Do
-  End Do
-End Do
-
-
-chargefactor = 1 
-Do i1= 1,9
-  Do i2= 1,4
-   Do i3= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(Mhh2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
-coup1L = cplFvFvhhL(gt1,i1,i2)
-coup1R = cplFvFvhhR(gt1,i1,i2)
-coup2L = cplcFeFvcHpmL(gt2,i1,i3)
-coup2R = cplcFeFvcHpmR(gt2,i1,i3)
-coup3 = cplhhHpmVWLm(i2,i3)
-vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFv2(i1)*C0_3m(MFv2(i1),Mhh2(i2),MHpm2(i3)) + B0(0._dp,Mhh2(i2),MHpm2(i3)) +0.5_dp)) 
-End if 
-   End Do
-  End Do
-End Do
-
-
-chargefactor = 1 
-Do i1= 1,9
-  i2= 1
-   Do i3= 1,4
-  If ((MFv2(i1).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2))) Then
-coup1L = cplFvFvVZRL(gt1,i1)
-coup1R = cplFvFvVZRR(gt1,i1)
-coup2L = cplcFeFvcHpmL(gt2,i1,i3)
-coup2R = cplcFeFvcHpmR(gt2,i1,i3)
-coup3 = cplHpmVWLmVZR(i3)
-End if 
-   End Do
-End Do
-
-
-chargefactor = 1 
 Do i1= 1,4
   Do i2= 1,9
    Do i3= 1,3
@@ -793,26 +793,6 @@ coup3R = -cplcFeFvVWLmL(i3,i2)
 vertex = vertex + chargefactor*(coup1L*coup2R*(-sqrt2*coup3R*MFv(i2)*MFe(i3)& 
 & *C0_3m(Mhh2(i1),MFv2(i2),MFe2(i3)) + oosqrt2*coup3L* & 
 & (B0(0._dp,MFv2(i2),MFe2(i3))-0.5_dp +Mhh2(i1)*C0_3m(Mhh2(i1),MFv2(i2),MFe2(i3))))) 
-End if 
-   End Do
-  End Do
-End Do
-
-
-chargefactor = 1 
-Do i1= 1,4
-  Do i2= 1,3
-   Do i3= 1,9
-  If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i2,i1)
-coup1R = cplFvFeHpmR(gt1,i2,i1)
-coup2L = cplcFeFvcHpmL(gt2,i3,i1)
-coup2R = cplcFeFvcHpmR(gt2,i3,i1)
-coup3L = cplcFeFvVWLmL(i2,i3)
-coup3R = cplcFeFvVWLmR(i2,i3)
-vertex = vertex + chargefactor*(coup1L*coup2R*(-sqrt2*coup3R*MFe(i2)*MFv(i3)& 
-& *C0_3m(MHpm2(i1),MFe2(i2),MFv2(i3)) + oosqrt2*coup3L* & 
-& (B0(0._dp,MFe2(i2),MFv2(i3))-0.5_dp +MHpm2(i1)*C0_3m(MHpm2(i1),MFe2(i2),MFv2(i3))))) 
 End if 
    End Do
   End Do
@@ -839,11 +819,11 @@ Do i1= 1,3
   Do i2= 1,4
    Do i3= 1,4
   If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MAh2(i3).gt.mf_l2(2))) Then
-coup1L = cplcFeFvcHpmL(i1,gt1,i2)
-coup1R = cplcFeFvcHpmR(i1,gt1,i2)
+coup1L = cplcFeFvHpmL(i1,gt1,i2)
+coup1R = cplcFeFvHpmR(i1,gt1,i2)
 coup2L = cplcFeFeAhL(gt2,i1,i3)
 coup2R = cplcFeFeAhR(gt2,i1,i3)
-coup3 = -cplAhHpmVWLm(i3,i2)
+coup3 = -cplAhcHpmVWLm(i3,i2)
 vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFe2(i1)*C0_3m(MFe2(i1),MHpm2(i2),MAh2(i3)) + B0(0._dp,MHpm2(i2),MAh2(i3)) +0.5_dp)) 
 End if 
    End Do
@@ -871,11 +851,11 @@ Do i1= 1,3
   Do i2= 1,4
    Do i3= 1,4
   If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2))) Then
-coup1L = cplcFeFvcHpmL(i1,gt1,i2)
-coup1R = cplcFeFvcHpmR(i1,gt1,i2)
+coup1L = cplcFeFvHpmL(i1,gt1,i2)
+coup1R = cplcFeFvHpmR(i1,gt1,i2)
 coup2L = cplcFeFehhL(gt2,i1,i3)
 coup2R = cplcFeFehhR(gt2,i1,i3)
-coup3 = -cplhhHpmVWLm(i3,i2)
+coup3 = -cplhhcHpmVWLm(i3,i2)
 vertex = vertex + chargefactor*(0.5_dp*sqrt2*coup1L*coup2R*coup3*(MFe2(i1)*C0_3m(MFe2(i1),MHpm2(i2),Mhh2(i3)) + B0(0._dp,MHpm2(i2),Mhh2(i3)) +0.5_dp)) 
 End if 
    End Do
@@ -917,11 +897,11 @@ chargefactor = 1
 Do i1= 1,3
   Do i2= 1,4
   If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2))) Then
-coup1L = cplcFeFvcHpmL(i1,gt1,i2)
-coup1R = cplcFeFvcHpmR(i1,gt1,i2)
+coup1L = cplcFeFvHpmL(i1,gt1,i2)
+coup1R = cplcFeFvHpmR(i1,gt1,i2)
 coup2L = cplcFeFeVZRL(gt2,i1)
 coup2R = cplcFeFeVZRR(gt2,i1)
-coup3 = cplHpmVWLmVZR(i2)
+coup3 = cplcHpmVWLmVZR(i2)
 End if 
    End Do
   End Do
@@ -951,6 +931,26 @@ coup2R = cplcFeFeVZRR(gt2,i1)
 coup3 = cplcVWRmVWLmVZR
 End if 
    End Do
+
+
+chargefactor = 1 
+Do i1= 1,4
+  Do i2= 1,3
+   Do i3= 1,9
+  If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2))) Then
+coup1L = cplFvFecHpmL(gt1,i2,i1)
+coup1R = cplFvFecHpmR(gt1,i2,i1)
+coup2L = cplcFeFvHpmL(gt2,i3,i1)
+coup2R = cplcFeFvHpmR(gt2,i3,i1)
+coup3L = cplcFeFvVWLmL(i2,i3)
+coup3R = cplcFeFvVWLmR(i2,i3)
+vertex = vertex + chargefactor*(coup1L*coup2R*(-sqrt2*coup3R*MFe(i2)*MFv(i3)& 
+& *C0_3m(MHpm2(i1),MFe2(i2),MFv2(i3)) + oosqrt2*coup3L* & 
+& (B0(0._dp,MFe2(i2),MFv2(i3))-0.5_dp +MHpm2(i1)*C0_3m(MHpm2(i1),MFe2(i2),MFv2(i3))))) 
+End if 
+   End Do
+  End Do
+End Do
 
 
 chargefactor = 1 
@@ -992,7 +992,73 @@ Do gt1=1,9
  Do gt2=1,9 
 gt3 = 2 
 gt4 = 1 
-! Fe,VWRm,Fv,VWRm
+! Fe,Hpm,Fv,Hpm
+chargefactor = 1 
+Do i1=1,3
+  Do i2=1,4
+    Do i3=1,9
+      Do i4=1,4
+If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MHpm2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFecHpmL(gt1,i1,i4)
+coup1R = cplFvFecHpmR(gt1,i1,i4)
+coup2L = cplcFeFvHpmL(i1,gt2,i2)
+coup2R = cplcFeFvHpmR(i1,gt2,i2)
+coup3L = cplFvFecHpmL(i3,gt3,i2)
+coup3R = cplFvFecHpmR(i3,gt3,i2)
+coup4L = cplcFeFvHpmL(gt4,i3,i4)
+coup4R = cplcFeFvHpmR(gt4,i3,i4)
+D27m2 = D27_Bagger(MHpm2(i2),MHpm2(i4),MFe2(i1),MFv2(i3))
+If(Real(D27m2,dp).eq.Real(D27m2,dp)) Then 
+teil = teil + D27m2*chargefactor*coup1L*coup2R*coup3L*coup4R 
+End if
+End if 
+    End Do 
+   End Do 
+  End Do 
+End Do 
+
+
+ ! Fe,Hpm,Fv,VWRm
+chargefactor = 1 
+Do i1=1,3
+  Do i2=1,4
+    Do i3=1,9
+If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2))) Then
+coup1L = cplFvFecVWRmL(gt1,i1)
+coup1R = cplFvFecVWRmR(gt1,i1)
+coup2L = cplcFeFvHpmL(i1,gt2,i2)
+coup2R = cplcFeFvHpmR(i1,gt2,i2)
+coup3L = cplFvFecHpmL(i3,gt3,i2)
+coup3R = cplFvFecHpmR(i3,gt3,i2)
+coup4L = cplcFeFvVWRmL(gt4,i3)
+coup4R = cplcFeFvVWRmR(gt4,i3)
+End if 
+    End Do 
+   End Do 
+  End Do 
+
+
+ ! Fe,VWRm,Fv,Hpm
+chargefactor = 1 
+Do i1=1,3
+    Do i3=1,9
+      Do i4=1,4
+If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MHpm2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFecHpmL(gt1,i1,i4)
+coup1R = cplFvFecHpmR(gt1,i1,i4)
+coup2L = cplcFeFvVWRmL(i1,gt2)
+coup2R = cplcFeFvVWRmR(i1,gt2)
+coup3L = cplFvFecVWRmL(i3,gt3)
+coup3R = cplFvFecVWRmR(i3,gt3)
+coup4L = cplcFeFvHpmL(gt4,i3,i4)
+coup4R = cplcFeFvHpmR(gt4,i3,i4)
+End if 
+    End Do 
+  End Do 
+End Do 
+
+
+ ! Fe,VWRm,Fv,VWRm
 chargefactor = 1 
 Do i1=1,3
     Do i3=1,9
@@ -1008,72 +1074,6 @@ coup4R = cplcFeFvVWRmR(gt4,i3)
 End if 
     End Do 
   End Do 
-
-
- ! Fe,VWRm,Fv,conj[Hpm]
-chargefactor = 1 
-Do i1=1,3
-    Do i3=1,9
-      Do i4=1,4
-If ((MFe2(i1).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MHpm2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i1,i4)
-coup1R = cplFvFeHpmR(gt1,i1,i4)
-coup2L = cplcFeFvVWRmL(i1,gt2)
-coup2R = cplcFeFvVWRmR(i1,gt2)
-coup3L = cplFvFecVWRmL(i3,gt3)
-coup3R = cplFvFecVWRmR(i3,gt3)
-coup4L = cplcFeFvcHpmL(gt4,i3,i4)
-coup4R = cplcFeFvcHpmR(gt4,i3,i4)
-End if 
-    End Do 
-  End Do 
-End Do 
-
-
- ! Fe,conj[Hpm],Fv,VWRm
-chargefactor = 1 
-Do i1=1,3
-  Do i2=1,4
-    Do i3=1,9
-If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MVWRm2.gt.mf_l2(2))) Then
-coup1L = cplFvFecVWRmL(gt1,i1)
-coup1R = cplFvFecVWRmR(gt1,i1)
-coup2L = cplcFeFvcHpmL(i1,gt2,i2)
-coup2R = cplcFeFvcHpmR(i1,gt2,i2)
-coup3L = cplFvFeHpmL(i3,gt3,i2)
-coup3R = cplFvFeHpmR(i3,gt3,i2)
-coup4L = cplcFeFvVWRmL(gt4,i3)
-coup4R = cplcFeFvVWRmR(gt4,i3)
-End if 
-    End Do 
-   End Do 
-  End Do 
-
-
- ! Fe,conj[Hpm],Fv,conj[Hpm]
-chargefactor = 1 
-Do i1=1,3
-  Do i2=1,4
-    Do i3=1,9
-      Do i4=1,4
-If ((MFe2(i1).gt.mf_l2(2)).Or.(MHpm2(i2).gt.mf_l2(2)).Or.(MFv2(i3).gt.mf_l2(2)).Or.(MHpm2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i1,i4)
-coup1R = cplFvFeHpmR(gt1,i1,i4)
-coup2L = cplcFeFvcHpmL(i1,gt2,i2)
-coup2R = cplcFeFvcHpmR(i1,gt2,i2)
-coup3L = cplFvFeHpmL(i3,gt3,i2)
-coup3R = cplFvFeHpmR(i3,gt3,i2)
-coup4L = cplcFeFvcHpmL(gt4,i3,i4)
-coup4R = cplcFeFvcHpmR(gt4,i3,i4)
-D27m2 = D27_Bagger(MHpm2(i2),MHpm2(i4),MFe2(i1),MFv2(i3))
-If(Real(D27m2,dp).eq.Real(D27m2,dp)) Then 
-teil = teil + D27m2*chargefactor*coup1L*coup2R*coup3L*coup4R 
-End if
-End if 
-    End Do 
-   End Do 
-  End Do 
-End Do 
 
 
  ! Fv,Ah,bar[Fe],Ah
@@ -1278,6 +1278,33 @@ End if
   End Do 
 
 
+ ! Ah,Fv,Hpm,Fv
+chargefactor = 1 
+Do i1=1,4
+  Do i2=1,9
+    Do i3=1,4
+      Do i4=1,9
+If ((MAh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFvAhL(gt1,i4,i1)
+coup1R = cplFvFvAhR(gt1,i4,i1)
+coup2L = cplFvFvAhL(gt2,i2,i1)
+coup2R = cplFvFvAhR(gt2,i2,i1)
+coup3L = cplcFeFvHpmL(gt4,i2,i3)
+coup3R = cplcFeFvHpmR(gt4,i2,i3)
+coup4L = cplFvFecHpmL(i4,gt3,i3)
+coup4R = cplFvFecHpmR(i4,gt3,i3)
+D0m2 = D0_Bagger(MAh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
+D27m2 = D27_Bagger(MAh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
+If ((Real(D27m2,dp).eq.Real(D27m2,dp)).And.(Real(D0m2,dp).eq.Real(D0m2,dp))) Then 
+teil = teil + 0.5_dp*chargefactor*D27m2*coup1L*coup2R*coup3L*coup4R+D0m2*coup1L*coup2L*coup3R*coup4R 
+End if
+End if 
+    End Do 
+   End Do 
+  End Do 
+End Do 
+
+
  ! Ah,Fv,VWRm,Fv
 chargefactor = 1 
 Do i1=1,4
@@ -1298,23 +1325,23 @@ End if
 End Do 
 
 
- ! Ah,Fv,conj[Hpm],Fv
+ ! hh,Fv,Hpm,Fv
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,9
     Do i3=1,4
       Do i4=1,9
-If ((MAh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFvAhL(gt1,i4,i1)
-coup1R = cplFvFvAhR(gt1,i4,i1)
-coup2L = cplFvFvAhL(gt2,i2,i1)
-coup2R = cplFvFvAhR(gt2,i2,i1)
-coup3L = cplcFeFvcHpmL(gt4,i2,i3)
-coup3R = cplcFeFvcHpmR(gt4,i2,i3)
-coup4L = cplFvFeHpmL(i4,gt3,i3)
-coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(MAh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
-D27m2 = D27_Bagger(MAh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFvhhL(gt1,i4,i1)
+coup1R = cplFvFvhhR(gt1,i4,i1)
+coup2L = cplFvFvhhL(gt2,i2,i1)
+coup2R = cplFvFvhhR(gt2,i2,i1)
+coup3L = cplcFeFvHpmL(gt4,i2,i3)
+coup3R = cplcFeFvHpmR(gt4,i2,i3)
+coup4L = cplFvFecHpmL(i4,gt3,i3)
+coup4R = cplFvFecHpmR(i4,gt3,i3)
+D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
+D27m2 = D27_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
 If ((Real(D27m2,dp).eq.Real(D27m2,dp)).And.(Real(D0m2,dp).eq.Real(D0m2,dp))) Then 
 teil = teil + 0.5_dp*chargefactor*D27m2*coup1L*coup2R*coup3L*coup4R+D0m2*coup1L*coup2L*coup3R*coup4R 
 End if
@@ -1345,44 +1372,17 @@ End if
 End Do 
 
 
- ! hh,Fv,conj[Hpm],Fv
-chargefactor = 1 
-Do i1=1,4
-  Do i2=1,9
-    Do i3=1,4
-      Do i4=1,9
-If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFvhhL(gt1,i4,i1)
-coup1R = cplFvFvhhR(gt1,i4,i1)
-coup2L = cplFvFvhhL(gt2,i2,i1)
-coup2R = cplFvFvhhR(gt2,i2,i1)
-coup3L = cplcFeFvcHpmL(gt4,i2,i3)
-coup3R = cplcFeFvcHpmR(gt4,i2,i3)
-coup4L = cplFvFeHpmL(i4,gt3,i3)
-coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))*MFv(i2)*MFv(i4) 
-D27m2 = D27_Bagger(Mhh2(i1),MHpm2(i3),MFv2(i2),MFv2(i4))
-If ((Real(D27m2,dp).eq.Real(D27m2,dp)).And.(Real(D0m2,dp).eq.Real(D0m2,dp))) Then 
-teil = teil + 0.5_dp*chargefactor*D27m2*coup1L*coup2R*coup3L*coup4R+D0m2*coup1L*coup2L*coup3R*coup4R 
-End if
-End if 
-    End Do 
-   End Do 
-  End Do 
-End Do 
-
-
- ! Hpm,bar[Fe],Ah,bar[Fe]
+ ! conj[Hpm],bar[Fe],Ah,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,3
     Do i3=1,4
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MAh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(i2,gt2,i1)
-coup2R = cplcFeFvcHpmR(i2,gt2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(i2,gt2,i1)
+coup2R = cplcFeFvHpmR(i2,gt2,i1)
 coup3L = cplcFeFeAhL(gt4,i2,i3)
 coup3R = cplcFeFeAhR(gt4,i2,i3)
 coup4L = cplcFeFeAhL(i4,gt3,i3)
@@ -1399,17 +1399,17 @@ End if
 End Do 
 
 
- ! Hpm,bar[Fe],hh,bar[Fe]
+ ! conj[Hpm],bar[Fe],hh,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,3
     Do i3=1,4
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(i2,gt2,i1)
-coup2R = cplcFeFvcHpmR(i2,gt2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(i2,gt2,i1)
+coup2R = cplcFeFvHpmR(i2,gt2,i1)
 coup3L = cplcFeFehhL(gt4,i2,i3)
 coup3R = cplcFeFehhR(gt4,i2,i3)
 coup4L = cplcFeFehhL(i4,gt3,i3)
@@ -1426,16 +1426,16 @@ End if
 End Do 
 
 
- ! Hpm,bar[Fe],VZR,bar[Fe]
+ ! conj[Hpm],bar[Fe],VZR,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,3
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(i2,gt2,i1)
-coup2R = cplcFeFvcHpmR(i2,gt2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(i2,gt2,i1)
+coup2R = cplcFeFvHpmR(i2,gt2,i1)
 coup3L = cplcFeFeVZRL(gt4,i2)
 coup3R = cplcFeFeVZRR(gt4,i2)
 coup4L = cplcFeFeVZRL(i4,gt3)
@@ -1443,6 +1443,32 @@ coup4R = cplcFeFeVZRR(i4,gt3)
 End if 
     End Do 
    End Do 
+End Do 
+
+
+ ! Ah,Fe,Hpm,Fv
+chargefactor = 1 
+Do i1=1,4
+  Do i2=1,3
+    Do i3=1,4
+      Do i4=1,9
+If ((MAh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFvAhL(gt1,i4,i1)
+coup1R = cplFvFvAhR(gt1,i4,i1)
+coup2L = cplcFeFeAhL(gt4,i2,i1)
+coup2R = cplcFeFeAhR(gt4,i2,i1)
+coup3L = cplcFeFvHpmL(i2,gt2,i3)
+coup3R = cplcFeFvHpmR(i2,gt2,i3)
+coup4L = cplFvFecHpmL(i4,gt3,i3)
+coup4R = cplFvFecHpmR(i4,gt3,i3)
+D0m2 = D0_Bagger(MAh2(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
+If (Real(D0m2,dp).eq.Real(D0m2,dp)) Then 
+teil = teil + 0.5_dp*chargefactor*D0m2*coup1L*coup2R*coup3R*coup4L 
+End if
+End if 
+    End Do 
+   End Do 
+  End Do 
 End Do 
 
 
@@ -1466,22 +1492,22 @@ End if
 End Do 
 
 
- ! Ah,Fe,conj[Hpm],Fv
+ ! hh,Fe,Hpm,Fv
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,3
     Do i3=1,4
       Do i4=1,9
-If ((MAh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFvAhL(gt1,i4,i1)
-coup1R = cplFvFvAhR(gt1,i4,i1)
-coup2L = cplcFeFeAhL(gt4,i2,i1)
-coup2R = cplcFeFeAhR(gt4,i2,i1)
-coup3L = cplcFeFvcHpmL(i2,gt2,i3)
-coup3R = cplcFeFvcHpmR(i2,gt2,i3)
-coup4L = cplFvFeHpmL(i4,gt3,i3)
-coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(MAh2(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
+If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
+coup1L = cplFvFvhhL(gt1,i4,i1)
+coup1R = cplFvFvhhR(gt1,i4,i1)
+coup2L = cplcFeFehhL(gt4,i2,i1)
+coup2R = cplcFeFehhR(gt4,i2,i1)
+coup3L = cplcFeFvHpmL(i2,gt2,i3)
+coup3R = cplcFeFvHpmR(i2,gt2,i3)
+coup4L = cplFvFecHpmL(i4,gt3,i3)
+coup4R = cplFvFecHpmR(i4,gt3,i3)
+D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
 If (Real(D0m2,dp).eq.Real(D0m2,dp)) Then 
 teil = teil + 0.5_dp*chargefactor*D0m2*coup1L*coup2R*coup3R*coup4L 
 End if
@@ -1512,43 +1538,17 @@ End if
 End Do 
 
 
- ! hh,Fe,conj[Hpm],Fv
-chargefactor = 1 
-Do i1=1,4
-  Do i2=1,3
-    Do i3=1,4
-      Do i4=1,9
-If ((Mhh2(i1).gt.mf_l2(2)).Or.(MFe2(i2).gt.mf_l2(2)).Or.(MHpm2(i3).gt.mf_l2(2)).Or.(MFv2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFvhhL(gt1,i4,i1)
-coup1R = cplFvFvhhR(gt1,i4,i1)
-coup2L = cplcFeFehhL(gt4,i2,i1)
-coup2R = cplcFeFehhR(gt4,i2,i1)
-coup3L = cplcFeFvcHpmL(i2,gt2,i3)
-coup3R = cplcFeFvcHpmR(i2,gt2,i3)
-coup4L = cplFvFeHpmL(i4,gt3,i3)
-coup4R = cplFvFeHpmR(i4,gt3,i3)
-D0m2 = D0_Bagger(Mhh2(i1),MHpm2(i3),MFe2(i2),MFv2(i4))*MFe(i2)*MFv(i4) 
-If (Real(D0m2,dp).eq.Real(D0m2,dp)) Then 
-teil = teil + 0.5_dp*chargefactor*D0m2*coup1L*coup2R*coup3R*coup4L 
-End if
-End if 
-    End Do 
-   End Do 
-  End Do 
-End Do 
-
-
- ! Hpm,Fv,Ah,bar[Fe]
+ ! conj[Hpm],Fv,Ah,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,9
     Do i3=1,4
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MAh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(gt4,i2,i1)
-coup2R = cplcFeFvcHpmR(gt4,i2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(gt4,i2,i1)
+coup2R = cplcFeFvHpmR(gt4,i2,i1)
 coup3L = cplFvFvAhL(gt2,i2,i3)
 coup3R = cplFvFvAhR(gt2,i2,i3)
 coup4L = cplcFeFeAhL(i4,gt3,i3)
@@ -1564,17 +1564,17 @@ End if
 End Do 
 
 
- ! Hpm,Fv,hh,bar[Fe]
+ ! conj[Hpm],Fv,hh,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,9
     Do i3=1,4
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(Mhh2(i3).gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(gt4,i2,i1)
-coup2R = cplcFeFvcHpmR(gt4,i2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(gt4,i2,i1)
+coup2R = cplcFeFvHpmR(gt4,i2,i1)
 coup3L = cplFvFvhhL(gt2,i2,i3)
 coup3R = cplFvFvhhR(gt2,i2,i3)
 coup4L = cplcFeFehhL(i4,gt3,i3)
@@ -1590,16 +1590,16 @@ End if
 End Do 
 
 
- ! Hpm,Fv,VZR,bar[Fe]
+ ! conj[Hpm],Fv,VZR,bar[Fe]
 chargefactor = 1 
 Do i1=1,4
   Do i2=1,9
       Do i4=1,3
 If ((MHpm2(i1).gt.mf_l2(2)).Or.(MFv2(i2).gt.mf_l2(2)).Or.(MVZR2.gt.mf_l2(2)).Or.(MFe2(i4).gt.mf_l2(2))) Then
-coup1L = cplFvFeHpmL(gt1,i4,i1)
-coup1R = cplFvFeHpmR(gt1,i4,i1)
-coup2L = cplcFeFvcHpmL(gt4,i2,i1)
-coup2R = cplcFeFvcHpmR(gt4,i2,i1)
+coup1L = cplFvFecHpmL(gt1,i4,i1)
+coup1R = cplFvFecHpmR(gt1,i4,i1)
+coup2L = cplcFeFvHpmL(gt4,i2,i1)
+coup2R = cplcFeFvHpmR(gt4,i2,i1)
 coup3L = cplFvFvVZRL(gt2,i2)
 coup3R = cplFvFvVZRR(gt2,i2)
 coup4L = cplcFeFeVZRL(i4,gt3)
@@ -1625,12 +1625,12 @@ End subroutine DeltaVB
  
  
 Subroutine CoupHiggsToPhoton(mHiggs,inG,ratFd,ratFe,ratFu,ratHpm,ratVWLm,             & 
-& ratVWRm,MHpm,MFd,MFe,MFu,MVWLm,MVWRm,gNLO,coup)
+& ratVWRm,MFd,MFe,MFu,MHpm,MVWLm,MVWRm,gNLO,coup)
 
 Implicit None 
 Complex(dp),Intent(in) :: ratFd(3),ratFe(3),ratFu(3),ratHpm(4),ratVWLm,ratVWRm
 
-Real(dp),Intent(in) :: MHpm(4),MFd(3),MFe(3),MFu(3),MVWLm,MVWRm
+Real(dp),Intent(in) :: MFd(3),MFe(3),MFu(3),MHpm(4),MVWLm,MVWRm
 
 Integer, Intent(in) :: inG 
 Real(dp), Intent(in) :: mHiggs, gNLO 
@@ -1686,10 +1686,10 @@ End Do
 coup = 0.75_dp*coup 
 End Subroutine CoupHiggsToGluon
 
-Subroutine CoupHiggsToPhotonSM(mHiggs,MHpm,MFd,MFe,MFu,MVWLm,MVWRm,gNLO,coup)
+Subroutine CoupHiggsToPhotonSM(mHiggs,MFd,MFe,MFu,MHpm,MVWLm,MVWRm,gNLO,coup)
 
 Implicit None 
-Real(dp),Intent(in) :: MHpm(4),MFd(3),MFe(3),MFu(3),MVWLm,MVWRm
+Real(dp),Intent(in) :: MFd(3),MFe(3),MFu(3),MHpm(4),MVWLm,MVWRm
 
 Real(dp), Intent(in) :: mHiggs, gNLO 
 Complex(dp), Intent(out) :: coup 
@@ -1732,12 +1732,12 @@ coup = 0.75_dp*coup
 End Subroutine CoupHiggsToGluonSM 
 
 Subroutine CoupPseudoHiggsToPhoton(mHiggs,inG,ratFd,ratFe,ratFu,ratHpm,               & 
-& ratVWLm,ratVWRm,MHpm,MFd,MFe,MFu,MVWLm,MVWRm,gNLO,coup)
+& ratVWLm,ratVWRm,MFd,MFe,MFu,MHpm,MVWLm,MVWRm,gNLO,coup)
 
 Implicit None 
 Complex(dp),Intent(in) :: ratFd(3),ratFe(3),ratFu(3),ratHpm(4),ratVWLm,ratVWRm
 
-Real(dp),Intent(in) :: MHpm(4),MFd(3),MFe(3),MFu(3),MVWLm,MVWRm
+Real(dp),Intent(in) :: MFd(3),MFe(3),MFu(3),MHpm(4),MVWLm,MVWRm
 
 Real(dp), Intent(in) :: mHiggs, gNLO 
 Complex(dp), Intent(out) :: coup 
@@ -1782,11 +1782,11 @@ End Do
 coup = 0.75_dp*coup 
 End Subroutine CoupPseudoHiggsToGluon
 
-Subroutine CoupPseudoHiggsToPhotonSM(mHiggs,MHpm,MFd,MFe,MFu,MVWLm,MVWRm,             & 
+Subroutine CoupPseudoHiggsToPhotonSM(mHiggs,MFd,MFe,MFu,MHpm,MVWLm,MVWRm,             & 
 & gNLO,coup)
 
 Implicit None 
-Real(dp),Intent(in) :: MHpm(4),MFd(3),MFe(3),MFu(3),MVWLm,MVWRm
+Real(dp),Intent(in) :: MFd(3),MFe(3),MFu(3),MHpm(4),MVWLm,MVWRm
 
 Real(dp), Intent(in) :: mHiggs,gNLO 
 Complex(dp), Intent(out) :: coup 

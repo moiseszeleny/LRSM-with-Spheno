@@ -42,7 +42,7 @@ BoundaryLowScaleInput={
 DEFINITION[MatchingConditions]={
     {g2, g2SM},
     {g3, g3SM},
-    {gBL, g1SM*Sin[ThetaW]/Sqrt[Cos[2*ThetaW]]},
+    {gBL, e/Sqrt[Cos[2 ThetaW]]},
     {k1, vSM},
     {Yt, YeSM},
     (*{YQ2, Conjg[(Transpose[YdSM]*k1*vSM)/k1^2]},

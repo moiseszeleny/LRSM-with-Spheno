@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:02 on 11.6.2025   
+! File created at 21:29 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -19,8 +19,8 @@ Contains
  
 Subroutine FvThreeBodyDecay(n_in,MAh,MAh2,MFd,MFd2,MFe,MFe2,MFu,MFu2,MFv,             & 
 & MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,MVZR,MVZR2,PhiW,           & 
-& TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,            & 
-& RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,             & 
+& TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,            & 
+& ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,             & 
 & gTAh,gThh,gTHpm,gTVWLm,gTVWRm,gTVZ,gTVZR,gFvFvcFdFd,gFvFvcFeFe,gFvFvcFuFu,             & 
 & gFvFvFvFv,gFvFecFdFu,epsI,deltaM,CheckRealStates,gT,gPartial,BR)
 
@@ -33,19 +33,19 @@ Real(dp),Intent(in) :: MAh(4),MAh2(4),MFd(3),MFd2(3),MFe(3),MFe2(3),MFu(3),MFu2(
 Complex(dp),Intent(in) :: ZDR(3,3),ZER(3,3),ZUR(3,3),ZDL(3,3),ZEL(3,3),ZUL(3,3),ZM(9,9),ZW(4,4)
 
 Complex(dp) :: cplcFdFdAhL(3,3,4),cplcFdFdAhR(3,3,4),cplcFdFdhhL(3,3,4),cplcFdFdhhR(3,3,4),          & 
-& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFdFucHpmL(3,3,4),& 
-& cplcFdFucHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),         & 
+& cplcFdFdVZL(3,3),cplcFdFdVZR(3,3),cplcFdFdVZRL(3,3),cplcFdFdVZRR(3,3),cplcFdFuHpmL(3,3,4),& 
+& cplcFdFuHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),cplcFdFuVWRmL(3,3),          & 
 & cplcFdFuVWRmR(3,3),cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),           & 
 & cplcFeFehhR(3,3,4),cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),& 
-& cplcFeFvcHpmL(3,9,4),cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),       & 
+& cplcFeFvHpmL(3,9,4),cplcFeFvHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),         & 
 & cplcFeFvVWRmL(3,9),cplcFeFvVWRmR(3,9),cplcFuFuAhL(3,3,4),cplcFuFuAhR(3,3,4),           & 
 & cplcFuFuhhL(3,3,4),cplcFuFuhhR(3,3,4),cplcFuFuVZL(3,3),cplcFuFuVZR(3,3),               & 
-& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),             & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),           & 
+& cplcFuFuVZRL(3,3),cplcFuFuVZRR(3,3),cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),           & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),           & 
 & cplFvFvAhL(9,9,4),cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),               & 
 & cplFvFvVZL(9,9),cplFvFvVZR(9,9),cplFvFvVZRL(9,9),cplFvFvVZRR(9,9)
 
-Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp),Intent(in) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp),Intent(in) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -128,15 +128,15 @@ Do i_run = i_start, i_end
 Call CouplingsFor_Fv_decays_3B(MFv(i_run),i_run,MAh,MAh2,MFd,MFd2,MFe,MFe2,           & 
 & MFu,MFu2,MFv,MFv2,Mhh,Mhh2,MHpm,MHpm2,MVWLm,MVWLm2,MVWRm,MVWRm2,MVZ,MVZ2,              & 
 & MVZR,MVZR2,PhiW,TW,UC,ZDR,ZER,UP,ZUR,ZDL,ZEL,ZUL,ZH,ZM,ZW,ZZ,gBL,g2,g3,LAM2,           & 
-& LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
+& LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,              & 
 & MU12,MU22,k1,vR,cplcFdFdAhL,cplcFdFdAhR,cplcFdFdhhL,cplcFdFdhhR,cplcFdFdVZL,           & 
-& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFucHpmL,cplcFdFucHpmR,cplcFdFuVWLmL,       & 
+& cplcFdFdVZR,cplcFdFdVZRL,cplcFdFdVZRR,cplcFdFuHpmL,cplcFdFuHpmR,cplcFdFuVWLmL,         & 
 & cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplcFeFeAhL,cplcFeFeAhR,cplcFeFehhL,         & 
-& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvcHpmL,           & 
-& cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFuAhL,     & 
+& cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,cplcFeFeVZRR,cplcFeFvHpmL,            & 
+& cplcFeFvHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,cplcFeFvVWRmR,cplcFuFuAhL,      & 
 & cplcFuFuAhR,cplcFuFuhhL,cplcFuFuhhR,cplcFuFuVZL,cplcFuFuVZR,cplcFuFuVZRL,              & 
-& cplcFuFuVZRR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,      & 
-& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplcFuFuVZRR,cplFvFecHpmL,cplFvFecHpmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,      & 
+& cplFvFecVWRmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,       & 
 & cplFvFvVZRL,cplFvFvVZRR,deltaM)
 
 IntegralVs = 0._dp 
@@ -173,9 +173,9 @@ gT(i_run) = gT(i_run) + Sum(gFvFvcFdFdi)
 gFvFvcFeFei = 0._dp 
 Call FvToFvcFeFe(i_run,MFv,MFe,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,Mhh,cplcFeFeAhL,         & 
 & cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,     & 
-& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplcFeFeVZRR,cplcFeFvHpmL,cplcFeFvHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,      & 
+& cplcFeFvVWRmR,cplFvFecHpmL,cplFvFecHpmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,     & 
+& cplFvFecVWRmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,       & 
 & cplFvFvVZRL,cplFvFvVZRR,IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,               & 
 & IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,               & 
 & NVSss,NVSst,NVVss,NVVst,gTVZtemp,gTVZRtemp,gTVWLmtemp,gTVWRmtemp,gTHpmtemp,            & 
@@ -206,9 +206,9 @@ gFvFvFvFv(i_run,:,:,:) = gFvFvFvFvi
 gT(i_run) = gT(i_run) + Sum(gFvFvFvFvi) 
  
 gFvFecFdFui = 0._dp 
-Call FvToFecFdFu(i_run,MFe,MFd,MFu,MVWLm,MVWRm,MHpm,MFv,cplcFdFucHpmL,cplcFdFucHpmR,  & 
-& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,   & 
-& cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,IntegralSs,IntegralSSss,           & 
+Call FvToFecFdFu(i_run,MFe,MFd,MFu,MVWLm,MVWRm,MHpm,MFv,cplcFdFuHpmL,cplcFdFuHpmR,    & 
+& cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplFvFecHpmL,cplFvFecHpmR,     & 
+& cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,IntegralSs,IntegralSSss,       & 
 & IntegralVs,IntegralVSss,IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,gTVWLmtemp,             & 
 & gTVWRmtemp,gTHpmtemp,deltaM,epsI,check,gFvFecFdFui)
 
@@ -880,9 +880,9 @@ End Subroutine FvToFvcFdFd
  
 Subroutine FvToFvcFeFe(iIN,MFv,MFe,MVZ,MVZR,MVWLm,MVWRm,MHpm,MAh,Mhh,cplcFeFeAhL,     & 
 & cplcFeFeAhR,cplcFeFehhL,cplcFeFehhR,cplcFeFeVZL,cplcFeFeVZR,cplcFeFeVZRL,              & 
-& cplcFeFeVZRR,cplcFeFvcHpmL,cplcFeFvcHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,    & 
-& cplcFeFvVWRmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,     & 
-& cplFvFeHpmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,         & 
+& cplcFeFeVZRR,cplcFeFvHpmL,cplcFeFvHpmR,cplcFeFvVWLmL,cplcFeFvVWLmR,cplcFeFvVWRmL,      & 
+& cplcFeFvVWRmR,cplFvFecHpmL,cplFvFecHpmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,     & 
+& cplFvFecVWRmR,cplFvFvAhL,cplFvFvAhR,cplFvFvhhL,cplFvFvhhR,cplFvFvVZL,cplFvFvVZR,       & 
 & cplFvFvVZRL,cplFvFvVZRR,IntegralSs,IntegralSSss,IntegralSSst,IntegralVs,               & 
 & IntegralVSss,IntegralVSst,IntegralVVss,IntegralVVst,NSs,NSSss,NSSst,NVs,               & 
 & NVSss,NVSst,NVVss,NVVst,gTVZ,gTVZR,gTVWLm,gTVWRm,gTHpm,gTAh,gThh,deltaM,               & 
@@ -893,10 +893,10 @@ Implicit None
 Real(dp),Intent(in) :: MFv(9),MFe(3),MVZ,MVZR,MVWLm,MVWRm,MHpm(4),MAh(4),Mhh(4)
 
 Complex(dp),Intent(in) :: cplcFeFeAhL(3,3,4),cplcFeFeAhR(3,3,4),cplcFeFehhL(3,3,4),cplcFeFehhR(3,3,4),          & 
-& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvcHpmL(3,9,4),& 
-& cplcFeFvcHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),         & 
-& cplcFeFvVWRmR(3,9),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),           & 
-& cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4),cplFvFvAhL(9,9,4),            & 
+& cplcFeFeVZL(3,3),cplcFeFeVZR(3,3),cplcFeFeVZRL(3,3),cplcFeFeVZRR(3,3),cplcFeFvHpmL(3,9,4),& 
+& cplcFeFvHpmR(3,9,4),cplcFeFvVWLmL(3,9),cplcFeFvVWLmR(3,9),cplcFeFvVWRmL(3,9),          & 
+& cplcFeFvVWRmR(3,9),cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),cplFvFecVWLmL(9,3),         & 
+& cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFvAhL(9,9,4),            & 
 & cplFvFvAhR(9,9,4),cplFvFvhhL(9,9,4),cplFvFvhhR(9,9,4),cplFvFvVZL(9,9),cplFvFvVZR(9,9), & 
 & cplFvFvVZRL(9,9),cplFvFvVZRR(9,9)
 
@@ -1189,7 +1189,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWRm'
 
 
 !-------------- 
-!  Hpm 
+!  conj[Hpm] 
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
@@ -1208,10 +1208,10 @@ mass(2) = MFe(gt3)
 mass(3) = -MFe(gt2) 
 mass(4) = MFv(gt1) 
  
-coup(2) = Conjg(cplFvFeHpmL(iIN,gt3,i1)) 
-coup(1) = Conjg(cplFvFeHpmR(iIN,gt3,i1)) 
-coup(4) = Conjg(cplcFeFvcHpmL(gt2,gt1,i1)) 
-coup(3) = Conjg(cplcFeFvcHpmR(gt2,gt1,i1))
+coup(2) = Conjg(cplFvFecHpmL(iIN,gt3,i1)) 
+coup(1) = Conjg(cplFvFecHpmR(iIN,gt3,i1)) 
+coup(4) = Conjg(cplcFeFvHpmL(gt2,gt1,i1)) 
+coup(3) = Conjg(cplcFeFvHpmR(gt2,gt1,i1))
 Call IntegrateScalarSS(Boson2,mass,coup,deltaM,epsI,IntegralSs,NSs,resR, check) 
 resR= 1*resR ! color factor 
 resS = resS + resR 
@@ -1219,7 +1219,7 @@ resS = resS + resR
  resD = resD + resS 
 If (resD.ne.resD) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1227,13 +1227,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)=resD
 End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  conj[Hpm] 
+!  Hpm 
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
@@ -1252,10 +1252,10 @@ mass(2) = MFe(gt2)
 mass(3) = -MFv(gt1) 
 mass(4) = MFe(gt3) 
  
-coup(2) = Conjg(cplcFeFvcHpmL(gt2,iIN,i1)) 
-coup(1) = Conjg(cplcFeFvcHpmR(gt2,iIN,i1)) 
-coup(4) = Conjg(cplFvFeHpmL(gt1,gt3,i1)) 
-coup(3) = Conjg(cplFvFeHpmR(gt1,gt3,i1))
+coup(2) = Conjg(cplcFeFvHpmL(gt2,iIN,i1)) 
+coup(1) = Conjg(cplcFeFvHpmR(gt2,iIN,i1)) 
+coup(4) = Conjg(cplFvFecHpmL(gt1,gt3,i1)) 
+coup(3) = Conjg(cplFvFecHpmR(gt1,gt3,i1))
 Call IntegrateScalarSS(Boson2,mass,coup,deltaM,epsI,IntegralSs,NSs,resR, check) 
 resR= 1*resR ! color factor 
 resS = resS + resR 
@@ -1263,7 +1263,7 @@ resS = resS + resR
  resD = resD + resS 
 If (resD.ne.resD) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: conj[Hpm]" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1271,7 +1271,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)=resD
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[Hpm]'
+Contribution(gt1,gt2,gt3,Isum)='Hpm'
       End Do 
 
 
@@ -1569,7 +1569,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZ,VWRm'
 
 
 !-------------- 
-!  VZ, Hpm 
+!  VZ, conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVZ 
@@ -1585,12 +1585,12 @@ mass(3) = -MFe(gt2)
  
 coup2(1) = cplFvFvVZL(iIN,gt1) 
 coup2(2) = cplFvFvVZR(iIN,gt1) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplcFeFeVZL(gt2,gt3) 
 coup2(6) = cplcFeFeVZR(gt2,gt3) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 coupT = coup2(5) 
 coup2(5) = coup2(6) 
 coup2(6) = coupT 
@@ -1601,7 +1601,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VZ,Hpm" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VZ,conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1609,13 +1609,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='VZ,Hpm'
+Contribution(gt1,gt2,gt3,Isum)='VZ,conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  VZ, conj[Hpm] 
+!  VZ, Hpm 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVZ 
@@ -1631,12 +1631,12 @@ mass(3) = -MFe(gt2)
  
 coup2(1) = cplFvFvVZL(iIN,gt1) 
 coup2(2) = cplFvFvVZR(iIN,gt1) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
 coup2(5) = cplcFeFeVZL(gt2,gt3) 
 coup2(6) = cplcFeFeVZR(gt2,gt3) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = -2*resC 
@@ -1644,7 +1644,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VZ,conj[Hpm]" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VZ,Hpm" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1652,7 +1652,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='VZ,conj[Hpm]'
+Contribution(gt1,gt2,gt3,Isum)='VZ,Hpm'
       End Do 
 
 
@@ -1908,7 +1908,7 @@ Contribution(gt1,gt2,gt3,Isum)='VZR,VWRm'
 
 
 !-------------- 
-!  VZR, Hpm 
+!  VZR, conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVZR 
@@ -1924,12 +1924,12 @@ mass(3) = -MFe(gt2)
  
 coup2(1) = cplFvFvVZRL(iIN,gt1) 
 coup2(2) = cplFvFvVZRR(iIN,gt1) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplcFeFeVZRL(gt2,gt3) 
 coup2(6) = cplcFeFeVZRR(gt2,gt3) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 coupT = coup2(5) 
 coup2(5) = coup2(6) 
 coup2(6) = coupT 
@@ -1940,7 +1940,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VZR,Hpm" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VZR,conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1948,13 +1948,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='VZR,Hpm'
+Contribution(gt1,gt2,gt3,Isum)='VZR,conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  VZR, conj[Hpm] 
+!  VZR, Hpm 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVZR 
@@ -1970,12 +1970,12 @@ mass(3) = -MFe(gt2)
  
 coup2(1) = cplFvFvVZRL(iIN,gt1) 
 coup2(2) = cplFvFvVZRR(iIN,gt1) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
 coup2(5) = cplcFeFeVZRL(gt2,gt3) 
 coup2(6) = cplcFeFeVZRR(gt2,gt3) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = -2*resC 
@@ -1983,7 +1983,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VZR,conj[Hpm]" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VZR,Hpm" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -1991,7 +1991,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='VZR,conj[Hpm]'
+Contribution(gt1,gt2,gt3,Isum)='VZR,Hpm'
       End Do 
 
 
@@ -2205,7 +2205,7 @@ Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],VWRm'
 
 
 !-------------- 
-!  conj[VWLm], Hpm 
+!  conj[VWLm], conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWLm 
@@ -2221,12 +2221,12 @@ mass(4) = MFv(gt1)
  
 coup2(1) = cplFvFecVWLmL(iIN,gt3) 
 coup2(2) = cplFvFecVWLmR(iIN,gt3) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplcFeFvVWLmL(gt2,gt1) 
 coup2(6) = cplcFeFvVWLmR(gt2,gt1) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -2234,7 +2234,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWLm],Hpm" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWLm],conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -2242,13 +2242,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  conj[VWLm], conj[Hpm] 
+!  conj[VWLm], Hpm 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWLm 
@@ -2264,12 +2264,12 @@ mass(3) = -MFv(gt1)
  
 coup2(1) = cplFvFecVWLmL(iIN,gt3) 
 coup2(2) = cplFvFecVWLmR(iIN,gt3) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
 coup2(5) = cplcFeFvVWLmL(gt2,gt1) 
 coup2(6) = cplcFeFvVWLmR(gt2,gt1) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = -2*resC 
@@ -2277,7 +2277,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWLm],conj[Hpm]" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWLm],Hpm" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -2285,7 +2285,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],conj[Hpm]'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],Hpm'
       End Do 
 
 
@@ -2465,7 +2465,7 @@ Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],VWRm'
 
 
 !-------------- 
-!  conj[VWRm], Hpm 
+!  conj[VWRm], conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWRm 
@@ -2481,12 +2481,12 @@ mass(4) = MFv(gt1)
  
 coup2(1) = cplFvFecVWRmL(iIN,gt3) 
 coup2(2) = cplFvFecVWRmR(iIN,gt3) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplcFeFvVWRmL(gt2,gt1) 
 coup2(6) = cplcFeFvVWRmR(gt2,gt1) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -2494,7 +2494,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWRm],Hpm" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWRm],conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -2502,13 +2502,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  conj[VWRm], conj[Hpm] 
+!  conj[VWRm], Hpm 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWRm 
@@ -2524,12 +2524,12 @@ mass(3) = -MFv(gt1)
  
 coup2(1) = cplFvFecVWRmL(iIN,gt3) 
 coup2(2) = cplFvFecVWRmR(iIN,gt3) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
 coup2(5) = cplcFeFvVWRmL(gt2,gt1) 
 coup2(6) = cplcFeFvVWRmR(gt2,gt1) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = -2*resC 
@@ -2537,7 +2537,7 @@ resC= 1*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWRm],conj[Hpm]" 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[VWRm],Hpm" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -2545,7 +2545,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],conj[Hpm]'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],Hpm'
       End Do 
 
 
@@ -2683,7 +2683,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWLm,VWRm'
 
 
 !-------------- 
-!  VWLm, Hpm 
+!  VWLm, conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWLm 
@@ -2699,59 +2699,16 @@ mass(3) = -MFv(gt1)
  
 coup2(1) = cplcFeFvVWLmL(gt2,iIN) 
 coup2(2) = cplcFeFvVWLmR(gt2,iIN) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplFvFecVWLmL(gt1,gt3) 
 coup2(6) = cplFvFecVWLmR(gt1,gt3) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 coupT = coup2(5) 
 coup2(5) = coup2(6) 
 coup2(6) = coupT 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = 2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VWLm,Hpm" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='VWLm,Hpm'
-      End Do 
-
-
-
-!-------------- 
-!  VWLm, conj[Hpm] 
-!-------------- 
-  Do i2=1,4
-Boson4(1) = MVWLm 
-Boson4(2) = gTVWLm 
-Boson4(3) = MHpm(i2) 
-Boson4(4) = gTHpm(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFe(gt2) 
-mass(3) = -MFv(gt1) 
-mass(4) = MFe(gt3) 
- 
-coup2(1) = cplcFeFvVWLmL(gt2,iIN) 
-coup2(2) = cplcFeFvVWLmR(gt2,iIN) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
-coup2(5) = cplFvFecVWLmL(gt1,gt3) 
-coup2(6) = cplFvFecVWLmR(gt1,gt3) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
-Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
 resC= 1*resC ! color factor 
@@ -2767,6 +2724,49 @@ Else
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
 Contribution(gt1,gt2,gt3,Isum)='VWLm,conj[Hpm]'
+      End Do 
+
+
+
+!-------------- 
+!  VWLm, Hpm 
+!-------------- 
+  Do i2=1,4
+Boson4(1) = MVWLm 
+Boson4(2) = gTVWLm 
+Boson4(3) = MHpm(i2) 
+Boson4(4) = gTHpm(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFe(gt2) 
+mass(3) = -MFv(gt1) 
+mass(4) = MFe(gt3) 
+ 
+coup2(1) = cplcFeFvVWLmL(gt2,iIN) 
+coup2(2) = cplcFeFvVWLmR(gt2,iIN) 
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
+coup2(5) = cplFvFecVWLmL(gt1,gt3) 
+coup2(6) = cplFvFecVWLmR(gt1,gt3) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
+Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = 2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VWLm,Hpm" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='VWLm,Hpm'
       End Do 
 
 
@@ -2864,7 +2864,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWLm,hh'
 
 
 !-------------- 
-!  VWRm, Hpm 
+!  VWRm, conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWRm 
@@ -2880,59 +2880,16 @@ mass(3) = -MFv(gt1)
  
 coup2(1) = cplcFeFvVWRmL(gt2,iIN) 
 coup2(2) = cplcFeFvVWRmR(gt2,iIN) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
 coup2(5) = cplFvFecVWRmL(gt1,gt3) 
 coup2(6) = cplFvFecVWRmR(gt1,gt3) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 coupT = coup2(5) 
 coup2(5) = coup2(6) 
 coup2(6) = coupT 
 Call IntegrateGaugeSscalarT(Boson4, mass, coup2, deltaM, epsI,IntegralVSst,NVSst, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = 2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: VWRm,Hpm" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='VWRm,Hpm'
-      End Do 
-
-
-
-!-------------- 
-!  VWRm, conj[Hpm] 
-!-------------- 
-  Do i2=1,4
-Boson4(1) = MVWRm 
-Boson4(2) = gTVWRm 
-Boson4(3) = MHpm(i2) 
-Boson4(4) = gTHpm(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFe(gt2) 
-mass(3) = -MFv(gt1) 
-mass(4) = MFe(gt3) 
- 
-coup2(1) = cplcFeFvVWRmL(gt2,iIN) 
-coup2(2) = cplcFeFvVWRmR(gt2,iIN) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
-coup2(5) = cplFvFecVWRmL(gt1,gt3) 
-coup2(6) = cplFvFecVWRmR(gt1,gt3) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
-Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
 resC= 1*resC ! color factor 
@@ -2948,6 +2905,49 @@ Else
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
 Contribution(gt1,gt2,gt3,Isum)='VWRm,conj[Hpm]'
+      End Do 
+
+
+
+!-------------- 
+!  VWRm, Hpm 
+!-------------- 
+  Do i2=1,4
+Boson4(1) = MVWRm 
+Boson4(2) = gTVWRm 
+Boson4(3) = MHpm(i2) 
+Boson4(4) = gTHpm(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFe(gt2) 
+mass(3) = -MFv(gt1) 
+mass(4) = MFe(gt3) 
+ 
+coup2(1) = cplcFeFvVWRmL(gt2,iIN) 
+coup2(2) = cplcFeFvVWRmR(gt2,iIN) 
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
+coup2(5) = cplFvFecVWRmL(gt1,gt3) 
+coup2(6) = cplFvFecVWRmR(gt1,gt3) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
+Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = 2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: VWRm,Hpm" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='VWRm,Hpm'
       End Do 
 
 
@@ -3045,7 +3045,7 @@ Contribution(gt1,gt2,gt3,Isum)='VWRm,hh'
 
 
 !-------------- 
-!  Hpm, Hpm 
+!  conj[Hpm], conj[Hpm] 
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
@@ -3060,194 +3060,14 @@ mass(2) = MFe(gt3)
 mass(3) = -MFe(gt2) 
 mass(4) = MFv(gt1) 
  
-coup2(1) = cplFvFeHpmL(iIN,gt3,i1) 
-coup2(2) = cplFvFeHpmR(iIN,gt3,i1) 
-coup2(4) = cplFvFeHpmL(iIN,gt3,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt3,i2)  
-coup2(5) = cplcFeFvcHpmL(gt2,gt1,i1) 
-coup2(6) = cplcFeFvcHpmR(gt2,gt1,i1) 
-coup2(8) = cplcFeFvcHpmL(gt2,gt1,i2) 
-coup2(7) = cplcFeFvcHpmR(gt2,gt1,i2) 
-Call IntegrateScalarS1S2(Boson4, mass, coup2, deltaM, epsI,IntegralSSss,NSSss, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = 2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,Hpm" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm,Hpm'
-        End Do 
-      End Do 
-
-
-
-!-------------- 
-!  Hpm, conj[Hpm] 
-!-------------- 
-Do i1=1,4
-  Do i2=1,4
-Boson4(1) = MHpm(i1) 
-Boson4(2) = gTHpm(i1) 
-Boson4(3) = MHpm(i2) 
-Boson4(4) = gTHpm(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFe(gt2) 
-mass(4) = MFe(gt3) 
-mass(3) = -MFv(gt1) 
- 
-coup2(1) = cplFvFeHpmL(iIN,gt3,i1) 
-coup2(2) = cplFvFeHpmR(iIN,gt3,i1) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
-coup2(5) = cplcFeFvcHpmL(gt2,gt1,i1) 
-coup2(6) = cplcFeFvcHpmR(gt2,gt1,i1) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
-Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = -2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,conj[Hpm]" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm,conj[Hpm]'
-        End Do 
-      End Do 
-
-
-
-!-------------- 
-!  Hpm, Ah 
-!-------------- 
-Do i1=1,4
-  Do i2=1,4
-Boson4(1) = MHpm(i1) 
-Boson4(2) = gTHpm(i1) 
-Boson4(3) = MAh(i2) 
-Boson4(4) = gTAh(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFv(gt1) 
-mass(4) = MFe(gt3) 
-mass(3) = -MFe(gt2) 
- 
-coup2(1) = cplFvFeHpmL(iIN,gt3,i1) 
-coup2(2) = cplFvFeHpmR(iIN,gt3,i1) 
-coup2(4) = Conjg(cplFvFvAhL(iIN,gt1,i2)) 
-coup2(3) = Conjg(cplFvFvAhR(iIN,gt1,i2))  
-coup2(5) = cplcFeFvcHpmL(gt2,gt1,i1) 
-coup2(6) = cplcFeFvcHpmR(gt2,gt1,i1) 
-coup2(8) = Conjg(cplcFeFeAhL(gt3,gt2,i2)) 
-coup2(7) = Conjg(cplcFeFeAhR(gt3,gt2,i2)) 
-Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = -2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,Ah" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm,Ah'
-        End Do 
-      End Do 
-
-
-
-!-------------- 
-!  Hpm, hh 
-!-------------- 
-Do i1=1,4
-  Do i2=1,4
-Boson4(1) = MHpm(i1) 
-Boson4(2) = gTHpm(i1) 
-Boson4(3) = Mhh(i2) 
-Boson4(4) = gThh(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFv(gt1) 
-mass(4) = MFe(gt3) 
-mass(3) = -MFe(gt2) 
- 
-coup2(1) = cplFvFeHpmL(iIN,gt3,i1) 
-coup2(2) = cplFvFeHpmR(iIN,gt3,i1) 
-coup2(4) = Conjg(cplFvFvhhL(iIN,gt1,i2)) 
-coup2(3) = Conjg(cplFvFvhhR(iIN,gt1,i2))  
-coup2(5) = cplcFeFvcHpmL(gt2,gt1,i1) 
-coup2(6) = cplcFeFvcHpmR(gt2,gt1,i1) 
-coup2(8) = Conjg(cplcFeFehhL(gt3,gt2,i2)) 
-coup2(7) = Conjg(cplcFeFehhR(gt3,gt2,i2)) 
-Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
-If (resC.ne.resC) resC = 0._dp
-resC = -2._dp*resC 
-resC= 1*resC ! color factor 
-resS = resS + resC 
-If (resS.ne.resS) Then 
-Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,hh" 
-Write(*,*)  "M_in: ",m_in 
-Write(*,*)  "mass: ",mass 
-Write(*,*)  "coup: ",coup 
-gSum(gt1,gt2,gt3,Isum)= 0._dp  
-Else 
-gSum(gt1,gt2,gt3,Isum)= resS  
-End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm,hh'
-        End Do 
-      End Do 
-
-
-
-!-------------- 
-!  conj[Hpm], conj[Hpm] 
-!-------------- 
-Do i1=1,3
-  Do i2=i1+1,4
-Boson4(1) = MHpm(i1) 
-Boson4(2) = gTHpm(i1) 
-Boson4(3) = MHpm(i2) 
-Boson4(4) = gTHpm(i2) 
-Isum = Isum + 1 
- 
-resS = 0._dp 
-mass(2) = MFe(gt2) 
-mass(3) = -MFv(gt1) 
-mass(4) = MFe(gt3) 
- 
-coup2(1) = cplcFeFvcHpmL(gt2,iIN,i1) 
-coup2(2) = cplcFeFvcHpmR(gt2,iIN,i1) 
-coup2(4) = cplcFeFvcHpmL(gt2,iIN,i2) 
-coup2(3) = cplcFeFvcHpmR(gt2,iIN,i2)  
-coup2(5) = cplFvFeHpmL(gt1,gt3,i1) 
-coup2(6) = cplFvFeHpmR(gt1,gt3,i1) 
-coup2(8) = cplFvFeHpmL(gt1,gt3,i2) 
-coup2(7) = cplFvFeHpmR(gt1,gt3,i2) 
+coup2(1) = cplFvFecHpmL(iIN,gt3,i1) 
+coup2(2) = cplFvFecHpmR(iIN,gt3,i1) 
+coup2(4) = cplFvFecHpmL(iIN,gt3,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt3,i2)  
+coup2(5) = cplcFeFvHpmL(gt2,gt1,i1) 
+coup2(6) = cplcFeFvHpmR(gt2,gt1,i1) 
+coup2(8) = cplcFeFvHpmL(gt2,gt1,i2) 
+coup2(7) = cplcFeFvHpmR(gt2,gt1,i2) 
 Call IntegrateScalarS1S2(Boson4, mass, coup2, deltaM, epsI,IntegralSSss,NSSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -3270,6 +3090,51 @@ Contribution(gt1,gt2,gt3,Isum)='conj[Hpm],conj[Hpm]'
 
 
 !-------------- 
+!  conj[Hpm], Hpm 
+!-------------- 
+Do i1=1,4
+  Do i2=1,4
+Boson4(1) = MHpm(i1) 
+Boson4(2) = gTHpm(i1) 
+Boson4(3) = MHpm(i2) 
+Boson4(4) = gTHpm(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFe(gt2) 
+mass(4) = MFe(gt3) 
+mass(3) = -MFv(gt1) 
+ 
+coup2(1) = cplFvFecHpmL(iIN,gt3,i1) 
+coup2(2) = cplFvFecHpmR(iIN,gt3,i1) 
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
+coup2(5) = cplcFeFvHpmL(gt2,gt1,i1) 
+coup2(6) = cplcFeFvHpmR(gt2,gt1,i1) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
+Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = -2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: conj[Hpm],Hpm" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='conj[Hpm],Hpm'
+        End Do 
+      End Do 
+
+
+
+!-------------- 
 !  conj[Hpm], Ah 
 !-------------- 
 Do i1=1,4
@@ -3282,15 +3147,15 @@ Isum = Isum + 1
  
 resS = 0._dp 
 mass(2) = MFv(gt1) 
-mass(4) = MFe(gt2) 
+mass(4) = MFe(gt3) 
 mass(3) = -MFe(gt2) 
  
-coup2(1) = cplcFeFvcHpmL(gt2,iIN,i1) 
-coup2(2) = cplcFeFvcHpmR(gt2,iIN,i1) 
+coup2(1) = cplFvFecHpmL(iIN,gt3,i1) 
+coup2(2) = cplFvFecHpmR(iIN,gt3,i1) 
 coup2(4) = Conjg(cplFvFvAhL(iIN,gt1,i2)) 
 coup2(3) = Conjg(cplFvFvAhR(iIN,gt1,i2))  
-coup2(5) = cplFvFeHpmL(gt1,gt3,i1) 
-coup2(6) = cplFvFeHpmR(gt1,gt3,i1) 
+coup2(5) = cplcFeFvHpmL(gt2,gt1,i1) 
+coup2(6) = cplcFeFvHpmR(gt2,gt1,i1) 
 coup2(8) = Conjg(cplcFeFeAhL(gt3,gt2,i2)) 
 coup2(7) = Conjg(cplcFeFeAhR(gt3,gt2,i2)) 
 Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
@@ -3327,15 +3192,15 @@ Isum = Isum + 1
  
 resS = 0._dp 
 mass(2) = MFv(gt1) 
-mass(4) = MFe(gt2) 
+mass(4) = MFe(gt3) 
 mass(3) = -MFe(gt2) 
  
-coup2(1) = cplcFeFvcHpmL(gt2,iIN,i1) 
-coup2(2) = cplcFeFvcHpmR(gt2,iIN,i1) 
+coup2(1) = cplFvFecHpmL(iIN,gt3,i1) 
+coup2(2) = cplFvFecHpmR(iIN,gt3,i1) 
 coup2(4) = Conjg(cplFvFvhhL(iIN,gt1,i2)) 
 coup2(3) = Conjg(cplFvFvhhR(iIN,gt1,i2))  
-coup2(5) = cplFvFeHpmL(gt1,gt3,i1) 
-coup2(6) = cplFvFeHpmR(gt1,gt3,i1) 
+coup2(5) = cplcFeFvHpmL(gt2,gt1,i1) 
+coup2(6) = cplcFeFvHpmR(gt2,gt1,i1) 
 coup2(8) = Conjg(cplcFeFehhL(gt3,gt2,i2)) 
 coup2(7) = Conjg(cplcFeFehhR(gt3,gt2,i2)) 
 Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
@@ -3354,6 +3219,141 @@ Else
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
 Contribution(gt1,gt2,gt3,Isum)='conj[Hpm],hh'
+        End Do 
+      End Do 
+
+
+
+!-------------- 
+!  Hpm, Hpm 
+!-------------- 
+Do i1=1,3
+  Do i2=i1+1,4
+Boson4(1) = MHpm(i1) 
+Boson4(2) = gTHpm(i1) 
+Boson4(3) = MHpm(i2) 
+Boson4(4) = gTHpm(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFe(gt2) 
+mass(3) = -MFv(gt1) 
+mass(4) = MFe(gt3) 
+ 
+coup2(1) = cplcFeFvHpmL(gt2,iIN,i1) 
+coup2(2) = cplcFeFvHpmR(gt2,iIN,i1) 
+coup2(4) = cplcFeFvHpmL(gt2,iIN,i2) 
+coup2(3) = cplcFeFvHpmR(gt2,iIN,i2)  
+coup2(5) = cplFvFecHpmL(gt1,gt3,i1) 
+coup2(6) = cplFvFecHpmR(gt1,gt3,i1) 
+coup2(8) = cplFvFecHpmL(gt1,gt3,i2) 
+coup2(7) = cplFvFecHpmR(gt1,gt3,i2) 
+Call IntegrateScalarS1S2(Boson4, mass, coup2, deltaM, epsI,IntegralSSss,NSSss, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = 2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,Hpm" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='Hpm,Hpm'
+        End Do 
+      End Do 
+
+
+
+!-------------- 
+!  Hpm, Ah 
+!-------------- 
+Do i1=1,4
+  Do i2=1,4
+Boson4(1) = MHpm(i1) 
+Boson4(2) = gTHpm(i1) 
+Boson4(3) = MAh(i2) 
+Boson4(4) = gTAh(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFv(gt1) 
+mass(4) = MFe(gt2) 
+mass(3) = -MFe(gt2) 
+ 
+coup2(1) = cplcFeFvHpmL(gt2,iIN,i1) 
+coup2(2) = cplcFeFvHpmR(gt2,iIN,i1) 
+coup2(4) = Conjg(cplFvFvAhL(iIN,gt1,i2)) 
+coup2(3) = Conjg(cplFvFvAhR(iIN,gt1,i2))  
+coup2(5) = cplFvFecHpmL(gt1,gt3,i1) 
+coup2(6) = cplFvFecHpmR(gt1,gt3,i1) 
+coup2(8) = Conjg(cplcFeFeAhL(gt3,gt2,i2)) 
+coup2(7) = Conjg(cplcFeFeAhR(gt3,gt2,i2)) 
+Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = -2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,Ah" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='Hpm,Ah'
+        End Do 
+      End Do 
+
+
+
+!-------------- 
+!  Hpm, hh 
+!-------------- 
+Do i1=1,4
+  Do i2=1,4
+Boson4(1) = MHpm(i1) 
+Boson4(2) = gTHpm(i1) 
+Boson4(3) = Mhh(i2) 
+Boson4(4) = gThh(i2) 
+Isum = Isum + 1 
+ 
+resS = 0._dp 
+mass(2) = MFv(gt1) 
+mass(4) = MFe(gt2) 
+mass(3) = -MFe(gt2) 
+ 
+coup2(1) = cplcFeFvHpmL(gt2,iIN,i1) 
+coup2(2) = cplcFeFvHpmR(gt2,iIN,i1) 
+coup2(4) = Conjg(cplFvFvhhL(iIN,gt1,i2)) 
+coup2(3) = Conjg(cplFvFvhhR(iIN,gt1,i2))  
+coup2(5) = cplFvFecHpmL(gt1,gt3,i1) 
+coup2(6) = cplFvFecHpmR(gt1,gt3,i1) 
+coup2(8) = Conjg(cplcFeFehhL(gt3,gt2,i2)) 
+coup2(7) = Conjg(cplcFeFehhR(gt3,gt2,i2)) 
+Call IntegrateScalarST(Boson4, mass, coup2, deltaM, epsI,IntegralSSst,NSSst, resC, check) 
+If (resC.ne.resC) resC = 0._dp
+resC = -2._dp*resC 
+resC= 1*resC ! color factor 
+resS = resS + resC 
+If (resS.ne.resS) Then 
+Write(*,*) "NaN appearing in the following diagrams: " 
+Write(*,*) "Fv->Fv cFe Fe Propagator: Hpm,hh" 
+Write(*,*)  "M_in: ",m_in 
+Write(*,*)  "mass: ",mass 
+Write(*,*)  "coup: ",coup 
+gSum(gt1,gt2,gt3,Isum)= 0._dp  
+Else 
+gSum(gt1,gt2,gt3,Isum)= resS  
+End If 
+Contribution(gt1,gt2,gt3,Isum)='Hpm,hh'
         End Do 
       End Do 
 
@@ -6786,9 +6786,9 @@ End If
 End Subroutine FvToFvFvFv 
  
  
-Subroutine FvToFecFdFu(iIN,MFe,MFd,MFu,MVWLm,MVWRm,MHpm,MFv,cplcFdFucHpmL,            & 
-& cplcFdFucHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplFvFecVWLmL,   & 
-& cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,cplFvFeHpmL,cplFvFeHpmR,IntegralSs,          & 
+Subroutine FvToFecFdFu(iIN,MFe,MFd,MFu,MVWLm,MVWRm,MHpm,MFv,cplcFdFuHpmL,             & 
+& cplcFdFuHpmR,cplcFdFuVWLmL,cplcFdFuVWLmR,cplcFdFuVWRmL,cplcFdFuVWRmR,cplFvFecHpmL,     & 
+& cplFvFecHpmR,cplFvFecVWLmL,cplFvFecVWLmR,cplFvFecVWRmL,cplFvFecVWRmR,IntegralSs,       & 
 & IntegralSSss,IntegralVs,IntegralVSss,IntegralVVss,NSs,NSSss,NVs,NVSss,NVVss,           & 
 & gTVWLm,gTVWRm,gTHpm,deltaM,epsI,check,g,WriteContributions)
 
@@ -6796,9 +6796,9 @@ Implicit None
  
 Real(dp),Intent(in) :: MFe(3),MFd(3),MFu(3),MVWLm,MVWRm,MHpm(4),MFv(9)
 
-Complex(dp),Intent(in) :: cplcFdFucHpmL(3,3,4),cplcFdFucHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),      & 
-& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),           & 
-& cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3),cplFvFeHpmL(9,3,4),cplFvFeHpmR(9,3,4)
+Complex(dp),Intent(in) :: cplcFdFuHpmL(3,3,4),cplcFdFuHpmR(3,3,4),cplcFdFuVWLmL(3,3),cplcFdFuVWLmR(3,3),        & 
+& cplcFdFuVWRmL(3,3),cplcFdFuVWRmR(3,3),cplFvFecHpmL(9,3,4),cplFvFecHpmR(9,3,4),         & 
+& cplFvFecVWLmL(9,3),cplFvFecVWLmR(9,3),cplFvFecVWRmL(9,3),cplFvFecVWRmR(9,3)
 
 Real(dp),Intent(inout) :: IntegralSs(500000,10),IntegralVs(25000,9),IntegralVVss(500000,12)
 
@@ -6920,7 +6920,7 @@ Contribution(gt1,gt2,gt3,Isum)='conj[VWRm]'
 
 
 !-------------- 
-!  Hpm 
+!  conj[Hpm] 
 !-------------- 
 Do i1=1,4
 Isum = Isum + 1 
@@ -6939,10 +6939,10 @@ mass(2) = MFe(gt1)
 mass(3) = -MFd(gt2) 
 mass(4) = MFu(gt3) 
  
-coup(2) = Conjg(cplFvFeHpmL(iIN,gt1,i1)) 
-coup(1) = Conjg(cplFvFeHpmR(iIN,gt1,i1)) 
-coup(4) = Conjg(cplcFdFucHpmL(gt2,gt3,i1)) 
-coup(3) = Conjg(cplcFdFucHpmR(gt2,gt3,i1))
+coup(2) = Conjg(cplFvFecHpmL(iIN,gt1,i1)) 
+coup(1) = Conjg(cplFvFecHpmR(iIN,gt1,i1)) 
+coup(4) = Conjg(cplcFdFuHpmL(gt2,gt3,i1)) 
+coup(3) = Conjg(cplcFdFuHpmR(gt2,gt3,i1))
 Call IntegrateScalarSS(Boson2,mass,coup,deltaM,epsI,IntegralSs,NSs,resR, check) 
 resR= 3*resR ! color factor 
 resS = resS + resR 
@@ -6950,7 +6950,7 @@ resS = resS + resR
  resD = resD + resS 
 If (resD.ne.resD) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fe cFd Fu Propagator: Hpm" 
+Write(*,*) "Fv->Fe cFd Fu Propagator: conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -6958,7 +6958,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)=resD
 End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[Hpm]'
       End Do 
 
 
@@ -7004,7 +7004,7 @@ Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],conj[VWRm]'
 
 
 !-------------- 
-!  conj[VWLm], Hpm 
+!  conj[VWLm], conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWLm 
@@ -7020,12 +7020,12 @@ mass(4) = MFu(gt3)
  
 coup2(1) = cplFvFecVWLmL(iIN,gt1) 
 coup2(2) = cplFvFecVWLmR(iIN,gt1) 
-coup2(4) = cplFvFeHpmL(iIN,gt1,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt1,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt1,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt1,i2)  
 coup2(5) = cplcFdFuVWLmL(gt2,gt3) 
 coup2(6) = cplcFdFuVWLmR(gt2,gt3) 
-coup2(8) = cplcFdFucHpmL(gt2,gt3,i2) 
-coup2(7) = cplcFdFucHpmR(gt2,gt3,i2) 
+coup2(8) = cplcFdFuHpmL(gt2,gt3,i2) 
+coup2(7) = cplcFdFuHpmR(gt2,gt3,i2) 
 Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -7033,7 +7033,7 @@ resC= 3*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fe cFd Fu Propagator: conj[VWLm],Hpm" 
+Write(*,*) "Fv->Fe cFd Fu Propagator: conj[VWLm],conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -7041,13 +7041,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWLm],conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  conj[VWRm], Hpm 
+!  conj[VWRm], conj[Hpm] 
 !-------------- 
   Do i2=1,4
 Boson4(1) = MVWRm 
@@ -7063,12 +7063,12 @@ mass(4) = MFu(gt3)
  
 coup2(1) = cplFvFecVWRmL(iIN,gt1) 
 coup2(2) = cplFvFecVWRmR(iIN,gt1) 
-coup2(4) = cplFvFeHpmL(iIN,gt1,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt1,i2)  
+coup2(4) = cplFvFecHpmL(iIN,gt1,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt1,i2)  
 coup2(5) = cplcFdFuVWRmL(gt2,gt3) 
 coup2(6) = cplcFdFuVWRmR(gt2,gt3) 
-coup2(8) = cplcFdFucHpmL(gt2,gt3,i2) 
-coup2(7) = cplcFdFucHpmR(gt2,gt3,i2) 
+coup2(8) = cplcFdFuHpmL(gt2,gt3,i2) 
+coup2(7) = cplcFdFuHpmR(gt2,gt3,i2) 
 Call IntegrateGaugeSscalarS(Boson4, mass, coup2, deltaM, epsI,IntegralVSss,NVSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -7076,7 +7076,7 @@ resC= 3*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fe cFd Fu Propagator: conj[VWRm],Hpm" 
+Write(*,*) "Fv->Fe cFd Fu Propagator: conj[VWRm],conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -7084,13 +7084,13 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[VWRm],conj[Hpm]'
       End Do 
 
 
 
 !-------------- 
-!  Hpm, Hpm 
+!  conj[Hpm], conj[Hpm] 
 !-------------- 
 Do i1=1,3
   Do i2=i1+1,4
@@ -7105,14 +7105,14 @@ mass(2) = MFe(gt1)
 mass(3) = -MFd(gt2) 
 mass(4) = MFu(gt3) 
  
-coup2(1) = cplFvFeHpmL(iIN,gt1,i1) 
-coup2(2) = cplFvFeHpmR(iIN,gt1,i1) 
-coup2(4) = cplFvFeHpmL(iIN,gt1,i2) 
-coup2(3) = cplFvFeHpmR(iIN,gt1,i2)  
-coup2(5) = cplcFdFucHpmL(gt2,gt3,i1) 
-coup2(6) = cplcFdFucHpmR(gt2,gt3,i1) 
-coup2(8) = cplcFdFucHpmL(gt2,gt3,i2) 
-coup2(7) = cplcFdFucHpmR(gt2,gt3,i2) 
+coup2(1) = cplFvFecHpmL(iIN,gt1,i1) 
+coup2(2) = cplFvFecHpmR(iIN,gt1,i1) 
+coup2(4) = cplFvFecHpmL(iIN,gt1,i2) 
+coup2(3) = cplFvFecHpmR(iIN,gt1,i2)  
+coup2(5) = cplcFdFuHpmL(gt2,gt3,i1) 
+coup2(6) = cplcFdFuHpmR(gt2,gt3,i1) 
+coup2(8) = cplcFdFuHpmL(gt2,gt3,i2) 
+coup2(7) = cplcFdFuHpmR(gt2,gt3,i2) 
 Call IntegrateScalarS1S2(Boson4, mass, coup2, deltaM, epsI,IntegralSSss,NSSss, resC, check) 
 If (resC.ne.resC) resC = 0._dp
 resC = 2._dp*resC 
@@ -7120,7 +7120,7 @@ resC= 3*resC ! color factor
 resS = resS + resC 
 If (resS.ne.resS) Then 
 Write(*,*) "NaN appearing in the following diagrams: " 
-Write(*,*) "Fv->Fe cFd Fu Propagator: Hpm,Hpm" 
+Write(*,*) "Fv->Fe cFd Fu Propagator: conj[Hpm],conj[Hpm]" 
 Write(*,*)  "M_in: ",m_in 
 Write(*,*)  "mass: ",mass 
 Write(*,*)  "coup: ",coup 
@@ -7128,7 +7128,7 @@ gSum(gt1,gt2,gt3,Isum)= 0._dp
 Else 
 gSum(gt1,gt2,gt3,Isum)= resS  
 End If 
-Contribution(gt1,gt2,gt3,Isum)='Hpm,Hpm'
+Contribution(gt1,gt2,gt3,Isum)='conj[Hpm],conj[Hpm]'
         End Do 
       End Do 
 

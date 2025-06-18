@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:11 on 11.6.2025   
+! File created at 21:34 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -1600,10 +1600,10 @@ If (OutputForMG) WriteNextBlock = .True.
 Write(io_L,106) "Block LRINPUT Q=",Q,"# (Renormalization Scale)" 
 Write(io_L,104) 2,Real(LAM2,dp), "# LAM2" 
 Write(io_L,104) 1,Real(LAM1,dp), "# LAM1" 
-Write(io_L,104) 14,Real(ALP1,dp), "# ALP1" 
 Write(io_L,104) 8,Real(RHO1,dp), "# RHO1" 
 Write(io_L,104) 9,Real(RHO2,dp), "# RHO2" 
 Write(io_L,104) 16,Real(ALP2,dp), "# ALP2" 
+Write(io_L,104) 14,Real(ALP1,dp), "# ALP1" 
 Write(io_L,104) 20,Real(ALP3,dp), "# ALP3" 
 Write(io_L,104) 6,Real(LAM5,dp), "# LAM5" 
 Write(io_L,104) 7,Real(LAM6,dp), "# LAM6" 
@@ -1627,7 +1627,7 @@ Write(io_L,104) 1,Real(ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2)),dp), "# Phi
 WriteNextBlock = .false. 
 If (OutputForMG) WriteNextBlock = .True. 
 Write(io_L,106) "Block THETAW Q=",Q,"# (Renormalization Scale)" 
-Write(io_L,104) 1,Real(ASin(Abs(ZZ(1,1))),dp), "# TW" 
+Write(io_L,104) 1,Real(ASin(Abs(Part(ZZ,1,1))),dp), "# TW" 
 If (WriteTreeLevelTadpoleParameters) Then 
 If (HighScaleModel.Eq."LOW") Then 
 WriteNextBlock = .false. 
@@ -1822,10 +1822,10 @@ Write(io_L,104) 3,Real(g3GUT,dp), "# g3"
 Write(io_L,106) "Block LRINPUTGUT Q=",M_GUT,"# (GUT scale)" 
 Write(io_L,104) 2,Real(LAM2GUT,dp), "# LAM2" 
 Write(io_L,104) 1,Real(LAM1GUT,dp), "# LAM1" 
-Write(io_L,104) 14,Real(ALP1GUT,dp), "# ALP1" 
 Write(io_L,104) 8,Real(RHO1GUT,dp), "# RHO1" 
 Write(io_L,104) 9,Real(RHO2GUT,dp), "# RHO2" 
 Write(io_L,104) 16,Real(ALP2GUT,dp), "# ALP2" 
+Write(io_L,104) 14,Real(ALP1GUT,dp), "# ALP1" 
 Write(io_L,104) 20,Real(ALP3GUT,dp), "# ALP3" 
 Write(io_L,104) 6,Real(LAM5GUT,dp), "# LAM5" 
 Write(io_L,104) 7,Real(LAM6GUT,dp), "# LAM6" 
@@ -3174,9 +3174,9 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFu(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFd(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFu(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFu(1))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFu(1))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -3334,9 +3334,9 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFu(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFd(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFu(2,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFu(2))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFu(2))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -3494,9 +3494,9 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFu(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFd(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFu(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFu(3))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFu(3))//" -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -3687,6 +3687,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 9
+  Do gt2=3, 4
+If (BRFe(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFv(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFe(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFe(1))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 9
 If (BRFe(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFv(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -3704,18 +3716,6 @@ Write(io_L,201) BRFe(1,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 9
-  Do gt2=3, 4
-If (BRFe(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFv(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFe(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFe(1))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFe(1,61:465)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -3847,6 +3847,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 9
+  Do gt2=3, 4
+If (BRFe(2,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFv(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFe(2,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFe(2))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 9
 If (BRFe(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFv(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -3864,18 +3876,6 @@ Write(io_L,201) BRFe(2,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 9
-  Do gt2=3, 4
-If (BRFe(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFv(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFe(2,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFe(2))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFe(2,61:465)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -4007,6 +4007,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 9
+  Do gt2=3, 4
+If (BRFe(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFv(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFe(3,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFe(3))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 9
 If (BRFe(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFv(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -4024,18 +4036,6 @@ Write(io_L,201) BRFe(3,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 9
-  Do gt2=3, 4
-If (BRFe(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFv(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFe(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFe(3))//" -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFe(3,61:465)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -4173,6 +4173,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 3
+  Do gt2=3, 4
+If (BRFd(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFu(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFd(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFd(1))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 3
 If (BRFd(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFu(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -4190,18 +4202,6 @@ Write(io_L,201) BRFd(1,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 3
-  Do gt2=3, 4
-If (BRFd(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFu(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFd(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFd(1))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFd(1,37:441)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -4333,6 +4333,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 3
+  Do gt2=3, 4
+If (BRFd(2,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFu(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFd(2,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFd(2))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 3
 If (BRFd(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFu(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -4350,18 +4362,6 @@ Write(io_L,201) BRFd(2,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 3
-  Do gt2=3, 4
-If (BRFd(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFu(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFd(2,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFd(2))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFd(2,37:441)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -4493,6 +4493,18 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 1, 3
+  Do gt2=3, 4
+If (BRFd(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGFu(gt1) 
+CurrentPDG2(2) = PDGHpm(gt2) 
+Write(io_L,201) BRFd(3,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleFd(3))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 1, 3
 If (BRFd(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFu(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -4510,18 +4522,6 @@ Write(io_L,201) BRFd(3,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 1, 3
-  Do gt2=3, 4
-If (BRFd(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFu(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRFd(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleFd(3))//" -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 If (Maxval(BRFd(3,37:441)).Gt.BRmin) Then 
 Write(io_L,100) "#    BR                NDA      ID1      ID2       ID3" 
 End If 
@@ -4657,20 +4657,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
 If (BRhh(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVZ 
@@ -4753,42 +4739,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRhh(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -4800,6 +4750,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRhh(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRhh(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRhh(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRhh(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(1))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRhh(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
@@ -4890,20 +4862,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
 If (BRhh(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVZ 
@@ -4986,42 +4944,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRhh(2,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -5033,6 +4955,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRhh(2,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRhh(2,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRhh(2,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRhh(2,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(2))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRhh(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
@@ -5123,20 +5067,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
 If (BRhh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVZ 
@@ -5219,42 +5149,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRhh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -5266,6 +5160,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRhh(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRhh(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRhh(3,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRhh(3,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRhh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
@@ -5356,20 +5272,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
 If (BRhh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVZ 
@@ -5452,42 +5354,6 @@ icount = icount +1
 End Do 
  
 Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRhh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRhh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -5499,6 +5365,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRhh(4,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRhh(4,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRhh(4,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRhh(4,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticlehh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRhh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
@@ -5570,11 +5458,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(1))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(1))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(1))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(1))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -5738,11 +5626,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(2,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(2,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(2))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(2))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(2,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(2))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(2))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -5906,11 +5794,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(3))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(3))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(3))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(3))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6074,11 +5962,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(4))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(4))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(4))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(4))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6242,11 +6130,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(5,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(5,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(5))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(5))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(5,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(5))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(5))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6410,11 +6298,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(6,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(6,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(6))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(6))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(6,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(6))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(6))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6578,11 +6466,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(7,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(7,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(7))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(7))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(7,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(7))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(7))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6746,11 +6634,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(8,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(8,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(8))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(8))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(8,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(8))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(8))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -6914,11 +6802,11 @@ Do gt1= 1, 3
   Do gt2=3, 4
 If (BRFv(9,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGHpm(gt2) 
+CurrentPDG2(2) = -PDGHpm(gt2) 
 Write(io_L,201) BRFv(9,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleFv(9))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//" "//")"
+ & Trim(NameParticleFv(9))//" -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
 Write(io_L,201) BRFv(9,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleFv(9))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
+ & Trim(NameParticleFv(9))//" -> "//Trim(NameParticleFe(gt1))//"^* "//Trim(NameParticleHpm(gt2))//" "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7151,28 +7039,6 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-If (BRVZ(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRVZ(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRVZ(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7184,11 +7050,42 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRVZ(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRVZ(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRVZ(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
 Write(io_L,201) BRVZ(1,icount),2,CurrentPDG2, & 
  & Trim(NameParticleVZ)//" -> "//Trim(NameParticleVWLm)//" "//Trim(NameParticleVWLm)//"^* "//")"
+End if 
+icount = icount +1 
+If (BRVZ(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGVWLm 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleVWLm)//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRVZ(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleVZ)//" -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVWRm)//" "//")"
 End if 
 icount = icount +1 
 If (BRVZ(1,icount).Gt.BrMin) Then 
@@ -7288,28 +7185,6 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-If (BRVZR(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRVZR(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRVZR(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRVZR(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRVZR(1,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRVZR(1,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRVZR(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7321,6 +7196,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRVZR(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRVZR(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRVZR(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRVZR(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRVZR(1,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRVZR(1,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleVZR)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRVZR(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWLm 
@@ -7356,30 +7253,6 @@ Write(io_L,200) -INT(PDGHpm(3)),gTHpm(3),Trim(NameParticleHpm(3))
 Write(io_L,100) "#    BR                NDA      ID1      ID2" 
 icount = 1 
 Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7394,52 +7267,40 @@ End Do
 Do gt1= 3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(2) = -PDGVWLm 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(2) = -PDGVWRm 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 1, 3
   Do gt2=1, 3
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFd(gt1) 
-CurrentPDG2(2) = -PDGFu(gt2) 
+CurrentPDG2(1) = PDGFu(gt1) 
+CurrentPDG2(2) = -PDGFd(gt2) 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleFu(gt2))//"^* "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleFd(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 End Do 
  
-Do gt1= 1, 3
-  Do gt2=1, 9
+Do gt1= 1, 9
+  Do gt2=1, 3
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGFv(gt2) 
+CurrentPDG2(1) = PDGFv(gt1) 
+CurrentPDG2(2) = -PDGFe(gt2) 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleFv(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 1, 4
-  Do gt2= gt1, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleFe(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7460,33 +7321,21 @@ End Do
 Do gt1= 1, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(2) = -PDGVWLm 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 1, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(2) = -PDGVWRm 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7505,44 +7354,32 @@ Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2=3, 4
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
+CurrentPDG2(1) = -PDGVWLm 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZ 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVZ)//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZ 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(1) = -PDGVWLm 
+CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVZ)//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZR 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(1) = -PDGVWRm 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZR 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(1) = -PDGVWRm 
+CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRHpm(3,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(3))//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
 End if 
@@ -7550,30 +7387,6 @@ If ((gTHpm(4).gt.MinWidth).or.(OutputForMG)) Then
 Write(io_L,200) -INT(PDGHpm(4)),gTHpm(4),Trim(NameParticleHpm(4)) 
 Write(io_L,100) "#    BR                NDA      ID1      ID2" 
 icount = 1 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 1, 4
-  Do gt2=3, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
   Do gt2=3, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
@@ -7589,52 +7402,40 @@ End Do
 Do gt1= 3, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(2) = -PDGVWLm 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(2) = -PDGVWRm 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleAh(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 1, 3
   Do gt2=1, 3
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFd(gt1) 
-CurrentPDG2(2) = -PDGFu(gt2) 
+CurrentPDG2(1) = PDGFu(gt1) 
+CurrentPDG2(2) = -PDGFd(gt2) 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleFd(gt1))//" "//Trim(NameParticleFu(gt2))//"^* "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleFu(gt1))//" "//Trim(NameParticleFd(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 End Do 
  
-Do gt1= 1, 3
-  Do gt2=1, 9
+Do gt1= 1, 9
+  Do gt2=1, 3
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGFe(gt1) 
-CurrentPDG2(2) = PDGFv(gt2) 
+CurrentPDG2(1) = PDGFv(gt1) 
+CurrentPDG2(2) = -PDGFe(gt2) 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleFe(gt1))//" "//Trim(NameParticleFv(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 1, 4
-  Do gt2= gt1, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleFv(gt1))//" "//Trim(NameParticleFe(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7655,33 +7456,21 @@ End Do
 Do gt1= 1, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(2) = -PDGVWLm 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
 Do gt1= 1, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(2) = -PDGVWRm 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2= gt1, 4
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 3, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7700,44 +7489,32 @@ Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2=3, 4
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = -PDGHpm(gt2) 
+CurrentPDG2(1) = -PDGVWLm 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleHpm(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZ 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVZ)//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZ 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(1) = -PDGVWLm 
+CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVZ)//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVWLm)//"^* "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZR 
-CurrentPDG2(2) = PDGVWLm 
+CurrentPDG2(1) = -PDGVWRm 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWLm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
 If (BRHpm(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGVZR 
-CurrentPDG2(2) = PDGVWRm 
+CurrentPDG2(1) = -PDGVWRm 
+CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRHpm(4,icount),2,CurrentPDG2, & 
- & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVZR)//" "//Trim(NameParticleVWRm)//" "//")"
+ & Trim(NameParticleHpm(4))//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
 End if 
@@ -7772,20 +7549,6 @@ CurrentPDG2(1) = PDGhh(gt1)
 CurrentPDG2(2) = PDGAh(gt2) 
 Write(io_L,201) BRAh(3,icount),2,CurrentPDG2, & 
  & Trim(NameParticleAh(3))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -7843,20 +7606,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 4
 If (BRAh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
@@ -7876,28 +7625,6 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRAh(3,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRAh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -7909,6 +7636,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRAh(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRAh(3,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRAh(3,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRAh(3,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleAh(3))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRAh(3,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWRm 
@@ -7944,20 +7693,6 @@ CurrentPDG2(1) = PDGhh(gt1)
 CurrentPDG2(2) = PDGAh(gt2) 
 Write(io_L,201) BRAh(4,icount),2,CurrentPDG2, & 
  & Trim(NameParticleAh(4))//" -> "//Trim(NameParticlehh(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
-Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//"^* "//")"
 End if 
 icount = icount +1 
   End Do 
@@ -8015,20 +7750,6 @@ icount = icount +1
   End Do 
 End Do 
  
-Do gt1= 3, 4
-  Do gt2=1, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
-Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
-Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 4
 If (BRAh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
@@ -8048,28 +7769,6 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWLm 
-Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//" "//")"
-Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRAh(4,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVWRm 
-Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//" "//")"
-Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
- & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//"^* "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
   Do gt2=3, 4
 If (BRAh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGHpm(gt1) 
@@ -8081,6 +7780,28 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+If (BRAh(4,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWLm 
+Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWLm)//"^* "//")"
+Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWLm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+Do gt1= 3, 4
+If (BRAh(4,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = -PDGVWRm 
+Write(io_L,201) BRAh(4,icount)/2._dp,2,CurrentPDG2, & 
+ & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVWRm)//"^* "//")"
+Write(io_L,201) BRAh(4,icount)/2._dp,2,-CurrentPDG2, & 
+ & Trim(NameParticleAh(4))//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVWRm)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRAh(4,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = -PDGVWRm 
@@ -8102,6 +7823,18 @@ Write(io_L,200) -INT(PDGVWLm),gTVWLm,Trim(NameParticleVWLm)
 Write(io_L,100) "#    BR                NDA      ID1      ID2" 
 icount = 1 
 Do gt1= 3, 4
+  Do gt2=3, 4
+If (BRVWLm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = -PDGHpm(gt1) 
+CurrentPDG2(2) = PDGAh(gt2) 
+Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 3, 4
 If (BRVWLm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = -PDGVWRm 
@@ -8110,18 +7843,6 @@ Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRVWLm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 3
   Do gt2=1, 3
 If (BRVWLm(1,icount).Gt.BrMin) Then 
@@ -8146,6 +7867,18 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+  Do gt2=1, 4
+If (BRVWLm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = -PDGHpm(gt1) 
+CurrentPDG2(2) = PDGhh(gt2) 
+Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
 Do gt1= 1, 4
 If (BRVWLm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
@@ -8165,17 +7898,23 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-  Do gt2=1, 4
 If (BRVWLm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
+CurrentPDG2(1) = -PDGHpm(gt1) 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
+ & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
   End Do 
-End Do 
- 
+Do gt1= 3, 4
+If (BRVWLm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = -PDGHpm(gt1) 
+CurrentPDG2(2) = PDGVZR 
+Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVZR)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
 If (BRVWLm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGVWLm 
 CurrentPDG2(2) = PDGVZ 
@@ -8192,29 +7931,18 @@ End if
 icount = icount +1 
 If (BRVWLm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = -PDGVWRm 
+CurrentPDG2(2) = PDGVZ 
+Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZ)//" "//")"
+End if 
+icount = icount +1 
+If (BRVWLm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = -PDGVWRm 
 CurrentPDG2(2) = PDGVZR 
 Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
  & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleVWRm)//"^* "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-If (BRVWLm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVZ 
-Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVZ)//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRVWLm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVZR 
-Write(io_L,201) BRVWLm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWLm)//"^* -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVZR)//" "//")"
-End if 
-icount = icount +1 
-  End Do 
 End if 
 
  
@@ -8227,6 +7955,18 @@ Write(io_L,200) INT(PDGVWRm),gTVWRm,Trim(NameParticleVWRm)
 Write(io_L,100) "#    BR                NDA      ID1      ID2" 
 icount = 1 
 Do gt1= 3, 4
+  Do gt2=3, 4
+If (BRVWRm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = PDGAh(gt2) 
+Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleAh(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
+Do gt1= 3, 4
 If (BRVWRm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGAh(gt1) 
 CurrentPDG2(2) = PDGVWLm 
@@ -8235,18 +7975,6 @@ Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, &
 End if 
 icount = icount +1 
   End Do 
-Do gt1= 3, 4
-  Do gt2=3, 4
-If (BRVWRm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = PDGAh(gt2) 
-Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleAh(gt2))//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-End Do 
- 
 Do gt1= 1, 3
   Do gt2=1, 3
 If (BRVWRm(1,icount).Gt.BrMin) Then 
@@ -8271,6 +7999,18 @@ icount = icount +1
   End Do 
 End Do 
  
+Do gt1= 3, 4
+  Do gt2=1, 4
+If (BRVWRm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = PDGhh(gt2) 
+Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticlehh(gt2))//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+End Do 
+ 
 Do gt1= 1, 4
 If (BRVWRm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGhh(gt1) 
@@ -8290,17 +8030,30 @@ End if
 icount = icount +1 
   End Do 
 Do gt1= 3, 4
-  Do gt2=1, 4
 If (BRVWRm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = PDGhh(gt2) 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = PDGVZ 
 Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticlehh(gt2))//" "//")"
+ & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVZ)//" "//")"
 End if 
 icount = icount +1 
   End Do 
-End Do 
- 
+Do gt1= 3, 4
+If (BRVWRm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGHpm(gt1) 
+CurrentPDG2(2) = PDGVZR 
+Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//" "//Trim(NameParticleVZR)//" "//")"
+End if 
+icount = icount +1 
+  End Do 
+If (BRVWRm(1,icount).Gt.BrMin) Then 
+CurrentPDG2(1) = PDGVWLm 
+CurrentPDG2(2) = PDGVZ 
+Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
+ & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleVWLm)//" "//Trim(NameParticleVZ)//" "//")"
+End if 
+icount = icount +1 
 If (BRVWRm(1,icount).Gt.BrMin) Then 
 CurrentPDG2(1) = PDGVWLm 
 CurrentPDG2(2) = PDGVZR 
@@ -8322,24 +8075,6 @@ Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, &
  & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleVWRm)//" "//Trim(NameParticleVZR)//" "//")"
 End if 
 icount = icount +1 
-Do gt1= 3, 4
-If (BRVWRm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVZ 
-Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVZ)//" "//")"
-End if 
-icount = icount +1 
-  End Do 
-Do gt1= 3, 4
-If (BRVWRm(1,icount).Gt.BrMin) Then 
-CurrentPDG2(1) = -PDGHpm(gt1) 
-CurrentPDG2(2) = PDGVZR 
-Write(io_L,201) BRVWRm(1,icount),2,CurrentPDG2, & 
- & Trim(NameParticleVWRm)//" -> "//Trim(NameParticleHpm(gt1))//"^* "//Trim(NameParticleVZR)//" "//")"
-End if 
-icount = icount +1 
-  End Do 
 End if 
 ! Information needed by MadGraph 
 If (OutputForMG) Then 
@@ -8387,13 +8122,12 @@ Subroutine WriteWHIZARD
 Write(123,*) "# Couplings and VEVs" 
  
 Write(123,*) "" 
-Write(123,*) "gBL= ",gBL
 Write(123,*) "LAM2= ",LAM2
 Write(123,*) "LAM1= ",LAM1
-Write(123,*) "ALP1= ",ALP1
 Write(123,*) "RHO1= ",RHO1
 Write(123,*) "RHO2= ",RHO2
 Write(123,*) "ALP2= ",ALP2
+Write(123,*) "ALP1= ",ALP1
 Write(123,*) "ALP3= ",ALP3
 Write(123,*) "LAM5= ",LAM5
 Write(123,*) "LAM6= ",LAM6
@@ -8499,7 +8233,7 @@ Write(123,*) ""
  
 Write(123,*) "" 
 Write(123,*) "PhiW= ",ACos(Sqrt(Abs(ZW(1,1))**2 + Abs(ZW(1,2))**2))
-Write(123,*) "TW= ",ASin(Abs(ZZ(1,1)))
+Write(123,*) "TW= ",ASin(Abs(Part(ZZ,1,1)))
 Write(123,*) "" 
 Write(123,*) "" 
 
@@ -14004,9 +13738,6 @@ InputValueforLAM2= .True.
 Else If (i_par.Eq.1) Then 
 LAM1IN= wert 
 InputValueforLAM1= .True. 
-Else If (i_par.Eq.14) Then 
-ALP1IN= wert 
-InputValueforALP1= .True. 
 Else If (i_par.Eq.8) Then 
 RHO1IN= wert 
 InputValueforRHO1= .True. 
@@ -14016,6 +13747,9 @@ InputValueforRHO2= .True.
 Else If (i_par.Eq.16) Then 
 ALP2IN= wert 
 InputValueforALP2= .True. 
+Else If (i_par.Eq.14) Then 
+ALP1IN= wert 
+InputValueforALP1= .True. 
 Else If (i_par.Eq.20) Then 
 ALP3IN= wert 
 InputValueforALP3= .True. 

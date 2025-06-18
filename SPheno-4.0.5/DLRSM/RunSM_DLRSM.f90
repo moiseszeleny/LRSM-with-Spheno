@@ -4,7 +4,7 @@
 !           1405.1434, 1411.0675, 1503.03098, 1703.09237, 1706.05372, 1805.07306  
 ! (c) Florian Staub, Mark Goodsell and Werner Porod 2020  
 ! ------------------------------------------------------------------------------  
-! File created at 1:11 on 11.6.2025   
+! File created at 21:34 on 17.6.2025   
 ! ----------------------------------------------------------------------  
  
  
@@ -23,21 +23,21 @@ Logical,Private,Save::OnlyDiagonal
 Contains 
  
  Subroutine RunSM_and_SUSY_RGEs(Qout,gBLinput,g2input,g3input,LAM2input,               & 
-& LAM1input,ALP1input,RHO1input,RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,       & 
+& LAM1input,RHO1input,RHO2input,ALP2input,ALP1input,ALP3input,LAM5input,LAM6input,       & 
 & LAM3input,LAM4input,Yinput,YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,         & 
-& MU12input,MU22input,k1input,vRinput,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,           & 
+& MU12input,MU22input,k1input,vRinput,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,           & 
 & ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR,CKMout,sinW2_out,      & 
 & Alpha_out,AlphaS_out,realCKM)
 
 Implicit None 
-Real(dp),Intent(in) :: gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,RHO1input,RHO2input,           & 
-& ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,MU12input,MU22input,       & 
+Real(dp),Intent(in) :: gBLinput,g2input,g3input,LAM2input,LAM1input,RHO1input,RHO2input,ALP2input,           & 
+& ALP1input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,MU12input,MU22input,       & 
 & k1input,vRinput
 
 Complex(dp),Intent(in) :: Yinput(3,3),YQ1input(3,3),YQ2input(3,3),Ytinput(3,3),YLinput(3,3),YRinput(3,3),       & 
 & Muxinput(3,3)
 
-Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
+Real(dp),Intent(out) :: gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,MU12,MU22,k1,vR
 
 Complex(dp),Intent(out) :: Y(3,3),YQ1(3,3),YQ2(3,3),Yt(3,3),YL(3,3),YR(3,3),Mux(3,3)
 
@@ -57,12 +57,12 @@ Real(dp) :: scale_save, Qin, tz, dt, g1D(144), g62_SM(62)
 ! Run SUSY RGEs from M_SUSY to Qin 
 Qin=sqrt(getRenormalizationScale()) 
 scale_save = Qin 
-Call ParametersToG144(gBLinput,g2input,g3input,LAM2input,LAM1input,ALP1input,         & 
-& RHO1input,RHO2input,ALP2input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,       & 
+Call ParametersToG144(gBLinput,g2input,g3input,LAM2input,LAM1input,RHO1input,         & 
+& RHO2input,ALP2input,ALP1input,ALP3input,LAM5input,LAM6input,LAM3input,LAM4input,       & 
 & Yinput,YQ1input,YQ2input,Ytinput,YLinput,YRinput,Muxinput,MU12input,MU22input,         & 
 & k1input,vRinput,g1D)
 
-Call GToParameters144(g1D,gBL,g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,               & 
+Call GToParameters144(g1D,gBL,g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,               & 
 & LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,YL,YR,Mux,MU12,MU22,k1,vR)
 
 gBL = Sqrt(3._dp/2._dp)*gBL 
@@ -106,7 +106,7 @@ sinW2_out = 0.22290_dp
 Alpha_out = Alpha 
 AlphaS_out = g3**2/(4._dp*Pi) 
 Call SetMatchingConditions(g1SM,g2SM,g3SM,YuSM,YdSM,YeSM,vSM,k1,vR,gBL,               & 
-& g2,g3,LAM2,LAM1,ALP1,RHO1,RHO2,ALP2,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
+& g2,g3,LAM2,LAM1,RHO1,RHO2,ALP2,ALP1,ALP3,LAM5,LAM6,LAM3,LAM4,Y,YQ1,YQ2,Yt,             & 
 & YL,YR,Mux,MU12,MU22,.False.)
 
 End if 
