@@ -252,7 +252,7 @@ Ppinv = Pp.T
 physical_charged_scalars_plus = (Ppinv*Matrix(phip_fields)).applyfunc(factor)
 
 ##### High energy approximation
-epsilon = symbols('epsilon')
+epsilon = symbols('epsilon', positive=True)
 physical_charged_scalars_plus_approx = physical_charged_scalars_plus.applyfunc(
     lambda x:x.subs(k1, epsilon*vR).series(x=epsilon, x0=0, n=2).removeO().subs(epsilon, k1/vR)
 )

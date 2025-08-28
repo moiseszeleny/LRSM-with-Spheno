@@ -6,9 +6,10 @@ from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1, B12_0, C0_, C1_, C2
 from diagram_v2 import all_diagrams
 from LFVXD.PaVe2 import D as Dim
 
-from DLRSM1.block_diagonalization_iss import ULmni, URmni, USmni, I3, eigenvalsMnu, mNi_changes, epsilon, mNi
+from DLRSM1.block_diagonalization_iss import ULmni, URmni, USmni, I3, eigenvalsMnu, mNi_changes, mNi
 from DLRSM1.block_diagonalization_iss import dict_Mii2, dict_muii, dict_Mii2_sqrt, dict_sqrt_muii_MDi, dict_Mii, mns_dummys, dummys_mns
 from DLRSM1.block_diagonalization_iss import Unu
+from DLRSM1.potential_senjanovic_HiggsDoublets import epsilon
 
 from DLRSM1.potential_senjanovic_HiggsDoublets import alpha13, alpha12, alpha23, lamb12, rho1, k1, vR, mHR, mH10
 from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import mW1, mW2, g
@@ -651,7 +652,17 @@ for int_key, config in _interaction_configs.items():
     actual_free_symbols = al_expr.free_symbols.union(ar_expr.free_symbols)
     provided_symbols_set = set(current_lambdify_args_syms)
     
-    missing_symbols = actual_free_symbols - provided_symbols_set - module_symbols
+    # Create a mapping based on symbol names rather than object identity
+    provided_symbols_by_name = {str(sym): sym for sym in current_lambdify_args_syms}
+    module_symbols_by_name = {name: Symbol(name) for name in pv_functions.keys()}
+    
+    # Check for missing symbols by name
+    missing_symbols = set()
+    for sym in actual_free_symbols:
+        sym_name = str(sym)
+        if sym_name not in provided_symbols_by_name and sym_name not in module_symbols_by_name:
+            missing_symbols.add(sym)
+    
     if missing_symbols:
         raise ValueError(
             f"For interaction '{int_key}', the following symbols are in the expressions "
@@ -731,8 +742,8 @@ def _calculate_interaction_formfactors(
     max_workers=None # new argument
 ):
     """Helper function to sum form factor contributions for a given interaction type."""
-    al_sum = mp.mpf(0)
-    ar_sum = mp.mpf(0)
+    al_terms = []
+    ar_terms = []
 
     config = _interaction_configs[interaction_key]
     ff_AL = function_formfactors[interaction_key]['AL']
@@ -766,12 +777,12 @@ def _calculate_interaction_formfactors(
             )
             for idx in index_pairs
         ]
-        # Use ThreadPoolExecutor instead of ProcessPoolExecutor to avoid pickling errors
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             results = list(executor.map(_single_ff_args, job_args))
         for ffL, ffR in results:
-            al_sum += ffL
-            ar_sum += ffR
+            # Coerce to mpmath complex to avoid mixing Python complex/float types
+            al_terms.append(mp.mpc(ffL))
+            ar_terms.append(mp.mpc(ffR))
     else:
         if interaction_key in two_neutrino_interactions:
             for i, mni_val in enumerate(mni_masses):
@@ -780,16 +791,31 @@ def _calculate_interaction_formfactors(
                         interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
                         ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, (i, j)
                     ))
-                    al_sum += ffL
-                    ar_sum += ffR
+                    al_terms.append(mp.mpc(ffL))
+                    ar_terms.append(mp.mpc(ffR))
         else:
             for i, mni_val in enumerate(mni_masses):
                 ffL, ffR = _single_ff_args((
                     interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
                     ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, i
                 ))
-                al_sum += ffL
-                ar_sum += ffR
+                al_terms.append(mp.mpc(ffL))
+                ar_terms.append(mp.mpc(ffR))
+    # Sum real and imaginary parts separately with mp.fsum for high-precision, stable complex summation
+    if al_terms:
+        al_real = [mp.re(x) for x in al_terms]
+        al_imag = [mp.im(x) for x in al_terms]
+        al_sum = mp.mpc(mp.fsum(al_real), mp.fsum(al_imag))
+    else:
+        al_sum = mp.mpc(0)
+
+    if ar_terms:
+        ar_real = [mp.re(x) for x in ar_terms]
+        ar_imag = [mp.im(x) for x in ar_terms]
+        ar_sum = mp.mpc(mp.fsum(ar_real), mp.fsum(ar_imag))
+    else:
+        ar_sum = mp.mpc(0)
+
     return {'AL': al_sum, 'AR': ar_sum}
 
 def formfactors_neutrino_sum(
@@ -943,15 +969,17 @@ if __name__ == '__main__':
 
     ff = formfactors_neutrino_sum(mni_vals, ml_vals, rho1_val, alpha13_val, alpha12_val, alpha23_val, lamb12_val, idx_a=1, idx_b=2, k1_val=k1_val, vR_val=vR_val, mHR_val=mHR_val, verbose=True, parallel=True, max_workers=4)
 
-    ALsum = 0
-    ARsum = 0
+    AL_terms = []
+    AR_terms = []
     for interaction, formfactor in ff.items():
         ffL = formfactor['AL']
         ffR = formfactor['AR']
         print('Diagram: ', interaction)
         print(f'AL = {ffL}')
         print(f'AR = {ffR}')
-        ALsum += ffL
-        ARsum += ffR
+        AL_terms.append(ffL)
+        AR_terms.append(ffR)
+    ALsum = mp.fsum(AL_terms)
+    ARsum = mp.fsum(AR_terms)
     #print('ALsum: ', ALsum)
     #print('ARsum: ', ARsum)
