@@ -1,3 +1,0 @@
-mp.dps=80
-B1_0: <class 'mpmath.ctx_mp_python.mpc'> (-13.8155105861393 + 3.46147230419622e-12j)
-C0_: <class 'mpmath.ctx_mp_python.mpc'> (-5.35775556790504e-7 - 1.38764358745064e-19j)

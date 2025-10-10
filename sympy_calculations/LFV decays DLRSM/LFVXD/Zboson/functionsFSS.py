@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Monday Agust 05 2024
+Created on Monday September 15 2025
 
 @author: Moises Zeleny (moiseszeleny@gmail.com)
 
-Functions for the FSV diagram for LFVZD
+Functions for the scalar contribution for mu to e gamma
 """
 from sympy import Function
 from PaVe2 import C0, C1, C2, C00, C11, C12, C22

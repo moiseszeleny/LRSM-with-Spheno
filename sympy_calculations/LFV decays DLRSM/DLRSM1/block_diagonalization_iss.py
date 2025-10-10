@@ -340,26 +340,26 @@ USmni = US.subs(dict_sqrt_muii_MDi).subs(dict_Mii2).subs(dict_muii).subs(dict_Mi
     lambda x:x.factor(deep=True)
 )
 
-GRL = (URmni.T*conjugate(URmni)*(eigenvalsMnu.subs(mNi_changes))*Dagger(ULmni)*conjugate(ULmni)).applyfunc(
-    lambda x:x.factor()
-).replace(
-    sin(epsilon), sin(epsilon)
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
+#GRL = (URmni.T*conjugate(URmni)*(eigenvalsMnu.subs(mNi_changes))*Dagger(ULmni)*conjugate(ULmni)).applyfunc(
+#    lambda x:x.factor()
+#).replace(
+#    sin(epsilon), sin(epsilon)
+#).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
+#    lambda x:x.factor(deep=True)
+#).subs(mns_dummys).simplify().subs(dummys_mns)
 
-GSR = (Dagger(USmni)*conjugate(USmni)*(eigenvalsMnu.subs(mNi_changes))*Dagger(URmni)*conjugate(URmni)).applyfunc(
-    lambda x:x.factor()
-).replace(
-    sin(epsilon), sin(epsilon)
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
+#GSR = (Dagger(USmni)*conjugate(USmni)*(eigenvalsMnu.subs(mNi_changes))*Dagger(URmni)*conjugate(URmni)).applyfunc(
+#    lambda x:x.factor()
+#).replace(
+#    sin(epsilon), sin(epsilon)
+#).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
+#    lambda x:x.factor(deep=True)
+#).subs(mns_dummys).simplify().subs(dummys_mns)
 
-a13, rho1 = symbols(r'\alpha_{13}, \rho_1', positive=True)
+#a13, rho1 = symbols(r'\alpha_{13}, \rho_1', positive=True)
 
-Gamma = (GRL - ((a13)/(2*rho1))*epsilon**2*Dagger(GSR)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
-    lambda x:x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
-)
+#Gamma = (GRL - ((a13)/(2*rho1))*epsilon**2*Dagger(GSR)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
+#    lambda x:x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
+#)
 
-Omega = (Gamma + Gamma.T).applyfunc(lambda x:x.factor())#.replace(epsilon**2,0)
+#Omega = (Gamma + Gamma.T).applyfunc(lambda x:x.factor())#.replace(epsilon**2,0)

@@ -1,111 +1,26 @@
-from sympy import Symbol, init_printing, conjugate, sin, cos, factor, Matrix
+from sympy import Symbol, conjugate, sin, cos, factor, Matrix
 from sympy import lambdify, Symbol, symbols
 from sympy.physics.quantum import Dagger
 from LFVXD.numeric.qcdloop_pv import B1_0, B2_0, B1_1, B2_1, B12_0, C0_, C1_, C2_
+from LFVXD.numeric import qcdloop_pv_wrappers as pv_wrappers
 
 from diagram_v2 import all_diagrams
 from LFVXD.PaVe2 import D as Dim
 
-from DLRSM1.block_diagonalization_iss import ULmni, URmni, USmni, I3, eigenvalsMnu, mNi_changes, mNi
-from DLRSM1.block_diagonalization_iss import dict_Mii2, dict_muii, dict_Mii2_sqrt, dict_sqrt_muii_MDi, dict_Mii, mns_dummys, dummys_mns
-from DLRSM1.block_diagonalization_iss import Unu
+from DLRSM1.mixing_lambdify_iss import QL_lamb, QR_lamb, TRL_lamb, J_lamb, K_lamb, OmegaRL_lamb, OmegaSR_lamb
+#from DLRSM1.block_diagonalization_iss import Unu
 from DLRSM1.potential_senjanovic_HiggsDoublets import epsilon
 
 from DLRSM1.potential_senjanovic_HiggsDoublets import alpha13, alpha12, alpha23, lamb12, rho1, k1, vR, mHR, mH10
 from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import mW1, mW2, g
 
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import QL, QR, TRL, K, J, OmegaRL, OmegaSR, ml, mn, i, j, a, b
-
 from neutrinos import UpmnsStandardParametrization, NuOscObservables
 Nudata = NuOscObservables
 
 import mpmath as mp
 mp.dps = 120; mp.pretty = True
-
-# light neutrino data
-th12,th13,th23 = symbols(r'\theta_{12}, \theta_{13}, \theta_{23}')
-mixing_angles = Nudata().substitutions(th12,th13,th23)
-
-Upmns_val = UpmnsStandardParametrization(th12,th13,th23).subs(mixing_angles)
 ###
-
-URmat = URmni
-URT = URmat.T
-URc = conjugate(URmat)
-URDagger = Dagger(URmat)
-ULmat = ULmni
-ULT = ULmat.T
-ULc = conjugate(ULmat)
-ULDagger = Dagger(ULmat)
-USmat = USmni
-UST = USmat.T
-USc = conjugate(USmat)
-USDagger = Dagger(USmat)
-Vl = I3
-
-eigenvalsMnu = eigenvalsMnu.subs(mNi_changes)
-
-GRLmat = (URT*conjugate(URmat)*(eigenvalsMnu)*ULDagger*ULc).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-
-GSRmat = (USDagger*USc*(eigenvalsMnu)*URDagger*URc).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-
-OmegaRLmat = (GRLmat + GRLmat.T).applyfunc(factor)
-OmegaSRmat = (GSRmat + GSRmat.T).applyfunc(factor)
-
-#Gamma_mat = (GRLmat - ((alpha13)/(2*rho1))*epsilon**2*Dagger(GSRmat)).subs(mns_dummys).simplify().subs(dummys_mns).applyfunc(
-#    lambda x: x.subs(sin(epsilon)**2, epsilon**2).factor(deep=True)
-#)
-
-#Omega_mat = (Gamma_mat + Gamma_mat.T).applyfunc(lambda x:x.expand().collect(rho1, factor))
-
-QLDagger = (ULDagger*Vl).subs(mns_dummys).simplify().subs(dummys_mns)
-QLmat = Dagger(QLDagger).subs(mns_dummys).simplify().subs(dummys_mns)
-
-QRDagger = (URT*Vl).subs(mns_dummys).simplify().subs(dummys_mns)
-QRmat = Dagger(QRDagger).subs(mns_dummys).simplify().subs(dummys_mns)
-
-SRLmat = (QRmat*(eigenvalsMnu)*ULDagger*ULmat).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-
-TRLmat = (URT*URc*(eigenvalsMnu)*QLDagger).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-TRLDagger = Dagger(TRLmat).subs(mns_dummys).simplify().subs(dummys_mns)
-
-TSRmat = (USDagger*USc*(eigenvalsMnu)*URDagger*Vl).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-TSRDagger = Dagger(TSRmat).subs(mns_dummys).simplify().subs(dummys_mns)
-
-Kmat = (SRLmat - epsilon**2*TSRDagger).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-KDagger = Dagger(Kmat).subs(mns_dummys).simplify().subs(dummys_mns)
-
-
-Jmat = (TSRDagger + SRLmat).applyfunc(
-    lambda x:x.factor()
-).subs(dict_Mii2).subs(dict_muii).subs(dict_Mii2_sqrt).applyfunc(
-    lambda x:x.factor(deep=True)
-).subs(mns_dummys).simplify().subs(dummys_mns)
-JDagger = Dagger(Jmat).subs(mns_dummys).simplify().subs(dummys_mns)
 
 # symbolic variables to replace
 mla, mlb, mni, mnj = symbols('m_{l_a}, m_{l_b}, m_{n_i}, m_{n_j}', positive=True)
@@ -233,14 +148,14 @@ symbolic_formfactor = {
 
 # Passarino-Veltman functions definitions
 pv_functions = {
-    'B1_0':B1_0,
-    'B2_0':B2_0,
-    'B1_1':B1_1,
-    'B2_1':B2_1,
-    'B12_0':B12_0,
-    'C0': C0_,
-    'C1': C1_,
-    'C2': C2_
+    'B1_0': pv_wrappers.B1_0,
+    'B2_0': pv_wrappers.B2_0,
+    'B1_1': pv_wrappers.B1_1,
+    'B2_1': pv_wrappers.B2_1,
+    'B12_0': pv_wrappers.B12_0,
+    'C0': pv_wrappers.C0_,
+    'C1': pv_wrappers.C1_,
+    'C2': pv_wrappers.C2_
 }
 
 # Helper map from string keys in _interaction_configs to actual SymPy symbols
@@ -263,31 +178,6 @@ def _create_lambdified_ff_pair(al_expr, ar_expr, arg_symbols_list, pv_funcs_dict
 # Common symbolic arguments for form factors
 _common_ff_args_sym = [mni, mla, mlb]
 _common_ff_args_sym_GL_ninj = [mni, mnj, mla, mlb] # For GL_ninj
-
-# mixing matrix numeric
-Unu_changes = {
-        Unu[i,j]:Upmns_val[i,j] for i in range(3) for j in range(3)
-    }
-
-QL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], QLmat.subs(
-    Unu_changes
-), 'mpmath')
-QR_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], QRmat, 'mpmath')
-TRL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], TRLmat.subs(
-    Unu_changes
-), 'mpmath')
-J_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], Jmat.subs(
-    Unu_changes
-), 'mpmath')
-K_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], Kmat.subs(
-    Unu_changes
-), 'mpmath')
-OmegaRL_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], OmegaRLmat.subs(
-    Unu_changes
-), 'mpmath')
-OmegaSR_lamb = lambdify([epsilon, mNi[3], mNi[4], mNi[5], mNi[6], mNi[7], mNi[8]], OmegaSRmat.subs(
-    Unu_changes
-), 'mpmath')
 
 # Configuration for _calculate_interaction_formfactors
 _interaction_configs = {
@@ -675,6 +565,17 @@ for int_key, config in _interaction_configs.items():
 
 import concurrent.futures
 
+
+def _safe_mpc(x):
+    """Coerce x to mp.mpc, but return 0+0j on NaN/Inf or coercion failure."""
+    try:
+        val = mp.mpc(x)
+        if mp.isnan(mp.re(val)) or mp.isnan(mp.im(val)) or mp.isinf(mp.re(val)) or mp.isinf(mp.im(val)):
+            return mp.mpc(0)
+        return val
+    except Exception:
+        return mp.mpc(0)
+
 def _single_ff_args(args):
     # Unpack all arguments
     (
@@ -781,8 +682,8 @@ def _calculate_interaction_formfactors(
             results = list(executor.map(_single_ff_args, job_args))
         for ffL, ffR in results:
             # Coerce to mpmath complex to avoid mixing Python complex/float types
-            al_terms.append(mp.mpc(ffL))
-            ar_terms.append(mp.mpc(ffR))
+            al_terms.append(_safe_mpc(ffL))
+            ar_terms.append(_safe_mpc(ffR))
     else:
         if interaction_key in two_neutrino_interactions:
             for i, mni_val in enumerate(mni_masses):
@@ -791,16 +692,16 @@ def _calculate_interaction_formfactors(
                         interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
                         ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, (i, j)
                     ))
-                    al_terms.append(mp.mpc(ffL))
-                    ar_terms.append(mp.mpc(ffR))
+                    al_terms.append(_safe_mpc(ffL))
+                    ar_terms.append(_safe_mpc(ffR))
         else:
             for i, mni_val in enumerate(mni_masses):
                 ffL, ffR = _single_ff_args((
                     interaction_key, two_neutrino_interactions, couplings, boson_mass_key, extra_param_keys,
                     ff_AL, ff_AR, matrix_values, param_values, mni_masses, ml_a_val, ml_b_val, a_idx, b_idx, i
                 ))
-                al_terms.append(mp.mpc(ffL))
-                ar_terms.append(mp.mpc(ffR))
+                al_terms.append(_safe_mpc(ffL))
+                ar_terms.append(_safe_mpc(ffR))
     # Sum real and imaginary parts separately with mp.fsum for high-precision, stable complex summation
     if al_terms:
         al_real = [mp.re(x) for x in al_terms]

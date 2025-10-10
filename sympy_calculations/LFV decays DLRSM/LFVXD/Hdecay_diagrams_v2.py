@@ -56,7 +56,7 @@ from .Higgs.functionsVFF import GVFF
 FACTOR_RD: Expr = I / (16 * pi**2)  # Standard 1-loop factor
 
 # Default masses (in GeV) for width calculation
-DEFAULT_HIGGS_MASS: float = 125.18
+DEFAULT_HIGGS_MASS: float = 125.20
 DEFAULT_TAU_MASS: float = 1.777
 DEFAULT_MUON_MASS: float = 0.1057 # GeV
 

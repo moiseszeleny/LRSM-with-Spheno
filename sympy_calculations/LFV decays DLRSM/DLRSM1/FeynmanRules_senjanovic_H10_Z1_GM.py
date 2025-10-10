@@ -299,10 +299,16 @@ interactionsW2m_n_l = lambda i, a: {
 interactionsH10_ll = lambda a: {
     (H10, ladj[a], l[a]): (sqrt2 / k1) * ml[a] * diracPL + (sqrt2 / k1) * ml[a] * diracPR
 }
+#interactionsH10_nn = lambda i, j: {
+#    (H10, n[i], nadj[j]): (
+#        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*epsilon**2*conjugate(OmegaSR[i,j])) * diracPL + 
+#        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*epsilon**2*OmegaSR[i,j]) * diracPR
+#    )
+#}
 interactionsH10_nn = lambda i, j: {
     (H10, n[i], nadj[j]): (
-        (1 / (sqrt2*k1)) * (OmegaRL[i,j] - alpha13/(2*rho1)*epsilon**2*conjugate(OmegaSR[i,j])) * diracPL + 
-        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j]) - alpha13/(2*rho1)*epsilon**2*OmegaSR[i,j]) * diracPR
+        (1 / (sqrt2*k1)) * (OmegaRL[i,j]) * diracPL + 
+        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j])) * diracPR
     )
 }
 ########################################

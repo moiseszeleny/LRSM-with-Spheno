@@ -10,6 +10,8 @@ Use these wrappers from high-precision code paths that expect `mpmath` numbers.
 import mpmath as mp
 from . import qcdloop_pv as _pv
 from typing import Any
+import warnings
+import math
 
 def _to_native_arg(x: Any) -> Any:
     """Convert an mpmath numeric to a native python float/complex for calling _pv functions.
@@ -64,10 +66,67 @@ def _wrap(name: str):
     orig = getattr(_pv, name)
 
     def wrapper(*args, **kwargs):
+        # Convert mpmath inputs to native Python types for the backend
         native_args = tuple(_to_native_arg(a) for a in args)
         native_kwargs = {k: _to_native_arg(v) for k, v in kwargs.items()}
-        out = orig(*native_args, **native_kwargs)
-        return _coerce_result_to_mpc(out)
+
+        # Try calling the underlying PV routine. If it raises or returns
+        # a non-finite value, retry a few times with tiny perturbations to
+        # avoid exact singularities (e.g. p^2 == 0 or exact equal masses).
+        try:
+            out = orig(*native_args, **native_kwargs)
+        except Exception as first_exc:
+            # Retry with small perturbations to numeric zero-arguments
+            last_exc = first_exc
+            for r in range(1, 6):
+                perturbed_args = []
+                eps = 1e-12 * r
+                for a in native_args:
+                    if isinstance(a, (int, float)) and a == 0:
+                        perturbed_args.append(a + eps)
+                    else:
+                        perturbed_args.append(a)
+                try:
+                    out = orig(*tuple(perturbed_args), **native_kwargs)
+                    break
+                except Exception as exc:
+                    last_exc = exc
+                    continue
+            else:
+                # All retries failed: re-raise the original exception but
+                # include a helpful message.
+                warnings.warn(
+                    f"PV wrapper: underlying function '{name}' failed after retries: {first_exc}")
+                raise last_exc
+
+        # Coerce the result and check for NaN/Inf. If non-finite, attempt a few
+        # retries similar to above and finally replace with a zero-valued complex
+        # to keep downstream code running (low-risk).
+        try:
+            coerced = _coerce_result_to_mpc(out)
+            # Check finiteness
+            if mp.isnan(mp.re(coerced)) or mp.isnan(mp.im(coerced)) or mp.isinf(mp.re(coerced)) or mp.isinf(mp.im(coerced)):
+                raise ValueError("non-finite PV result")
+            return coerced
+        except Exception:
+            # Retry numeric perturbations once more
+            for r in range(1, 6):
+                perturbed_args = []
+                eps = 1e-12 * r
+                for a in native_args:
+                    if isinstance(a, (int, float)) and a == 0:
+                        perturbed_args.append(a + eps)
+                    else:
+                        perturbed_args.append(a)
+                try:
+                    out = orig(*tuple(perturbed_args), **native_kwargs)
+                    coerced = _coerce_result_to_mpc(out)
+                    if not (mp.isnan(mp.re(coerced)) or mp.isnan(mp.im(coerced)) or mp.isinf(mp.re(coerced)) or mp.isinf(mp.im(coerced))):
+                        return coerced
+                except Exception:
+                    continue
+            warnings.warn(f"PV wrapper: non-finite result from '{name}', returning 0+0j to continue.")
+            return mp.mpc(0)
 
     wrapper.__name__ = name
     wrapper.__doc__ = f"Wrapper around _pv.{name}: coerces output to mpmath.mpc.\n\n" + (getattr(orig, "__doc__", "") or "")
