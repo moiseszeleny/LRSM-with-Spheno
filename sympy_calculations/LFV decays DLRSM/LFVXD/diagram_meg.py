@@ -1,14 +1,14 @@
 # In this file we construct the scalar and vectorial contributions to mu to e gamma in the DLRSM
 # We use the Feynman rules from the DLRSM1 package
 
-from sympy import pi, sqrt
+from sympy import pi, sqrt, symbols
 
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import interactionsSp_n_l, interactionsSm_n_l
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import interactionsWp_n_l, interactionsWm_n_l, g
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import ml, i, a, b, nadj, n, l, ladj, gamma_mu
 from DLRSM1.FeynmanRules_senjanovic_H10_Z1_GM import mn as MN
 from DLRSM1.dirac import diracPL, diracPR
-from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import W1p, W1m, W2p, W2m,mW1, mW2, k1, mZ1_sym
+from DLRSM1.Gauge_Higgs_senjanovic_HiggsDoublets import W1p, W1m, W2p, W2m, mW1, mW2, k1, mZ1_sym
 from DLRSM1.potential_senjanovic_HiggsDoublets import (
     GLp,
     GLm,
@@ -28,7 +28,8 @@ from LFVXD.vertexes_v2 import VertexSFF, VertexVFF
 F = 1/(16*pi**2)
 
 # electric charge in terms of  mW1, mZ1 and  k1
-e = (2*mW1/k1)*sqrt(1 - mW1**2/mZ1_sym**2)
+#e = symbols('e')# for symbolic compact form
+e = (2*mW1/k1)*sqrt(1 - mW1**2/mZ1_sym**2) # for numerical evaluations
 
 # Define Vertexes for contribution of W1
 cR_Wp_nadji_lb = interactionsWp_n_l(i, b)[(W1p, nadj[i], l[b])].expand().coeff(gamma_mu*diracPR).subs(g,2*mW1/k1)
@@ -118,6 +119,6 @@ symbolic_contribution_meg = {
 symbolic_formfactor_meg = {}
 for contribution in symbolic_contribution_meg:
     symbolic_formfactor_meg[contribution] = {
-        'sigmaL': e*symbolic_contribution_meg[contribution].sigmaL(),
-        'sigmaR': e*symbolic_contribution_meg[contribution].sigmaR()
+        'sigmaL': e*F*symbolic_contribution_meg[contribution].sigmaL(),
+        'sigmaR': e*F*symbolic_contribution_meg[contribution].sigmaR()
     }

@@ -1,5 +1,5 @@
 from sympy import MatrixSymbol, BlockMatrix, ZeroMatrix, Identity, block_collapse
-from sympy import I, sqrt, eye, solve, DiagonalMatrix, symbols, Matrix
+from sympy import I, sqrt, DiagonalMatrix, symbols, Matrix
 from sympy.physics.quantum import Dagger
 
 n = 3
@@ -127,4 +127,4 @@ O = BlockMatrix([
 ])
 U_approx3 = block_collapse(U_approx2*O)
 
-U_approx4 = U_approx3.subs(M,DiagonalMatrix(M)).subs(mu,DiagonalMatrix(mu))
+U_approx4 = U_approx3.subs(M, DiagonalMatrix(M)).subs(mu,DiagonalMatrix(mu))
