@@ -9,6 +9,8 @@ Form factors sigmaL, sigmaR for the mu to e gamma decay
 """
 from .MueGamma.contributionS import HS
 from .MueGamma.contributionV import HV
+from .MueGamma.contributionGV import HGV
+from .MueGamma.contributionVG import HVG
 
 class OneFermionSContribution():
     '''Class for the form factors for S contribution with one fermion in the loop for mu to e gamma decay
@@ -87,7 +89,90 @@ class OneFermionVContribution():
                 + v1.cR*v2.cL*HV(ma, mb, M0, MV, 3)
                 + v1.cR*v2.cR*HV(ma, mb, M0, MV, 4)
                )
+
+class OneFermionGVContribution():
+    '''Class for the form factors for GV contribution with one fermion in the loop for mu to e gamma decay
+    '''
+    def __init__(self, v1, v2, v3, ma, mb, M0, MV):
+        self.v1 = v1
+        self.v2 = v2
+        self.v3 = v3
+        self.ma = ma
+        self.mb = mb
+        self.M0 = M0
+        self.MV = MV
+        self.masas = (ma, mb, M0, MV)
+        self.vertices = [v1, v2, v3]
+
+    def __str__(self):
+        return f'OneFermionGVContribution(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
+
+    def __repr__(self):
+        return self.__str__()
     
+    def sigmaR(self):
+        v1 = self.v1
+        v2 = self.v2
+        v3 = self.v3
+        ma, mb, M0, MV = self.masas
+        return v3.c*(v1.cR*v2.cR*HGV(ma, mb, M0, MV, 1)
+                + v1.cR*v2.cL*HGV(ma, mb, M0, MV, 2)
+                + v1.cL*v2.cR*HGV(ma, mb, M0, MV, 3)
+                + v1.cL*v2.cL*HGV(ma, mb, M0, MV, 4)
+               )
+    
+    def sigmaL(self):
+        v1 = self.v1
+        v2 = self.v2
+        v3 = self.v3
+        ma, mb, M0, MV = self.masas
+        return v3.c*(v1.cL*v2.cL*HGV(ma, mb, M0, MV, 1)
+                + v1.cL*v2.cR*HGV(ma, mb, M0, MV, 2)
+                + v1.cR*v2.cL*HGV(ma, mb, M0, MV, 3)
+                + v1.cR*v2.cR*HGV(ma, mb, M0, MV, 4)
+               )
+
+class OneFermionVGContribution():
+    '''Class for the form factors for VG contribution with one fermion in the loop for mu to e gamma decay
+    '''
+    def __init__(self, v1, v2, v3, ma, mb, M0, MV):
+        self.v1 = v1
+        self.v2 = v2
+        self.v3 = v3
+        self.ma = ma
+        self.mb = mb
+        self.M0 = M0
+        self.MV = MV
+        self.masas = (ma, mb, M0, MV)
+        self.vertices = [v1, v2, v3]
+
+    def __str__(self):
+        return f'OneFermionVGContribution(\n\t{self.v1!r},\n\t{self.v2!r},\n\t{self.v3!r},\n\t{self.masas!r})'
+
+    def __repr__(self):
+        return self.__str__()
+    
+    def sigmaR(self):
+        v1 = self.v1
+        v2 = self.v2
+        v3 = self.v3
+        ma, mb, M0, MV = self.masas
+        return v3.c*(v1.cR*v2.cR*HVG(ma, mb, M0, MV, 1)
+                + v1.cR*v2.cL*HVG(ma, mb, M0, MV, 2)
+                + v1.cL*v2.cR*HVG(ma, mb, M0, MV, 3)
+                + v1.cL*v2.cL*HVG(ma, mb, M0, MV, 4)
+               )
+    
+    def sigmaL(self):
+        v1 = self.v1
+        v2 = self.v2
+        v3 = self.v3
+        ma, mb, M0, MV = self.masas
+        return v3.c*(v1.cL*v2.cL*HVG(ma, mb, M0, MV, 1)
+                + v1.cL*v2.cR*HVG(ma, mb, M0, MV, 2)
+                + v1.cR*v2.cL*HVG(ma, mb, M0, MV, 3)
+                + v1.cR*v2.cR*HVG(ma, mb, M0, MV, 4)
+               )
 
 def width_mu_to_e_gamma(mb, sigmaL, sigmaR):
     '''Width for the mu to e gamma decay

@@ -1,14 +1,28 @@
 # Script to create a LaTeX file with expressions for all
 # form factors for LFV Higgs decays in the DLRSM model
 from symbolic_formfactors import symbolic_formfactor
-from sympy import latex
+from LFVXD.PaVe2 import PaVeFunction
+from sympy import latex, fraction
+
+def PV_factor(exp):
+    """
+    Function to factor out the Passarino-Veltman functions from an expression
+    """
+    pv_functions = exp.atoms(PaVeFunction)
+    factored_exp = exp.factor()
+    num, denom = fraction(factored_exp)
+    collected_pv_num = num.collect(pv_functions, lambda x:x.simplify())
+    denom = denom.simplify()
+    final_exp = collected_pv_num/denom
+    return final_exp
+
 
 def latex_formfactor(formfactors):
     """
     Function to create LaTeX expressions given a specific diagram
     """
-    left_ff = formfactors['AL']
-    right_ff = formfactors['AR']
+    left_ff = PV_factor(formfactors['AL'])
+    right_ff = PV_factor(formfactors['AR'])
 
     # Convert the form factors to LaTeX format
     left_ff_latex = latex(left_ff)

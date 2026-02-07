@@ -271,12 +271,13 @@ TRL = IndexedBase('T_{RL}') # Yukawa-related matrix
 K = IndexedBase('K')        # Yukawa-related matrix
 J = IndexedBase('J')        # Yukawa-related matrix
 OmegaRL = IndexedBase(r'\Omega_{RL}')
+#OmegaRL = IndexedBase(r'\Omega')
 OmegaSR = IndexedBase(r'\Omega_{SR}')
 #Omega = IndexedBase('Omega') # Yukawa-related matrix (neutrino mass matrix)
 ml = IndexedBase(r'm_\ell') # Charged lepton mass (diagonal matrix m_l[a,a] or just m_l[a])
 mn = IndexedBase('mn') # Neutrino mass symbol
 # mn = IndexedBase('m_n') # Neutrino mass (not directly used in these vertices)
-sqrt2 = sqrt(2)
+sqrt2 = 1#sqrt(2)
 
 # 1. W Boson - Lepton Interactions
 # Note: Assuming QL[a,i] means row a, column i (lepton a, neutrino i)
@@ -307,8 +308,8 @@ interactionsH10_ll = lambda a: {
 #}
 interactionsH10_nn = lambda i, j: {
     (H10, n[i], nadj[j]): (
-        (1 / (sqrt2*k1)) * (OmegaRL[i,j]) * diracPL + 
-        (1 / (sqrt2*k1)) * (conjugate(OmegaRL[i,j])) * diracPR
+        (1 / (2*k1)) * (OmegaRL[i,j]) * diracPL + 
+        (1 / (2*k1)) * (conjugate(OmegaRL[i,j])) * diracPR
     )
 }
 ########################################
