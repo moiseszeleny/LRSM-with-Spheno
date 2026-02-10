@@ -1,10 +1,14 @@
-# Ignore all .vscode
-*.vscode
+# Editor settings
+.vscode/
 
-#Ignore pycache generated files
+# Python cache and bytecode
+__pycache__/
 *.pyc
 
-#Ignore extra files
+# Windows zone identifier artifacts
+*:Zone.Identifier
+
+# Project-specific extras
 svm3d.py
 svm3d_cmap.py
 svm3d_cmap_multiclass.py
